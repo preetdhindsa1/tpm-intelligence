@@ -1,0 +1,14 @@
+{
+ "fetched_at": "2026-11-21T21:23:20+00:00",
+ "kep_yaml_path": "keps/sig-storage/6395-dynamic-node-local-ephemeral-volumes/kep.yaml",
+ "note": "Trimmed real data. PR author/reviewer logins replaced by placeholders.",
+ "prs": [
+  143442,
+  143445,
+  143474,
+  143522,
+  143644,
+  143709
+ ],
+ "rest_event_count_2570": 307
+}

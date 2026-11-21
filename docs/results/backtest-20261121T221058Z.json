@@ -1,0 +1,4549 @@
+{
+ "measured_at": "20261121T221058Z",
+ "events": 135588,
+ "seconds": 25.9,
+ "config": {
+  "replications": 20,
+  "sims": 500,
+  "seed": 1338,
+  "interval": [
+   10.0,
+   90.0
+  ]
+ },
+ "results": [
+  {
+   "release": "kubernetes:v1.37",
+   "lead_days": 28,
+   "as_of": "2026-06-25T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.36"
+   ],
+   "n": 89,
+   "landed_share": 0.775,
+   "brier": 0.5,
+   "brier_baseline": 0.1765,
+   "skill": -1.833,
+   "reliability": [
+    [
+     "0.0-0.2",
+     50,
+     0.046,
+     0.7
+    ],
+    [
+     "0.2-0.4",
+     16,
+     0.238,
+     0.875
+    ],
+    [
+     "0.4-0.6",
+     16,
+     0.592,
+     0.875
+    ],
+    [
+     "0.6-0.8",
+     7,
+     0.608,
+     0.857
+    ],
+    [
+     "0.8-1.0",
+     0,
+     null,
+     null
+    ]
+   ],
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1432",
+     "probability": 0.597,
+     "low": 0.534,
+     "high": 0.656,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#1710",
+     "probability": 0.258,
+     "low": 0.224,
+     "high": 0.286,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2021",
+     "probability": 0.602,
+     "low": 0.547,
+     "high": 0.642,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2033",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2371",
+     "probability": 0.598,
+     "low": 0.548,
+     "high": 0.638,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2535",
+     "probability": 0.118,
+     "low": 0.096,
+     "high": 0.142,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2570",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2837",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3257",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "probability": 0.004,
+     "low": 0.0,
+     "high": 0.012,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3721",
+     "probability": 0.033,
+     "low": 0.022,
+     "high": 0.048,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4049",
+     "probability": 0.597,
+     "low": 0.562,
+     "high": 0.65,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "probability": 0.599,
+     "low": 0.544,
+     "high": 0.669,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4188",
+     "probability": 0.61,
+     "low": 0.582,
+     "high": 0.644,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4192",
+     "probability": 0.002,
+     "low": 0.0,
+     "high": 0.004,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4222",
+     "probability": 0.054,
+     "low": 0.032,
+     "high": 0.078,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4317",
+     "probability": 0.08,
+     "low": 0.052,
+     "high": 0.103,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4412",
+     "probability": 0.601,
+     "low": 0.556,
+     "high": 0.657,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4438",
+     "probability": 0.601,
+     "low": 0.555,
+     "high": 0.645,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4568",
+     "probability": 0.582,
+     "low": 0.521,
+     "high": 0.635,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "probability": 0.582,
+     "low": 0.532,
+     "high": 0.634,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4762",
+     "probability": 0.113,
+     "low": 0.08,
+     "high": 0.142,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "probability": 0.006,
+     "low": 0.0,
+     "high": 0.013,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4872",
+     "probability": 0.583,
+     "low": 0.544,
+     "high": 0.622,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4939",
+     "probability": 0.014,
+     "low": 0.0,
+     "high": 0.024,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4951",
+     "probability": 0.202,
+     "low": 0.178,
+     "high": 0.233,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4960",
+     "probability": 0.584,
+     "low": 0.524,
+     "high": 0.625,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5004",
+     "probability": 0.596,
+     "low": 0.536,
+     "high": 0.658,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5030",
+     "probability": 0.595,
+     "low": 0.55,
+     "high": 0.652,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5040",
+     "probability": 0.598,
+     "low": 0.532,
+     "high": 0.653,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5055",
+     "probability": 0.008,
+     "low": 0.002,
+     "high": 0.018,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5207",
+     "probability": 0.046,
+     "low": 0.031,
+     "high": 0.062,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5237",
+     "probability": 0.58,
+     "low": 0.513,
+     "high": 0.648,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5295",
+     "probability": 0.587,
+     "low": 0.538,
+     "high": 0.658,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5303",
+     "probability": 0.222,
+     "low": 0.187,
+     "high": 0.268,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5311",
+     "probability": 0.595,
+     "low": 0.536,
+     "high": 0.652,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5343",
+     "probability": 0.255,
+     "low": 0.222,
+     "high": 0.293,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5366",
+     "probability": 0.245,
+     "low": 0.205,
+     "high": 0.29,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "probability": 0.004,
+     "low": 0.0,
+     "high": 0.01,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "probability": 0.064,
+     "low": 0.046,
+     "high": 0.078,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5495",
+     "probability": 0.603,
+     "low": 0.536,
+     "high": 0.649,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5502",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "probability": 0.283,
+     "low": 0.238,
+     "high": 0.323,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.008,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "probability": 0.03,
+     "low": 0.014,
+     "high": 0.044,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "probability": 0.167,
+     "low": 0.123,
+     "high": 0.214,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5598",
+     "probability": 0.171,
+     "low": 0.131,
+     "high": 0.206,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5677",
+     "probability": 0.623,
+     "low": 0.567,
+     "high": 0.66,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5681",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5683",
+     "probability": 0.262,
+     "low": 0.212,
+     "high": 0.304,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5729",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "probability": 0.005,
+     "low": 0.0,
+     "high": 0.008,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5793",
+     "probability": 0.596,
+     "low": 0.546,
+     "high": 0.647,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5808",
+     "probability": 0.179,
+     "low": 0.142,
+     "high": 0.211,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5823",
+     "probability": 0.596,
+     "low": 0.523,
+     "high": 0.662,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5825",
+     "probability": 0.16,
+     "low": 0.116,
+     "high": 0.198,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5836",
+     "probability": 0.272,
+     "low": 0.239,
+     "high": 0.313,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5855",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "probability": 0.23,
+     "low": 0.169,
+     "high": 0.309,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5936",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.008,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5941",
+     "probability": 0.217,
+     "low": 0.166,
+     "high": 0.282,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5943",
+     "probability": 0.216,
+     "low": 0.174,
+     "high": 0.255,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5945",
+     "probability": 0.244,
+     "low": 0.204,
+     "high": 0.309,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5958",
+     "probability": 0.165,
+     "low": 0.13,
+     "high": 0.204,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5963",
+     "probability": 0.196,
+     "low": 0.159,
+     "high": 0.233,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5966",
+     "probability": 0.204,
+     "low": 0.176,
+     "high": 0.278,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5996",
+     "probability": 0.232,
+     "low": 0.185,
+     "high": 0.275,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5999",
+     "probability": 0.055,
+     "low": 0.033,
+     "high": 0.07,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6030",
+     "probability": 0.173,
+     "low": 0.132,
+     "high": 0.22,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6032",
+     "probability": 0.013,
+     "low": 0.002,
+     "high": 0.024,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6035",
+     "probability": 0.044,
+     "low": 0.033,
+     "high": 0.06,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6063",
+     "probability": 0.146,
+     "low": 0.11,
+     "high": 0.168,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6072",
+     "probability": 0.247,
+     "low": 0.205,
+     "high": 0.298,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6080",
+     "probability": 0.215,
+     "low": 0.173,
+     "high": 0.249,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6089",
+     "probability": 0.052,
+     "low": 0.036,
+     "high": 0.07,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6122",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6132",
+     "probability": 0.002,
+     "low": 0.0,
+     "high": 0.004,
+     "baseline": 0.7272727272727273,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6154",
+     "probability": 0.181,
+     "low": 0.139,
+     "high": 0.229,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6164",
+     "probability": 0.011,
+     "low": 0.004,
+     "high": 0.022,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6178",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#961",
+     "probability": 0.617,
+     "low": 0.587,
+     "high": 0.673,
+     "baseline": 0.7272727272727273,
+     "landed": true
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.37",
+   "lead_days": 14,
+   "as_of": "2026-07-09T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.36"
+   ],
+   "n": 91,
+   "landed_share": 0.769,
+   "brier": 0.5666,
+   "brier_baseline": 0.1949,
+   "skill": -1.907,
+   "reliability": [
+    [
+     "0.0-0.2",
+     70,
+     0.049,
+     0.743
+    ],
+    [
+     "0.2-0.4",
+     4,
+     0.217,
+     0.75
+    ],
+    [
+     "0.4-0.6",
+     0,
+     null,
+     null
+    ],
+    [
+     "0.6-0.8",
+     17,
+     0.649,
+     0.882
+    ],
+    [
+     "0.8-1.0",
+     0,
+     null,
+     null
+    ]
+   ],
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1432",
+     "probability": 0.151,
+     "low": 0.13,
+     "high": 0.181,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#1710",
+     "probability": 0.636,
+     "low": 0.585,
+     "high": 0.685,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2021",
+     "probability": 0.654,
+     "low": 0.588,
+     "high": 0.705,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2033",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2371",
+     "probability": 0.138,
+     "low": 0.117,
+     "high": 0.159,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2535",
+     "probability": 0.048,
+     "low": 0.027,
+     "high": 0.066,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2570",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2837",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3257",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3721",
+     "probability": 0.007,
+     "low": 0.002,
+     "high": 0.016,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4049",
+     "probability": 0.654,
+     "low": 0.612,
+     "high": 0.701,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "probability": 0.653,
+     "low": 0.596,
+     "high": 0.714,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4188",
+     "probability": 0.203,
+     "low": 0.169,
+     "high": 0.239,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4192",
+     "probability": 0.659,
+     "low": 0.612,
+     "high": 0.692,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4222",
+     "probability": 0.016,
+     "low": 0.008,
+     "high": 0.026,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4317",
+     "probability": 0.02,
+     "low": 0.01,
+     "high": 0.029,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4412",
+     "probability": 0.654,
+     "low": 0.614,
+     "high": 0.705,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4438",
+     "probability": 0.142,
+     "low": 0.104,
+     "high": 0.171,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4568",
+     "probability": 0.642,
+     "low": 0.58,
+     "high": 0.688,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "probability": 0.147,
+     "low": 0.121,
+     "high": 0.19,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4762",
+     "probability": 0.04,
+     "low": 0.012,
+     "high": 0.074,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "probability": 0.005,
+     "low": 0.0,
+     "high": 0.014,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4872",
+     "probability": 0.644,
+     "low": 0.607,
+     "high": 0.682,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4939",
+     "probability": 0.017,
+     "low": 0.0,
+     "high": 0.034,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4951",
+     "probability": 0.136,
+     "low": 0.105,
+     "high": 0.165,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4960",
+     "probability": 0.644,
+     "low": 0.592,
+     "high": 0.702,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5004",
+     "probability": 0.644,
+     "low": 0.578,
+     "high": 0.72,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5030",
+     "probability": 0.65,
+     "low": 0.593,
+     "high": 0.71,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5040",
+     "probability": 0.656,
+     "low": 0.596,
+     "high": 0.726,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5055",
+     "probability": 0.059,
+     "low": 0.037,
+     "high": 0.08,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5207",
+     "probability": 0.012,
+     "low": 0.006,
+     "high": 0.018,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5237",
+     "probability": 0.135,
+     "low": 0.102,
+     "high": 0.179,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5295",
+     "probability": 0.637,
+     "low": 0.588,
+     "high": 0.695,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5303",
+     "probability": 0.22,
+     "low": 0.172,
+     "high": 0.263,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5304",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5311",
+     "probability": 0.651,
+     "low": 0.565,
+     "high": 0.717,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "probability": 0.029,
+     "low": 0.008,
+     "high": 0.045,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5343",
+     "probability": 0.628,
+     "low": 0.587,
+     "high": 0.685,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5366",
+     "probability": 0.106,
+     "low": 0.062,
+     "high": 0.141,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "probability": 0.002,
+     "low": 0.0,
+     "high": 0.006,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5495",
+     "probability": 0.654,
+     "low": 0.599,
+     "high": 0.698,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5502",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "probability": 0.104,
+     "low": 0.076,
+     "high": 0.133,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "probability": 0.016,
+     "low": 0.01,
+     "high": 0.022,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5598",
+     "probability": 0.033,
+     "low": 0.02,
+     "high": 0.05,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5677",
+     "probability": 0.148,
+     "low": 0.117,
+     "high": 0.173,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5681",
+     "probability": 0.015,
+     "low": 0.0,
+     "high": 0.029,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5683",
+     "probability": 0.101,
+     "low": 0.076,
+     "high": 0.126,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5729",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5793",
+     "probability": 0.12,
+     "low": 0.089,
+     "high": 0.162,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5808",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5823",
+     "probability": 0.158,
+     "low": 0.12,
+     "high": 0.2,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5825",
+     "probability": 0.09,
+     "low": 0.063,
+     "high": 0.134,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5836",
+     "probability": 0.096,
+     "low": 0.066,
+     "high": 0.124,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5855",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.006,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "probability": 0.221,
+     "low": 0.183,
+     "high": 0.263,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5936",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5941",
+     "probability": 0.136,
+     "low": 0.101,
+     "high": 0.169,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5943",
+     "probability": 0.226,
+     "low": 0.179,
+     "high": 0.271,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5945",
+     "probability": 0.106,
+     "low": 0.08,
+     "high": 0.135,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5958",
+     "probability": 0.103,
+     "low": 0.077,
+     "high": 0.13,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5963",
+     "probability": 0.105,
+     "low": 0.076,
+     "high": 0.139,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5966",
+     "probability": 0.025,
+     "low": 0.013,
+     "high": 0.037,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5996",
+     "probability": 0.134,
+     "low": 0.107,
+     "high": 0.17,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5999",
+     "probability": 0.017,
+     "low": 0.008,
+     "high": 0.026,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6030",
+     "probability": 0.11,
+     "low": 0.079,
+     "high": 0.149,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6032",
+     "probability": 0.007,
+     "low": 0.0,
+     "high": 0.016,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6035",
+     "probability": 0.014,
+     "low": 0.0,
+     "high": 0.023,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6060",
+     "probability": 0.14,
+     "low": 0.108,
+     "high": 0.168,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6063",
+     "probability": 0.065,
+     "low": 0.047,
+     "high": 0.085,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6072",
+     "probability": 0.103,
+     "low": 0.064,
+     "high": 0.131,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6080",
+     "probability": 0.026,
+     "low": 0.014,
+     "high": 0.044,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6089",
+     "probability": 0.017,
+     "low": 0.008,
+     "high": 0.025,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6122",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6132",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6154",
+     "probability": 0.107,
+     "low": 0.08,
+     "high": 0.146,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6164",
+     "probability": 0.095,
+     "low": 0.066,
+     "high": 0.115,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6178",
+     "probability": 0.016,
+     "low": 0.006,
+     "high": 0.028,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#961",
+     "probability": 0.669,
+     "low": 0.63,
+     "high": 0.72,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.37",
+   "lead_days": 7,
+   "as_of": "2026-07-16T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.36"
+   ],
+   "n": 91,
+   "landed_share": 0.769,
+   "brier": 0.5818,
+   "brier_baseline": 0.1949,
+   "skill": -1.985,
+   "reliability": [
+    [
+     "0.0-0.2",
+     74,
+     0.035,
+     0.743
+    ],
+    [
+     "0.2-0.4",
+     0,
+     null,
+     null
+    ],
+    [
+     "0.4-0.6",
+     0,
+     null,
+     null
+    ],
+    [
+     "0.6-0.8",
+     17,
+     0.758,
+     0.882
+    ],
+    [
+     "0.8-1.0",
+     0,
+     null,
+     null
+    ]
+   ],
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1432",
+     "probability": 0.059,
+     "low": 0.039,
+     "high": 0.082,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#1710",
+     "probability": 0.741,
+     "low": 0.686,
+     "high": 0.787,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2021",
+     "probability": 0.767,
+     "low": 0.713,
+     "high": 0.825,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2033",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2371",
+     "probability": 0.011,
+     "low": 0.006,
+     "high": 0.016,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2535",
+     "probability": 0.008,
+     "low": 0.0,
+     "high": 0.016,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2570",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2837",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3257",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3721",
+     "probability": 0.002,
+     "low": 0.0,
+     "high": 0.004,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4049",
+     "probability": 0.766,
+     "low": 0.717,
+     "high": 0.804,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "probability": 0.138,
+     "low": 0.109,
+     "high": 0.164,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4188",
+     "probability": 0.104,
+     "low": 0.082,
+     "high": 0.121,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4192",
+     "probability": 0.767,
+     "low": 0.718,
+     "high": 0.801,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4222",
+     "probability": 0.01,
+     "low": 0.0,
+     "high": 0.019,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4317",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.004,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4412",
+     "probability": 0.17,
+     "low": 0.137,
+     "high": 0.201,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4438",
+     "probability": 0.059,
+     "low": 0.04,
+     "high": 0.083,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4568",
+     "probability": 0.754,
+     "low": 0.705,
+     "high": 0.799,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "probability": 0.054,
+     "low": 0.032,
+     "high": 0.076,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4762",
+     "probability": 0.015,
+     "low": 0.002,
+     "high": 0.03,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4872",
+     "probability": 0.759,
+     "low": 0.729,
+     "high": 0.79,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4939",
+     "probability": 0.029,
+     "low": 0.01,
+     "high": 0.052,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4951",
+     "probability": 0.06,
+     "low": 0.036,
+     "high": 0.076,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4960",
+     "probability": 0.754,
+     "low": 0.7,
+     "high": 0.806,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5004",
+     "probability": 0.754,
+     "low": 0.682,
+     "high": 0.831,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5030",
+     "probability": 0.175,
+     "low": 0.136,
+     "high": 0.209,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5040",
+     "probability": 0.768,
+     "low": 0.71,
+     "high": 0.835,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5055",
+     "probability": 0.013,
+     "low": 0.004,
+     "high": 0.023,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5207",
+     "probability": 0.073,
+     "low": 0.048,
+     "high": 0.096,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5237",
+     "probability": 0.056,
+     "low": 0.028,
+     "high": 0.082,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5295",
+     "probability": 0.747,
+     "low": 0.706,
+     "high": 0.794,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5303",
+     "probability": 0.108,
+     "low": 0.011,
+     "high": 0.178,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5304",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5311",
+     "probability": 0.757,
+     "low": 0.667,
+     "high": 0.813,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "probability": 0.024,
+     "low": 0.009,
+     "high": 0.042,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5343",
+     "probability": 0.738,
+     "low": 0.699,
+     "high": 0.789,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5366",
+     "probability": 0.062,
+     "low": 0.034,
+     "high": 0.096,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "probability": 0.005,
+     "low": 0.002,
+     "high": 0.009,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5495",
+     "probability": 0.764,
+     "low": 0.7,
+     "high": 0.816,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5502",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "probability": 0.066,
+     "low": 0.043,
+     "high": 0.086,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "probability": 0.072,
+     "low": 0.038,
+     "high": 0.1,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5598",
+     "probability": 0.008,
+     "low": 0.002,
+     "high": 0.012,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5677",
+     "probability": 0.05,
+     "low": 0.024,
+     "high": 0.068,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5681",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5683",
+     "probability": 0.766,
+     "low": 0.713,
+     "high": 0.826,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "probability": 0.009,
+     "low": 0.004,
+     "high": 0.018,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5729",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.004,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5793",
+     "probability": 0.768,
+     "low": 0.737,
+     "high": 0.816,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5808",
+     "probability": 0.751,
+     "low": 0.663,
+     "high": 0.821,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5823",
+     "probability": 0.009,
+     "low": 0.002,
+     "high": 0.016,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5825",
+     "probability": 0.041,
+     "low": 0.015,
+     "high": 0.063,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5836",
+     "probability": 0.062,
+     "low": 0.041,
+     "high": 0.079,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5855",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "probability": 0.087,
+     "low": 0.026,
+     "high": 0.153,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5936",
+     "probability": 0.067,
+     "low": 0.048,
+     "high": 0.08,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5941",
+     "probability": 0.069,
+     "low": 0.037,
+     "high": 0.101,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5943",
+     "probability": 0.105,
+     "low": 0.046,
+     "high": 0.171,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5945",
+     "probability": 0.06,
+     "low": 0.038,
+     "high": 0.091,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5958",
+     "probability": 0.054,
+     "low": 0.038,
+     "high": 0.075,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5963",
+     "probability": 0.056,
+     "low": 0.03,
+     "high": 0.073,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5966",
+     "probability": 0.097,
+     "low": 0.051,
+     "high": 0.134,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5996",
+     "probability": 0.084,
+     "low": 0.068,
+     "high": 0.103,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5999",
+     "probability": 0.005,
+     "low": 0.0,
+     "high": 0.01,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6030",
+     "probability": 0.07,
+     "low": 0.038,
+     "high": 0.1,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6032",
+     "probability": 0.008,
+     "low": 0.0,
+     "high": 0.022,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6035",
+     "probability": 0.01,
+     "low": 0.0,
+     "high": 0.018,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6060",
+     "probability": 0.061,
+     "low": 0.034,
+     "high": 0.083,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6063",
+     "probability": 0.027,
+     "low": 0.006,
+     "high": 0.056,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6072",
+     "probability": 0.058,
+     "low": 0.032,
+     "high": 0.086,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6080",
+     "probability": 0.005,
+     "low": 0.002,
+     "high": 0.01,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6089",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.006,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6122",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6132",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.9012345679012346,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6154",
+     "probability": 0.066,
+     "low": 0.04,
+     "high": 0.092,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6164",
+     "probability": 0.024,
+     "low": 0.012,
+     "high": 0.032,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6178",
+     "probability": 0.007,
+     "low": 0.0,
+     "high": 0.012,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#961",
+     "probability": 0.773,
+     "low": 0.732,
+     "high": 0.829,
+     "baseline": 0.9012345679012346,
+     "landed": true
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.38",
+   "lead_days": 28,
+   "as_of": "2026-10-20T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.36",
+    "kubernetes:v1.37"
+   ],
+   "n": 86,
+   "landed_share": 0.721,
+   "brier": 0.5339,
+   "brier_baseline": 0.2016,
+   "skill": -1.648,
+   "reliability": [
+    [
+     "0.0-0.2",
+     54,
+     0.044,
+     0.704
+    ],
+    [
+     "0.2-0.4",
+     22,
+     0.23,
+     0.682
+    ],
+    [
+     "0.4-0.6",
+     2,
+     0.589,
+     1.0
+    ],
+    [
+     "0.6-0.8",
+     8,
+     0.604,
+     0.875
+    ],
+    [
+     "0.8-1.0",
+     0,
+     null,
+     null
+    ]
+   ],
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1979",
+     "probability": 0.214,
+     "low": 0.184,
+     "high": 0.252,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2172",
+     "probability": 0.117,
+     "low": 0.089,
+     "high": 0.143,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2371",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2570",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2837",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3104",
+     "probability": 0.026,
+     "low": 0.014,
+     "high": 0.04,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3157",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "probability": 0.223,
+     "low": 0.192,
+     "high": 0.246,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3953",
+     "probability": 0.014,
+     "low": 0.008,
+     "high": 0.02,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4006",
+     "probability": 0.012,
+     "low": 0.008,
+     "high": 0.018,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4438",
+     "probability": 0.034,
+     "low": 0.02,
+     "high": 0.049,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4443",
+     "probability": 0.223,
+     "low": 0.184,
+     "high": 0.286,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "probability": 0.077,
+     "low": 0.056,
+     "high": 0.098,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4815",
+     "probability": 0.03,
+     "low": 0.018,
+     "high": 0.046,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4858",
+     "probability": 0.004,
+     "low": 0.0,
+     "high": 0.008,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4885",
+     "probability": 0.601,
+     "low": 0.573,
+     "high": 0.644,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4939",
+     "probability": 0.603,
+     "low": 0.553,
+     "high": 0.654,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4958",
+     "probability": 0.215,
+     "low": 0.176,
+     "high": 0.264,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4960",
+     "probability": 0.198,
+     "low": 0.163,
+     "high": 0.227,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5007",
+     "probability": 0.194,
+     "low": 0.176,
+     "high": 0.231,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5075",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5237",
+     "probability": 0.588,
+     "low": 0.556,
+     "high": 0.636,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5359",
+     "probability": 0.229,
+     "low": 0.203,
+     "high": 0.25,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5365",
+     "probability": 0.155,
+     "low": 0.12,
+     "high": 0.202,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5419",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5440",
+     "probability": 0.063,
+     "low": 0.05,
+     "high": 0.074,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "probability": 0.029,
+     "low": 0.019,
+     "high": 0.044,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5502",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "probability": 0.007,
+     "low": 0.002,
+     "high": 0.012,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "probability": 0.023,
+     "low": 0.012,
+     "high": 0.038,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5677",
+     "probability": 0.605,
+     "low": 0.572,
+     "high": 0.631,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5683",
+     "probability": 0.606,
+     "low": 0.578,
+     "high": 0.641,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5690",
+     "probability": 0.607,
+     "low": 0.566,
+     "high": 0.642,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.006,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5714",
+     "probability": 0.191,
+     "low": 0.17,
+     "high": 0.204,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5793",
+     "probability": 0.28,
+     "low": 0.241,
+     "high": 0.318,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5823",
+     "probability": 0.04,
+     "low": 0.027,
+     "high": 0.059,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5825",
+     "probability": 0.011,
+     "low": 0.004,
+     "high": 0.016,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5836",
+     "probability": 0.289,
+     "low": 0.258,
+     "high": 0.327,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5855",
+     "probability": 0.009,
+     "low": 0.002,
+     "high": 0.017,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5866",
+     "probability": 0.006,
+     "low": 0.002,
+     "high": 0.01,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "probability": 0.161,
+     "low": 0.131,
+     "high": 0.189,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5905",
+     "probability": 0.228,
+     "low": 0.179,
+     "high": 0.292,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5922",
+     "probability": 0.198,
+     "low": 0.167,
+     "high": 0.224,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5936",
+     "probability": 0.182,
+     "low": 0.149,
+     "high": 0.208,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5941",
+     "probability": 0.026,
+     "low": 0.013,
+     "high": 0.034,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5945",
+     "probability": 0.589,
+     "low": 0.558,
+     "high": 0.626,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5972",
+     "probability": 0.01,
+     "low": 0.004,
+     "high": 0.016,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5981",
+     "probability": 0.011,
+     "low": 0.0,
+     "high": 0.022,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5996",
+     "probability": 0.602,
+     "low": 0.565,
+     "high": 0.627,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5999",
+     "probability": 0.605,
+     "low": 0.568,
+     "high": 0.631,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6003",
+     "probability": 0.004,
+     "low": 0.0,
+     "high": 0.01,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6007",
+     "probability": 0.053,
+     "low": 0.04,
+     "high": 0.064,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6011",
+     "probability": 0.216,
+     "low": 0.181,
+     "high": 0.246,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6030",
+     "probability": 0.062,
+     "low": 0.042,
+     "high": 0.076,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6032",
+     "probability": 0.167,
+     "low": 0.144,
+     "high": 0.193,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6058",
+     "probability": 0.004,
+     "low": 0.0,
+     "high": 0.008,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6060",
+     "probability": 0.009,
+     "low": 0.006,
+     "high": 0.012,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6061",
+     "probability": 0.02,
+     "low": 0.014,
+     "high": 0.03,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6063",
+     "probability": 0.005,
+     "low": 0.0,
+     "high": 0.012,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6080",
+     "probability": 0.034,
+     "low": 0.018,
+     "high": 0.046,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6089",
+     "probability": 0.23,
+     "low": 0.204,
+     "high": 0.253,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6132",
+     "probability": 0.013,
+     "low": 0.008,
+     "high": 0.02,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6232",
+     "probability": 0.034,
+     "low": 0.022,
+     "high": 0.051,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6247",
+     "probability": 0.213,
+     "low": 0.165,
+     "high": 0.264,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6252",
+     "probability": 0.226,
+     "low": 0.193,
+     "high": 0.268,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6264",
+     "probability": 0.221,
+     "low": 0.196,
+     "high": 0.255,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6268",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6276",
+     "probability": 0.228,
+     "low": 0.196,
+     "high": 0.252,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6283",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.006,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6313",
+     "probability": 0.272,
+     "low": 0.243,
+     "high": 0.313,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6315",
+     "probability": 0.228,
+     "low": 0.198,
+     "high": 0.25,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6318",
+     "probability": 0.14,
+     "low": 0.125,
+     "high": 0.154,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6356",
+     "probability": 0.229,
+     "low": 0.198,
+     "high": 0.274,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6361",
+     "probability": 0.219,
+     "low": 0.186,
+     "high": 0.258,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6371",
+     "probability": 0.217,
+     "low": 0.164,
+     "high": 0.255,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6386",
+     "probability": 0.235,
+     "low": 0.199,
+     "high": 0.266,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6395",
+     "probability": 0.212,
+     "low": 0.174,
+     "high": 0.26,
+     "baseline": 0.700507614213198,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6404",
+     "probability": 0.605,
+     "low": 0.561,
+     "high": 0.643,
+     "baseline": 0.700507614213198,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6406",
+     "probability": 0.203,
+     "low": 0.15,
+     "high": 0.283,
+     "baseline": 0.700507614213198,
+     "landed": true
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.38",
+   "lead_days": 14,
+   "as_of": "2026-11-03T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.36",
+    "kubernetes:v1.37"
+   ],
+   "n": 87,
+   "landed_share": 0.724,
+   "brier": 0.5422,
+   "brier_baseline": 0.2113,
+   "skill": -1.567,
+   "reliability": [
+    [
+     "0.0-0.2",
+     74,
+     0.054,
+     0.676
+    ],
+    [
+     "0.2-0.4",
+     2,
+     0.238,
+     1.0
+    ],
+    [
+     "0.4-0.6",
+     0,
+     null,
+     null
+    ],
+    [
+     "0.6-0.8",
+     11,
+     0.683,
+     1.0
+    ],
+    [
+     "0.8-1.0",
+     0,
+     null,
+     null
+    ]
+   ],
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1979",
+     "probability": 0.162,
+     "low": 0.102,
+     "high": 0.221,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2172",
+     "probability": 0.035,
+     "low": 0.02,
+     "high": 0.046,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2371",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2570",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2837",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3104",
+     "probability": 0.031,
+     "low": 0.017,
+     "high": 0.052,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3157",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "probability": 0.116,
+     "low": 0.102,
+     "high": 0.137,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3953",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4006",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4438",
+     "probability": 0.022,
+     "low": 0.008,
+     "high": 0.035,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4443",
+     "probability": 0.124,
+     "low": 0.104,
+     "high": 0.152,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "probability": 0.676,
+     "low": 0.644,
+     "high": 0.718,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "probability": 0.008,
+     "low": 0.004,
+     "high": 0.012,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4815",
+     "probability": 0.005,
+     "low": 0.0,
+     "high": 0.008,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4858",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4885",
+     "probability": 0.686,
+     "low": 0.651,
+     "high": 0.722,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4939",
+     "probability": 0.686,
+     "low": 0.642,
+     "high": 0.733,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4958",
+     "probability": 0.161,
+     "low": 0.107,
+     "high": 0.211,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4960",
+     "probability": 0.044,
+     "low": 0.028,
+     "high": 0.058,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5007",
+     "probability": 0.128,
+     "low": 0.108,
+     "high": 0.154,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5075",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5237",
+     "probability": 0.675,
+     "low": 0.625,
+     "high": 0.733,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5359",
+     "probability": 0.118,
+     "low": 0.096,
+     "high": 0.15,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5365",
+     "probability": 0.018,
+     "low": 0.011,
+     "high": 0.028,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5419",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5440",
+     "probability": 0.014,
+     "low": 0.004,
+     "high": 0.026,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "probability": 0.005,
+     "low": 0.0,
+     "high": 0.012,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "probability": 0.004,
+     "low": 0.0,
+     "high": 0.008,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5502",
+     "probability": 0.068,
+     "low": 0.05,
+     "high": 0.092,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "probability": 0.127,
+     "low": 0.098,
+     "high": 0.156,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5677",
+     "probability": 0.143,
+     "low": 0.123,
+     "high": 0.167,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5681",
+     "probability": 0.113,
+     "low": 0.091,
+     "high": 0.138,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5683",
+     "probability": 0.147,
+     "low": 0.118,
+     "high": 0.183,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5690",
+     "probability": 0.061,
+     "low": 0.048,
+     "high": 0.076,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5714",
+     "probability": 0.041,
+     "low": 0.026,
+     "high": 0.061,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5793",
+     "probability": 0.697,
+     "low": 0.652,
+     "high": 0.729,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5823",
+     "probability": 0.009,
+     "low": 0.004,
+     "high": 0.014,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5825",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.01,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5836",
+     "probability": 0.132,
+     "low": 0.101,
+     "high": 0.159,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5855",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5866",
+     "probability": 0.684,
+     "low": 0.635,
+     "high": 0.731,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "probability": 0.059,
+     "low": 0.038,
+     "high": 0.076,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5905",
+     "probability": 0.181,
+     "low": 0.117,
+     "high": 0.261,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5922",
+     "probability": 0.681,
+     "low": 0.632,
+     "high": 0.734,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5936",
+     "probability": 0.122,
+     "low": 0.094,
+     "high": 0.15,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5941",
+     "probability": 0.024,
+     "low": 0.016,
+     "high": 0.04,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5945",
+     "probability": 0.672,
+     "low": 0.642,
+     "high": 0.719,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5972",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5981",
+     "probability": 0.007,
+     "low": 0.0,
+     "high": 0.016,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5996",
+     "probability": 0.193,
+     "low": 0.152,
+     "high": 0.226,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5999",
+     "probability": 0.683,
+     "low": 0.655,
+     "high": 0.713,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6003",
+     "probability": 0.005,
+     "low": 0.0,
+     "high": 0.012,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6007",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.006,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6011",
+     "probability": 0.127,
+     "low": 0.094,
+     "high": 0.163,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6030",
+     "probability": 0.011,
+     "low": 0.002,
+     "high": 0.026,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6032",
+     "probability": 0.679,
+     "low": 0.643,
+     "high": 0.712,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6058",
+     "probability": 0.006,
+     "low": 0.0,
+     "high": 0.014,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6060",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.006,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6061",
+     "probability": 0.02,
+     "low": 0.01,
+     "high": 0.04,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6063",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6080",
+     "probability": 0.005,
+     "low": 0.0,
+     "high": 0.008,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6089",
+     "probability": 0.114,
+     "low": 0.086,
+     "high": 0.144,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6132",
+     "probability": 0.045,
+     "low": 0.026,
+     "high": 0.057,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6232",
+     "probability": 0.023,
+     "low": 0.008,
+     "high": 0.036,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6247",
+     "probability": 0.157,
+     "low": 0.083,
+     "high": 0.218,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6252",
+     "probability": 0.139,
+     "low": 0.116,
+     "high": 0.159,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6264",
+     "probability": 0.162,
+     "low": 0.135,
+     "high": 0.19,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6268",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6276",
+     "probability": 0.131,
+     "low": 0.107,
+     "high": 0.152,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6283",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6313",
+     "probability": 0.03,
+     "low": 0.016,
+     "high": 0.042,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6315",
+     "probability": 0.22,
+     "low": 0.196,
+     "high": 0.239,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6318",
+     "probability": 0.043,
+     "low": 0.022,
+     "high": 0.061,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6356",
+     "probability": 0.116,
+     "low": 0.088,
+     "high": 0.157,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6361",
+     "probability": 0.256,
+     "low": 0.232,
+     "high": 0.278,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6371",
+     "probability": 0.158,
+     "low": 0.09,
+     "high": 0.213,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6386",
+     "probability": 0.171,
+     "low": 0.114,
+     "high": 0.222,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6395",
+     "probability": 0.02,
+     "low": 0.009,
+     "high": 0.031,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6404",
+     "probability": 0.095,
+     "low": 0.074,
+     "high": 0.121,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6406",
+     "probability": 0.693,
+     "low": 0.65,
+     "high": 0.723,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.38",
+   "lead_days": 7,
+   "as_of": "2026-11-10T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.36",
+    "kubernetes:v1.37"
+   ],
+   "n": 87,
+   "landed_share": 0.724,
+   "brier": 0.5318,
+   "brier_baseline": 0.2113,
+   "skill": -1.517,
+   "reliability": [
+    [
+     "0.0-0.2",
+     74,
+     0.04,
+     0.676
+    ],
+    [
+     "0.2-0.4",
+     0,
+     null,
+     null
+    ],
+    [
+     "0.4-0.6",
+     0,
+     null,
+     null
+    ],
+    [
+     "0.6-0.8",
+     13,
+     0.764,
+     1.0
+    ],
+    [
+     "0.8-1.0",
+     0,
+     null,
+     null
+    ]
+   ],
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1979",
+     "probability": 0.044,
+     "low": 0.008,
+     "high": 0.098,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2172",
+     "probability": 0.003,
+     "low": 0.0,
+     "high": 0.01,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2371",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2570",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2837",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3104",
+     "probability": 0.016,
+     "low": 0.004,
+     "high": 0.03,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3157",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "probability": 0.768,
+     "low": 0.729,
+     "high": 0.808,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3953",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.004,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4006",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4438",
+     "probability": 0.017,
+     "low": 0.0,
+     "high": 0.03,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4443",
+     "probability": 0.767,
+     "low": 0.732,
+     "high": 0.81,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "probability": 0.758,
+     "low": 0.721,
+     "high": 0.783,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4815",
+     "probability": 0.015,
+     "low": 0.006,
+     "high": 0.026,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4858",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4885",
+     "probability": 0.771,
+     "low": 0.742,
+     "high": 0.82,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4939",
+     "probability": 0.155,
+     "low": 0.122,
+     "high": 0.181,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4958",
+     "probability": 0.047,
+     "low": 0.006,
+     "high": 0.098,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4960",
+     "probability": 0.066,
+     "low": 0.044,
+     "high": 0.094,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5007",
+     "probability": 0.765,
+     "low": 0.722,
+     "high": 0.806,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5075",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5237",
+     "probability": 0.153,
+     "low": 0.122,
+     "high": 0.182,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5359",
+     "probability": 0.078,
+     "low": 0.055,
+     "high": 0.099,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5365",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5419",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5440",
+     "probability": 0.005,
+     "low": 0.0,
+     "high": 0.009,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "probability": 0.012,
+     "low": 0.002,
+     "high": 0.024,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5502",
+     "probability": 0.763,
+     "low": 0.729,
+     "high": 0.802,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "probability": 0.082,
+     "low": 0.056,
+     "high": 0.103,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "probability": 0.001,
+     "low": 0.0,
+     "high": 0.002,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5677",
+     "probability": 0.076,
+     "low": 0.056,
+     "high": 0.094,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5681",
+     "probability": 0.057,
+     "low": 0.036,
+     "high": 0.07,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5683",
+     "probability": 0.083,
+     "low": 0.056,
+     "high": 0.119,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5690",
+     "probability": 0.004,
+     "low": 0.0,
+     "high": 0.006,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5714",
+     "probability": 0.104,
+     "low": 0.087,
+     "high": 0.126,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "probability": 0.078,
+     "low": 0.065,
+     "high": 0.093,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5793",
+     "probability": 0.134,
+     "low": 0.115,
+     "high": 0.148,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5823",
+     "probability": 0.002,
+     "low": 0.0,
+     "high": 0.004,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5825",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5836",
+     "probability": 0.086,
+     "low": 0.066,
+     "high": 0.101,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5855",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5866",
+     "probability": 0.767,
+     "low": 0.719,
+     "high": 0.812,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "probability": 0.029,
+     "low": 0.015,
+     "high": 0.048,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5905",
+     "probability": 0.037,
+     "low": 0.008,
+     "high": 0.069,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5922",
+     "probability": 0.764,
+     "low": 0.711,
+     "high": 0.815,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5936",
+     "probability": 0.747,
+     "low": 0.702,
+     "high": 0.789,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5941",
+     "probability": 0.021,
+     "low": 0.01,
+     "high": 0.032,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5945",
+     "probability": 0.121,
+     "low": 0.086,
+     "high": 0.156,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5972",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5981",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5996",
+     "probability": 0.099,
+     "low": 0.086,
+     "high": 0.12,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5999",
+     "probability": 0.159,
+     "low": 0.139,
+     "high": 0.182,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6003",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6007",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6011",
+     "probability": 0.092,
+     "low": 0.07,
+     "high": 0.109,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6030",
+     "probability": 0.767,
+     "low": 0.735,
+     "high": 0.796,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6032",
+     "probability": 0.764,
+     "low": 0.722,
+     "high": 0.804,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6058",
+     "probability": 0.198,
+     "low": 0.168,
+     "high": 0.231,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6060",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6061",
+     "probability": 0.011,
+     "low": 0.004,
+     "high": 0.02,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6063",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6080",
+     "probability": 0.002,
+     "low": 0.0,
+     "high": 0.006,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6089",
+     "probability": 0.764,
+     "low": 0.744,
+     "high": 0.794,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6132",
+     "probability": 0.009,
+     "low": 0.0,
+     "high": 0.018,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6232",
+     "probability": 0.02,
+     "low": 0.004,
+     "high": 0.032,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6247",
+     "probability": 0.172,
+     "low": 0.148,
+     "high": 0.196,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6252",
+     "probability": 0.094,
+     "low": 0.072,
+     "high": 0.11,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6264",
+     "probability": 0.034,
+     "low": 0.016,
+     "high": 0.053,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6268",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6276",
+     "probability": 0.072,
+     "low": 0.052,
+     "high": 0.091,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6283",
+     "probability": 0.0,
+     "low": 0.0,
+     "high": 0.0,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6313",
+     "probability": 0.007,
+     "low": 0.002,
+     "high": 0.014,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6315",
+     "probability": 0.109,
+     "low": 0.085,
+     "high": 0.136,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6318",
+     "probability": 0.009,
+     "low": 0.0,
+     "high": 0.019,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6356",
+     "probability": 0.06,
+     "low": 0.044,
+     "high": 0.079,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6361",
+     "probability": 0.018,
+     "low": 0.01,
+     "high": 0.032,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6371",
+     "probability": 0.006,
+     "low": 0.002,
+     "high": 0.009,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6386",
+     "probability": 0.023,
+     "low": 0.012,
+     "high": 0.034,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6395",
+     "probability": 0.102,
+     "low": 0.078,
+     "high": 0.124,
+     "baseline": 0.8313953488372093,
+     "landed": false
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6404",
+     "probability": 0.769,
+     "low": 0.733,
+     "high": 0.805,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6406",
+     "probability": 0.121,
+     "low": 0.102,
+     "high": 0.151,
+     "baseline": 0.8313953488372093,
+     "landed": true
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,29 @@
+{
+ "body": "# Enhancement Description\n- One-line enhancement description (can be used as a release note): Support memory qos with cgroups v2\n- Kubernetes Enhancement Proposal: https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/2570-memory-qos\n- Discussion Link: <!-- link to SIG mailing list thread, meeting, or recording where the Enhancement was discussed before KEP creation --> https://docs.google.com/document/d/1r9Fx2omdMLP8SJ59np-C6uBqeuS4TSbQc5ChmQWMYJ8/edit?usp=sharing\n- Primary contact (assignee): @xiaoxubeii @QiWang19 @sohankunkerkar\n- Responsible SIGs: node\n- Enhancement target (which target equals to which milestone):\n  - Alpha1 release target (x.y): v1.22\n  - Alpha2 release target (x.y): v1.27\n  - Alpha3 release target (x.y): v1.36\n  - Beta release target (x.y): blocked for https://docs.google.com/document/d/1mY0MTT34P-Eyv5G1t_Pqs4OWyIH-cg9caRKWmqYlSbI/edit?usp=sharing \n  - Stable release target (x.y):\n- [x] Alpha1\n  - [x] KEP (`k/enhancements`) update PR(s): \n    - #2571 \n  - [x] Code (`k/k`) update PR(s): \n    - kubernetes/kubernetes#102578 \n    - kubernetes/kubernetes/pull/102970\n  - [x] Docs (`k/website`) update PR(s): \n    - https://github.com/kubernetes/website/pull/28566\n- [x] Alpha2\n  - [x] KEP (`k/enhancements`) update PR(s): \n    - https://github.com/kubernetes/enhancements/pull/3818 \n  - [x] Code (`k/k`) update PR(s): \n    - https://github.com/kubernetes/kubernetes/pull/115371\n  - [x] Docs (`k/website`) update PR(s): \n    - https://github.com/kubernetes/website/pull/39853\n    - https://github.com/kubernetes/website/pull/43183\n- [x] Alpha3 1.36\n  - [x] KEP (`k/enhancements`) update PR(s): \n    - https://github.com/kubernetes/enhancements/pull/5879\n  - [x] Code (`k/k`) update PR(s): \n    - https://github.com/kubernetes/kubernetes/pull/137584\n    - https://github.com/kubernetes/kubernetes/pull/137637\n    - https://github.com/kubernetes/kubernetes/pull/137719\n    - https://github.com/kubernetes/kubernetes/pull/137889\n  - [x] Docs (`k/website`) update PR(s): \n    - https://github.com/kubernetes/website/pull/54577\n    - https://github.com/kubernetes/website/pull/54417\n    - https://github.com/kubernetes/website/pull/55257\n- [x] Beta 1.37\n  - [x] KEP (`k/enhancements`) update PR(s): \n    - https://github.com/kubernetes/enhancements/pull/6143\n    - https://github.com/kubernetes/enhancements/pull/6216\n  - [x] Code (`k/k`) update PR(s): \n    - https://github.com/kubernetes/kubernetes/pull/139377\n    - https://github.com/kubernetes/kubernetes/pull/138903\n    - https://github.com/kubernetes/kubernetes/pull/139530\n  - [x] Docs (`k/website`) update PR(s): \n    - [x] https://github.com/kubernetes/website/pull/56261\n    - [x] https://github.com/kubernetes/website/pull/56283\n- [x] Beta2 1.38\n  - [x] KEP (`k/enhancements`) update PR(s): \n    - [x] https://github.com/kubernetes/enhancements/pull/6322\n    - [x] https://github.com/kubernetes/enhancements/pull/6362\n  - [ ] Code (`k/k`) update PR(s): \n    - [x] https://github.com/kubernetes/kubernetes/pull/142854\n    - [x] https://github.com/kubernetes/kubernetes/pull/141287\n  - [ ] Docs (`k/website`) update PR(s): ",
+ "closed_at": null,
+ "created_at": "2021-03-14T11:23:50Z",
+ "html_url": "https://github.com/kubernetes/enhancements/issues/2570",
+ "labels": [
+  {
+   "name": "sig/node"
+  },
+  {
+   "name": "stage/beta"
+  },
+  {
+   "name": "tracked/yes"
+  },
+  {
+   "name": "lead-opted-in"
+  }
+ ],
+ "milestone": {
+  "number": 40,
+  "title": "v1.38"
+ },
+ "number": 2570,
+ "state": "open",
+ "state_reason": "reopened",
+ "title": "Support memory qos with cgroups v2",
+ "updated_at": "2026-11-21T04:15:38Z"
+}

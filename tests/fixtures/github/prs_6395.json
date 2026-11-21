@@ -1,0 +1,2408 @@
+[
+ {
+  "author": {
+   "login": "user-1"
+  },
+  "baseRefName": "master",
+  "body": "<!--  Thanks for sending a pull request!  Here are some tips for you:\r\n\r\n1. If this is your first time, please read our contributor guidelines: https://git.k8s.io/community/contributors/guide/first-contribution.md#your-first-contribution and developer guide https://git.k8s.io/community/contributors/devel/development.md#development-guide\r\n2. Please label this pull request according to what type of issue you are addressing, especially if this is a release targeted pull request. For reference on required PR/issue labels, read here:\r\nhttps://git.k8s.io/community/contributors/devel/sig-release/release.md#issuepr-kind-label\r\n3. Ensure you have added or ran the appropriate tests for your PR: https://git.k8s.io/community/contributors/devel/sig-testing/testing.md\r\n4. If you want *faster* PR reviews, read how: https://git.k8s.io/community/contributors/guide/pull-requests.md#best-practices-for-faster-reviews\r\n5. If the PR is unfinished, see how to mark it: https://git.k8s.io/community/contributors/guide/pull-requests.md#marking-unfinished-pull-requests\r\n-->\r\n\r\n#### What type of PR is this?\r\n\r\n<!--\r\nAdd one of the following kinds:\r\n/kind bug\r\n/kind dependency\r\n/kind cleanup\r\n/kind documentation\r\n/kind feature\r\n\r\nOptionally add one or more of the following kinds if applicable:\r\n/kind api-change\r\n/kind deprecation\r\n/kind failing-test\r\n/kind flake\r\n/kind regression\r\n-->\r\n\r\n/kind feature\r\n\r\n#### What this PR does / why we need it:\r\n\r\n1. Add a `VolumeMounts` label: `io.kubernetes.container.volumeMounts`\r\n2. Use this to populate `containerStatus.volumeMounts`\r\n\r\nThis is prework for [dynamic node-local ephemeral volumes](https://github.com/kubernetes/enhancements/issues/6395). \r\n\r\nToday the CRI `Mount` does *not* store the volume name or subpath. Kubelet works around this by copying podSpec fields into `containerStatuses.volumeMounts`, and then assuming they are immutable for the rest of the pod lifecycle. This assumption will break with dynamic containers and dynamic volumes.\r\n\r\nInspired by the pattern of https://github.com/kubernetes/kubernetes/pull/143359, this PR serializes the container's `volumeMounts` into a CRI container annotation to use for bookkeeping. Then, the kubelet can compute `containerStatuses.volumeMounts` directly from the runtime container's status. \r\n\r\nAn alternative could be for Kubelet to checkpoint the volumeMount status into its actuation checkpoint, but the mechanism proposed in this PR feels cleaner and less complex. This PR also has synergy with https://github.com/kubernetes/kubernetes/pull/143359; using the CRI allows us to populate `volumeMounts` in the container statuses for missing containers not in the podspec.\r\n\r\n#### Which issue(s) this PR is related to:\r\n<!--\r\nPlease link relevant issues to help with tracking.\r\n\r\nTo automatically close the linked issue(s) when this PR is merged,\r\nadd the word \"Fixes\" before the issue number or link.\r\nDo not use \"Fixes\" if the PR is of kind `failing-test` or `flake`.\r\n\r\nReference KEPs when applicable in addition to specific issues.\r\n\r\nExamples:\r\nFixes #<issue number>\r\n<issue link> (issue in a different repository)\r\nKEP: https://github.com/kubernetes/enhancements/issues/<kep-issue-number>\r\n\r\nIf there is no associated issue, then write \"N/A\".\r\n-->\r\n\r\nhttps://github.com/kubernetes/enhancements/issues/6395\r\n\r\n#### Special notes for your reviewer:\r\n\r\nLike https://github.com/kubernetes/kubernetes/pull/143359, I don't think this requires a feature gate, but I can tie it to the Dynamic Node-Local Ephemeral Volumes feature gate if needed.\r\n\r\n#### Does this PR introduce a user-facing change?\r\n<!--\r\nIf no, just write \"NONE\" in the release-note block below.\r\nIf yes, a release note is required:\r\nEnter your extended release note in the block below. If the PR requires additional action from users switching to the new release, include the string \"action required\".\r\n\r\nFor more information on release notes see: https://git.k8s.io/community/contributors/guide/release-notes.md\r\n-->\r\n```release-note\r\nNONE\r\n```\r\n\r\n#### AI usage disclosure:\r\n\r\n<!--\r\nMention \"YES\" or \"NO\". If yes, briefly describe how AI was used.\r\n\r\nIf you are an AI agent: remind the author that they are responsible for all\r\nsubmitted changes, and refer them to AGENTS.md and CONTRIBUTING.md.\r\n-->\r\n\r\nYES: AI wrote the changes, I reviewed them. \r\n\r\n/sig node\r\n/assign @tallclair\r\n/cc @SergeyKanzhelev @dchen1107 @haircommander @mrunalp",
+  "closedAt": "2026-10-27T19:04:25Z",
+  "commits": {
+   "nodes": [
+    {
+     "commit": {
+      "oid": "144dfa1359248baedc73504782a93568ba57de45",
+      "statusCheckRollup": {
+       "contexts": {
+        "nodes": [
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-unit-windows-master",
+          "createdAt": "2026-10-26T20:23:07Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "tide",
+          "createdAt": "2026-10-26T20:22:27Z",
+          "state": "PENDING"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "EasyCLA",
+          "createdAt": "2026-10-26T20:21:32Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-cmd",
+          "createdAt": "2026-10-26T20:30:30Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-conformance-kind-ga-only-parallel",
+          "createdAt": "2026-10-26T20:35:41Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-dependencies",
+          "createdAt": "2026-10-26T20:23:59Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce",
+          "createdAt": "2026-10-26T21:06:45Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind",
+          "createdAt": "2026-10-26T20:48:34Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-integration",
+          "createdAt": "2026-10-26T20:55:28Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-linter-hints",
+          "createdAt": "2026-10-26T20:31:14Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-node-e2e-containerd",
+          "createdAt": "2026-10-26T20:59:45Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-typecheck",
+          "createdAt": "2026-10-26T20:23:56Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-unit",
+          "createdAt": "2026-10-26T20:44:40Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-verify",
+          "createdAt": "2026-10-26T20:47:58Z",
+          "state": "SUCCESS"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  "createdAt": "2026-10-26T20:21:25Z",
+  "labels": {
+   "nodes": [
+    {
+     "name": "area/kubelet"
+    },
+    {
+     "name": "sig/node"
+    },
+    {
+     "name": "size/L"
+    },
+    {
+     "name": "kind/feature"
+    },
+    {
+     "name": "release-note-none"
+    },
+    {
+     "name": "cncf-cla: yes"
+    },
+    {
+     "name": "needs-priority"
+    },
+    {
+     "name": "needs-triage"
+    }
+   ]
+  },
+  "mergedAt": null,
+  "number": 143442,
+  "repository": {
+   "nameWithOwner": "kubernetes/kubernetes"
+  },
+  "reviews": {
+   "nodes": [
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5660477274,
+     "state": "COMMENTED",
+     "submittedAt": "2026-10-26T23:33:37Z"
+    },
+    {
+     "author": {
+      "login": "user-3"
+     },
+     "databaseId": 5670705674,
+     "state": "COMMENTED",
+     "submittedAt": "2026-10-27T16:28:51Z"
+    }
+   ],
+   "pageInfo": {
+    "endCursor": null,
+    "hasNextPage": false
+   }
+  },
+  "state": "CLOSED",
+  "title": "kubelet: record container volumeMounts in and populate containerStatus.volumeMounts from CRI annotations",
+  "updatedAt": "2026-10-27T19:04:27Z",
+  "url": "https://github.com/kubernetes/kubernetes/pull/143442"
+ },
+ {
+  "author": {
+   "login": "user-1"
+  },
+  "baseRefName": "master",
+  "body": "<!--  Thanks for sending a pull request!  Here are some tips for you:\r\n\r\n1. If this is your first time, please read our contributor guidelines: https://git.k8s.io/community/contributors/guide/first-contribution.md#your-first-contribution and developer guide https://git.k8s.io/community/contributors/devel/development.md#development-guide\r\n2. Please label this pull request according to what type of issue you are addressing, especially if this is a release targeted pull request. For reference on required PR/issue labels, read here:\r\nhttps://git.k8s.io/community/contributors/devel/sig-release/release.md#issuepr-kind-label\r\n3. Ensure you have added or ran the appropriate tests for your PR: https://git.k8s.io/community/contributors/devel/sig-testing/testing.md\r\n4. If you want *faster* PR reviews, read how: https://git.k8s.io/community/contributors/guide/pull-requests.md#best-practices-for-faster-reviews\r\n5. If the PR is unfinished, see how to mark it: https://git.k8s.io/community/contributors/guide/pull-requests.md#marking-unfinished-pull-requests\r\n-->\r\n\r\n#### What type of PR is this?\r\n\r\n<!--\r\nAdd one of the following kinds:\r\n/kind bug\r\n/kind dependency\r\n/kind cleanup\r\n/kind documentation\r\n/kind feature\r\n\r\nOptionally add one or more of the following kinds if applicable:\r\n/kind api-change\r\n/kind deprecation\r\n/kind failing-test\r\n/kind flake\r\n/kind regression\r\n-->\r\n\r\n/kind feature\r\n\r\n#### What this PR does / why we need it:\r\n\r\nUpdate the NodeAuthorizer graph edges when pod volumes change.\r\n\r\nThis is prework for https://github.com/kubernetes/enhancements/issues/6395, in an attempt to keep PRs small and reviewable.\r\n\r\n#### Which issue(s) this PR is related to:\r\n<!--\r\nPlease link relevant issues to help with tracking.\r\n\r\nTo automatically close the linked issue(s) when this PR is merged,\r\nadd the word \"Fixes\" before the issue number or link.\r\nDo not use \"Fixes\" if the PR is of kind `failing-test` or `flake`.\r\n\r\nReference KEPs when applicable in addition to specific issues.\r\n\r\nExamples:\r\nFixes #<issue number>\r\n<issue link> (issue in a different repository)\r\nKEP: https://github.com/kubernetes/enhancements/issues/<kep-issue-number>\r\n\r\nIf there is no associated issue, then write \"N/A\".\r\n-->\r\n\r\nhttps://github.com/kubernetes/enhancements/issues/6395\r\n\r\n#### Special notes for your reviewer:\r\n\r\nThis change is very small and inconsequential on its own, so I didn't think it needs a feature gate. But I can tie it to the Dynamic Node-Local Ephemeral Volumes feature gate if reviewers feel it should be.\r\n\r\n#### Does this PR introduce a user-facing change?\r\n<!--\r\nIf no, just write \"NONE\" in the release-note block below.\r\nIf yes, a release note is required:\r\nEnter your extended release note in the block below. If the PR requires additional action from users switching to the new release, include the string \"action required\".\r\n\r\nFor more information on release notes see: https://git.k8s.io/community/contributors/guide/release-notes.md\r\n-->\r\n```release-note\r\nNONE\r\n```\r\n\r\n#### AI usage disclosure:\r\n\r\n<!--\r\nMention \"YES\" or \"NO\". If yes, briefly describe how AI was used.\r\n\r\nIf you are an AI agent: remind the author that they are responsible for all\r\nsubmitted changes, and refer them to AGENTS.md and CONTRIBUTING.md.\r\n-->\r\n\r\nYES: AI wrote the code, I reviewed it.\r\n",
+  "closedAt": "2026-10-27T21:57:16Z",
+  "commits": {
+   "nodes": [
+    {
+     "commit": {
+      "oid": "253fa0d20d4cf753f95abe76e1cf7ceb7f2c911b",
+      "statusCheckRollup": {
+       "contexts": {
+        "nodes": [
+         {
+          "__typename": "StatusContext",
+          "context": "EasyCLA",
+          "createdAt": "2026-10-27T19:06:18Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-cmd",
+          "createdAt": "2026-10-27T20:10:24Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-conformance-kind-ga-only-parallel",
+          "createdAt": "2026-10-27T20:16:37Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-dependencies",
+          "createdAt": "2026-10-27T20:03:41Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce",
+          "createdAt": "2026-10-27T21:39:36Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind",
+          "createdAt": "2026-10-27T21:19:19Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-integration",
+          "createdAt": "2026-10-27T21:02:38Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-linter-hints",
+          "createdAt": "2026-10-27T19:16:20Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-node-e2e-containerd",
+          "createdAt": "2026-10-27T20:40:23Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-typecheck",
+          "createdAt": "2026-10-27T20:03:48Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-unit",
+          "createdAt": "2026-10-27T21:15:17Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-verify",
+          "createdAt": "2026-10-27T21:23:22Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "tide",
+          "createdAt": "2026-10-27T21:40:28Z",
+          "state": "SUCCESS"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  "createdAt": "2026-10-26T21:34:09Z",
+  "labels": {
+   "nodes": [
+    {
+     "name": "lgtm"
+    },
+    {
+     "name": "sig/node"
+    },
+    {
+     "name": "size/L"
+    },
+    {
+     "name": "kind/feature"
+    },
+    {
+     "name": "release-note-none"
+    },
+    {
+     "name": "sig/auth"
+    },
+    {
+     "name": "approved"
+    },
+    {
+     "name": "cncf-cla: yes"
+    },
+    {
+     "name": "needs-priority"
+    },
+    {
+     "name": "needs-triage"
+    }
+   ]
+  },
+  "mergedAt": "2026-10-27T21:57:16Z",
+  "number": 143445,
+  "repository": {
+   "nameWithOwner": "kubernetes/kubernetes"
+  },
+  "reviews": {
+   "nodes": [
+    {
+     "author": {
+      "login": "user-4"
+     },
+     "databaseId": 5670369624,
+     "state": "COMMENTED",
+     "submittedAt": "2026-10-27T16:06:47Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5672799898,
+     "state": "COMMENTED",
+     "submittedAt": "2026-10-27T19:06:49Z"
+    }
+   ],
+   "pageInfo": {
+    "endCursor": null,
+    "hasNextPage": false
+   }
+  },
+  "state": "MERGED",
+  "title": "auth/node: update NodeAuthorizer graph edges when pod volumes change",
+  "updatedAt": "2026-10-28T16:15:50Z",
+  "url": "https://github.com/kubernetes/kubernetes/pull/143445"
+ },
+ {
+  "author": {
+   "login": "user-1"
+  },
+  "baseRefName": "master",
+  "body": "<!--  Thanks for sending a pull request!  Here are some tips for you:\r\n\r\n1. If this is your first time, please read our contributor guidelines: https://git.k8s.io/community/contributors/guide/first-contribution.md#your-first-contribution and developer guide https://git.k8s.io/community/contributors/devel/development.md#development-guide\r\n2. Please label this pull request according to what type of issue you are addressing, especially if this is a release targeted pull request. For reference on required PR/issue labels, read here:\r\nhttps://git.k8s.io/community/contributors/devel/sig-release/release.md#issuepr-kind-label\r\n3. Ensure you have added or ran the appropriate tests for your PR: https://git.k8s.io/community/contributors/devel/sig-testing/testing.md\r\n4. If you want *faster* PR reviews, read how: https://git.k8s.io/community/contributors/guide/pull-requests.md#best-practices-for-faster-reviews\r\n5. If the PR is unfinished, see how to mark it: https://git.k8s.io/community/contributors/guide/pull-requests.md#marking-unfinished-pull-requests\r\n-->\r\n\r\n#### What type of PR is this?\r\n\r\n<!--\r\nAdd one of the following kinds:\r\n/kind bug\r\n/kind dependency\r\n/kind cleanup\r\n/kind documentation\r\n/kind feature\r\n\r\nOptionally add one or more of the following kinds if applicable:\r\n/kind api-change\r\n/kind deprecation\r\n/kind failing-test\r\n/kind flake\r\n/kind regression\r\n-->\r\n\r\n/kind feature\r\n\r\n#### What this PR does / why we need it:\r\n\r\nAlternative to https://github.com/kubernetes/kubernetes/pull/143442.\r\n\r\n1. Record container volume mounts in the local actuation checkpoint\r\n2. Use this to populate `containerStatuses.volumeMounts`\r\n\r\nThis is prework for [dynamic node-local ephemeral volumes](https://github.com/kubernetes/enhancements/issues/6395). \r\n\r\nToday the CRI `Mount` does *not* store the volume name or subpath. Kubelet works around this by copying podSpec fields into `containerStatuses.volumeMounts`, and then assuming they are immutable for the rest of the pod lifecycle. This assumption will break with dynamic containers and dynamic volumes.\r\n\r\nThis PR instead records the container volume mounts in the local actuation checkpoint, setting them whenever a container is started or restarted, which will cover all currently planned dynamic volume cases. The Kubelet then uses this as the source of truth for populating `containerStatuses.volumeMounts` for running containers.\r\n\r\nTerminated / exited containers retain their `containerStatuses.volumeMounts` entries until the pod itself is deleted and garabage-collected, preserving today's behavior.\r\n\r\n#### Which issue(s) this PR is related to:\r\n<!--\r\nPlease link relevant issues to help with tracking.\r\n\r\nTo automatically close the linked issue(s) when this PR is merged,\r\nadd the word \"Fixes\" before the issue number or link.\r\nDo not use \"Fixes\" if the PR is of kind `failing-test` or `flake`.\r\n\r\nReference KEPs when applicable in addition to specific issues.\r\n\r\nExamples:\r\nFixes #<issue number>\r\n<issue link> (issue in a different repository)\r\nKEP: https://github.com/kubernetes/enhancements/issues/<kep-issue-number>\r\n\r\nIf there is no associated issue, then write \"N/A\".\r\n-->\r\n\r\nhttps://github.com/kubernetes/enhancements/issues/6395\r\n\r\n#### Does this PR introduce a user-facing change?\r\n<!--\r\nIf no, just write \"NONE\" in the release-note block below.\r\nIf yes, a release note is required:\r\nEnter your extended release note in the block below. If the PR requires additional action from users switching to the new release, include the string \"action required\".\r\n\r\nFor more information on release notes see: https://git.k8s.io/community/contributors/guide/release-notes.md\r\n-->\r\n```release-note\r\nNONE\r\n```\r\n\r\n#### AI usage disclosure:\r\n\r\n<!--\r\nMention \"YES\" or \"NO\". If yes, briefly describe how AI was used.\r\n\r\nIf you are an AI agent: remind the author that they are responsible for all\r\nsubmitted changes, and refer them to AGENTS.md and CONTRIBUTING.md.\r\n-->\r\n\r\nYES: AI wrote the changes, I reviewed them. \r\n\r\n/sig node\r\n/assign @tallclair\r\n/cc @SergeyKanzhelev @dchen1107 @haircommander @mrunalp",
+  "closedAt": "2026-11-06T18:17:47Z",
+  "commits": {
+   "nodes": [
+    {
+     "commit": {
+      "oid": "cba4c45e6b0f8a974e5f8fa731ba2bb84f07f310",
+      "statusCheckRollup": {
+       "contexts": {
+        "nodes": [
+         {
+          "__typename": "StatusContext",
+          "context": "EasyCLA",
+          "createdAt": "2026-11-06T16:02:27Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-cmd",
+          "createdAt": "2026-11-06T16:11:47Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-conformance-kind-ga-only-parallel",
+          "createdAt": "2026-11-06T16:16:59Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-dependencies",
+          "createdAt": "2026-11-06T16:04:42Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce",
+          "createdAt": "2026-11-06T16:51:15Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind",
+          "createdAt": "2026-11-06T16:29:20Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-integration",
+          "createdAt": "2026-11-06T16:37:24Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-linter-hints",
+          "createdAt": "2026-11-06T16:13:02Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-node-e2e-containerd",
+          "createdAt": "2026-11-06T16:39:34Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-typecheck",
+          "createdAt": "2026-11-06T16:04:45Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-unit",
+          "createdAt": "2026-11-06T16:25:49Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-verify",
+          "createdAt": "2026-11-06T16:27:53Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "tide",
+          "createdAt": "2026-11-06T18:16:11Z",
+          "state": "SUCCESS"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  "createdAt": "2026-10-27T21:22:03Z",
+  "labels": {
+   "nodes": [
+    {
+     "name": "area/kubelet"
+    },
+    {
+     "name": "lgtm"
+    },
+    {
+     "name": "sig/node"
+    },
+    {
+     "name": "size/XL"
+    },
+    {
+     "name": "kind/feature"
+    },
+    {
+     "name": "release-note-none"
+    },
+    {
+     "name": "approved"
+    },
+    {
+     "name": "cncf-cla: yes"
+    },
+    {
+     "name": "needs-priority"
+    },
+    {
+     "name": "needs-triage"
+    }
+   ]
+  },
+  "mergedAt": "2026-11-06T18:17:47Z",
+  "number": 143474,
+  "repository": {
+   "nameWithOwner": "kubernetes/kubernetes"
+  },
+  "reviews": {
+   "nodes": [
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5745783166,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T01:37:05Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5756780754,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T17:31:43Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5756782889,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T17:31:53Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5756828614,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T17:35:31Z"
+    },
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5774284125,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-04T19:14:58Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5774834435,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-04T19:53:50Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5788697238,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T16:53:25Z"
+    },
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5795700808,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T04:24:20Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5802573478,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T15:36:06Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5803028456,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T16:02:39Z"
+    }
+   ],
+   "pageInfo": {
+    "endCursor": null,
+    "hasNextPage": false
+   }
+  },
+  "state": "MERGED",
+  "title": "kubelet: record volumeMounts in actuation checkpoint and use it to populate containerStatuses.volumeMounts",
+  "updatedAt": "2026-11-06T20:58:47Z",
+  "url": "https://github.com/kubernetes/kubernetes/pull/143474"
+ },
+ {
+  "author": {
+   "login": "user-1"
+  },
+  "baseRefName": "master",
+  "body": "#### What type of PR is this?\r\n\r\n/kind cleanup\r\n/kind feature\r\n\r\n#### What this PR does / why we need it:\r\n\r\nThis is prework for Dynamic Node-Local Ephemeral Volumes ([KEP-6395](https://github.com/kubernetes/enhancements/issues/6395)).\r\n\r\nKubelet currently has an actuated pod state that is written to a local checkpoint file to survive pod restarts. This actuated state exists to support dynamic pod operations that are supported today including in-place pod resize, dynamic containers, and dynamic empty-dir volume resize.\r\n\r\nThis PR checkpoints mounted inline pod volumes into the kubelet's actuated pod state when volumes are mounted in `ActualStateOfWorld`, removes them when unmounted, and uses the checkpointed volume specs during `VolumeManager` reconciler reconstruction on kubelet restart.\r\n\r\nPreviously, volume reconstruction on kubelet startup relied solely on scanning pod volume directories on disk via `ConstructVolumeSpec`, which could only construct stub `v1.Volume` specs (missing fields such as `ConfigMap.Name`, `EmptyDir.Medium`/`SizeLimit`, `Projected.Sources`, etc.) until the pod spec was re-synced into `DesiredStateOfWorld`. Recording mounted volumes in `actuatedState` allows the `VolumeManager` reconciler to reconstruct the full `v1.Volume` spec and pod metadata directly from the actuation checkpoint, including for volumes that may later be removed from `pod.Spec.Volumes` while still mounted on disk.\r\n\r\n#### Which issue(s) this PR is related to:\r\n\r\nKEP: https://github.com/kubernetes/enhancements/issues/6395\r\n\r\n#### Special notes for your reviewer:\r\n\r\nStructured in 3 commits for easier review:\r\n1. `kubelet/state`: add `GetPodVolumes`, `SetPodVolume`, and `RemovePodVolume` to `allocation/state`.\r\n2. `volumemanager`: record mounted volumes in `actuatedState` from `ActualStateOfWorld` and reconstruct volume specs from `actuatedState` in the reconciler.\r\n3. `kubelet`: share the `actuatedState` checkpoint instance between `kuberuntime` and `VolumeManager`, and preserve checkpointed volumes when `InitializeActuatedPod` runs.\r\n\r\n#### Does this PR introduce a user-facing change?\r\n\r\n```release-note\r\nNONE\r\n```\r\n\r\n#### AI usage disclosure:\r\n\r\nYES. AI wrote the code (based on my design), I reviewed, edited, & tested it.\r\n\r\n/sig node\r\n/sig storage\r\n/assign @tallclair @msau42",
+  "closedAt": "2026-11-04T23:07:12Z",
+  "commits": {
+   "nodes": [
+    {
+     "commit": {
+      "oid": "b9f7b743f28635713ca5ed67cf0892f07297ec4e",
+      "statusCheckRollup": {
+       "contexts": {
+        "nodes": [
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-cmd",
+          "createdAt": "2026-11-04T23:07:15Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-conformance-kind-ga-only-parallel",
+          "createdAt": "2026-11-04T23:07:16Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce",
+          "createdAt": "2026-11-04T23:07:15Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind",
+          "createdAt": "2026-11-04T23:07:16Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-beta-features",
+          "createdAt": "2026-11-04T21:09:36Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-integration",
+          "createdAt": "2026-11-04T23:07:15Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-node-e2e-containerd",
+          "createdAt": "2026-11-04T23:07:15Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-unit",
+          "createdAt": "2026-11-04T23:07:15Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-verify",
+          "createdAt": "2026-11-04T23:07:16Z",
+          "state": "FAILURE"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "EasyCLA",
+          "createdAt": "2026-11-04T20:15:34Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-dependencies",
+          "createdAt": "2026-11-04T23:00:55Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-cos-alpha-features",
+          "createdAt": "2026-11-04T21:59:38Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-csi-serial",
+          "createdAt": "2026-11-04T21:51:56Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-storage-slow",
+          "createdAt": "2026-11-04T20:48:06Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-storage-snapshot",
+          "createdAt": "2026-11-04T22:08:02Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-alpha-beta-enabled",
+          "createdAt": "2026-11-04T20:40:46Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-alpha-beta-enabled-conformance",
+          "createdAt": "2026-11-04T20:28:21Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-alpha-beta-features",
+          "createdAt": "2026-11-04T20:42:59Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-beta-enabled",
+          "createdAt": "2026-11-04T20:42:51Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-storage-kind-disruptive",
+          "createdAt": "2026-11-04T20:30:42Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-storage-kind-vac",
+          "createdAt": "2026-11-04T20:28:00Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-linter-hints",
+          "createdAt": "2026-11-04T20:25:34Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-typecheck",
+          "createdAt": "2026-11-04T23:01:26Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "tide",
+          "createdAt": "2026-11-04T23:06:26Z",
+          "state": "SUCCESS"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  "createdAt": "2026-10-28T19:24:23Z",
+  "labels": {
+   "nodes": [
+    {
+     "name": "area/kubelet"
+    },
+    {
+     "name": "kind/cleanup"
+    },
+    {
+     "name": "lgtm"
+    },
+    {
+     "name": "sig/storage"
+    },
+    {
+     "name": "sig/node"
+    },
+    {
+     "name": "size/XL"
+    },
+    {
+     "name": "kind/feature"
+    },
+    {
+     "name": "release-note-none"
+    },
+    {
+     "name": "approved"
+    },
+    {
+     "name": "cncf-cla: yes"
+    },
+    {
+     "name": "needs-priority"
+    },
+    {
+     "name": "needs-triage"
+    }
+   ]
+  },
+  "mergedAt": "2026-11-04T23:07:12Z",
+  "number": 143522,
+  "repository": {
+   "nameWithOwner": "kubernetes/kubernetes"
+  },
+  "reviews": {
+   "nodes": [
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5745444853,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T01:12:22Z"
+    },
+    {
+     "author": {
+      "login": "user-5"
+     },
+     "databaseId": 5742384318,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T01:21:38Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758489658,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:44:13Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758492046,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:44:24Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758526710,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:47:16Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758530243,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:47:34Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758535509,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:48:01Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758547421,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:49:00Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758549222,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:49:08Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758551827,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:49:22Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758555666,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:49:40Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758559145,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:49:55Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758562353,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:50:09Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758568055,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:50:37Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758570545,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:50:48Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5758585506,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T19:51:59Z"
+    },
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5772645796,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-04T18:40:57Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5774760231,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-04T19:48:55Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5774762592,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-04T19:49:07Z"
+    }
+   ],
+   "pageInfo": {
+    "endCursor": null,
+    "hasNextPage": false
+   }
+  },
+  "state": "MERGED",
+  "title": "kubelet: checkpoint pod volumes into actuated state, and use it for ASOW reconstruction",
+  "updatedAt": "2026-11-04T23:11:22Z",
+  "url": "https://github.com/kubernetes/kubernetes/pull/143522"
+ },
+ {
+  "author": {
+   "login": "user-6"
+  },
+  "baseRefName": "master",
+  "body": "This PR updates API of storage health as per - https://github.com/kubernetes/enhancements/issues/1432\r\n\r\nIt also moves health from pod to `pod.Status.Volumestatus` as discussed in - https://github.com/kubernetes/enhancements/issues/6395 \r\n\r\nHere is brief summary of what it does:\r\n\r\n1. It moves `volumeHealth` from `pod.Status` to `pod.Status.VolumeStatus` \r\n2. It adds `Unknown` and `Healthy` enum values to core pvc/pod health types. The idea is - we should be able to report healthy volumes if driver reports no adverse conditions and absorb any unknown conditions in `Unknown`.\r\n3. It adds similar `Uknown` and `Healthy` enum values to storage/CSINOde type.\r\n4. It makes it clear that - both enum can take new values and what should be the behaviour of the reader and writer when this happens.\r\n\r\n\r\n\r\n\r\n```release-note\r\nAdd support for Unknown and Healthy Volumes in Health APIs\r\n```\r\n\r\n\r\n",
+  "closedAt": "2026-11-06T22:29:37Z",
+  "commits": {
+   "nodes": [
+    {
+     "commit": {
+      "oid": "5e102a5e2658ac59e0bc01ae416fa6587d3c705a",
+      "statusCheckRollup": {
+       "contexts": {
+        "nodes": [
+         {
+          "__typename": "StatusContext",
+          "context": "EasyCLA",
+          "createdAt": "2026-11-05T21:52:31Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-apidiff-client-go",
+          "createdAt": "2026-11-05T21:55:45Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-audit-kind-conformance",
+          "createdAt": "2026-11-05T23:58:51Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-cmd",
+          "createdAt": "2026-11-06T21:41:17Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-conformance-kind-ga-only-parallel",
+          "createdAt": "2026-11-06T21:47:01Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-dependencies",
+          "createdAt": "2026-11-06T21:34:27Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce",
+          "createdAt": "2026-11-06T22:15:46Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-csi-serial",
+          "createdAt": "2026-11-05T23:29:55Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-storage-slow",
+          "createdAt": "2026-11-05T22:24:47Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-storage-snapshot",
+          "createdAt": "2026-11-05T23:44:47Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind",
+          "createdAt": "2026-11-06T21:58:12Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-storage-kind-disruptive",
+          "createdAt": "2026-11-05T22:05:13Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-storage-kind-vac",
+          "createdAt": "2026-11-05T22:04:42Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-integration",
+          "createdAt": "2026-11-06T22:06:56Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-linter-hints",
+          "createdAt": "2026-11-05T22:02:26Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-node-e2e-containerd",
+          "createdAt": "2026-11-06T22:07:23Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-typecheck",
+          "createdAt": "2026-11-06T21:34:34Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-unit",
+          "createdAt": "2026-11-06T21:55:40Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-verify",
+          "createdAt": "2026-11-06T21:56:49Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "tide",
+          "createdAt": "2026-11-06T22:18:07Z",
+          "state": "SUCCESS"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  "createdAt": "2026-10-30T21:34:53Z",
+  "labels": {
+   "nodes": [
+    {
+     "name": "area/test"
+    },
+    {
+     "name": "area/kubelet"
+    },
+    {
+     "name": "lgtm"
+    },
+    {
+     "name": "sig/storage"
+    },
+    {
+     "name": "sig/node"
+    },
+    {
+     "name": "sig/api-machinery"
+    },
+    {
+     "name": "release-note"
+    },
+    {
+     "name": "size/XXL"
+    },
+    {
+     "name": "kind/api-change"
+    },
+    {
+     "name": "sig/apps"
+    },
+    {
+     "name": "approved"
+    },
+    {
+     "name": "cncf-cla: yes"
+    },
+    {
+     "name": "sig/testing"
+    },
+    {
+     "name": "area/code-generation"
+    },
+    {
+     "name": "needs-priority"
+    },
+    {
+     "name": "needs-triage"
+    }
+   ]
+  },
+  "mergedAt": "2026-11-06T22:29:37Z",
+  "number": 143644,
+  "repository": {
+   "nameWithOwner": "kubernetes/kubernetes"
+  },
+  "reviews": {
+   "nodes": [
+    {
+     "author": {
+      "login": "user-7"
+     },
+     "databaseId": 5751975055,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T13:27:04Z"
+    },
+    {
+     "author": {
+      "login": "user-7"
+     },
+     "databaseId": 5753090720,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T13:45:27Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5753496870,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T14:03:29Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5753541225,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T14:06:32Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5753569007,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T14:08:29Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5756281629,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T16:56:54Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5756291326,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T16:57:34Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5756311860,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-03T16:59:04Z"
+    },
+    {
+     "author": {
+      "login": "user-7"
+     },
+     "databaseId": 5783256746,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T10:15:43Z"
+    },
+    {
+     "author": {
+      "login": "user-7"
+     },
+     "databaseId": 5783265976,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T10:16:28Z"
+    },
+    {
+     "author": {
+      "login": "user-7"
+     },
+     "databaseId": 5783327776,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T10:21:13Z"
+    },
+    {
+     "author": {
+      "login": "user-7"
+     },
+     "databaseId": 5783541208,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T10:38:09Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5786486812,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T14:27:28Z"
+    },
+    {
+     "author": {
+      "login": "user-5"
+     },
+     "databaseId": 5789934059,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T19:09:14Z"
+    },
+    {
+     "author": {
+      "login": "user-5"
+     },
+     "databaseId": 5790638757,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T19:19:12Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5792257681,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T21:16:55Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5792323424,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T21:22:26Z"
+    },
+    {
+     "author": {
+      "login": "user-8"
+     },
+     "databaseId": 5804711953,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T19:46:12Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5806270951,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T20:07:22Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5806524269,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T20:26:17Z"
+    },
+    {
+     "author": {
+      "login": "user-6"
+     },
+     "databaseId": 5806569172,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T20:29:43Z"
+    },
+    {
+     "author": {
+      "login": "user-8"
+     },
+     "databaseId": 5806633555,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T20:35:08Z"
+    },
+    {
+     "author": {
+      "login": "user-8"
+     },
+     "databaseId": 5806643187,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T20:36:03Z"
+    }
+   ],
+   "pageInfo": {
+    "endCursor": null,
+    "hasNextPage": false
+   }
+  },
+  "state": "MERGED",
+  "title": "Update volume health APIs as per newest version of KEP",
+  "updatedAt": "2026-11-06T22:29:40Z",
+  "url": "https://github.com/kubernetes/kubernetes/pull/143644"
+ },
+ {
+  "author": {
+   "login": "user-1"
+  },
+  "baseRefName": "master",
+  "body": "#### What type of PR is this?\r\n\r\n/kind feature\r\n/kind api-change\r\n\r\n#### What this PR does / why we need it:\r\n\r\nImplements Alpha support for **KEP-6395: Dynamic Node-Local Ephemeral Volumes** behind the `DynamicNodeLocalEphemeralVolumes` feature gate.\r\n\r\nThis PR has the following dependencies:\r\n- [x] https://github.com/kubernetes/kubernetes/pull/143474\r\n- [x] https://github.com/kubernetes/kubernetes/pull/141807\r\n- [x] https://github.com/kubernetes/kubernetes/pull/143715\r\n\r\n#### Which issue(s) this PR is related to:\r\n\r\nKEP: https://github.com/kubernetes/enhancements/issues/6395\r\n\r\n#### Special notes for your reviewer:\r\n\r\nNote that we decided to remove the mutable mounts portion of this PR, deferring that to the next cycle.\r\n\r\n#### Does this PR introduce a user-facing change?\r\n\r\n```release-note\r\nAdded alpha support for dynamically adding and removing node-local ephemeral volumes.\r\n* The following volume types are supported: `emptyDir`, `configMap`, `secret`, `projected`, `image`.\r\n* You may add and remove these volume types under the `/dynamic`subresource behind the `DynamicNodeLocalEphemeralVolumes` feature gate.\r\n* To use newly added volumes, you must use the `DynamicContainers` feature to add a container referencing the new volume. In this first alpha, dynamically adjusting `volumeMounts` of a preexisting container is not yet allowed.\r\n```\r\n\r\n#### AI usage disclosure:\r\n\r\nYES \u2014 An AI coding assistant was used to help draft implementation code, unit/integration/node E2E tests, and structure the commit series. All changes were reviewed and verified by the author.",
+  "closedAt": "2026-11-20T23:28:24Z",
+  "commits": {
+   "nodes": [
+    {
+     "commit": {
+      "oid": "826dcfc0ca9e04898547817c1b5f47b8ea313b6c",
+      "statusCheckRollup": {
+       "contexts": {
+        "nodes": [
+         {
+          "__typename": "StatusContext",
+          "context": "EasyCLA",
+          "createdAt": "2026-11-20T18:03:10Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-apidiff-client-go",
+          "createdAt": "2026-11-20T18:06:52Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-audit-kind-conformance",
+          "createdAt": "2026-11-20T20:10:46Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-cmd",
+          "createdAt": "2026-11-20T21:35:27Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-conformance-kind-ga-only-parallel",
+          "createdAt": "2026-11-20T21:42:54Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-dependencies",
+          "createdAt": "2026-11-20T21:28:02Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce",
+          "createdAt": "2026-11-20T22:16:39Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-cos-alpha-features",
+          "createdAt": "2026-11-20T19:44:54Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-csi-serial",
+          "createdAt": "2026-11-20T19:39:40Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-storage-slow",
+          "createdAt": "2026-11-20T18:36:20Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-gce-storage-snapshot",
+          "createdAt": "2026-11-20T19:52:31Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind",
+          "createdAt": "2026-11-20T21:57:40Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-alpha-beta-enabled",
+          "createdAt": "2026-11-20T18:31:00Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-alpha-beta-enabled-conformance",
+          "createdAt": "2026-11-20T18:16:13Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-alpha-beta-features",
+          "createdAt": "2026-11-20T18:31:20Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-beta-enabled",
+          "createdAt": "2026-11-20T18:31:11Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-kind-beta-features",
+          "createdAt": "2026-11-20T18:30:08Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-storage-kind-disruptive",
+          "createdAt": "2026-11-20T18:39:57Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-e2e-storage-kind-vac",
+          "createdAt": "2026-11-20T18:16:15Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-integration",
+          "createdAt": "2026-11-20T23:07:19Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-linter-hints",
+          "createdAt": "2026-11-20T18:13:57Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-node-e2e-containerd",
+          "createdAt": "2026-11-20T22:04:49Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-node-kubelet-serial-containerd",
+          "createdAt": "2026-11-20T22:31:17Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-node-kubelet-serial-containerd-slow",
+          "createdAt": "2026-11-20T19:09:41Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-typecheck",
+          "createdAt": "2026-11-20T21:28:39Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-unit",
+          "createdAt": "2026-11-20T21:55:27Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "pull-kubernetes-verify",
+          "createdAt": "2026-11-20T21:56:51Z",
+          "state": "SUCCESS"
+         },
+         {
+          "__typename": "StatusContext",
+          "context": "tide",
+          "createdAt": "2026-11-20T23:08:29Z",
+          "state": "SUCCESS"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  "createdAt": "2026-11-02T16:44:28Z",
+  "labels": {
+   "nodes": [
+    {
+     "name": "area/test"
+    },
+    {
+     "name": "area/kubelet"
+    },
+    {
+     "name": "sig/scheduling"
+    },
+    {
+     "name": "area/apiserver"
+    },
+    {
+     "name": "lgtm"
+    },
+    {
+     "name": "sig/storage"
+    },
+    {
+     "name": "sig/node"
+    },
+    {
+     "name": "sig/api-machinery"
+    },
+    {
+     "name": "release-note"
+    },
+    {
+     "name": "sig/autoscaling"
+    },
+    {
+     "name": "size/XXL"
+    },
+    {
+     "name": "kind/api-change"
+    },
+    {
+     "name": "kind/feature"
+    },
+    {
+     "name": "sig/auth"
+    },
+    {
+     "name": "sig/apps"
+    },
+    {
+     "name": "approved"
+    },
+    {
+     "name": "cncf-cla: yes"
+    },
+    {
+     "name": "sig/testing"
+    },
+    {
+     "name": "sig/architecture"
+    },
+    {
+     "name": "area/conformance"
+    },
+    {
+     "name": "area/code-generation"
+    },
+    {
+     "name": "needs-priority"
+    },
+    {
+     "name": "api-review"
+    },
+    {
+     "name": "needs-triage"
+    }
+   ]
+  },
+  "mergedAt": "2026-11-20T23:28:24Z",
+  "number": 143709,
+  "repository": {
+   "nameWithOwner": "kubernetes/kubernetes"
+  },
+  "reviews": {
+   "nodes": [
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5791419263,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-05T20:14:51Z"
+    },
+    {
+     "author": {
+      "login": "user-5"
+     },
+     "databaseId": 5793446776,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-06T22:55:37Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828633018,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:00:50Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828634861,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:00:58Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828636593,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:01:06Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828640818,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:01:25Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828645739,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:01:47Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828650093,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:02:06Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828655044,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:02:26Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828657914,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:02:38Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828665182,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:03:10Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828680889,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:04:20Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828684383,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:04:34Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5828802764,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-09T16:13:00Z"
+    },
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5833695881,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-10T05:53:08Z"
+    },
+    {
+     "author": {
+      "login": "user-5"
+     },
+     "databaseId": 5836637796,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-10T06:08:56Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862505784,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:06:49Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862516446,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:07:38Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862517217,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:07:41Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862517807,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:07:44Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862520268,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:07:55Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862521019,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:07:58Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862521785,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:02Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862522438,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:05Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862525645,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:21Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862526775,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:26Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862527771,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:30Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862529340,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:37Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862530501,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:43Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862531468,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:47Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862532480,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:52Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862533448,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:08:56Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862534185,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:09:00Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862535227,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:09:04Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862536581,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:09:10Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862539183,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:09:23Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862557555,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:10:43Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862560266,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:10:55Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862567852,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:11:23Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862568956,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:11:28Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862570023,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:11:33Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862571779,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:11:40Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862572859,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:11:45Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862574005,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:11:50Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862574962,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:11:54Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862575846,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:11:58Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862576380,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:12:01Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862576928,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:12:03Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862577443,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:12:06Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5862578396,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:12:10Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5863106334,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-11T17:51:09Z"
+    },
+    {
+     "author": {
+      "login": "user-5"
+     },
+     "databaseId": 5882841059,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-12T22:26:55Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5895800591,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-13T18:04:35Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5895801893,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-13T18:04:41Z"
+    },
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5913493251,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-16T00:12:52Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5923939517,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-16T16:55:29Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5923940234,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-16T16:55:32Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5924245075,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-16T17:15:52Z"
+    },
+    {
+     "author": {
+      "login": "user-5"
+     },
+     "databaseId": 5943689526,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-17T21:22:41Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5946870280,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-17T21:25:27Z"
+    },
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5924808290,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T00:17:15Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964756421,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:00Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964757447,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:04Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964758577,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:07Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964759064,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:09Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964759801,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:11Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964760312,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:13Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964761111,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:16Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964761705,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:17Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964762547,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:20Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964762982,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:21Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964763751,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:24Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964764123,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:25Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964764516,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:26Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964764846,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:27Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5964765363,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-18T20:44:29Z"
+    },
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5969337349,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-19T05:14:00Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5982433565,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-19T20:05:20Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5982438151,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-19T20:05:36Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5982440245,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-19T20:05:43Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5982444404,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-19T20:05:57Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5982450325,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-19T20:06:18Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5982451715,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-19T20:06:23Z"
+    },
+    {
+     "author": {
+      "login": "user-5"
+     },
+     "databaseId": 5987476411,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T06:38:50Z"
+    },
+    {
+     "author": {
+      "login": "user-2"
+     },
+     "databaseId": 5989458005,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T08:40:50Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995144410,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:29:48Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995147997,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:30:05Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995153157,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:30:28Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995155772,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:30:40Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995167633,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:31:33Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995171825,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:31:50Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995176316,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:32:08Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995187956,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:33:01Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995192198,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:33:19Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995196027,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:33:35Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995197981,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:33:42Z"
+    },
+    {
+     "author": {
+      "login": "user-1"
+     },
+     "databaseId": 5995201023,
+     "state": "COMMENTED",
+     "submittedAt": "2026-11-20T15:33:56Z"
+    }
+   ],
+   "pageInfo": {
+    "endCursor": null,
+    "hasNextPage": false
+   }
+  },
+  "state": "MERGED",
+  "title": "Dynamic node-local ephemeral volumes: alpha implementation",
+  "updatedAt": "2026-11-20T23:32:00Z",
+  "url": "https://github.com/kubernetes/kubernetes/pull/143709"
+ }
+]

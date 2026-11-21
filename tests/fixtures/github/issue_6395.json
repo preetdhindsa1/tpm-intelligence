@@ -1,0 +1,32 @@
+{
+ "body": "### Enhancement Description\n\n- One-line enhancement description (can be used as a release note): Support dynamically adding and removing node-local ephemeral volumes (ConfigMaps, Secrets, Projected, EmptyDir) to existing pods.\n- Kubernetes Enhancement Proposal: https://github.com/kubernetes/enhancements/blob/master/keps/sig-storage/6395-dynamic-node-local-ephemeral-volumes/README.md\n- Discussion Link: \n- PRs by stage and milestone:\n  - [ ] Alpha - v1.38\n    - [x] KEP (`k/enhancements`) update PR(s): https://github.com/kubernetes/enhancements/pull/6421#discussion_r4075092520\n    - [ ] Code (`k/k`) update PR(s):\n       - https://github.com/kubernetes/kubernetes/pull/143442\n       - https://github.com/kubernetes/kubernetes/pull/143445\n       - https://github.com/kubernetes/kubernetes/pull/143474\n       - https://github.com/kubernetes/kubernetes/pull/143522\n       - https://github.com/kubernetes/kubernetes/pull/143709\n    - [ ] Docs (`k/website`) update PR(s):\n\n<!-- Uncomment these as you prepare the enhancement for the next stage\n- [ ] Beta - v1.xx\n  - [ ] KEP (`k/enhancements`) update PR(s):\n  - [ ] Code (`k/k`) update PR(s):\n  - [ ] Docs (`k/website`) update(s):\n- [ ] Stable - v1.xx\n  - [ ] KEP (`k/enhancements`) update PR(s):\n  - [ ] Code (`k/k`) update PR(s):\n  - [ ] Docs (`k/website`) update(s):\n-->\n\n_Please keep this description up to date. This will help the Enhancement Team to track the evolution of the enhancement efficiently._",
+ "closed_at": null,
+ "created_at": "2026-09-18T18:03:25Z",
+ "html_url": "https://github.com/kubernetes/enhancements/issues/6395",
+ "labels": [
+  {
+   "name": "sig/node"
+  },
+  {
+   "name": "sig/storage"
+  },
+  {
+   "name": "stage/alpha"
+  },
+  {
+   "name": "tracked/yes"
+  },
+  {
+   "name": "lead-opted-in"
+  }
+ ],
+ "milestone": {
+  "number": 40,
+  "title": "v1.38"
+ },
+ "number": 6395,
+ "state": "open",
+ "state_reason": null,
+ "title": "Dynamic node-local ephemeral volumes",
+ "updated_at": "2026-11-21T00:33:56Z"
+}

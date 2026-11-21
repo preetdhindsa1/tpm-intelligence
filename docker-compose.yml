@@ -1,0 +1,122 @@
+# Local stack. Copy .env.example to .env first.
+# UIs: API http://localhost:8000/docs   Jaeger http://localhost:16686
+
+x-otel-env: &otel-env
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+  OTEL_EXPORTER_OTLP_INSECURE: "true"
+  DEPLOY_ENV: local
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+
+x-app-env: &app-env
+  <<: *otel-env
+  DATABASE_URL: postgresql+psycopg://tpm:tpm@postgres:5432/tpm
+  REDIS_URL: redis://redis:6379/0
+  QUEUE_BACKEND: redis
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tpm
+      POSTGRES_PASSWORD: tpm
+      POSTGRES_DB: tpm
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tpm -d tpm"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports: ["16686:16686"]
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.114.0
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./observability/otel-collector.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "13133:13133" # health
+    depends_on: [jaeger]
+
+  migrate:
+    build: .
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      <<: *app-env
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    build: .
+    command: ["python", "-m", "api.main"]
+    environment:
+      <<: *app-env
+      OTEL_SERVICE_NAME: tpm-api
+      CORS_ORIGINS: http://localhost:3000
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./docs/results:/app/docs/results:ro  # newest backtest -> forecast validation gate
+    ports: ["8000:8000"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+      otel-collector: { condition: service_started }
+
+  worker:
+    build: .
+    command: ["python", "-m", "pipeline.worker"]
+    environment:
+      <<: *app-env
+      OTEL_SERVICE_NAME: tpm-worker
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+      otel-collector: { condition: service_started }
+
+  web:
+    build: ./web
+    environment:
+      API_URL: http://api:8000          # server-side rendering inside the network
+    ports: ["3000:3000"]                 # browser SSE uses http://localhost:8000 (build default)
+    depends_on:
+      api: { condition: service_started }
+
+  # One-shot collector: docker compose run --rm poller --release v1.38 [--backfill]
+  poller:
+    build: .
+    profiles: ["tools"]
+    entrypoint: ["python", "-m", "collectors.github_poller"]
+    environment:
+      <<: *app-env
+      OTEL_SERVICE_NAME: tpm-github-poller
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+      otel-collector: { condition: service_started }
+
+volumes:
+  pgdata:
