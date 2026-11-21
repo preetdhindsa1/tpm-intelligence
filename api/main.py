@@ -17,7 +17,7 @@ from starlette.concurrency import run_in_threadpool
 from api.live import Updates
 from api.schemas import FeatureDetailOut, FeaturesOut, LoadOut, ReleaseOut
 from api.service import ReleaseService, ReleaseView
-from api.views import feature_detail, feature_row, release_out
+from api.views import feature_detail, feature_row, release_out, release_summary_out
 
 SERVICE_NAME = "tpm-api"
 ENHANCEMENTS_REPO = "kubernetes/enhancements"
@@ -60,9 +60,8 @@ def create_app(
 
     @app.get("/releases", response_model=list[ReleaseOut])
     async def releases() -> list[ReleaseOut]:
-        """Known releases, oldest first."""
-        keys = await run_in_threadpool(svc().release_keys)
-        return [release_out(await view(k.split(":", 1)[1])) for k in keys]
+        """Known releases, oldest first. Dates and counts only: no forecast is run."""
+        return [release_summary_out(r) for r in await run_in_threadpool(svc().releases)]
 
     @app.get("/releases/{name}/features", response_model=FeaturesOut)
     async def features(name: str, include_removed: bool = True) -> FeaturesOut:

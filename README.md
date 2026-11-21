@@ -103,6 +103,8 @@ make web-test               # eslint + tsc + vitest + next build, in Node 20 via
 | PRs in the v1.38 window with a verified link | **609 / 2,757 (22.1%)**; 24 suggested-only; 2,124 unlinked (count as load) |
 | Linking precision per method | TBD (not yet measured): needs a hand-labelled sample |
 | Engine: assess all 106 v1.38 features from 60,230 events | project 0.22 s + assess 0.89 s (single run, laptop, Docker; not a p95) |
+| API `/releases` (dashboard home), 162k events, 6 releases | cold cache **6.9 s**, warm 0.06 s (was several minutes cold: it forecast every release). Single runs, laptop, Docker; measured 2026-11-21, not a p95 |
+| API v1.38 feature table, cold cache, 3 concurrent requests | **~21 s** each, sharing **one** computation (was one computation per request). Single run, measured 2026-11-21 |
 | Data freshness | TBD (not yet measured) |
 | Event → dashboard latency (p95) | TBD (not yet measured) |
 

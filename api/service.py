@@ -31,7 +31,7 @@ from engine.forecast import (
     forecast_release,
 )
 from engine.odds import training_pairs
-from engine.projection import World, project
+from engine.projection import ReleaseInfo, World, project
 from engine.recalibrate import Recalibration, fit
 from pipeline.events import NormalizedEvent
 
@@ -79,6 +79,16 @@ class PostgresEventSource:
 
 
 @dataclass(frozen=True)
+class ReleaseSummary:
+    """A release's dates and feature counts, without assessment or forecast (cheap)."""
+
+    release: ReleaseInfo
+    features_in_release: int
+    features_ever_in_release: int
+    as_of: datetime
+
+
+@dataclass(frozen=True)
 class ReleaseView:
     """One computed release state."""
 
@@ -123,6 +133,12 @@ class ReleaseService:
         self._recal_ttl = recalibration_ttl.total_seconds()
         self._validation = validation
         self._lock = threading.Lock()
+        # One lock per release key: concurrent requests wait for a running computation
+        # instead of starting their own (single flight).
+        self._key_locks: dict[str, threading.Lock] = {}
+        self._key_locks_guard = threading.Lock()
+        self._summaries: tuple[int, float, list[ReleaseSummary]] | None = None
+        self._summaries_lock = threading.Lock()
 
     @property
     def version(self) -> int:
@@ -141,27 +157,68 @@ class ReleaseService:
 
     def release_keys(self) -> list[str]:
         """Known release keys, oldest first."""
+        return [r.release.key for r in self.releases()]
+
+    def releases(self) -> list[ReleaseSummary]:
+        """Every known release with dates and feature counts, oldest first.
+
+        Uses one projection of the stored events (no assessment, no forecast), cached
+        until new events arrive or ``ttl`` passes.
+        """
         self.refresh()
-        world = project(self._snapshot_events(), self._now())
-        return sorted(world.releases, key=lambda k: world.releases[k].cycle_start_at or self._now())
+        with self._summaries_lock:
+            hit = self._summaries
+            if hit and hit[0] == self._version and time.monotonic() - hit[1] < self._ttl:
+                return hit[2]
+            version = self._version
+            with tracer.start_as_current_span("api.compute_release_list"):
+                world = project(self._snapshot_events(), self._now())
+                summaries = [
+                    ReleaseSummary(
+                        info,
+                        len(world.features_in(key)),
+                        len(world.features_ever_in(key)),
+                        world.as_of,
+                    )
+                    for key, info in sorted(
+                        world.releases.items(),
+                        key=lambda kv: kv[1].cycle_start_at or world.as_of,
+                    )
+                ]
+            self._summaries = (version, time.monotonic(), summaries)
+            return summaries
 
     def view(self, release_name: str) -> ReleaseView:
-        """Current view of a release (recomputed if stale)."""
+        """Current view of a release (recomputed if stale, at most once at a time)."""
         key = f"{self._project}:{release_name}"
         self.refresh()
+        cached = self._fresh(key)
+        if cached:
+            return cached
+        with self._key_lock(key):
+            cached = self._fresh(key)  # another request may have just computed it
+            if cached:
+                return cached
+            with tracer.start_as_current_span(
+                "api.compute_release_view", attributes={"tpm.release": key}
+            ):
+                view = self._compute(key)
+            self._views[key] = view
+            return view
+
+    def _fresh(self, key: str) -> ReleaseView | None:
         cached = self._views.get(key)
         if (
             cached
             and cached.version == self._version
-            and (time.monotonic() - cached.computed_at < self._ttl)
+            and time.monotonic() - cached.computed_at < self._ttl
         ):
             return cached
-        with tracer.start_as_current_span(
-            "api.compute_release_view", attributes={"tpm.release": key}
-        ):
-            view = self._compute(key)
-        self._views[key] = view
-        return view
+        return None
+
+    def _key_lock(self, key: str) -> threading.Lock:
+        with self._key_locks_guard:
+            return self._key_locks.setdefault(key, threading.Lock())
 
     def _snapshot_events(self) -> Sequence[NormalizedEvent]:
         with self._lock:

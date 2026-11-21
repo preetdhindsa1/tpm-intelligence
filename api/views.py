@@ -13,7 +13,7 @@ from api.schemas import (
     ReleaseOut,
     TimelineEntryOut,
 )
-from api.service import ReleaseView
+from api.service import ReleaseSummary, ReleaseView
 from engine.assess import FeatureAssessment
 from engine.forecast import Forecast
 
@@ -31,6 +31,22 @@ def release_out(view: ReleaseView) -> ReleaseOut:
         features_in_release=sum(1 for f in view.assessment.features if f.in_release),
         features_ever_in_release=len(view.assessment.features),
         as_of=view.assessment.as_of,
+    )
+
+
+def release_summary_out(summary: ReleaseSummary) -> ReleaseOut:
+    """Release header from the cheap listing (same shape as :func:`release_out`)."""
+    r = summary.release
+    return ReleaseOut(
+        key=r.key,
+        name=r.name,
+        cycle_start_at=r.cycle_start_at,
+        enhancements_freeze_at=r.enhancements_freeze_at,
+        code_freeze_at=r.code_freeze_at,
+        release_at=r.release_at,
+        features_in_release=summary.features_in_release,
+        features_ever_in_release=summary.features_ever_in_release,
+        as_of=summary.as_of,
     )
 
 
