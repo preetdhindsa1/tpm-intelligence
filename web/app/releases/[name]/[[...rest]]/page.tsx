@@ -10,6 +10,6 @@ export default async function LegacyRelease({ params }: { params: Promise<{ name
   const { name, rest } = await params;
   const matches = (await api.releases()).filter((r) => r.name === decodeURIComponent(name));
   if (matches.length === 0) notFound();
-  if (matches.length > 1) redirect("/");
+  if (matches.length > 1) redirect("/releases");
   redirect(releasePath(projectSlug(matches[0]), matches[0].name, rest?.length ? `/${rest.join("/")}` : ""));
 }

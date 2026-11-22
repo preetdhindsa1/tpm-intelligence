@@ -14,9 +14,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
         <header className="border-b bg-white">
           <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-3">
-            <Link href="/" className="font-semibold">TPM Intelligence</Link>
-            <span className="text-xs text-slate-500">
-              Cross-team release intelligence · decision support, not guarantees
+            <div className="flex items-center gap-6">
+              <Link href="/" className="font-semibold">TPM Intelligence</Link>
+              <nav aria-label="Main" className="flex gap-4 text-sm text-slate-600">
+                <Link href="/" className="hover:text-slate-900">Overview</Link>
+                <Link href="/releases" className="hover:text-slate-900">Release health</Link>
+              </nav>
+            </div>
+            <span className="hidden text-xs text-slate-500 sm:inline">
+              AI-native program health · decision support, not guarantees
             </span>
           </div>
         </header>

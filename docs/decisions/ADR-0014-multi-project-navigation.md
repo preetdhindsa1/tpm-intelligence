@@ -52,3 +52,14 @@ is collected.
   together with the Kafka meaning of "removed" (Fix Version taken off).
 - The home card's facts need the release view, which can take about 40 s to recompute
   when its cache expires; the card shows dates at once and streams the facts in.
+
+## Update (2026-11-22): front page
+
+`/` is now a front page that explains the product. It shows:
+- the pipeline, with each step marked as deterministic, AI then fact-checked, or human;
+- a live pulse of the current release, from the API's computed facts;
+- a scorecard of measured results.
+
+Release health moved to `/releases`. The scorecard values are copied from the README's
+"Measured results" table into `web/lib/measured.ts`, each with its date. Failing and
+unmeasured results are shown as such.

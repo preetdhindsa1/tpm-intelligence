@@ -16,7 +16,7 @@ export function ReleaseSwitcher({ groups, project, release }: { groups: Switcher
   const select = "rounded-md border bg-white px-2 py-1 text-sm font-medium text-slate-800";
   return (
     <nav aria-label="Project and release" className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-      <Link href="/" className="text-indigo-700 hover:underline">
+      <Link href="/releases" className="text-indigo-700 hover:underline">
         All releases
       </Link>
       <span aria-hidden>/</span>

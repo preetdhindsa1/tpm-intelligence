@@ -1,0 +1,81 @@
+// Measured results shown on the front page. Copied from README.md "Measured results"
+// (the source of truth); every entry carries its date and how to read it. Results that
+// failed are shown too: measure, don't claim (CLAUDE.md section 2).
+
+export type Verdict = "pass" | "partial" | "fail" | "pending";
+
+export type Measured = {
+  id: string;
+  label: string;
+  value: string;
+  detail: string;
+  verdict: Verdict;
+  measured: string; // YYYY-MM-DD, or "" when not measured yet
+};
+
+export const MEASURED: Measured[] = [
+  {
+    id: "fact-checker",
+    label: "Fact checker agrees with labelled claims",
+    value: "43 / 43",
+    detail: "22 verified, 21 removed across all 5 reasons. Labels proposed by the developer, pending TPM review.",
+    verdict: "pass",
+    measured: "2026-11-22",
+  },
+  {
+    id: "linking",
+    label: "Tracked v1.38 features with a verified PR",
+    value: "68 / 69",
+    detail: "Coverage counts whether a link exists, not whether it is right. Precision per method: not yet labelled.",
+    verdict: "pass",
+    measured: "2026-11-21",
+  },
+  {
+    id: "risk-analyst",
+    label: "Risk analyst claims removed by the checker",
+    value: "4.0%",
+    detail: "12 real v1.37/v1.38 cases, critical-flag coverage 100%, $0.024 per run. Small sample.",
+    verdict: "pass",
+    measured: "2026-11-22",
+  },
+  {
+    id: "vp-summary",
+    label: "VP summary claims removed by the checker",
+    value: "0%",
+    detail: "4 real release fact sheets, at most 217 words, about $0.14 per draft. Small sample.",
+    verdict: "pass",
+    measured: "2026-11-22",
+  },
+  {
+    id: "link-suggester",
+    label: "AI link suggester precision",
+    value: "84.8%",
+    detail: "60 hidden-key cases, recall 70%. Suggestions never count until a person confirms them.",
+    verdict: "partial",
+    measured: "2026-11-22",
+  },
+  {
+    id: "forecast",
+    label: "Forecast beats the base rate",
+    value: "9 of 12",
+    detail: "Backtests v1.35–v1.38 at 28/14/7 days before freeze. Not every case, so odds stay labelled \"not validated\".",
+    verdict: "partial",
+    measured: "2026-11-22",
+  },
+  {
+    id: "simulator",
+    label: "What-if simulator within ±20% on replay",
+    value: "Not validated",
+    detail: "Median review wait off by +205% (v1.37) and +350% (v1.38); time to merge within range. Shown with a warning.",
+    verdict: "fail",
+    measured: "2026-11-22",
+  },
+  {
+    id: "freshness",
+    label: "Event → dashboard latency (p95)",
+    value: "TBD",
+    detail: "Not yet measured.",
+    verdict: "pending",
+    measured: "",
+  },
+];

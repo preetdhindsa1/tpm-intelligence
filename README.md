@@ -15,7 +15,9 @@ drafts the executive update for a human to approve.
 > forecast odds "not validated".
 > Everything else below is **TBD (not yet measured)**.
 
-![v1.38 dashboard: stat tiles, dependency graph, Code Freeze outcomes, verified executive brief](docs/images/dashboard-v1.38.png)
+![Front page: what TPM Intelligence does, with a live pulse of Kubernetes v1.38](docs/images/front-page.png)
+
+![v1.38 dashboard: stat tiles, feature dependencies, Code Freeze outcomes, verified executive brief](docs/images/dashboard-v1.38.png)
 
 _The v1.38 dashboard on 2026-11-22 (local Docker, real public data). Layout and decisions:
 ADR-0013._
@@ -53,7 +55,7 @@ make install                # Python deps into .venv
 make test                   # ruff + mypy + pytest
 make up                     # Postgres (+ migrations), Redis, OTel Collector, Jaeger, API, worker, web
 curl localhost:8000/healthz
-open http://localhost:3000  # release health across projects → release dashboard → feature detail
+open http://localhost:3000  # front page → release health (/releases) → release dashboard → feature detail
 open http://localhost:16686 # Jaeger: traces from tpm-api and tpm-worker
 ```
 
@@ -189,6 +191,10 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
     fact-checked.
   - Not copied from the mockup: the days-of-delay curve and "reallocate TPMs" lines,
     because nothing computes them. The curve is a candidate for M7.
+- **Front page** at `/`: what the product does, how the pipeline splits deterministic code,
+  AI and human approval, a live pulse of the current release (computed facts from the API),
+  and a scorecard of measured results with dates, including the ones that fail. Release
+  health moved to `/releases`.
 - **Multi-project navigation** (ADR-0014): a "Release health" home page across projects,
   a project/release switcher, and release URLs that carry the project
   (`/projects/kubernetes/releases/v1.38`; old `/releases/v1.38` links redirect).
