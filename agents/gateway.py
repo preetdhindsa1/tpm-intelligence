@@ -98,6 +98,11 @@ def default_client(settings: AISettings) -> MessagesClient:
     """Anthropic SDK client. Credentials come from ``ANTHROPIC_API_KEY``."""
     import anthropic
 
+    from pipeline.env import configured
+
+    if configured("ANTHROPIC_API_KEY") is None:
+        raise AIError("ANTHROPIC_API_KEY is not configured on this deployment")
+
     mode = "content" if settings.trace_content else "metadata_only"
     otel: Any = {"traces": {"content_mode": mode}}
     client = anthropic.Anthropic(

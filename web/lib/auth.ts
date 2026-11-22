@@ -11,8 +11,11 @@ export function devLoginEnabled(env: Env = process.env): boolean {
   return env.AUTH_DEV_LOGIN === "true" && env.AUTH_MODE === "local";
 }
 
+/** A setting that is present and not the deploy placeholder (ADR-0017). */
+const set = (v: string | undefined) => Boolean(v && v.trim() && v.trim() !== "unconfigured");
+
 export function githubEnabled(env: Env = process.env): boolean {
-  return Boolean(env.AUTH_GITHUB_ID && env.AUTH_GITHUB_SECRET);
+  return set(env.AUTH_GITHUB_ID) && set(env.AUTH_GITHUB_SECRET);
 }
 
 const LOGIN = /^[a-z\d](?:[a-z\d-]{0,38})$/i; // GitHub login rules

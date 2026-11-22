@@ -33,6 +33,10 @@ Cloud SQL `db-g1-small`, no Redis. **Estimated** ~$95-125/month (not a quote; th
 bill replaces it). Set a budget alert on the billing account first (console: Billing ->
 Budgets & alerts).
 
+**One command:** `sh infra/first-deploy.sh --yes --with-local-secrets --seed-local-data`
+runs every step below and skips what is already done. Seed only into a fresh database,
+before any migration has run there. The manual steps are listed for reference.
+
 1. `sh infra/bootstrap.sh tpm-intelligence`: creates the private, versioned state bucket.
 2. Fill in `infra/terraform.tfvars` (gitignored; see the example). Then `make tf-real-plan`,
    and review the plan.
@@ -41,7 +45,7 @@ Budgets & alerts).
    - build and push `app:bootstrap` and `web:bootstrap` for `linux/amd64`. Bake in the API URL:
      `--build-arg NEXT_PUBLIC_API_URL=https://tpm-api-<number>.<region>.run.app`.
    - `terraform apply`.
-4. Add the hand-made secrets: `github-token` (read-only), `anthropic-api-key`, and
+4. The hand-made secrets start as the placeholder `unconfigured` (the code treats it as unset). Add the real values: `github-token` (read-only), `anthropic-api-key`, and
    `auth-github-id` / `auth-github-secret` from a GitHub OAuth app whose callback is
    `<web_url>/api/auth/callback/github`. Use
    `printf %s "$VALUE" | gcloud secrets versions add <name> --data-file=-`.

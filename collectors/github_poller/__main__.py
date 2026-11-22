@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import os
 import sys
 from pathlib import Path
 
@@ -41,14 +40,15 @@ def main(argv: list[str] | None = None) -> int:
         from collectors.github_poller.client import GitHubClient
         from collectors.github_poller.sync import GitHubPoller
         from connectors import load_team
+        from pipeline.env import configured
         from pipeline.factory import create_transport
         from pipeline.queue import EventPublisher
         from pipeline.store.cursors import PostgresCursorStore
         from pipeline.store.session import make_engine
 
-        token = os.environ.get("GITHUB_TOKEN")
+        token = configured("GITHUB_TOKEN")
         if not token:
-            logger.error("GITHUB_TOKEN is not set")
+            logger.error("GITHUB_TOKEN is not set (or still the deploy placeholder)")
             return 2
 
         team = load_team(args.team)

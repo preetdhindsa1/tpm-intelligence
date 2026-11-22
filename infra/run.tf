@@ -147,7 +147,11 @@ resource "google_cloud_run_v2_service" "api" {
     ignore_changes = [template[0].containers[0].image, client, client_version]
   }
 
-  depends_on = [google_secret_manager_secret_iam_member.readers, google_secret_manager_secret_version.otel_config]
+  depends_on = [
+    google_secret_manager_secret_iam_member.readers,
+    google_secret_manager_secret_version.otel_config,
+    google_secret_manager_secret_version.placeholder,
+  ]
 }
 
 # ---------------------------------------------------------------- Web (Next.js)
@@ -214,7 +218,7 @@ resource "google_cloud_run_v2_service" "web" {
     ignore_changes = [template[0].containers[0].image, client, client_version]
   }
 
-  depends_on = [google_secret_manager_secret_iam_member.readers]
+  depends_on = [google_secret_manager_secret_iam_member.readers, google_secret_manager_secret_version.placeholder]
 }
 
 resource "google_cloud_run_v2_service_iam_member" "public" {
@@ -309,7 +313,11 @@ resource "google_cloud_run_v2_job" "poller" {
     }
   }
 
-  depends_on = [google_secret_manager_secret_iam_member.readers, google_secret_manager_secret_version.otel_config]
+  depends_on = [
+    google_secret_manager_secret_iam_member.readers,
+    google_secret_manager_secret_version.otel_config,
+    google_secret_manager_secret_version.placeholder,
+  ]
 }
 
 # Run before each deploy: gcloud run jobs execute tpm-migrate --wait

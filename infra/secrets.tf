@@ -75,6 +75,21 @@ resource "google_secret_manager_secret" "github_oauth" {
   depends_on = [google_project_service.apis]
 }
 
+# Cloud Run cannot start a revision whose secret has no version, so each hand-added secret
+# starts with the placeholder "unconfigured", which the code treats as unset
+# (pipeline/env.py, web/lib/auth.ts). Real values are added as newer versions by hand;
+# Terraform never overwrites them.
+resource "google_secret_manager_secret_version" "placeholder" {
+  for_each = {
+    github-token       = google_secret_manager_secret.github_token.id
+    anthropic-api-key  = google_secret_manager_secret.anthropic_api_key.id
+    auth-github-id     = google_secret_manager_secret.github_oauth["auth-github-id"].id
+    auth-github-secret = google_secret_manager_secret.github_oauth["auth-github-secret"].id
+  }
+  secret      = each.value
+  secret_data = "unconfigured"
+}
+
 # Collector config for the sidecars, mounted as a file.
 resource "google_secret_manager_secret" "otel_config" {
   secret_id = "otel-collector-config"

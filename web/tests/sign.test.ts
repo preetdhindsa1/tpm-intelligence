@@ -33,5 +33,7 @@ describe("signed actions (ADR-0016)", () => {
     expect(devLoginEnabled({ AUTH_DEV_LOGIN: "true", AUTH_MODE: "required" })).toBe(false);
     expect(devLoginEnabled({ AUTH_DEV_LOGIN: "true" })).toBe(false);
     expect(githubEnabled({ AUTH_GITHUB_ID: "x" })).toBe(false);
+    expect(githubEnabled({ AUTH_GITHUB_ID: "unconfigured", AUTH_GITHUB_SECRET: "unconfigured" })).toBe(false);
+    expect(githubEnabled({ AUTH_GITHUB_ID: "id", AUTH_GITHUB_SECRET: "s" })).toBe(true);
   });
 });
