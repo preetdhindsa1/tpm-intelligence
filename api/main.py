@@ -754,7 +754,17 @@ def main() -> None:
 
     telemetry = init_telemetry(SERVICE_NAME)
     origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
-    app = create_app(cors_origins=origins)
+    updates: Updates | None = None
+    if os.getenv("WORKER_IN_PROCESS", "").lower() == "true":
+        # Cloud, option B (ADR-0017): the worker runs in this process and announces new
+        # events directly, so no worker service and no Redis are needed.
+        from api.live import DEBOUNCE_S, InMemoryUpdates
+        from pipeline.worker import start_in_background
+
+        local = InMemoryUpdates(debounce_s=DEBOUNCE_S)
+        start_in_background(local.publish)
+        updates = local
+    app = create_app(cors_origins=origins, updates=updates)
     # Warm in the background so the server starts accepting requests at once.
     threading.Thread(target=app.state.warm_on_boot, name="warm-on-boot", daemon=True).start()
     try:

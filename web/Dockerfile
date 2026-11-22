@@ -5,6 +5,9 @@ RUN npm ci
 
 FROM node:20-alpine AS build
 WORKDIR /app
+# The browser's API URL (live-update stream) is fixed at build time (ADR-0007).
+ARG NEXT_PUBLIC_API_URL=http://localhost:8000
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build

@@ -4,8 +4,8 @@ output "api_url" {
 }
 
 output "web_url" {
-  description = "Public dashboard URL (add it to cors_origins after the first apply)."
-  value       = google_cloud_run_v2_service.web.uri
+  description = "Public dashboard URL. GitHub OAuth callback: <web_url>/api/auth/callback/github"
+  value       = local.web_url
 }
 
 output "image_registry" {
@@ -16,4 +16,14 @@ output "image_registry" {
 output "cloud_sql_connection_name" {
   description = "For the Cloud SQL Auth Proxy when running backfills from a laptop."
   value       = google_sql_database_instance.db.connection_name
+}
+
+output "workload_identity_provider" {
+  description = "GitHub repository variable GCP_WIF_PROVIDER for the deploy workflow."
+  value       = google_iam_workload_identity_pool_provider.github.name
+}
+
+output "deployer_service_account" {
+  description = "GitHub repository variable GCP_DEPLOYER for the deploy workflow."
+  value       = google_service_account.deployer.email
 }

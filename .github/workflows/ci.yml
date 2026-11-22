@@ -93,10 +93,9 @@ jobs:
       - run: terraform fmt -check -recursive
       - run: terraform init -backend=false -input=false
       - run: terraform validate
-      # Plan only (phase 1): placeholder project and a dummy token, so nothing is contacted.
-      - run: terraform plan -input=false -refresh=false -lock=false -var project_id=tpm-demo-placeholder -var project_number=000000000000
-        env:
-          GOOGLE_OAUTH_ACCESS_TOKEN: offline-plan
+      # Offline plan in a scratch copy with local state: nothing is contacted, and the
+      # real GCS state (ADR-0017) is never touched.
+      - run: sh offline-plan.sh ..
 
   docker:
     name: Docker image builds

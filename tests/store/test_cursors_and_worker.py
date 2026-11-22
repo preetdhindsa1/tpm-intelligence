@@ -42,3 +42,45 @@ def test_worker_stores_events_idempotently(engine: Engine) -> None:
             .where(EventRecord.event_id == event.event_id)
         ).scalar_one()
     assert count == 1
+
+
+def test_in_process_worker_stores_and_announces(
+    engine: Engine, db_url: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Cloud option B (ADR-0017): the API runs the worker in a thread, no Redis."""
+    import threading
+    import uuid
+
+    from pipeline.memory import InMemoryTransport
+    from pipeline.queue import EventPublisher
+    from pipeline.worker import start_in_background
+
+    monkeypatch.setenv("DATABASE_URL", db_url)
+    from pipeline.queue import EVENTS_TOPIC
+    from pipeline.worker import SUBSCRIPTION
+
+    transport = InMemoryTransport()
+    transport.pull(EVENTS_TOPIC, SUBSCRIPTION, 1, 0)  # subscribe before publishing
+    # A fresh event id: the worker announces only events it had not stored before.
+    event = k8s_6395_tracked_no().model_copy(update={"event_id": str(uuid.uuid4())})
+    announced = threading.Event()
+    messages: list[str] = []
+
+    def notify(message: str) -> None:
+        messages.append(message)
+        announced.set()
+
+    stop = start_in_background(notify, transport)
+    try:
+        EventPublisher(transport).publish(event)
+        assert announced.wait(10), "the in-process worker did not announce the event"
+    finally:
+        stop.set()
+    with sessionmaker(engine)() as s:
+        stored = s.scalar(
+            select(func.count())
+            .select_from(EventRecord)
+            .where(EventRecord.event_id == event.event_id)
+        )
+    assert stored == 1
+    assert event.event_id in messages[0]

@@ -1,8 +1,8 @@
 # Secrets live in Secret Manager, never in code or git (CLAUDE.md section 10).
 # The GitHub token is added by hand after apply (read-only scope):
 #   gcloud secrets versions add github-token --data-file=-
-# Generated values (DB password, Redis auth) are written by Terraform, so the state file is
-# sensitive and must live in a locked-down GCS bucket.
+# Generated values (DB password, action-signing and session secrets) are written by
+# Terraform, so the state file is sensitive and lives in a locked-down GCS bucket.
 
 resource "google_secret_manager_secret" "github_token" {
   secret_id = "github-token"
@@ -35,17 +35,44 @@ resource "google_secret_manager_secret_version" "database_url" {
   secret_data = "postgresql+psycopg://${google_sql_user.app.name}:${random_password.db.result}@/${google_sql_database.app.name}?host=/cloudsql/${google_sql_database_instance.db.connection_name}"
 }
 
-resource "google_secret_manager_secret" "redis_url" {
-  secret_id = "redis-url"
+# Sign-in (ADR-0016). Web and API share the action-signing secret; Auth.js uses its own.
+# The GitHub OAuth app's ID and secret are added by hand, like the GitHub token:
+#   printf %s "$ID" | gcloud secrets versions add auth-github-id --data-file=-
+resource "random_password" "action" {
+  length  = 64
+  special = false
+}
+
+resource "random_password" "auth" {
+  length  = 64
+  special = false
+}
+
+resource "google_secret_manager_secret" "generated" {
+  for_each  = toset(["tpm-action-secret", "auth-secret"])
+  secret_id = each.value
   replication {
     auto {}
   }
   depends_on = [google_project_service.apis]
 }
 
-resource "google_secret_manager_secret_version" "redis_url" {
-  secret      = google_secret_manager_secret.redis_url.id
-  secret_data = "redis://:${google_redis_instance.cache.auth_string}@${google_redis_instance.cache.host}:${google_redis_instance.cache.port}/0"
+resource "google_secret_manager_secret_version" "generated" {
+  for_each = {
+    "tpm-action-secret" = random_password.action.result
+    "auth-secret"       = random_password.auth.result
+  }
+  secret      = google_secret_manager_secret.generated[each.key].id
+  secret_data = each.value
+}
+
+resource "google_secret_manager_secret" "github_oauth" {
+  for_each  = toset(["auth-github-id", "auth-github-secret"])
+  secret_id = each.value
+  replication {
+    auto {}
+  }
+  depends_on = [google_project_service.apis]
 }
 
 # Collector config for the sidecars, mounted as a file.
@@ -65,15 +92,16 @@ resource "google_secret_manager_secret_version" "otel_config" {
 locals {
   secret_readers = {
     "database_url:api"     = google_secret_manager_secret.database_url.id
-    "database_url:worker"  = google_secret_manager_secret.database_url.id
     "database_url:poller"  = google_secret_manager_secret.database_url.id
     "database_url:migrate" = google_secret_manager_secret.database_url.id
-    "redis_url:api"        = google_secret_manager_secret.redis_url.id
-    "redis_url:worker"     = google_secret_manager_secret.redis_url.id
     "github_token:poller"  = google_secret_manager_secret.github_token.id
     "anthropic:api"        = google_secret_manager_secret.anthropic_api_key.id
+    "action:api"           = google_secret_manager_secret.generated["tpm-action-secret"].id
+    "action:web"           = google_secret_manager_secret.generated["tpm-action-secret"].id
+    "auth:web"             = google_secret_manager_secret.generated["auth-secret"].id
+    "oauth_id:web"         = google_secret_manager_secret.github_oauth["auth-github-id"].id
+    "oauth_secret:web"     = google_secret_manager_secret.github_oauth["auth-github-secret"].id
     "otel_config:api"      = google_secret_manager_secret.otel_config.id
-    "otel_config:worker"   = google_secret_manager_secret.otel_config.id
     "otel_config:poller"   = google_secret_manager_secret.otel_config.id
     "otel_config:migrate"  = google_secret_manager_secret.otel_config.id
   }

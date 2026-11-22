@@ -64,9 +64,11 @@ tf-validate: ## Terraform fmt check + validate (Docker; no cloud credentials)
 	$(TERRAFORM) validate
 
 tf-plan: tf-validate ## Offline plan with a placeholder project and dummy token: nothing is contacted or applied
-	docker run --rm -v "$(CURDIR)":/work -w /work/infra -e GOOGLE_OAUTH_ACCESS_TOKEN=offline-plan \
-	  hashicorp/terraform:1.10 plan -input=false -refresh=false -lock=false \
-	  -var project_id=tpm-demo-placeholder -var project_number=000000000000
+	docker run --rm -v "$(CURDIR)":/src:ro --entrypoint sh hashicorp/terraform:1.10 /src/infra/offline-plan.sh /src
+
+tf-real-plan: ## Plan against tpm-intelligence (reads the cloud and GCS state; changes nothing)
+	docker run --rm -v "$(CURDIR)":/work -w /work/infra -e GOOGLE_OAUTH_ACCESS_TOKEN="$$(gcloud auth print-access-token)" hashicorp/terraform:1.10 init -input=false -reconfigure
+	docker run --rm -v "$(CURDIR)":/work -w /work/infra -e GOOGLE_OAUTH_ACCESS_TOKEN="$$(gcloud auth print-access-token)" hashicorp/terraform:1.10 plan -input=false -out=main.tfplan
 
 LANGFUSE = docker compose -p tpm-langfuse --env-file .env -f observability/langfuse/docker-compose.yml -f observability/langfuse/compose.override.yml
 

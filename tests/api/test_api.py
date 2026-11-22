@@ -491,3 +491,22 @@ def test_validation_only_counts_backtests_of_the_deployed_model(tmp_path: Path) 
     # The deployed model uses main-PR durations: only the B file speaks for it.
     assert load_validation(tmp_path).validated
     assert not load_validation(tmp_path, ForecastConfig(durations="all")).validated
+
+
+def test_in_memory_updates_accept_publishes_from_another_thread() -> None:
+    """The in-process worker publishes from its own thread (ADR-0017)."""
+    import asyncio
+
+    updates = InMemoryUpdates(heartbeat_s=5)
+
+    async def scenario() -> object:
+        async def never() -> bool:
+            return False
+
+        stream = updates.subscribe(never)
+        first = asyncio.ensure_future(stream.__anext__())
+        await asyncio.sleep(0.05)  # subscribed
+        threading.Thread(target=updates.publish, args=(notification("e1", "x"),)).start()
+        return await asyncio.wait_for(first, timeout=2)
+
+    assert asyncio.run(scenario()) is not None  # a trace context, not a heartbeat

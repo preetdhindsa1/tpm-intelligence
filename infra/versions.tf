@@ -1,5 +1,5 @@
-# Phase 1: plan only, never applied (README "Limitations"). State is local by default;
-# a real deployment would use the commented GCS backend below.
+# State lives in a GCS bucket (versioned, uniform access, created once by
+# infra/bootstrap.sh). CI's offline plan runs with -backend=false.
 terraform {
   required_version = ">= 1.9"
 
@@ -14,10 +14,10 @@ terraform {
     }
   }
 
-  # backend "gcs" {
-  #   bucket = "<project>-tfstate"
-  #   prefix = "tpm-intelligence"
-  # }
+  backend "gcs" {
+    bucket = "tpm-intelligence-tfstate"
+    prefix = "tpm-intelligence"
+  }
 }
 
 provider "google" {

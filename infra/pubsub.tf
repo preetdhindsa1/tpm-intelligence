@@ -1,5 +1,5 @@
 # Event queue (ADR-0001). Names match pipeline/queue.py (EVENTS_TOPIC) and
-# pipeline/worker.py (SUBSCRIPTION).
+# pipeline/worker.py (SUBSCRIPTION), run inside the API in the cloud (ADR-0017).
 
 locals {
   pubsub_agent = "serviceAccount:service-${var.project_number}@gcp-sa-pubsub.iam.gserviceaccount.com"
@@ -52,14 +52,14 @@ resource "google_pubsub_topic_iam_member" "poller_publishes" {
 resource "google_pubsub_subscription_iam_member" "worker_consumes" {
   subscription = google_pubsub_subscription.worker.id
   role         = "roles/pubsub.subscriber"
-  member       = google_service_account.sa["worker"].member
+  member       = google_service_account.sa["api"].member
 }
 
 # The worker also dead-letters itself after max attempts (same as the Redis backend).
 resource "google_pubsub_topic_iam_member" "worker_dead_letters" {
   topic  = google_pubsub_topic.events_dead_letter.id
   role   = "roles/pubsub.publisher"
-  member = google_service_account.sa["worker"].member
+  member = google_service_account.sa["api"].member
 }
 
 # Pub/Sub's own dead-letter forwarding needs these on its service agent.

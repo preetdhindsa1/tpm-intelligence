@@ -217,8 +217,9 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 
 ## Limitations
 
-- Phase 1 runs locally only. The Terraform in `infra/` is checked with an offline plan
-  (84 resources) but has never been applied, so a real deployment is untested.
+- The cloud deployment (option B, ADR-0017: one API instance running the worker, no Redis,
+  shared-core Cloud SQL) is planned against the real project (91 resources, read-only plan)
+  but **not applied yet**, so no live URL exists.
 - **Phase 3 M1: sign-in and permissions** (ADR-0016). Reading is public. Drafting or
   approving executive updates, deciding AI link suggestions, saving scenarios, and
   generating risk notes with paid AI need a GitHub sign-in on the approver allowlist.

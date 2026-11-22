@@ -74,6 +74,33 @@ def run(
     return handled
 
 
+def start_in_background(
+    notify: Callable[[str], None], transport: Transport | None = None
+) -> threading.Event:
+    """Run the worker in a daemon thread of the current process (cloud API, ADR-0017).
+
+    Stored events are announced through ``notify`` instead of Redis. Returns the stop flag.
+    """
+    from pipeline.factory import create_transport
+    from pipeline.store.session import make_engine
+
+    stop = threading.Event()
+    handler = store_events(sessionmaker(make_engine()), notify=notify)
+    queue = transport or create_transport()
+
+    def loop() -> None:
+        logger.info("in-process worker started", extra={"subscription": SUBSCRIPTION})
+        while not stop.is_set():
+            try:
+                run(stop, queue, handler=handler)
+            except Exception:  # keep consuming; a bad batch must not stop the API's worker
+                logger.exception("in-process worker failed; retrying in 5 s")
+                stop.wait(5)
+
+    threading.Thread(target=loop, name="worker", daemon=True).start()
+    return stop
+
+
 def main() -> None:
     """Start telemetry, connect to the queue, consume until SIGTERM/SIGINT."""
     import os

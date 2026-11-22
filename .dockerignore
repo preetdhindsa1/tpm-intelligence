@@ -10,4 +10,6 @@
 web
 infra
 tests
-docs
+# Backtest results stay in the image: the API reads its validation labels from them.
+docs/decisions
+docs/images

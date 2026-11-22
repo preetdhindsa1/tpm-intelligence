@@ -1,4 +1,5 @@
-# Postgres (source of truth) and Redis (cache, live push): ADR-0002.
+# Postgres, the source of truth (ADR-0002). No Redis in the cloud (ADR-0017): the API runs
+# the worker in-process, so live updates need no broker.
 
 resource "random_password" "db" {
   length  = 32
@@ -43,16 +44,4 @@ resource "google_sql_user" "app" {
   name     = "tpm"
   instance = google_sql_database_instance.db.name
   password = random_password.db.result
-}
-
-resource "google_redis_instance" "cache" {
-  name               = "${local.name}-redis"
-  tier               = "BASIC"
-  memory_size_gb     = var.redis_memory_gb
-  region             = var.region
-  redis_version      = "REDIS_7_2"
-  authorized_network = google_compute_network.vpc.id
-  connect_mode       = "DIRECT_PEERING"
-  auth_enabled       = true
-  depends_on         = [google_project_service.apis]
 }

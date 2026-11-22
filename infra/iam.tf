@@ -2,8 +2,7 @@
 
 locals {
   service_accounts = {
-    api       = "TPM API (read DB, live updates)"
-    worker    = "TPM pipeline worker (consume events, write DB)"
+    api       = "TPM API (read DB, live updates; runs the event worker in-process, ADR-0017)"
     poller    = "TPM GitHub poller (read-only GitHub, publish events)"
     migrate   = "TPM database migrations"
     web       = "TPM web app"
@@ -12,7 +11,7 @@ locals {
 
   # Every Python service exports traces, metrics and logs through its collector sidecar.
   telemetry_roles = ["roles/cloudtrace.agent", "roles/monitoring.metricWriter", "roles/logging.logWriter"]
-  db_users        = ["api", "worker", "poller", "migrate"]
+  db_users        = ["api", "poller", "migrate"]
 
   telemetry_bindings = {
     for pair in setproduct(local.db_users, local.telemetry_roles) : "${pair[0]}:${pair[1]}" => {

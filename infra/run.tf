@@ -1,5 +1,5 @@
-# Cloud Run workloads (ADR-0007). One Python image (Dockerfile) with a different command
-# per workload, matching docker-compose.yml. Each Python workload runs the OTel Collector
+# Cloud Run workloads (ADR-0007, sized for option B in ADR-0017). One Python image
+# (Dockerfile) with a different command per workload. The API also runs the event worker. Each Python workload runs the OTel Collector
 # as a sidecar on localhost:4317, exporting to Cloud Trace / Monitoring / Logging.
 
 locals {
@@ -12,10 +12,6 @@ locals {
     OTEL_EXPORTER_OTLP_INSECURE = "true"
   }
 
-  vpc_egress = {
-    network    = google_compute_network.vpc.id
-    subnetwork = google_compute_subnetwork.run.id
-  }
 }
 
 # ---------------------------------------------------------------- API (FastAPI + SSE)
@@ -31,17 +27,12 @@ resource "google_cloud_run_v2_service" "api" {
     timeout         = "3600s" # SSE streams stay open
 
     scaling {
-      min_instance_count = 1 # keeps the in-process forecast cache warm (README: cold cache ~7 s)
-      max_instance_count = 4
+      # Exactly one instance: it holds the computed release in memory and runs the only
+      # event worker, whose live-update notices reach SSE clients of this instance only.
+      min_instance_count = 1
+      max_instance_count = 1
     }
 
-    vpc_access {
-      egress = "PRIVATE_RANGES_ONLY"
-      network_interfaces {
-        network    = local.vpc_egress.network
-        subnetwork = local.vpc_egress.subnetwork
-      }
-    }
 
     containers {
       name    = "api"
@@ -54,16 +45,21 @@ resource "google_cloud_run_v2_service" "api" {
 
       resources {
         limits = {
-          cpu    = "2"
-          memory = "2Gi"
+          cpu = "1"
+          # The computed release is ~1.4 GiB, and a background recompute briefly holds a
+          # second copy (stale-while-revalidate, ADR-0002), so 2 GiB would run out.
+          memory = "4Gi"
         }
-        cpu_idle = false # recompute and SSE pushes happen outside requests
+        cpu_idle = false # recompute, the worker and SSE pushes happen outside requests
       }
 
       dynamic "env" {
         for_each = merge(local.common_env, {
           OTEL_SERVICE_NAME = "tpm-api"
-          CORS_ORIGINS      = join(",", var.cors_origins)
+          CORS_ORIGINS      = join(",", concat([local.web_url], var.cors_origins))
+          WORKER_IN_PROCESS = "true"
+          AUTH_MODE         = "required" # ADR-0016: fail closed
+          APPROVERS         = join(",", var.approvers)
         })
         content {
           name  = env.key
@@ -80,10 +76,10 @@ resource "google_cloud_run_v2_service" "api" {
         }
       }
       env {
-        name = "REDIS_URL"
+        name = "TPM_ACTION_SECRET"
         value_source {
           secret_key_ref {
-            secret  = google_secret_manager_secret.redis_url.secret_id
+            secret  = google_secret_manager_secret.generated["tpm-action-secret"].secret_id
             version = "latest"
           }
         }
@@ -146,6 +142,11 @@ resource "google_cloud_run_v2_service" "api" {
     }
   }
 
+  # The deploy workflow rolls out new images; Terraform owns everything else.
+  lifecycle {
+    ignore_changes = [template[0].containers[0].image, client, client_version]
+  }
+
   depends_on = [google_secret_manager_secret_iam_member.readers, google_secret_manager_secret_version.otel_config]
 }
 
@@ -171,10 +172,34 @@ resource "google_cloud_run_v2_service" "web" {
         container_port = 3000
       }
       # Server-side rendering calls the API over HTTPS. The browser's SSE URL
-      # (NEXT_PUBLIC_API_URL) is baked in at image build time.
-      env {
-        name  = "API_URL"
-        value = google_cloud_run_v2_service.api.uri
+      # (NEXT_PUBLIC_API_URL) is baked in at image build time (deploy workflow).
+      dynamic "env" {
+        for_each = {
+          API_URL      = local.api_url
+          NEXTAUTH_URL = local.web_url
+          AUTH_MODE    = "required" # never enables the development login (ADR-0016)
+        }
+        content {
+          name  = env.key
+          value = env.value
+        }
+      }
+      dynamic "env" {
+        for_each = {
+          TPM_ACTION_SECRET  = google_secret_manager_secret.generated["tpm-action-secret"].secret_id
+          AUTH_SECRET        = google_secret_manager_secret.generated["auth-secret"].secret_id
+          AUTH_GITHUB_ID     = google_secret_manager_secret.github_oauth["auth-github-id"].secret_id
+          AUTH_GITHUB_SECRET = google_secret_manager_secret.github_oauth["auth-github-secret"].secret_id
+        }
+        content {
+          name = env.key
+          value_source {
+            secret_key_ref {
+              secret  = env.value
+              version = "latest"
+            }
+          }
+        }
       }
       resources {
         limits = {
@@ -184,6 +209,12 @@ resource "google_cloud_run_v2_service" "web" {
       }
     }
   }
+
+  lifecycle {
+    ignore_changes = [template[0].containers[0].image, client, client_version]
+  }
+
+  depends_on = [google_secret_manager_secret_iam_member.readers]
 }
 
 resource "google_cloud_run_v2_service_iam_member" "public" {
@@ -195,104 +226,6 @@ resource "google_cloud_run_v2_service_iam_member" "public" {
   location = var.region
   role     = "roles/run.invoker"
   member   = "allUsers"
-}
-
-# ---------------------------------------------------------------- Worker (Pub/Sub pull loop)
-# A worker pool, not a service: pipeline/worker.py pulls continuously and serves no HTTP.
-
-resource "google_cloud_run_v2_worker_pool" "worker" {
-  name                = "${local.name}-worker"
-  location            = var.region
-  deletion_protection = false
-
-  scaling {
-    manual_instance_count = 1
-  }
-
-  template {
-    service_account = google_service_account.sa["worker"].email
-
-    vpc_access {
-      egress = "PRIVATE_RANGES_ONLY"
-      network_interfaces {
-        network    = local.vpc_egress.network
-        subnetwork = local.vpc_egress.subnetwork
-      }
-    }
-
-    containers {
-      name    = "worker"
-      image   = local.app_image
-      command = ["python", "-m", "pipeline.worker"]
-
-      resources {
-        limits = {
-          cpu    = "1"
-          memory = "512Mi"
-        }
-      }
-
-      dynamic "env" {
-        for_each = merge(local.common_env, { OTEL_SERVICE_NAME = "tpm-worker" })
-        content {
-          name  = env.key
-          value = env.value
-        }
-      }
-      env {
-        name = "DATABASE_URL"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.database_url.secret_id
-            version = "latest"
-          }
-        }
-      }
-      env {
-        name = "REDIS_URL"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.redis_url.secret_id
-            version = "latest"
-          }
-        }
-      }
-
-      volume_mounts {
-        name       = "cloudsql"
-        mount_path = "/cloudsql"
-      }
-    }
-
-    containers {
-      name  = "otel-collector"
-      image = local.otel_image
-      args  = ["--config=/etc/otelcol/config.yaml"]
-      volume_mounts {
-        name       = "otel-config"
-        mount_path = "/etc/otelcol"
-      }
-    }
-
-    volumes {
-      name = "cloudsql"
-      cloud_sql_instance {
-        instances = [google_sql_database_instance.db.connection_name]
-      }
-    }
-    volumes {
-      name = "otel-config"
-      secret {
-        secret = google_secret_manager_secret.otel_config.secret_id
-        items {
-          version = "latest"
-          path    = "config.yaml"
-        }
-      }
-    }
-  }
-
-  depends_on = [google_secret_manager_secret_iam_member.readers, google_secret_manager_secret_version.otel_config]
 }
 
 # ---------------------------------------------------------------- Jobs: poller and migrations

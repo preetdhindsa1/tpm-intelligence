@@ -1,0 +1,72 @@
+# Deploy to Google Cloud after CI passes on main (ADR-0017). Keyless: GitHub's OIDC token
+# is exchanged for the deployer service account through Workload Identity Federation.
+# Repository variables (not secrets; set once after `terraform apply`):
+#   GCP_PROJECT_ID, GCP_PROJECT_NUMBER, GCP_REGION, GCP_WIF_PROVIDER, GCP_DEPLOYER
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      vars.GCP_WIF_PROVIDER != '' &&
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    env:
+      PROJECT: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SHA }}
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and push images
+        run: |
+          REG="$REGION-docker.pkg.dev/$PROJECT/tpm"
+          API_URL="https://tpm-api-${{ vars.GCP_PROJECT_NUMBER }}.$REGION.run.app"
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker build -t "$REG/app:$SHA" .
+          docker build --build-arg NEXT_PUBLIC_API_URL="$API_URL" -t "$REG/web:$SHA" web
+          docker push "$REG/app:$SHA"
+          docker push "$REG/web:$SHA"
+          echo "REG=$REG" >> "$GITHUB_ENV"
+
+      - name: Migrate the database (before any new code runs)
+        run: |
+          gcloud run jobs update tpm-migrate --image "$REG/app:$SHA" --region "$REGION"
+          gcloud run jobs execute tpm-migrate --region "$REGION" --wait
+
+      - name: Roll out
+        run: |
+          gcloud run jobs update tpm-github-poller --image "$REG/app:$SHA" --region "$REGION"
+          gcloud run services update tpm-api --container api --image "$REG/app:$SHA" --region "$REGION"
+          gcloud run services update tpm-web --image "$REG/web:$SHA" --region "$REGION"
+
+      - name: Smoke test
+        run: |
+          API="https://tpm-api-${{ vars.GCP_PROJECT_NUMBER }}.$REGION.run.app"
+          WEB="https://tpm-web-${{ vars.GCP_PROJECT_NUMBER }}.$REGION.run.app"
+          curl -fsS --retry 10 --retry-delay 15 --retry-all-errors "$API/healthz"
+          test "$(curl -fsS "$API/me" | python3 -c 'import json,sys; print(json.load(sys.stdin)["mode"])')" = required
+          curl -fsS -o /dev/null --retry 5 --retry-delay 10 "$WEB/"

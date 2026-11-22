@@ -1,14 +1,16 @@
 """Live-update notifications from the worker to the API (for SSE).
 
-The worker publishes one small message per stored event on a Redis channel, with the W3C
-trace context of the event it just stored. The API debounces bursts (a backfill stores
-thousands of events) and hands the first message's trace context to the SSE handler, so
-the API's recompute joins the trace that started in the collector.
+The worker publishes one small message per stored event, with the W3C trace context of
+the event it just stored: on a Redis channel when it runs as its own service (local
+Docker), or in-process when the API runs it (cloud, ADR-0017). The API debounces bursts
+(a backfill stores thousands of events) and hands the first message's trace context to
+the SSE handler, so the API's recompute joins the trace that started in the collector.
 """
 
 from __future__ import annotations
 
 import asyncio
+import threading
 from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import Protocol
@@ -51,28 +53,41 @@ async def _debounced(
 
 @dataclass
 class InMemoryUpdates:
-    """For tests: call ``publish`` to simulate the worker."""
+    """Updates within one process: tests, and the cloud API running the worker in-process.
+
+    ``publish`` may be called from any thread (the worker runs in its own): each message is
+    handed to the subscriber's event loop with ``call_soon_threadsafe``.
+    """
 
     heartbeat_s: float = HEARTBEAT_S
     debounce_s: float = 0.0
-    _queues: list[asyncio.Queue[str]] = field(default_factory=list)
+    _queues: list[tuple[asyncio.AbstractEventLoop, asyncio.Queue[str]]] = field(
+        default_factory=list
+    )
+    _lock: threading.Lock = field(default_factory=threading.Lock)
 
     def publish(self, message: str) -> None:
         """Deliver to every subscriber."""
-        for q in self._queues:
-            q.put_nowait(message)
+        with self._lock:
+            targets = list(self._queues)
+        for loop, q in targets:
+            if not loop.is_closed():
+                loop.call_soon_threadsafe(q.put_nowait, message)
 
     async def subscribe(
         self, is_disconnected: Callable[[], Awaitable[bool]]
     ) -> AsyncIterator[Context | None]:
         """Iterate debounced updates."""
         queue: asyncio.Queue[str] = asyncio.Queue()
-        self._queues.append(queue)
+        entry = (asyncio.get_running_loop(), queue)
+        with self._lock:
+            self._queues.append(entry)
         try:
             async for ctx in _debounced(queue, is_disconnected, self.heartbeat_s, self.debounce_s):
                 yield ctx
         finally:
-            self._queues.remove(queue)
+            with self._lock:
+                self._queues.remove(entry)
 
 
 class RedisUpdates:

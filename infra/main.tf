@@ -3,16 +3,15 @@ locals {
   apis = [
     "artifactregistry.googleapis.com",
     "cloudscheduler.googleapis.com",
-    "compute.googleapis.com",
     "monitoring.googleapis.com",
     "pubsub.googleapis.com",
-    "redis.googleapis.com",
     "run.googleapis.com",
     "secretmanager.googleapis.com",
-    "servicenetworking.googleapis.com",
     "sqladmin.googleapis.com",
     "cloudtrace.googleapis.com",
     "logging.googleapis.com",
+    "iamcredentials.googleapis.com", # keyless deploys from GitHub Actions
+    "sts.googleapis.com",
   ]
 
   registry  = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.images.repository_id}"
@@ -20,6 +19,11 @@ locals {
   web_image = "${local.registry}/web:${var.image_tag}"
   # Same collector image as docker-compose.yml, run as a sidecar next to each Python service.
   otel_image = "otel/opentelemetry-collector-contrib:0.114.0"
+
+  # Cloud Run's deterministic URLs, known before the services exist (web <-> API <-> GitHub
+  # OAuth callback refer to each other).
+  api_url = "https://${local.name}-api-${var.project_number}.${var.region}.run.app"
+  web_url = "https://${local.name}-web-${var.project_number}.${var.region}.run.app"
 }
 
 resource "google_project_service" "apis" {

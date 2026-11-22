@@ -33,7 +33,7 @@ variable "poll_schedule" {
 }
 
 variable "cors_origins" {
-  description = "Browser origins allowed to call the API (the web URL or a custom domain). Set after the first apply: the web URL is not known before it."
+  description = "Extra browser origins allowed to call the API (e.g. a custom domain). The Cloud Run web URL is always allowed."
   type        = list(string)
   default     = []
 }
@@ -47,17 +47,23 @@ variable "public_access" {
 variable "db_tier" {
   description = "Cloud SQL machine tier."
   type        = string
-  default     = "db-custom-1-3840"
-}
-
-variable "redis_memory_gb" {
-  description = "Memorystore capacity."
-  type        = number
-  default     = 1
+  default     = "db-g1-small" # shared core, option B (ADR-0017); about 300k events fit easily
 }
 
 variable "alert_notification_channels" {
   description = "Cloud Monitoring notification channel IDs for alerts (empty: alerts fire with no notification)."
   type        = list(string)
   default     = []
+}
+
+variable "approvers" {
+  description = "GitHub logins allowed to approve and act (ADR-0016)."
+  type        = list(string)
+  default     = []
+}
+
+variable "github_repo" {
+  description = "owner/name of the repository whose main branch may deploy (keyless, ADR-0017)."
+  type        = string
+  default     = "preetdhindsa1/tpm-intelligence"
 }
