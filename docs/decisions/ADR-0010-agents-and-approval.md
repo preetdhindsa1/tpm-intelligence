@@ -8,6 +8,7 @@
 M1 built the fact checker and M2 the AI gateway. M3 adds the first agents. The owner's
 choices (2026-11-22):
 
+- *(Superseded by ADR-0016: approvers sign in with GitHub and are recorded as `user:<login>`.)*
 - The approver is recorded as `APPROVER_NAME` (Harpreet), labelled "local,
   unauthenticated", until sign-in arrives in Phase 3.
 - One retry when more than 30% of claims are removed.

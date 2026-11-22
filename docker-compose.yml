@@ -98,6 +98,10 @@ services:
     build: ./web
     environment:
       API_URL: http://api:8000          # server-side rendering inside the network
+      NEXTAUTH_URL: http://localhost:3000
+    env_file:                            # AUTH_* and TPM_ACTION_SECRET (ADR-0016)
+      - path: .env
+        required: false
     ports: ["3000:3000"]                 # browser SSE uses http://localhost:8000 (build default)
     depends_on:
       api: { condition: service_started }

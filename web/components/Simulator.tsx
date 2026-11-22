@@ -2,6 +2,7 @@
 
 // What-if simulator (ADR-0012). Every number comes from the API's simulator; this page
 // only shows it. Baseline is always next to the scenario, and results are ranges.
+import { useMe } from "@/components/Me";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   updatesRequest,
@@ -224,6 +225,8 @@ function Compare({ a, b }: { a: SavedScenario; b: SavedScenario }) {
 }
 
 export function Simulator({ release }: { release: string }) {
+  const me = useMe();
+  const canAct = me?.approver ?? false;
   const [info, setInfo] = useState<SimulatorInfo | null>(null);
   const [settings, setSettings] = useState<ScenarioSettings>({ name: "", pools: {}, arrival_multiplier: 1 });
   const [sim, setSim] = useState<Simulation | null>(null);
@@ -410,7 +413,8 @@ export function Simulator({ release }: { release: string }) {
           />
           <button
             onClick={save}
-            disabled={busy || !settings.name.trim()}
+            disabled={busy || !settings.name.trim() || !canAct}
+            title={canAct ? undefined : "Sign in as an approver to save scenarios"}
             className="rounded border px-3 py-1.5 font-medium text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
           >
             Run and save

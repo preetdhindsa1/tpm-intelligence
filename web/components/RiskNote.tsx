@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { publicApiUrl, type RiskNote } from "@/lib/api";
+import type { RiskNote } from "@/lib/api";
 import { formatUtc, refLabel, removedSummary } from "@/lib/format";
 
 /**
@@ -15,7 +16,8 @@ export function RiskNotePanel({ release, number }: { release: string; number: nu
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`${publicApiUrl}/releases/${release}/features/${number}/risk-note`)
+    // Through the signed route: only an approver's visit may generate a new (paid) note.
+    fetch(`/api/act/releases/${release}/features/${number}/risk-note`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((body: RiskNote) => !cancelled && setNote(body))
       .catch((e: Error) => !cancelled && setError(e.message));
@@ -34,6 +36,15 @@ export function RiskNotePanel({ release, number }: { release: string; number: nu
       </div>
       {error ? <p className="text-sm text-rose-700">Could not load the explanation ({error}).</p> : null}
       {!note && !error ? <p className="text-sm text-slate-500">Checking the facts…</p> : null}
+      {note && note.status === "sign_in_required" ? (
+        <p className="text-sm text-slate-600">
+          No explanation written yet.{" "}
+          <Link href="/api/auth/signin" prefetch={false} className="font-medium text-indigo-700 hover:underline">
+            Sign in as an approver
+          </Link>{" "}
+          to generate one (it uses paid AI).
+        </p>
+      ) : null}
       {note && (note.status === "paused" || note.status === "failed") ? (
         <p className="text-sm text-amber-800">No explanation yet: {note.reason}</p>
       ) : null}

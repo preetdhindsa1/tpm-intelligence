@@ -108,7 +108,7 @@ export const api = {
 export type VerifiedClaim = { text: string; type: string; refs: string[]; value: unknown };
 
 export type RiskNote = {
-  status: "not_at_risk" | "fresh" | "reused" | "stale" | "paused" | "failed";
+  status: "not_at_risk" | "fresh" | "reused" | "stale" | "paused" | "failed" | "sign_in_required";
   reason: string | null;
   claims: VerifiedClaim[];
   claims_removed: number;
@@ -165,9 +165,12 @@ export const SECTION_TITLES: Record<string, string> = {
   asks: "Asks",
 };
 
-/** Browser-side calls for the update page (POST/PATCH need the public URL). */
+/**
+ * Browser-side calls to the API, through the same-origin signed route (ADR-0016): the web
+ * server adds the signed-in user's signature, and the API decides who may act.
+ */
 export async function updatesRequest<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${publicApiUrl}${path}`, {
+  const res = await fetch(`/api/act${path}`, {
     ...init,
     headers: { "content-type": "application/json", ...(init?.headers ?? {}) },
   });

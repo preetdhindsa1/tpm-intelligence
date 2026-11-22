@@ -248,7 +248,6 @@ def test_update_endpoints_draft_edit_approve() -> None:
         gateway=Gateway(AISettings(), MemoryLedger(), client),
         notes=MemoryNoteStore(),
         updates=MemoryUpdateStore(),
-        approver_name="Harpreet",
     )
     api = TestClient(create_app(service=service, ai=ai))
 
@@ -269,7 +268,7 @@ def test_update_endpoints_draft_edit_approve() -> None:
 
     approved = api.post(f"/releases/v1.38/updates/{uid}/approve", json={}).json()
     assert approved["status"] == "approved"
-    assert approved["decided_by"] == "Harpreet (local, unauthenticated)"
+    assert approved["decided_by"] == "user:local (local, unauthenticated)"
     again = api.post(f"/releases/v1.38/updates/{uid}/approve", json={})
     assert again.status_code == 409
     assert [u["id"] for u in api.get("/releases/v1.38/updates").json()] == [uid]
@@ -310,9 +309,7 @@ def test_link_review_queue_confirm_changes_the_facts() -> None:
         validation=lambda: Validation(False, "test: not validated"),
         extra_links=lambda key: engine_links(store.list(key)),
     )
-    client = TestClient(
-        create_app(service=service, link_store=store, ai=AIServices(approver_name="Harpreet"))
-    )
+    client = TestClient(create_app(service=service, link_store=store, ai=AIServices()))
 
     def row_6395() -> dict[str, int]:
         rows = client.get("/releases/v1.38/features").json()["features"]
@@ -327,7 +324,7 @@ def test_link_review_queue_confirm_changes_the_facts() -> None:
 
     done = client.post(f"/releases/v1.38/link-suggestions/{item['id']}/confirm", json={})
     assert done.status_code == 200
-    assert done.json()["decided_by"] == "user:Harpreet (local, unauthenticated)"
+    assert done.json()["decided_by"] == "user:local (local, unauthenticated)"
     assert (row_6395()["prs_total"], row_6395()["suggested_prs"]) == (6, 0)
 
     again = client.post(f"/releases/v1.38/link-suggestions/{item['id']}/reject", json={})
@@ -348,9 +345,7 @@ def test_simulator_endpoints_label_not_validated_and_save_scenarios() -> None:
         now=lambda: utc(2026, 11, 3),
         validation=lambda: Validation(False, "test: not validated"),
     )
-    client = TestClient(
-        create_app(service=service, sim_store=store, ai=AIServices(approver_name="Harpreet"))
-    )
+    client = TestClient(create_app(service=service, sim_store=store, ai=AIServices()))
     assert client.get("/releases/v1.38/simulator").status_code == 404  # not calibrated yet
     store.save_calibration(calibration())
 
@@ -377,7 +372,7 @@ def test_simulator_endpoints_label_not_validated_and_save_scenarios() -> None:
     saved = client.post("/releases/v1.38/scenarios", json=body)
     assert saved.status_code == 201
     row = saved.json()
-    assert row["created_by"].startswith("user:Harpreet")
+    assert row["created_by"] == "user:local (local, unauthenticated)"
     assert row["result"]["scenario"] == sim["scenario"]  # same seeds, same result
     assert client.post("/releases/v1.38/scenarios", json=body).status_code == 409
     assert [s["id"] for s in client.get("/releases/v1.38/scenarios").json()] == [row["id"]]

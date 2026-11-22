@@ -8,7 +8,7 @@ import threading
 from collections.abc import AsyncIterator
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from opentelemetry import trace
@@ -16,6 +16,7 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from starlette.concurrency import run_in_threadpool
 
 from api.ai import AIServices
+from api.auth import Actor, AuthConfig, identify, require_approver
 from api.live import Updates
 from api.schemas import (
     ClaimOutApi,
@@ -29,6 +30,7 @@ from api.schemas import (
     LinkSuggestionOut,
     LinkSuggestionsOut,
     LoadOut,
+    MeOut,
     MergeDatesOut,
     ReleaseOut,
     RiskNoteOut,
@@ -85,13 +87,28 @@ def create_app(
     link_store: Any = None,
     sim_store: Any = None,
     snapshot_store: Any = None,
+    auth: AuthConfig | None = None,
 ) -> FastAPI:
-    """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis."""
+    """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis.
+
+    ``auth`` defaults to the environment (``AUTH_MODE``, ``TPM_ACTION_SECRET``,
+    ``APPROVERS``; ADR-0016).
+    """
+    auth_config = auth or AuthConfig.from_env()
+
+    async def acting(request: Request) -> Actor:
+        return await identify(request, auth_config)
+
+    async def approver(request: Request) -> Actor:
+        return await require_approver(request, auth_config)
+
     app = FastAPI(title="TPM Intelligence API", version="0.1.0")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=cors_origins or ["http://localhost:3000"],
         allow_methods=["GET", "POST", "PATCH"],
+        # Actions come through the web app's server with a signature (ADR-0016), never
+        # from the browser directly; CORS covers reads and the live-update stream.
         allow_headers=["*"],
     )
     state: dict[str, Any] = {
@@ -126,6 +143,16 @@ def create_app(
 
     app.state.warm_on_boot = warm_on_boot
 
+    @app.get("/me", response_model=MeOut)
+    async def me(who: Actor = Depends(acting)) -> MeOut:
+        """Who the web app is acting for, and whether they may approve (ADR-0016)."""
+        return MeOut(
+            login=None if who.login == "anonymous" else who.login,
+            signed_in=who.signed_in,
+            approver=who.approver,
+            mode=auth_config.mode,
+        )
+
     @app.get("/healthz")
     def healthz() -> dict[str, str]:
         """Liveness probe."""
@@ -158,13 +185,18 @@ def create_app(
         return feature_detail(v, a)
 
     @app.get("/releases/{name}/features/{number}/risk-note", response_model=RiskNoteOut)
-    async def feature_risk_note(name: str, number: int) -> RiskNoteOut:
-        """Why this feature is at risk, in verified claims. May call Claude (on demand only)."""
+    async def feature_risk_note(
+        name: str, number: int, who: Actor = Depends(acting)
+    ) -> RiskNoteOut:
+        """Why this feature is at risk, in verified claims.
+
+        Anyone sees a stored note. Only an approver can make a new one (paid AI, ADR-0016).
+        """
         v = await view(name)
         a = v.feature(f"{ENHANCEMENTS_REPO}#{number}")
         if a is None:
             raise HTTPException(404, f"feature #{number} was never in {name}")
-        result = await run_in_threadpool(ai_services.risk_note, v, a)
+        result = await run_in_threadpool(lambda: ai_services.risk_note(v, a, generate=who.approver))
         note = result.note
         if note is None:
             return RiskNoteOut(status=result.status.value, reason=result.reason)
@@ -232,7 +264,7 @@ def create_app(
         return v, update
 
     @app.post("/releases/{name}/updates", response_model=ExecUpdateOut, status_code=201)
-    async def create_update(name: str) -> ExecUpdateOut:
+    async def create_update(name: str, who: Actor = Depends(approver)) -> ExecUpdateOut:
         """Draft an executive update (calls Claude; essential). Never sent anywhere."""
         from agents.gateway import AIError, BudgetExceededError
 
@@ -259,7 +291,9 @@ def create_app(
         return update_out(update, await run_in_threadpool(ai_services.stale, v, update))
 
     @app.patch("/releases/{name}/updates/{update_id}", response_model=ExecUpdateOut)
-    async def edit_update(name: str, update_id: int, body: UpdateEditIn) -> ExecUpdateOut:
+    async def edit_update(
+        name: str, update_id: int, body: UpdateEditIn, who: Actor = Depends(approver)
+    ) -> ExecUpdateOut:
         """Remove or reword claims in a draft; each claim is re-checked."""
         from agents.vp_summary import UpdateError
         from verify.claims import Claim
@@ -277,7 +311,9 @@ def create_app(
             raise HTTPException(422, str(exc)) from exc
         return update_out(update, await run_in_threadpool(ai_services.stale, v, update))
 
-    async def _decide(name: str, update_id: int, body: DecisionIn, approve: bool) -> ExecUpdateOut:
+    async def _decide(
+        name: str, update_id: int, body: DecisionIn, approve: bool, who: Actor
+    ) -> ExecUpdateOut:
         from agents.vp_summary import UpdateError
 
         v, _ = await owned_update(name, update_id)
@@ -287,6 +323,7 @@ def create_app(
                     v,
                     update_id,
                     approve=approve,
+                    approver=who.recorded_as,
                     acknowledge_warnings=body.acknowledge_warnings,
                     acknowledge_stale=body.acknowledge_stale,
                     note=body.note,
@@ -297,14 +334,18 @@ def create_app(
         return update_out(update, stale=False)
 
     @app.post("/releases/{name}/updates/{update_id}/approve", response_model=ExecUpdateOut)
-    async def approve_update(name: str, update_id: int, body: DecisionIn) -> ExecUpdateOut:
+    async def approve_update(
+        name: str, update_id: int, body: DecisionIn, who: Actor = Depends(approver)
+    ) -> ExecUpdateOut:
         """TPM approval. Records who and when; the platform still sends nothing."""
-        return await _decide(name, update_id, body, approve=True)
+        return await _decide(name, update_id, body, approve=True, who=who)
 
     @app.post("/releases/{name}/updates/{update_id}/reject", response_model=ExecUpdateOut)
-    async def reject_update(name: str, update_id: int, body: DecisionIn) -> ExecUpdateOut:
+    async def reject_update(
+        name: str, update_id: int, body: DecisionIn, who: Actor = Depends(approver)
+    ) -> ExecUpdateOut:
         """TPM rejection, with an optional note."""
-        return await _decide(name, update_id, body, approve=False)
+        return await _decide(name, update_id, body, approve=False, who=who)
 
     def links() -> Any:
         if state["links"] is None:
@@ -368,7 +409,7 @@ def create_app(
         )
 
     async def _decide_link(
-        name: str, suggestion_id: int, body: LinkDecisionIn, confirm: bool
+        name: str, suggestion_id: int, body: LinkDecisionIn, confirm: bool, who: Actor
     ) -> LinkSuggestionOut:
         from agents.link_store import SuggestionError
 
@@ -380,7 +421,7 @@ def create_app(
                     key,
                     suggestion_id,
                     confirm=confirm,
-                    by=f"user:{ai_services.approver}",
+                    by=who.recorded_as,
                     note=body.note,
                 )
             )
@@ -396,18 +437,20 @@ def create_app(
         response_model=LinkSuggestionOut,
     )
     async def confirm_link(
-        name: str, suggestion_id: int, body: LinkDecisionIn
+        name: str, suggestion_id: int, body: LinkDecisionIn, who: Actor = Depends(approver)
     ) -> LinkSuggestionOut:
         """A person confirms: the link becomes verified and counts from now on."""
-        return await _decide_link(name, suggestion_id, body, confirm=True)
+        return await _decide_link(name, suggestion_id, body, confirm=True, who=who)
 
     @app.post(
         "/releases/{name}/link-suggestions/{suggestion_id}/reject",
         response_model=LinkSuggestionOut,
     )
-    async def reject_link(name: str, suggestion_id: int, body: LinkDecisionIn) -> LinkSuggestionOut:
+    async def reject_link(
+        name: str, suggestion_id: int, body: LinkDecisionIn, who: Actor = Depends(approver)
+    ) -> LinkSuggestionOut:
         """A person rejects: the suggestion is hidden from the feature for good."""
-        return await _decide_link(name, suggestion_id, body, confirm=False)
+        return await _decide_link(name, suggestion_id, body, confirm=False, who=who)
 
     def simulator() -> Any:
         from api.simulation import SimulatorService
@@ -517,7 +560,9 @@ def create_app(
         )
 
     @app.post("/releases/{name}/scenarios", response_model=SavedScenarioOut, status_code=201)
-    async def save_scenario(name: str, body: ScenarioIn) -> SavedScenarioOut:
+    async def save_scenario(
+        name: str, body: ScenarioIn, who: Actor = Depends(approver)
+    ) -> SavedScenarioOut:
         """Run and save a named scenario with its result (409 if the name is taken)."""
         from api.sim_store import ScenarioExistsError
 
@@ -532,7 +577,7 @@ def create_app(
                     body.name.strip(),
                     body.model_dump(mode="json"),
                     result.model_dump(mode="json"),
-                    f"user:{ai_services.approver}",
+                    who.recorded_as,
                 )
             )
         except ScenarioExistsError as exc:

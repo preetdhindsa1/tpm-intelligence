@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { updatesRequest, type LinkSuggestion, type LinkSuggestions } from "@/lib/api";
+import { ApproverNote, useMe } from "@/components/Me";
 import { formatUtc, suggestionCounts } from "@/lib/format";
 
 type Tab = "suggested" | "confirmed" | "rejected";
@@ -13,6 +14,8 @@ const TABS: { id: Tab; label: string }[] = [
 const ENH = "https://github.com/kubernetes/enhancements/issues";
 
 export function LinkQueue({ release }: { release: string }) {
+  const me = useMe();
+  const canAct = me?.approver ?? false;
   const [data, setData] = useState<LinkSuggestions | null>(null);
   const [tab, setTab] = useState<Tab>("suggested");
   const [busy, setBusy] = useState<number | null>(null);
@@ -57,6 +60,7 @@ export function LinkQueue({ release }: { release: string }) {
 
   return (
     <div className="space-y-4">
+      <ApproverNote me={me} action="confirm or reject links" />
       <p className="text-sm text-slate-600">
         {suggestionCounts(data.counts) || "No suggestions yet. Run make suggest-links."} · AI cost so far $
         {data.cost_usd.toFixed(2)}
@@ -109,14 +113,14 @@ export function LinkQueue({ release }: { release: string }) {
                   className="min-w-48 flex-1 rounded border px-2 py-1 text-sm"
                 />
                 <button
-                  disabled={busy !== null}
+                  disabled={busy !== null || !canAct}
                   onClick={() => decide(s, "confirm")}
                   className="rounded bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
                 >
                   Confirm link
                 </button>
                 <button
-                  disabled={busy !== null}
+                  disabled={busy !== null || !canAct}
                   onClick={() => decide(s, "reject")}
                   className="rounded border bg-white px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-50"
                 >

@@ -32,6 +32,7 @@ class NoteStatus(StrEnum):
     STALE = "stale"  # facts changed but a new note could not be made (budget/error)
     PAUSED = "paused"  # budget blocked and no note exists yet
     FAILED = "failed"  # AI error and no note exists yet
+    SIGN_IN_REQUIRED = "sign_in_required"  # a new note needs paid AI; only approvers can
 
 
 @dataclass(frozen=True)
@@ -50,8 +51,14 @@ def risk_note(
     feature: FeatureAssessment,
     release_facts: FactSheet,
     prompt: Prompt | None = None,
+    *,
+    generate: bool = True,
 ) -> NoteResult:
-    """Return a verified note for an at-risk feature, generating one only if needed."""
+    """Return a verified note for an at-risk feature, generating one only if needed.
+
+    With ``generate=False`` (visitors who are not approvers, ADR-0016) Claude is never
+    called: a stored note is returned, marked stale if the facts have moved on.
+    """
     if not is_at_risk(feature, release_facts):
         return NoteResult(NoteStatus.NOT_AT_RISK)
     prompt = prompt or load_prompt("risk_analyst")
@@ -63,6 +70,10 @@ def risk_note(
         )
         if not changed:
             return NoteResult(NoteStatus.REUSED, previous, why)
+    if not generate:
+        if previous is not None:
+            return NoteResult(NoteStatus.STALE, previous, "an approver can refresh it")
+        return NoteResult(NoteStatus.SIGN_IN_REQUIRED, None, "sign in as an approver to generate")
     try:
         result = run_loop(gateway, TASK, prompt, facts)
     except BudgetExceededError as exc:

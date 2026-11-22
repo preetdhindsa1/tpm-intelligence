@@ -567,3 +567,12 @@ class SnapshotsOut(_Out):
     release: str
     current_model_version: str
     runs: list[SnapshotRunOut]
+
+
+class MeOut(_Out):
+    """The person the web app is acting for (ADR-0016)."""
+
+    login: str | None
+    signed_in: bool
+    approver: bool
+    mode: str  # required | local

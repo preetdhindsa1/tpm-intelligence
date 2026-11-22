@@ -219,7 +219,13 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 
 - Phase 1 runs locally only. The Terraform in `infra/` is checked with an offline plan
   (84 resources) but has never been applied, so a real deployment is untested.
-- Phase 2 so far: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, and the AI link suggester with a review queue, a what-if simulator (not validated), and the redesigned dashboard. Still to come: forecast improvements. Sign-in, webhooks, Jira and cloud deploy are Phase 3.
+- **Phase 3 M1: sign-in and permissions** (ADR-0016). Reading is public. Drafting or
+  approving executive updates, deciding AI link suggestions, saving scenarios, and
+  generating risk notes with paid AI need a GitHub sign-in on the approver allowlist.
+  Approvals record the GitHub login. Actions are signed by the web server and checked by
+  the API; a missing configuration fails closed. Real GitHub sign-in needs an OAuth app
+  (see `.env.example`); local development uses `AUTH_MODE=local`.
+- Phase 2 so far: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, and the AI link suggester with a review queue, a what-if simulator (not validated), and the redesigned dashboard. Still to come: forecast improvements. Sign-in is done (Phase 3 M1); webhooks, Jira and cloud deploy are next in Phase 3.
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue
   description (the release team's tracking list) and from KEP references in PR text.

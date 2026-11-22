@@ -38,7 +38,7 @@ feature. CLAUDE.md §2.2 allows AI to *suggest* links here, but an AI link must 
    API `GET /releases/{r}/link-suggestions`, `POST .../{id}/confirm`, `.../reject`; page
    `/releases/{r}/links`).
    - Only `suggested` rows can be decided, and decisions are final.
-   - Each decision records `user:<APPROVER_NAME> (local, unauthenticated)`, the time and an
+   - *(Since ADR-0016: `user:<github-login>` of a signed-in approver.)* Each decision records `user:<APPROVER_NAME> (local, unauthenticated)`, the time and an
      optional note. The database requires a decider on every decision.
 5. **Engine merge** (`World.extra_links`, `engine.links.merge_extra_links`, pure):
    - A confirmed link becomes `verified` (method `ai_suggested`, confidence 0.85,

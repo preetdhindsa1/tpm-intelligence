@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AuthStatus } from "@/components/AuthStatus";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,9 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/releases" className="hover:text-slate-900">Release health</Link>
               </nav>
             </div>
-            <span className="hidden text-xs text-slate-500 sm:inline">
-              AI-native program health · decision support, not guarantees
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="hidden text-xs text-slate-500 lg:inline">
+                AI-native program health · decision support, not guarantees
+              </span>
+              <AuthStatus />
+            </div>
           </div>
         </header>
         <main className="mx-auto max-w-[1600px] px-6 py-6">{children}</main>

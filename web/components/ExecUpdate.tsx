@@ -2,15 +2,19 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { SECTION_TITLES, updatesRequest, type ExecUpdate, type VerifiedClaim } from "@/lib/api";
+import { ApproverNote, useMe } from "@/components/Me";
 import { formatUtc, refLabel } from "@/lib/format";
 
 const ORDER = ["summary", "at_risk", "removed", "asks"];
 
 export function ExecUpdatePanel({ release }: { release: string }) {
+  const me = useMe();
+  const canAct = me?.approver ?? false;
   const [updates, setUpdates] = useState<ExecUpdate[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   const load = useCallback(async () => {
     const list = await updatesRequest<ExecUpdate[]>(`/releases/${release}/updates`);
@@ -26,7 +30,8 @@ export function ExecUpdatePanel({ release }: { release: string }) {
         setUpdates(list);
         setSelected((s) => s ?? list[0]?.id ?? null);
       })
-      .catch((e: Error) => !cancelled && setError(e.message));
+      .catch((e: Error) => !cancelled && setError(e.message))
+      .finally(() => !cancelled && setLoaded(true));
     return () => {
       cancelled = true;
     };
@@ -59,10 +64,11 @@ export function ExecUpdatePanel({ release }: { release: string }) {
 
   return (
     <div className="space-y-4">
+      <ApproverNote me={me} action="draft, edit or approve updates" />
       <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={draft}
-          disabled={busy !== null}
+          disabled={busy !== null || !canAct}
           className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
         >
           Draft update
@@ -84,15 +90,28 @@ export function ExecUpdatePanel({ release }: { release: string }) {
         {busy ? <span className="text-sm text-slate-500" aria-live="polite">{busy}</span> : null}
       </div>
       {error ? <p className="rounded border border-rose-200 bg-rose-50 p-2 text-sm text-rose-800">{error}</p> : null}
-      {!current && !busy ? <p className="text-sm text-slate-500">No updates yet. Draft one to start.</p> : null}
-      {current ? <UpdateView key={current.id} update={current} release={release} onChange={replace} run={run} /> : null}
+      {!loaded ? <p className="text-sm text-slate-500">Loading updates…</p> : null}
+      {loaded && !current && !busy && !error ? <p className="text-sm text-slate-500">No updates yet.</p> : null}
+      {current ? <UpdateView key={current.id} update={current} release={release} onChange={replace} run={run} canAct={canAct} /> : null}
     </div>
   );
 }
 
 type Runner = <T>(label: string, fn: () => Promise<T>) => Promise<T | undefined>;
 
-function UpdateView({ update, release, onChange, run }: { update: ExecUpdate; release: string; onChange: (u: ExecUpdate) => void; run: Runner }) {
+function UpdateView({
+  update,
+  release,
+  onChange,
+  run,
+  canAct,
+}: {
+  update: ExecUpdate;
+  release: string;
+  onChange: (u: ExecUpdate) => void;
+  run: Runner;
+  canAct: boolean;
+}) {
   const [editing, setEditing] = useState(false);
   const [draftSections, setDraftSections] = useState<Record<string, VerifiedClaim[]>>(update.sections);
   const [ackWarnings, setAckWarnings] = useState(false);
@@ -231,7 +250,7 @@ function UpdateView({ update, release, onChange, run }: { update: ExecUpdate; re
                 <button onClick={() => { setDraftSections(update.sections); setEditing(false); }} className="rounded border px-3 py-1.5 text-sm">Cancel</button>
               </>
             ) : (
-              <button onClick={() => setEditing(true)} className="rounded border px-3 py-1.5 text-sm hover:bg-slate-50">Edit</button>
+              <button onClick={() => setEditing(true)} disabled={!canAct} className="rounded border px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50">Edit</button>
             )}
           </div>
           {!editing ? (
@@ -256,8 +275,8 @@ function UpdateView({ update, release, onChange, run }: { update: ExecUpdate; re
                 aria-label="Decision note"
               />
               <div className="flex gap-2">
-                <button onClick={() => decide("approve")} className="rounded bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700">Approve</button>
-                <button onClick={() => decide("reject")} className="rounded border px-3 py-1.5 text-sm hover:bg-slate-50">Reject</button>
+                <button onClick={() => decide("approve")} disabled={!canAct} className="rounded bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50">Approve</button>
+                <button onClick={() => decide("reject")} disabled={!canAct} className="rounded border px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50">Reject</button>
               </div>
             </div>
           ) : null}

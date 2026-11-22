@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import threading
 from dataclasses import dataclass, field
 from typing import Any
@@ -41,7 +40,6 @@ class AIServices:
     gateway: Gateway | None = None
     notes: NoteStore | None = None
     updates: UpdateStore | None = None
-    approver_name: str = field(default_factory=lambda: os.getenv("APPROVER_NAME", "unknown"))
     _sheets: dict[tuple[str, int], FactSheet] = field(default_factory=dict)
     _lock: threading.Lock = field(default_factory=threading.Lock)
 
@@ -62,11 +60,6 @@ class AIServices:
                 self.updates = self.updates or PostgresUpdateStore(factory)
             return self.gateway, self.notes, self.updates
 
-    @property
-    def approver(self) -> str:
-        """Recorded on decisions until sign-in exists (Phase 3)."""
-        return f"{self.approver_name} (local, unauthenticated)"
-
     def sheet(self, view: ReleaseView) -> FactSheet:
         """Fact sheet per (release, view version), cached."""
         key = (view.assessment.release.key, view.version)
@@ -75,10 +68,19 @@ class AIServices:
                 self._sheets = {key: fact_sheet_for(view)}  # keep only the newest
             return self._sheets[key]
 
-    def risk_note(self, view: ReleaseView, feature: FeatureAssessment) -> NoteResult:
-        """Verified risk note for a feature (may call Claude)."""
+    def risk_note(
+        self, view: ReleaseView, feature: FeatureAssessment, *, generate: bool = True
+    ) -> NoteResult:
+        """Verified risk note for a feature; calls Claude only if ``generate`` is set."""
         gateway, notes, _ = self._ensure()
-        return risk_note(gateway, notes, view.assessment.release.key, feature, self.sheet(view))
+        return risk_note(
+            gateway,
+            notes,
+            view.assessment.release.key,
+            feature,
+            self.sheet(view),
+            generate=generate,
+        )
 
     # ---------------------------------------------------------------- executive updates
 
@@ -123,9 +125,9 @@ class AIServices:
         return edit_update(updates, update_id, sections)
 
     def decide(
-        self, view: ReleaseView, update_id: int, *, approve: bool, **kwargs: Any
+        self, view: ReleaseView, update_id: int, *, approve: bool, approver: str, **kwargs: Any
     ) -> ExecUpdate:
-        """Approve or reject, recording the local approver."""
+        """Approve or reject, recording the signed-in approver (ADR-0016)."""
         from agents.vp_summary import decide
 
         _, _, updates = self._ensure()
@@ -136,7 +138,7 @@ class AIServices:
             updates,
             update_id,
             approve=approve,
-            approver=self.approver,
+            approver=approver,
             stale=self.stale(view, update),
             **kwargs,
         )
