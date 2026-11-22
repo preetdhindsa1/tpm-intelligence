@@ -130,5 +130,6 @@ def test_prompt_versions(tmp_path: Path) -> None:
         load_prompt("x", 3, directory=tmp_path)
 
 
-def test_repo_smoke_prompt_exists() -> None:
-    assert load_prompt("smoke").label == "smoke.v1"
+def test_repo_smoke_prompt_latest_and_history() -> None:
+    assert load_prompt("smoke").label == "smoke.v2"  # v2: digits and #keys (2026-11-22)
+    assert load_prompt("smoke", 1).label == "smoke.v1"  # old versions stay loadable

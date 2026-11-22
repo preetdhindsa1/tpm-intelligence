@@ -216,3 +216,21 @@ def test_tolerances(kind: FactKind, fact: object, claimed: object, ok: bool) -> 
 def test_duplicate_fact_keys_are_rejected() -> None:
     with pytest.raises(ValueError, match="duplicate"):
         FactSheet([Fact("release::x", FactKind.COUNT, 1), Fact("release::x", FactKind.COUNT, 2)])
+
+
+def test_bare_subject_number_is_an_identifier_not_a_value() -> None:
+    """Found by the first real AI run (2026-11-22): "Feature 6395" without the '#'."""
+    ok = Claim(
+        text="The estimated probability for feature 6395 is 0.38.",
+        type=FactKind.PROBABILITY,
+        refs=(F + "odds.probability",),
+        value=0.384,
+    )
+    assert verdict(ok) == (Verdict.VERIFIED, None)
+    wrong_feature = Claim(
+        text="The estimated probability for feature 6396 is 0.38.",
+        type=FactKind.PROBABILITY,
+        refs=(F + "odds.probability",),
+        value=0.384,
+    )
+    assert verdict(wrong_feature) == (Verdict.REMOVED, Reason.TEXT_MISMATCH)

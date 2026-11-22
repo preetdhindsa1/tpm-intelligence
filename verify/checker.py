@@ -15,6 +15,7 @@ Removed claims are never shown. Their counts are kept and published.
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
@@ -111,7 +112,12 @@ def check_claim(claim: Claim, facts: FactSheet) -> CheckedClaim:
     if not values_match(primary, claim.value):
         return removed(Reason.WRONG_VALUE, f"fact {primary.key} = {primary.value!r}")
     cited = [facts[r] for r in claim.refs]
-    unsupported = [n for n in stated_numbers(claim.text) if not _number_supported(n, cited)]
+    identifiers = _identifier_numbers(claim.refs)
+    unsupported = [
+        n
+        for n in stated_numbers(claim.text)
+        if n not in identifiers and not _number_supported(n, cited)
+    ]
     if unsupported:
         shown = ", ".join(f"{n:g}" for n in unsupported)
         return removed(Reason.TEXT_MISMATCH, f"text states {shown}, not in the cited facts")
@@ -181,6 +187,14 @@ def _dates_match(actual: datetime, claimed: ClaimValue) -> bool:
 
 
 # ---------------------------------------------------------------- numbers in the text
+
+
+def _identifier_numbers(refs: Sequence[str]) -> set[float]:
+    """Numbers inside the cited subjects' keys ("Feature 6395" when citing #6395's facts).
+
+    Only the subject part (before ``::``) counts, so a field name can never whitelist a value.
+    """
+    return {float(n) for ref in refs for n in re.findall(r"\d+", ref.split("::", 1)[0])}
 
 
 def _number_supported(n: float, cited: Sequence[Fact]) -> bool:

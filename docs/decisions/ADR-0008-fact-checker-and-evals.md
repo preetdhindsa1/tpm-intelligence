@@ -45,7 +45,7 @@ The verifier comes first (M1), so no AI output can reach a person without passin
      Dates, times, versions and issue/PR/Jira keys are masked first.
    - Otherwise `verified`. Counts per reason and the removal rate are kept for publishing.
 4. **Evals** (`evals/`, `python -m evals.run_evals`, `make evals`, a CI step).
-   - **Fact-checker suite.** 36 labelled claim cases, using real-shaped facts from #6395,
+   - **Fact-checker suite.** 38 labelled claim cases (2 added after the first real AI run), using real-shaped facts from #6395,
      #2570, v1.38, KAFKA-21181 and KAFKA-19831. It covers every verdict, including the
      claims from the dashboard mockup ("reallocating 3 TPMs reduces risk by 45%",
      "92% confidence of a bottleneck"), which have no facts behind them. The checker is

@@ -92,6 +92,20 @@ Phase 2 agents call Claude. CLAUDE.md §8 sets the rules:
 - **Langfuse v4 no longer offers its old trace-read API.** Checks use
   `/api/public/v2/observations`.
 
+## First measured runs (2026-11-22)
+
+`make ai-smoke` on the #6395 fact sheet, Haiku 5.5, effort `low`:
+
+| Prompt | Verified | Removed | Cost | Note |
+|---|---|---|---|---|
+| `smoke.v1` | 9 | 10 (text_mismatch) | $0.00107 | Mostly a checker false positive: "feature 6395" without `#`. Fixed: numbers in a cited subject's key are identifiers. One sentence wrote "Nine" in words |
+| `smoke.v2` | 16 | 1 (text_mismatch) | $0.00098 | Correct removal: the sentence stated "0 open and 2 suggested" without citing those facts |
+| `smoke.v2` again | n/a | n/a | $0 | Served from the cache |
+
+Langfuse first stored the v1 spans twice: its first ingest after start-up took longer than
+the exporter's 10 s timeout, so the exporter retried. The timeout is now 30 s. Langfuse shows
+the GenAI generations but not their cost; `ai_usage` is the cost record.
+
 ## AI vs rules
 
 AI produces only `ClaimsOut`, which the fact checker verifies. Everything that decides

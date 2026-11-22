@@ -61,5 +61,6 @@ def langfuse_processor(exporter: SpanExporter | None = None) -> SpanProcessor | 
         exporter = OTLPSpanExporter(
             endpoint=f"{host.rstrip('/')}/api/public/otel/v1/traces",
             headers={"Authorization": f"Basic {token}"},
+            timeout=30,  # first ingest after start-up can exceed the 10 s default (2026-11-22)
         )
     return AISpanFilter(BatchSpanProcessor(exporter))
