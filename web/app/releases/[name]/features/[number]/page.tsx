@@ -17,7 +17,9 @@ export default async function FeaturePage({ params }: { params: Promise<{ name: 
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href={`/releases/${name}`} className="text-sm text-indigo-700 hover:underline">← {name} release health</Link>
+          <Link href={`/releases/${name}`} className="text-sm text-[var(--tpm-accent)] hover:underline">
+            ← {name} dashboard
+          </Link>
           <h1 className="text-2xl font-semibold">
             <a className="hover:underline" href={f.url ?? "#"}>#{f.number}</a> {f.title}
           </h1>
