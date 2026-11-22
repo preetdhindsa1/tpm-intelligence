@@ -87,6 +87,12 @@ def build_providers(
     tracer_provider = TracerProvider(resource=resource)
     for exporter in exporters:
         tracer_provider.add_span_processor(BatchSpanProcessor(exporter))
+    if span_exporters is None:  # explicit exporters (tests) never leak to Langfuse
+        from observability.langfuse_export import langfuse_processor
+
+        langfuse = langfuse_processor()
+        if langfuse is not None:
+            tracer_provider.add_span_processor(langfuse)
     meter_provider = MeterProvider(resource=resource, metric_readers=readers)
     return Telemetry(tracer_provider=tracer_provider, meter_provider=meter_provider)
 

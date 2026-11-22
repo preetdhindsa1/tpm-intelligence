@@ -387,3 +387,47 @@ class SyncCursor(Base):
     last_success_at: Mapped[datetime | None] = mapped_column(_tz())
     consecutive_failures: Mapped[int] = mapped_column(Integer, server_default="0")
     last_error: Mapped[str | None] = mapped_column(Text)
+
+
+AI_OUTCOMES = ("ok", "refused", "max_tokens", "error", "budget_denied", "cache_hit")
+
+
+class AIUsage(Base):
+    """One AI call attempt: tokens, cost and outcome. Sums per UTC day enforce the budget."""
+
+    __tablename__ = "ai_usage"
+    __table_args__ = (
+        CheckConstraint(_in("outcome", AI_OUTCOMES), name="outcome"),
+        Index(None, "at"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+    task: Mapped[str] = mapped_column(String(64))
+    prompt_version: Mapped[str] = mapped_column(String(64))
+    model_requested: Mapped[str] = mapped_column(String(64))
+    model_served: Mapped[str | None] = mapped_column(String(64))
+    essential: Mapped[bool]
+    outcome: Mapped[str] = mapped_column(String(16))
+    input_tokens: Mapped[int] = mapped_column(Integer, server_default="0")
+    output_tokens: Mapped[int] = mapped_column(Integer, server_default="0")
+    cache_read_tokens: Mapped[int] = mapped_column(Integer, server_default="0")
+    cache_write_tokens: Mapped[int] = mapped_column(Integer, server_default="0")
+    cost_usd: Mapped[Decimal] = mapped_column(Numeric(12, 6), server_default="0")
+    fingerprint: Mapped[str] = mapped_column(String(64))
+    request_id: Mapped[str | None] = mapped_column(String(128))
+    detail: Mapped[str | None] = mapped_column(Text)
+
+
+class AIResult(Base):
+    """Cached structured output by input fingerprint, with its fact-check counts."""
+
+    __tablename__ = "ai_results"
+
+    fingerprint: Mapped[str] = mapped_column(String(64), primary_key=True)
+    task: Mapped[str] = mapped_column(String(64))
+    prompt_version: Mapped[str] = mapped_column(String(64))
+    model: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+    output: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    check_counts: Mapped[dict[str, Any] | None] = mapped_column(JSONB)

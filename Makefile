@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan
+.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke
 
 UV ?= uv
 RELEASE ?=
@@ -67,3 +67,14 @@ tf-plan: tf-validate ## Offline plan with a placeholder project and dummy token:
 	docker run --rm -v "$(CURDIR)":/work -w /work/infra -e GOOGLE_OAUTH_ACCESS_TOKEN=offline-plan \
 	  hashicorp/terraform:1.10 plan -input=false -refresh=false -lock=false \
 	  -var project_id=tpm-demo-placeholder -var project_number=000000000000
+
+LANGFUSE = docker compose -p tpm-langfuse --env-file .env -f observability/langfuse/docker-compose.yml -f observability/langfuse/compose.override.yml
+
+langfuse-up: ## Start self-hosted Langfuse (LLM traces) on http://localhost:3001
+	$(LANGFUSE) up -d
+
+langfuse-down: ## Stop Langfuse (data kept in its volumes)
+	$(LANGFUSE) down
+
+ai-smoke: ## One real Claude call on #6395 facts, fact-checked (costs < $0.01; needs ANTHROPIC_API_KEY)
+	docker compose run --rm --no-deps -e OTEL_SERVICE_NAME=tpm-ai-smoke api python scripts/ai_smoke.py

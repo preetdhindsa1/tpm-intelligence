@@ -22,7 +22,7 @@ make tf-validate   # fmt + validate, in Docker
 make tf-plan       # offline plan: placeholder project, dummy token, nothing contacted
 ```
 
-CI runs the same checks. On 2026-11-21 the offline plan showed **81 resources to add**.
+CI runs the same checks. On 2026-11-22 the offline plan showed **84 resources to add** (81 before the Phase 2 AI key secret and spend alert).
 An offline plan shows the configuration is consistent. It does not show that a real apply
 works: quotas, org policies and API enablement are untested.
 

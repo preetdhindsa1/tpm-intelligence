@@ -12,6 +12,15 @@ resource "google_secret_manager_secret" "github_token" {
   depends_on = [google_project_service.apis]
 }
 
+# Anthropic API key for the agents (phase 2), added by hand like the GitHub token.
+resource "google_secret_manager_secret" "anthropic_api_key" {
+  secret_id = "anthropic-api-key"
+  replication {
+    auto {}
+  }
+  depends_on = [google_project_service.apis]
+}
+
 resource "google_secret_manager_secret" "database_url" {
   secret_id = "database-url"
   replication {
@@ -62,6 +71,7 @@ locals {
     "redis_url:api"        = google_secret_manager_secret.redis_url.id
     "redis_url:worker"     = google_secret_manager_secret.redis_url.id
     "github_token:poller"  = google_secret_manager_secret.github_token.id
+    "anthropic:api"        = google_secret_manager_secret.anthropic_api_key.id
     "otel_config:api"      = google_secret_manager_secret.otel_config.id
     "otel_config:worker"   = google_secret_manager_secret.otel_config.id
     "otel_config:poller"   = google_secret_manager_secret.otel_config.id

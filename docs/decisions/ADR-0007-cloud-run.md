@@ -39,7 +39,7 @@ workloads have different shapes:
     (`observability/otel-collector-cloud.yaml`).
   - Alert policies cover queue backlog, dead letters and poller failures.
 - **Checks:** CI and `make tf-plan` run fmt, validate and an **offline plan** (placeholder
-  project, dummy token, `-refresh=false`). Measured 2026-11-21: 81 resources to add.
+  project, dummy token, `-refresh=false`). Measured 2026-11-22: 84 resources to add (81 before the Phase 2 AI key secret and spend alert).
 
 ## Alternatives considered
 

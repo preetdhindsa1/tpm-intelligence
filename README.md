@@ -133,11 +133,16 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 - **M1 done: fact checker and evals** (`verify/`, `evals/`, ADR-0008). Engine output becomes
   a typed fact sheet. AI claims must cite fact keys and are verified or removed with a
   reason. No AI agents yet.
+- **M2 done: AI plumbing** (`agents/`, ADR-0009). One gateway to Claude with models from
+  config, structured output, a $2/day budget (slow at 80%, pause at 100%), a cache keyed by
+  a hash of the input facts, versioned prompts, OTel spans and metrics, and self-hosted
+  Langfuse for AI traces (`make langfuse-up` → http://localhost:3001). `make ai-smoke` makes
+  one real, fact-checked call.
 
 ## Limitations
 
 - Phase 1 runs locally only. The Terraform in `infra/` is checked with an offline plan
-  (81 resources) but has never been applied, so a real deployment is untested.
+  (84 resources) but has never been applied, so a real deployment is untested.
 - No AI agents, simulator, sign-in, webhooks or Jira in phase 1.
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue

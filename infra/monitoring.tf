@@ -68,3 +68,21 @@ resource "google_monitoring_alert_policy" "poller_failures" {
   notification_channels = var.alert_notification_channels
   depends_on            = [google_project_service.apis]
 }
+
+# AI spend at 80% of the daily cap (CLAUDE.md section 9). The gateway exports the
+# ai.budget.used_fraction gauge; the collector sends it to Managed Prometheus.
+resource "google_monitoring_alert_policy" "ai_budget" {
+  display_name = "TPM: AI spend at 80% of the daily cap"
+  combiner     = "OR"
+
+  conditions {
+    display_name = "ai_budget_used_fraction >= 0.8"
+    condition_prometheus_query_language {
+      query    = "max(ai_budget_used_fraction) >= 0.8"
+      duration = "60s"
+    }
+  }
+
+  notification_channels = var.alert_notification_channels
+  depends_on            = [google_project_service.apis]
+}

@@ -1,0 +1,41 @@
+# Local overrides for the vendored Langfuse stack (ADR-0009). Run via `make langfuse-up`.
+# - Only the web UI is published, on 127.0.0.1:3001 (our web app owns :3000; our Postgres
+#   and Redis own :5432 and :6379). Everything else stays on Langfuse's private network.
+# - Langfuse's own product telemetry is off. The AI gateway is not used.
+# - The project and its API keys are created headlessly from .env (LANGFUSE_* values).
+x-local-env: &local-env
+  TELEMETRY_ENABLED: "false"
+  NEXTAUTH_URL: http://localhost:3001
+
+services:
+  langfuse-worker:
+    ports: !reset []
+    environment:
+      <<: *local-env
+
+  langfuse-web:
+    ports: !override
+      - 127.0.0.1:3001:3000
+    environment:
+      <<: *local-env
+      LANGFUSE_INIT_ORG_ID: tpm-intelligence
+      LANGFUSE_INIT_ORG_NAME: TPM Intelligence
+      LANGFUSE_INIT_PROJECT_ID: tpm-intelligence-local
+      LANGFUSE_INIT_PROJECT_NAME: tpm-intelligence (local)
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:?set LANGFUSE_PUBLIC_KEY in .env}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LANGFUSE_SECRET_KEY:?set LANGFUSE_SECRET_KEY in .env}
+      LANGFUSE_INIT_USER_EMAIL: ${LANGFUSE_INIT_USER_EMAIL:-admin@tpm.local}
+      LANGFUSE_INIT_USER_NAME: TPM admin
+      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD:?set LANGFUSE_INIT_USER_PASSWORD in .env}
+
+  langfuse-ai-gateway:
+    profiles: ["unused"]
+
+  clickhouse:
+    ports: !reset []
+  minio:
+    ports: !reset []
+  redis:
+    ports: !reset []
+  postgres:
+    ports: !reset []
