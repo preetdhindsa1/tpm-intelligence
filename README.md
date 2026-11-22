@@ -161,16 +161,24 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   are checked word for word. "Link review →" on the release page lists suggestions; only a
   person's confirmation makes a link count. `make suggest-links RELEASE=v1.38` runs it
   within the daily budget.
-- **M5 in progress: review simulator** (ADR-0012). SimPy model of PRs queueing for SIG
-  reviewer pools, fitted on earlier releases and validated by replay. With PR comments
-  counted as review activity it fails on both v1.37 and v1.38 (review wait far too long),
-  so it is **not validated**; scenarios are not built yet.
+- **M5: what-if simulator, shipped not validated** (ADR-0012). SimPy model of PRs
+  queueing for SIG reviewer pools, fitted on earlier releases and validated by replay.
+  With PR comments counted as review activity it fails on both v1.37 and v1.38 (review
+  wait far too long), so it is **not validated**.
+  - "Simulate →" on the release page lets you change reviewers, new reviewers and
+    ramp-up, interruptions and the flow of new PRs per SIG pool.
+  - It shows baseline vs scenario until the next milestone, as ranges over 8 seeded
+    runs. Scenarios can be saved and compared.
+  - Every result carries a "not validated" banner.
+  - A scenario request takes p95 0.86 s (40 requests, local Docker, measured
+    2026-11-22).
+  - `make sim-calibrate RELEASE=v1.38` fits and stores the calibration.
 
 ## Limitations
 
 - Phase 1 runs locally only. The Terraform in `infra/` is checked with an offline plan
   (84 resources) but has never been applied, so a real deployment is untested.
-- Phase 2 so far: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, and the AI link suggester with a review queue. Still to come: simulator, dashboard redesign, forecast improvements. Sign-in, webhooks, Jira and cloud deploy are Phase 3.
+- Phase 2 so far: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, and the AI link suggester with a review queue, and a what-if simulator (not validated). Still to come: dashboard redesign, forecast improvements. Sign-in, webhooks, Jira and cloud deploy are Phase 3.
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue
   description (the release team's tracking list) and from KEP references in PR text.

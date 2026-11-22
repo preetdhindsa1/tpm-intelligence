@@ -332,3 +332,52 @@ def test_link_review_queue_confirm_changes_the_facts() -> None:
     assert again.status_code == 409
     assert client.post("/releases/v1.38/link-suggestions/99/confirm", json={}).status_code == 404
     assert client.get("/releases/v1.38/link-suggestions?status=bogus").status_code == 422
+
+
+def test_simulator_endpoints_label_not_validated_and_save_scenarios() -> None:
+    from api.ai import AIServices
+    from api.sim_store import MemorySimStore
+    from tests.simulator.test_scenario import calibration
+
+    store = MemorySimStore()
+    service = ReleaseService(
+        InMemoryEventSource(list(fixture_events())),
+        forecast=FAST,
+        now=lambda: utc(2026, 11, 3),
+        validation=lambda: Validation(False, "test: not validated"),
+    )
+    client = TestClient(
+        create_app(service=service, sim_store=store, ai=AIServices(approver_name="Harpreet"))
+    )
+    assert client.get("/releases/v1.38/simulator").status_code == 404  # not calibrated yet
+    store.save_calibration(calibration())
+
+    info = client.get("/releases/v1.38/simulator").json()
+    assert info["validated"] is False
+    assert "not validated" in info["note"]
+    assert info["horizon_label"] == "Code Freeze"
+    assert info["source_releases"] == ["kubernetes:v1.37"]
+    assert {p["pool"] for p in info["pools"]} == {"sig/node", "other"}
+
+    body = {"name": "cut node", "pools": {"sig/node": {"reviewers": -1}}}
+    sim = client.post("/releases/v1.38/simulate", json=body).json()
+    assert sim["validated"] is False
+    assert "not validated" in sim["note"]
+    assert sim["baseline"]["total"]["merged"]["low"] <= sim["baseline"]["total"]["merged"]["high"]
+    node = next(p for p in sim["scenario"]["pools"] if p["pool"] == "sig/node")
+    now = next(p for p in info["pools"] if p["pool"] == "sig/node")["reviewers_now"]
+    assert node["reviewers"] == max(0, now - 1)
+
+    bad = client.post("/releases/v1.38/simulate", json={"pools": {"sig/nope": {}}})
+    assert bad.status_code == 422
+    assert client.post("/releases/v1.38/scenarios", json={"pools": {}}).status_code == 422
+
+    saved = client.post("/releases/v1.38/scenarios", json=body)
+    assert saved.status_code == 201
+    row = saved.json()
+    assert row["created_by"].startswith("user:Harpreet")
+    assert row["result"]["scenario"] == sim["scenario"]  # same seeds, same result
+    assert client.post("/releases/v1.38/scenarios", json=body).status_code == 409
+    assert [s["id"] for s in client.get("/releases/v1.38/scenarios").json()] == [row["id"]]
+    assert client.get(f"/releases/v1.38/scenarios/{row['id']}").json()["name"] == "cut node"
+    assert client.get("/releases/v1.38/scenarios/999").status_code == 404

@@ -6,6 +6,7 @@ events arrive or after ``ttl`` (odds depend on the time left before Code Freeze)
 
 from __future__ import annotations
 
+import gc
 import logging
 import threading
 import time
@@ -213,6 +214,13 @@ class ReleaseService:
             ):
                 view = self._compute(key)
             self._views[key] = view
+            # The projected world is large (about 300k events) and lives until the next
+            # refresh. Moving it out of the garbage collector's reach stops full
+            # collections, triggered by simulator requests, from re-scanning it each time
+            # (measured: 3-4 s pauses on every ~9th request). Frozen objects are still freed
+            # by reference counting; only reference cycles among them are kept.
+            gc.collect()
+            gc.freeze()
             return view
 
     def _fresh(self, key: str) -> ReleaseView | None:

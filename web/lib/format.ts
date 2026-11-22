@@ -1,5 +1,5 @@
 // Pure display helpers. Wording follows CLAUDE.md: ranges, never certainties.
-import type { Flag, Odds } from "./api";
+import type { Flag, Odds, SimRange } from "./api";
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
@@ -82,4 +82,45 @@ export function suggestionCounts(counts: Record<string, number>): string {
     .filter(([k]) => (counts[k] ?? 0) > 0)
     .map(([k, label]) => `${(counts[k] ?? 0).toLocaleString("en-US")} ${label}`)
     .join(" · ");
+}
+
+/** A duration in days, as hours under one day ("9 h", "1.6 d"). */
+export function daysLabel(d: number): string {
+  if (d < 1) return `${Math.round(d * 24)} h`;
+  return `${d.toFixed(1)} d`;
+}
+
+/** "9 h (8–11 h)" for waits, "626 (601–639)" for counts. */
+export function rangeLabel(r: SimRange | null, kind: "days" | "count"): string {
+  if (!r) return "—";
+  if (kind === "count") return `${Math.round(r.median)} (${Math.round(r.low)}–${Math.round(r.high)})`;
+  return `${daysLabel(r.median)} (${daysLabel(r.low)}–${daysLabel(r.high)})`;
+}
+
+export type SimDelta = { text: string; tone: "better" | "worse" | "same"; overlaps: boolean };
+
+/** Scenario minus baseline on the medians. ``overlaps``: the two ranges overlap, so the
+ *  difference may be noise. */
+export function simDelta(
+  base: SimRange | null,
+  scen: SimRange | null,
+  kind: "days" | "count",
+  lowerIsBetter: boolean,
+): SimDelta | null {
+  if (!base || !scen) return null;
+  const diff = scen.median - base.median;
+  const overlaps = scen.low <= base.high && base.low <= scen.high;
+  const small = kind === "days" ? Math.abs(diff) * 24 < 0.5 : Math.abs(diff) < 0.5;
+  if (small) return { text: "no change", tone: "same", overlaps: true };
+  const sign = diff > 0 ? "+" : "−";
+  const abs = Math.abs(diff);
+  const text = kind === "days" ? `${sign}${daysLabel(abs)}` : `${sign}${Math.round(abs)}`;
+  const better = lowerIsBetter ? diff < 0 : diff > 0;
+  return { text, tone: better ? "better" : "worse", overlaps };
+}
+
+/** "+205%" for a validation error. */
+export function errorPct(e: number | null): string {
+  if (e === null) return "—";
+  return `${e > 0 ? "+" : "−"}${Math.round(Math.abs(e) * 100)}%`;
 }

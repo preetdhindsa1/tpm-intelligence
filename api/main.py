@@ -28,6 +28,11 @@ from api.schemas import (
     LoadOut,
     ReleaseOut,
     RiskNoteOut,
+    SavedScenarioOut,
+    ScenarioIn,
+    SimPoolOut,
+    SimulationOut,
+    SimulatorOut,
     UpdateEditIn,
     UpdateWarningOut,
 )
@@ -35,6 +40,20 @@ from api.service import ReleaseService, ReleaseView
 from api.views import feature_detail, feature_row, release_out, release_summary_out
 
 SERVICE_NAME = "tpm-api"
+SIM_NOTE = (
+    "Decision support, not a guarantee: if these assumptions hold, results are likely in "
+    "these ranges."
+)
+SIM_NOT_VALIDATED = (
+    " The simulator is not validated (ADR-0012): do not treat any what-if here as reliable."
+)
+
+
+def sim_note(validated: bool) -> str:
+    """Honest wording for every simulator response (CLAUDE.md section 14)."""
+    return SIM_NOTE if validated else SIM_NOTE + SIM_NOT_VALIDATED
+
+
 ENHANCEMENTS_REPO = "kubernetes/enhancements"
 
 logger = logging.getLogger(__name__)
@@ -47,6 +66,7 @@ def create_app(
     cors_origins: list[str] | None = None,
     ai: AIServices | None = None,
     link_store: Any = None,
+    sim_store: Any = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis."""
     app = FastAPI(title="TPM Intelligence API", version="0.1.0")
@@ -56,7 +76,13 @@ def create_app(
         allow_methods=["GET", "POST", "PATCH"],
         allow_headers=["*"],
     )
-    state: dict[str, Any] = {"service": service, "updates": updates, "links": link_store}
+    state: dict[str, Any] = {
+        "service": service,
+        "updates": updates,
+        "links": link_store,
+        "sim_store": sim_store,
+        "sim": None,
+    }
     ai_services = ai or AIServices()
 
     def svc() -> ReleaseService:
@@ -354,6 +380,154 @@ def create_app(
         """A person rejects: the suggestion is hidden from the feature for good."""
         return await _decide_link(name, suggestion_id, body, confirm=False)
 
+    def simulator() -> Any:
+        from api.simulation import SimulatorService
+
+        if state["sim"] is None:
+            store = state["sim_store"] or _default_sim_store()
+            state["sim"] = SimulatorService(store)
+        return state["sim"]
+
+    async def sim_state(name: str) -> tuple[ReleaseView, Any, Any]:
+        from api.simulation import NoCalibrationError
+
+        v = await view(name)
+        try:
+            cal, st = await run_in_threadpool(simulator().state, v)
+        except NoCalibrationError as exc:
+            raise HTTPException(
+                404, f"no simulator calibration for {name}; run `make sim-calibrate`"
+            ) from exc
+        return v, cal, st
+
+    @app.get("/releases/{name}/simulator", response_model=SimulatorOut)
+    async def simulator_info(name: str) -> SimulatorOut:
+        """Inputs, sources and validation status of the simulator for this release."""
+        from collections import Counter
+
+        from simulator.scenario import base_reviewers
+
+        _, cal, st = await sim_state(name)
+        c = cal.calibration
+        open_now = Counter(p.pool for p in st.in_flight)
+        return SimulatorOut(
+            release=st.release_key,
+            validated=c.validated,
+            validation=dict(c.validation),
+            calibration_id=cal.id,
+            calibrated_at=cal.created_at,
+            source_releases=list(c.inputs.source_releases),
+            data_until=c.data_until,
+            effort_days=c.effort_days,
+            as_of=st.as_of,
+            horizon_at=st.horizon_at,
+            horizon_label=st.horizon_label,
+            replications=simulator().replications,
+            pools=[
+                SimPoolOut(
+                    pool=p.name,
+                    prs_measured=p.prs,
+                    arrivals_per_week=round(p.arrivals_per_week, 2),
+                    reviewers_per_week_source=round(p.reviewers_per_week, 2),
+                    reviewers_now=base_reviewers(st.staffing, p.name),
+                    open_prs_now=open_now.get(p.name, 0),
+                    first_wait_median_days=p.first_wait_median_days,
+                    follow_wait_median_days=p.follow_wait_median_days,
+                    first_scale=c.scales[p.name][0],
+                    later_scale=c.scales[p.name][1],
+                )
+                for p in c.inputs.pools.values()
+            ],
+            note=sim_note(c.validated),
+        )
+
+    async def simulate_out(name: str, body: ScenarioIn) -> SimulationOut:
+        from simulator.scenario import PoolChange, Scenario, comparison_to_json
+
+        v, cal, _ = await sim_state(name)
+        scenario = Scenario(
+            name=body.name or "scenario",
+            pools={k: PoolChange(**c.model_dump()) for k, c in body.pools.items()},
+            arrival_multiplier=body.arrival_multiplier,
+        )
+        problems = scenario.problems(list(cal.calibration.inputs.pools))
+        if problems:
+            raise HTTPException(422, "; ".join(problems))
+        sim = await run_in_threadpool(simulator().simulate, v, scenario)
+        out = comparison_to_json(sim.comparison)
+        return SimulationOut(
+            release=sim.state.release_key,
+            validated=sim.calibration.calibration.validated,
+            calibration_id=sim.calibration.id,
+            source_releases=list(sim.calibration.calibration.inputs.source_releases),
+            as_of=sim.state.as_of,
+            horizon_at=sim.state.horizon_at,
+            horizon_label=sim.state.horizon_label,
+            replications=out["replications"],
+            seed=out["seed"],
+            baseline=out["baseline"],
+            scenario=out["scenario"],
+            seconds=sim.seconds,
+            note=sim_note(sim.calibration.calibration.validated),
+        )
+
+    @app.post("/releases/{name}/simulate", response_model=SimulationOut)
+    async def simulate(name: str, body: ScenarioIn) -> SimulationOut:
+        """Run a scenario next to the baseline. Nothing is saved."""
+        return await simulate_out(name, body)
+
+    def saved_out(row: Any) -> SavedScenarioOut:
+        return SavedScenarioOut(
+            id=row.id,
+            name=row.name,
+            created_by=row.created_by,
+            created_at=row.created_at,
+            calibration_id=row.calibration_id,
+            settings=row.settings,
+            result=row.result,
+        )
+
+    @app.post("/releases/{name}/scenarios", response_model=SavedScenarioOut, status_code=201)
+    async def save_scenario(name: str, body: ScenarioIn) -> SavedScenarioOut:
+        """Run and save a named scenario with its result (409 if the name is taken)."""
+        from api.sim_store import ScenarioExistsError
+
+        if not body.name.strip():
+            raise HTTPException(422, "a saved scenario needs a name")
+        result = await simulate_out(name, body)
+        try:
+            row = await run_in_threadpool(
+                lambda: simulator().store.save_scenario(
+                    result.release,
+                    result.calibration_id,
+                    body.name.strip(),
+                    body.model_dump(mode="json"),
+                    result.model_dump(mode="json"),
+                    f"user:{ai_services.approver}",
+                )
+            )
+        except ScenarioExistsError as exc:
+            raise HTTPException(409, f"a scenario named {body.name!r} already exists") from exc
+        return saved_out(row)
+
+    @app.get("/releases/{name}/scenarios", response_model=list[SavedScenarioOut])
+    async def list_scenarios(name: str) -> list[SavedScenarioOut]:
+        """Saved scenarios for the release, newest first."""
+        v = await view(name)
+        rows = await run_in_threadpool(simulator().store.list_scenarios, v.assessment.release.key)
+        return [saved_out(r) for r in rows]
+
+    @app.get("/releases/{name}/scenarios/{scenario_id}", response_model=SavedScenarioOut)
+    async def get_scenario(name: str, scenario_id: int) -> SavedScenarioOut:
+        """One saved scenario."""
+        v = await view(name)
+        row = await run_in_threadpool(
+            simulator().store.get_scenario, v.assessment.release.key, scenario_id
+        )
+        if row is None:
+            raise HTTPException(404, f"scenario {scenario_id} not found for {name}")
+        return saved_out(row)
+
     @app.get("/releases/{name}/load", response_model=LoadOut)
     async def load(name: str) -> LoadOut:
         """Open PRs not linked to any feature, per SIG. Not per person (CLAUDE.md section 10)."""
@@ -421,6 +595,15 @@ def _default_service() -> ReleaseService:
     return ReleaseService(
         PostgresEventSource(factory), extra_links=lambda key: engine_links(links.list(key))
     )
+
+
+def _default_sim_store() -> Any:
+    from sqlalchemy.orm import sessionmaker
+
+    from api.sim_store import PostgresSimStore
+    from pipeline.store.session import make_engine
+
+    return PostgresSimStore(sessionmaker(make_engine()))
 
 
 def _default_updates() -> Updates:

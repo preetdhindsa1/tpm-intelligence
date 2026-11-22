@@ -198,3 +198,88 @@ export type LinkSuggestions = {
   cost_usd: number;
   suggestions: LinkSuggestion[];
 };
+
+// ---- simulator (ADR-0012) ----
+
+export type SimRange = { median: number; low: number; high: number };
+
+export type PoolOutcome = {
+  pool: string;
+  reviewers: number | null;
+  review_wait_days: SimRange | null;
+  merged: SimRange | null;
+  not_merged: SimRange | null;
+};
+
+export type PoolChange = { reviewers: number; new_reviewers: number; ramp_weeks: number; interruption: number };
+
+export type ScenarioSettings = { name: string; pools: Record<string, PoolChange>; arrival_multiplier: number };
+
+export type SimOutcome = { scenario: ScenarioSettings; pools: PoolOutcome[]; total: PoolOutcome };
+
+export type SimCheck = { name: string; real: number | null; simulated: number | null; error: number | null; passed: boolean };
+
+export type SimValidation = {
+  passed: boolean;
+  source_file?: string;
+  measured_at?: string;
+  tolerance?: number;
+  reason?: string;
+  releases: { release: string; passed: boolean; checks: SimCheck[] }[];
+};
+
+export type SimPool = {
+  pool: string;
+  prs_measured: number;
+  arrivals_per_week: number;
+  reviewers_per_week_source: number;
+  reviewers_now: number;
+  open_prs_now: number;
+  first_wait_median_days: number | null;
+  follow_wait_median_days: number | null;
+  first_scale: number;
+  later_scale: number;
+};
+
+export type SimulatorInfo = {
+  release: string;
+  validated: boolean;
+  validation: SimValidation;
+  calibration_id: number;
+  calibrated_at: string;
+  source_releases: string[];
+  data_until: string;
+  effort_days: number;
+  as_of: string;
+  horizon_at: string;
+  horizon_label: string;
+  replications: number;
+  pools: SimPool[];
+  note: string;
+};
+
+export type Simulation = {
+  release: string;
+  validated: boolean;
+  calibration_id: number;
+  source_releases: string[];
+  as_of: string;
+  horizon_at: string;
+  horizon_label: string;
+  replications: number;
+  seed: number;
+  baseline: SimOutcome;
+  scenario: SimOutcome;
+  seconds: number;
+  note: string;
+};
+
+export type SavedScenario = {
+  id: number;
+  name: string;
+  created_by: string;
+  created_at: string;
+  calibration_id: number;
+  settings: ScenarioSettings;
+  result: Simulation;
+};

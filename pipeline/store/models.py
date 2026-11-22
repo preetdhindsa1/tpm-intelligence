@@ -21,6 +21,7 @@ from typing import Any
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -533,4 +534,40 @@ class LinkSuggestionRecord(Base):
     decided_by: Mapped[str | None] = mapped_column(String(128))
     decided_at: Mapped[datetime | None] = mapped_column(_tz())
     decision_note: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
+class SimCalibrationRecord(Base):
+    """A fitted simulator calibration for one release (ADR-0012, CLAUDE.md section 14).
+
+    Stored with its source releases, measurement date and validation result, so every
+    scenario result can show the inputs it used. ``body`` holds the measured inputs,
+    including the real PR paths (no names, no PR text).
+    """
+
+    __tablename__ = "sim_calibrations"
+    __table_args__ = (Index(None, "release_key", "created_at"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    release_key: Mapped[str] = mapped_column(String(128))
+    source_releases: Mapped[list[str]] = mapped_column(ARRAY(Text))
+    measured_at: Mapped[datetime] = mapped_column(_tz())
+    validated: Mapped[bool] = mapped_column(Boolean)
+    body: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
+class SimScenarioRecord(Base):
+    """A saved what-if and its result, named per release (ADR-0012)."""
+
+    __tablename__ = "sim_scenarios"
+    __table_args__ = (UniqueConstraint("release_key", "name"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    release_key: Mapped[str] = mapped_column(String(128))
+    calibration_id: Mapped[int] = mapped_column(ForeignKey("sim_calibrations.id"))
+    name: Mapped[str] = mapped_column(String(128))
+    settings: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    result: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    created_by: Mapped[str] = mapped_column(String(128))
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())

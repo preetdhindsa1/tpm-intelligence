@@ -1,7 +1,8 @@
 # ADR-0012: Review simulator (SimPy) and its validation
 
-- **Status:** in progress (Phase 2 M5). The model and validation are done; the simulator is
-  **not validated** (failed both releases on review wait after comments were collected). Scenarios, API and page are not built yet, pending the owner's decision.
+- **Status:** accepted (Phase 2 M5), shipped **not validated**. It failed both releases on
+  review wait after comments were collected. The owner chose (2026-11-22) to ship scenarios
+  with a visible "not validated" label rather than rework the model now.
 - **Date:** 2026-11-22
 
 ## Context
@@ -115,6 +116,58 @@ The first suspected cause (below) was fixed in the data, not the model:
 3. **The earlier releases vary little in load per reviewer**, so they barely show how waits
    respond to capacity. v1.38 is outside that range.
 
+## Scenarios (shipped not validated, 2026-11-22)
+
+The owner chose to ship what-ifs with a visible "not validated" label (§14 allows this) and
+to move on, rather than rework the model now.
+
+- **Calibration** (`make sim-calibrate RELEASE=v1.38`, `scripts/calibrate_simulator.py`):
+  - fitted offline on the releases finished before the release started;
+  - stored in `sim_calibrations` (migration 0006) with its source releases, date, fitted
+    values, the measured inputs (real PR paths, no names or text) and the newest
+    validation result;
+  - requests never re-fit.
+- **Starting state** (`simulator/scenario.py`):
+  - the release's open PRs now, each at the review round it has reached;
+  - the release's own measured reviewers per week per pool.
+- **Horizon:** until the next milestone: Code Freeze, else release day, else 4 weeks.
+- **What can change, per pool:**
+  - experienced reviewers ±n;
+  - new reviewers with a ramp-up;
+  - share of time lost to interruptions.
+  - Also, for the whole release, new PRs as a multiple of the measured rate.
+- **Results:**
+  - median review wait, PRs merged by the horizon, and PRs not merged;
+  - per pool and in total, as the median and 10th–90th percentile of 8 seeded runs.
+- **Baseline vs scenario:**
+  - The baseline always runs alongside the scenario and is cached per calibration and
+    data version.
+  - Each PR's random numbers are drawn per pool and run, so a change to one pool leaves
+    every other pool's results identical (common random numbers; tested).
+- **Saved scenarios** (`sim_scenarios`): named per release, stored with their settings,
+  result, calibration id and who saved them. Two can be compared side by side; the page
+  warns when they used different calibrations.
+- **Honest labels:**
+  - Every API response carries `validated: false` and a note saying not to rely on it.
+  - The page shows the validation errors in a banner.
+  - Because the fitted reviewer time sits at its lower limit, the page also says that
+    reviewer capacity has very little effect in this model. Removing 15 of 21 sig/node
+    reviewers moves its median wait only from 0.39 to 0.41 days.
+- **Speed** (measured 2026-11-22, local Docker, v1.38 with 756 open PRs, 40 different
+  scenarios):
+  - warm requests: median 0.70 s, **p95 0.86 s** (target under 2 s);
+  - the first scenario after new data: 1.2 s (baseline not yet cached);
+  - before the fix below, p95 was 3.9 s.
+  - The fix: full garbage-collection passes, triggered by simulator requests, re-scanned
+    the ~300k projected events, which caused 3–4 s pauses on every ~9th request. The API
+    now calls `gc.freeze()` after building a release view.
+  - The first call after an API restart waits about 42 s for the release view itself.
+    That was already the case and is not simulator time.
+- **Not done:**
+  - Simulator output does not feed the feature odds: an unvalidated model must not change
+    the forecast. Deferred to M7, and only if a model passes validation.
+  - No AI description of results and no "suggested fix" yet.
+
 ## Alternatives considered
 
 - **A fitted queueing formula (M/M/c) instead of SimPy.** It is less flexible for ramp-up,
@@ -124,7 +177,9 @@ The first suspected cause (below) was fixed in the data, not the model:
 
 ## Trade-offs and consequences
 
-- Until validation passes, no what-if may be presented as reliable (§14).
+- Until validation passes, no what-if may be presented as reliable (§14). The UI says so.
+- Any future rework must be validated on a release not used to choose it. v1.37 and v1.38
+  have now been seen.
 - Fitting takes about 1 minute per release, so it is run offline (`make sim-validate`), not
   on each request.
 

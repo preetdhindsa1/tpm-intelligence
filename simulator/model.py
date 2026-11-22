@@ -92,9 +92,18 @@ class _Reviewer:
 
 
 def simulate(
-    prs: Sequence[SimPR], pools: Mapping[str, PoolSpec], until: float, seed: int
+    prs: Sequence[SimPR],
+    pools: Mapping[str, PoolSpec],
+    until: float,
+    seed: int,
+    effort_draws: Sequence[np.ndarray[Any, Any]] | None = None,
 ) -> list[PRResult]:
-    """Run once until ``until`` days; the same inputs and seed give the same result."""
+    """Run once until ``until`` days; the same inputs and seed give the same result.
+
+    ``effort_draws`` (one unit-mean exponential per remaining round, per PR) lets a caller
+    hold each PR's random numbers fixed between a baseline and a scenario
+    (``simulator.scenario``). Without it, draws come from ``seed`` in PR order.
+    """
     rng = np.random.default_rng(seed)
     env = simpy.Environment()
     stores: dict[str, Any] = {}
@@ -108,7 +117,11 @@ def simulate(
     results = [PRResult(p.key, p.pool, p.opened_at) for p in prs]
     # Effort draws per PR, made up front: a scenario that changes one pool does not shift
     # the random numbers of PRs elsewhere (common random numbers for baseline vs scenario).
-    draws = [rng.exponential(1.0, size=max(p.path.rounds, 0)) for p in prs]
+    draws: Sequence[np.ndarray[Any, Any]] = (
+        effort_draws
+        if effort_draws is not None
+        else [rng.exponential(1.0, size=max(p.path.rounds, 0)) for p in prs]
+    )
 
     def run(pr: SimPR, out: PRResult, unit: Any) -> Generator[Any, Any, None]:
         spec = pools.get(pr.pool)

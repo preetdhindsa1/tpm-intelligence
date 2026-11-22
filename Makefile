@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links sim-validate
+.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links sim-validate sim-calibrate
 
 UV ?= uv
 RELEASE ?=
@@ -85,6 +85,9 @@ evals-live: ## Paid agent evals (risk analyst ~$0.03, VP summary ~$0.40); SUITE=
 
 sim-validate: ## Fit the simulator on earlier releases, replay v1.37 and v1.38 (~3 min, no AI)
 	$(UV) run python scripts/validate_simulator.py
+
+sim-calibrate: ## Fit the simulator for RELEASE and store it for the API (~2 min, no AI)
+	$(UV) run python scripts/calibrate_simulator.py --release $(or $(RELEASE),v1.38)
 
 suggest-links: ## Paid AI link suggestions for unlinked PRs (~$0.0004 each); RELEASE=v1.38 LIMIT=
 	docker compose build -q api

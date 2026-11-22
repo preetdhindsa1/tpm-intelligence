@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class _Out(BaseModel):
@@ -245,3 +245,113 @@ class LinkDecisionIn(BaseModel):
     """Confirm or reject a suggestion."""
 
     note: str | None = None
+
+
+# ---- simulator (ADR-0012) -----------------------------------------------------------------
+
+
+class PoolChangeIn(BaseModel):
+    """A change to one reviewer pool. Defaults mean "no change"."""
+
+    reviewers: int = Field(0, ge=-50, le=50)
+    new_reviewers: int = Field(0, ge=0, le=50)
+    ramp_weeks: float = Field(0.0, ge=0, le=52)
+    interruption: float = Field(0.0, ge=0, le=0.9)
+
+
+class ScenarioIn(BaseModel):
+    """A what-if. ``name`` is required only to save it."""
+
+    name: str = Field("", max_length=128)
+    pools: dict[str, PoolChangeIn] = Field(default_factory=dict)
+    arrival_multiplier: float = Field(1.0, ge=0, le=3)
+
+
+class RangeOut(_Out):
+    """Median and 10th-90th percentile over replications."""
+
+    median: float
+    low: float
+    high: float
+
+
+class PoolOutcomeOut(_Out):
+    """One pool (or ``all``) at the horizon."""
+
+    pool: str
+    reviewers: int | None
+    review_wait_days: RangeOut | None
+    merged: RangeOut | None
+    not_merged: RangeOut | None
+
+
+class OutcomeOut(_Out):
+    """One scenario's result."""
+
+    scenario: dict[str, Any]
+    pools: list[PoolOutcomeOut]
+    total: PoolOutcomeOut
+
+
+class SimPoolOut(_Out):
+    """Measured and fitted inputs of one pool, shown as the result's assumptions."""
+
+    pool: str
+    prs_measured: int
+    arrivals_per_week: float
+    reviewers_per_week_source: float  # median over the source releases
+    reviewers_now: int  # this release's measured reviewers per week, rounded
+    open_prs_now: int
+    first_wait_median_days: float | None
+    follow_wait_median_days: float | None
+    first_scale: float
+    later_scale: float
+
+
+class SimulatorOut(_Out):
+    """What the simulator would run on, and whether it is validated."""
+
+    release: str
+    validated: bool
+    validation: dict[str, Any]
+    calibration_id: int
+    calibrated_at: datetime
+    source_releases: list[str]
+    data_until: datetime
+    effort_days: float
+    as_of: datetime
+    horizon_at: datetime
+    horizon_label: str
+    replications: int
+    pools: list[SimPoolOut]
+    note: str
+
+
+class SimulationOut(_Out):
+    """Baseline next to a scenario (CLAUDE.md section 14)."""
+
+    release: str
+    validated: bool
+    calibration_id: int
+    source_releases: list[str]
+    as_of: datetime
+    horizon_at: datetime
+    horizon_label: str
+    replications: int
+    seed: int
+    baseline: OutcomeOut
+    scenario: OutcomeOut
+    seconds: float
+    note: str
+
+
+class SavedScenarioOut(_Out):
+    """A saved scenario with the result it had when saved."""
+
+    id: int
+    name: str
+    created_by: str
+    created_at: datetime
+    calibration_id: int
+    settings: dict[str, Any]
+    result: SimulationOut

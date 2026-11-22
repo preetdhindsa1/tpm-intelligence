@@ -1,0 +1,466 @@
+"use client";
+
+// What-if simulator (ADR-0012). Every number comes from the API's simulator; this page
+// only shows it. Baseline is always next to the scenario, and results are ranges.
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  updatesRequest,
+  type PoolChange,
+  type PoolOutcome,
+  type SavedScenario,
+  type ScenarioSettings,
+  type Simulation,
+  type SimulatorInfo,
+} from "@/lib/api";
+import { daysLabel, errorPct, formatUtc, rangeLabel, simDelta, type SimDelta } from "@/lib/format";
+
+const LOW_EFFORT_DAYS = 0.03; // the fit's lower bound is 0.02 days (simulator/replay.py)
+const NO_CHANGE: PoolChange = { reviewers: 0, new_reviewers: 0, ramp_weeks: 0, interruption: 0 };
+
+function changed(c: PoolChange | undefined): boolean {
+  return !!c && (c.reviewers !== 0 || c.new_reviewers !== 0 || c.interruption !== 0);
+}
+
+function Delta({ d }: { d: SimDelta | null }) {
+  if (!d) return <span className="text-slate-400">—</span>;
+  const tone =
+    d.tone === "same"
+      ? "text-slate-500"
+      : d.tone === "better"
+        ? "bg-emerald-50 text-emerald-800"
+        : "bg-rose-50 text-rose-800";
+  return (
+    <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${tone}`} title={d.overlaps ? "Ranges overlap: may be noise" : undefined}>
+      {d.text}
+      {d.overlaps && d.tone !== "same" ? " ~" : ""}
+    </span>
+  );
+}
+
+function NotValidated({ info }: { info: SimulatorInfo }) {
+  const v = info.validation;
+  return (
+    <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+      <p className="font-semibold">Not validated: do not rely on these what-ifs.</p>
+      <p className="mt-1">
+        Replaying past releases with their real staffing, the simulator did not match every real median within the ±
+        {Math.round((v.tolerance ?? 0.2) * 100)}% allowed:
+      </p>
+      <ul className="mt-1 list-disc pl-5">
+        {v.releases.map((r) => (
+          <li key={r.release}>
+            {r.release.replace("kubernetes:", "")}:{" "}
+            {r.checks.map((c) => `${c.name.replace(" (days)", "")} ${errorPct(c.error)} ${c.passed ? "(pass)" : "(fail)"}`).join(", ")}
+          </li>
+        ))}
+        {v.releases.length === 0 && <li>{v.reason ?? "no validation run"}</li>}
+      </ul>
+      {info.effort_days <= LOW_EFFORT_DAYS && (
+        <p className="mt-1">
+          The fitted reviewer time per round is at its lower limit ({daysLabel(info.effort_days)}), so in this model reviewer
+          capacity has very little effect: adding or removing reviewers moves waits less than it likely would in reality.
+        </p>
+      )}
+      <p className="mt-1">Details: ADR-0012{v.source_file ? ` · ${v.source_file}` : ""}.</p>
+    </div>
+  );
+}
+
+function Assumptions({ info }: { info: SimulatorInfo }) {
+  return (
+    <details className="rounded-lg border bg-white p-4 text-sm">
+      <summary className="cursor-pointer font-medium text-slate-800">Assumptions and measured inputs</summary>
+      <ul className="mt-2 space-y-0.5 text-slate-600">
+        <li>
+          Measured on {info.source_releases.map((r) => r.replace("kubernetes:", "")).join(", ")} (data until{" "}
+          {formatUtc(info.data_until)}), calibration #{info.calibration_id} fitted {formatUtc(info.calibrated_at)}.
+        </li>
+        <li>
+          Starts from the {info.pools.reduce((n, p) => n + p.open_prs_now, 0)} open PRs of this release now ({formatUtc(info.as_of)}) and runs
+          until {info.horizon_label} ({formatUtc(info.horizon_at)}). New PRs arrive at the measured weekly rate.
+        </li>
+        <li>
+          Each PR follows a real PR&apos;s review path from the source releases. A reviewer spends about {daysLabel(info.effort_days)} per
+          round (fitted). Ranges are the 10th–90th percentile of {info.replications} seeded runs.
+        </li>
+        <li>A PR&apos;s pool is its first sig/* label in sorted order. Reviewers are counted per pool, never per person.</li>
+      </ul>
+      <table className="mt-3 w-full text-left text-xs">
+        <thead className="text-slate-500">
+          <tr>
+            <th className="py-1">Pool</th>
+            <th>PRs measured</th>
+            <th>New PRs / week</th>
+            <th>Reviewers / week (source)</th>
+            <th>Reviewers now</th>
+            <th>Open PRs now</th>
+            <th>Median wait, first / later round</th>
+          </tr>
+        </thead>
+        <tbody>
+          {info.pools.map((p) => (
+            <tr key={p.pool} className="border-t">
+              <td className="py-1 font-medium">{p.pool}</td>
+              <td>{p.prs_measured}</td>
+              <td>{p.arrivals_per_week}</td>
+              <td>{p.reviewers_per_week_source}</td>
+              <td>{p.reviewers_now}</td>
+              <td>{p.open_prs_now}</td>
+              <td>
+                {p.first_wait_median_days === null ? "—" : daysLabel(p.first_wait_median_days)} /{" "}
+                {p.follow_wait_median_days === null ? "—" : daysLabel(p.follow_wait_median_days)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+
+function ResultRow({ base, scen, bold }: { base: PoolOutcome; scen: PoolOutcome; bold?: boolean }) {
+  const reviewers =
+    base.reviewers === null ? "" : base.reviewers === scen.reviewers ? `${base.reviewers}` : `${base.reviewers} → ${scen.reviewers}`;
+  return (
+    <tr className={`border-t ${bold ? "font-semibold" : ""}`}>
+      <td className="py-1.5">{base.pool === "all" ? "All pools" : base.pool}</td>
+      <td>{reviewers}</td>
+      <td>{rangeLabel(base.review_wait_days, "days")}</td>
+      <td>{rangeLabel(scen.review_wait_days, "days")}</td>
+      <td>
+        <Delta d={simDelta(base.review_wait_days, scen.review_wait_days, "days", true)} />
+      </td>
+      <td>{rangeLabel(base.merged, "count")}</td>
+      <td>{rangeLabel(scen.merged, "count")}</td>
+      <td>
+        <Delta d={simDelta(base.merged, scen.merged, "count", false)} />
+      </td>
+      <td>{rangeLabel(scen.not_merged, "count")}</td>
+    </tr>
+  );
+}
+
+function Results({ sim, onlyChanged }: { sim: Simulation; onlyChanged: boolean }) {
+  const touched = new Set(Object.entries(sim.scenario.scenario.pools).filter(([, c]) => changed(c)).map(([p]) => p));
+  const rows = sim.baseline.pools.filter((p) => !onlyChanged || touched.has(p.pool) || sim.scenario.scenario.arrival_multiplier !== 1);
+  return (
+    <div className="overflow-x-auto rounded-lg border bg-white">
+      <table className="w-full text-left text-sm">
+        <thead className="bg-slate-50 text-xs text-slate-500">
+          <tr>
+            <th className="px-0 py-2">Pool</th>
+            <th>Reviewers</th>
+            <th>Review wait · baseline</th>
+            <th>Review wait · scenario</th>
+            <th>Δ</th>
+            <th>Merged by {sim.horizon_label} · baseline</th>
+            <th>· scenario</th>
+            <th>Δ</th>
+            <th>Not merged · scenario</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ResultRow base={sim.baseline.total} scen={sim.scenario.total} bold />
+          {rows.map((b) => (
+            <ResultRow key={b.pool} base={b} scen={sim.scenario.pools.find((s) => s.pool === b.pool)!} />
+          ))}
+        </tbody>
+      </table>
+      <p className="border-t px-3 py-2 text-xs text-slate-500">
+        {sim.note} Medians with 10th–90th percentile over {sim.replications} runs (seed {sim.seed}); &quot;~&quot; means the ranges
+        overlap. Computed in {sim.seconds.toFixed(2)} s.
+      </p>
+    </div>
+  );
+}
+
+function Compare({ a, b }: { a: SavedScenario; b: SavedScenario }) {
+  const pools = a.result.scenario.pools.map((p) => p.pool);
+  const row = (label: string, x: PoolOutcome | undefined, y: PoolOutcome | undefined) => (
+    <tr key={label} className="border-t">
+      <td className="py-1.5">{label}</td>
+      <td>{rangeLabel(x?.review_wait_days ?? null, "days")}</td>
+      <td>{rangeLabel(y?.review_wait_days ?? null, "days")}</td>
+      <td>
+        <Delta d={simDelta(x?.review_wait_days ?? null, y?.review_wait_days ?? null, "days", true)} />
+      </td>
+      <td>{rangeLabel(x?.merged ?? null, "count")}</td>
+      <td>{rangeLabel(y?.merged ?? null, "count")}</td>
+    </tr>
+  );
+  return (
+    <div className="overflow-x-auto rounded-lg border bg-white">
+      <p className="px-3 pt-2 text-sm font-medium">
+        {a.name} vs {b.name}
+        {a.calibration_id !== b.calibration_id && (
+          <span className="ml-2 text-xs font-normal text-amber-700">(different calibrations: not directly comparable)</span>
+        )}
+      </p>
+      <table className="w-full text-left text-sm">
+        <thead className="text-xs text-slate-500">
+          <tr>
+            <th className="py-2">Pool</th>
+            <th>Wait · {a.name}</th>
+            <th>Wait · {b.name}</th>
+            <th>Δ</th>
+            <th>Merged · {a.name}</th>
+            <th>Merged · {b.name}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {row("All pools", a.result.scenario.total, b.result.scenario.total)}
+          {pools.map((p) =>
+            row(
+              p,
+              a.result.scenario.pools.find((x) => x.pool === p),
+              b.result.scenario.pools.find((x) => x.pool === p),
+            ),
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function Simulator({ release }: { release: string }) {
+  const [info, setInfo] = useState<SimulatorInfo | null>(null);
+  const [settings, setSettings] = useState<ScenarioSettings>({ name: "", pools: {}, arrival_multiplier: 1 });
+  const [sim, setSim] = useState<Simulation | null>(null);
+  const [saved, setSaved] = useState<SavedScenario[]>([]);
+  const [picked, setPicked] = useState<number[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [onlyChanged, setOnlyChanged] = useState(false);
+
+  const loadSaved = useCallback(
+    () => updatesRequest<SavedScenario[]>(`/releases/${release}/scenarios`).then(setSaved),
+    [release],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    updatesRequest<SimulatorInfo>(`/releases/${release}/simulator`)
+      .then((d) => !cancelled && setInfo(d))
+      .catch((e: Error) => !cancelled && setError(e.message));
+    loadSaved().catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [release, loadSaved]);
+
+  function setPool(pool: string, field: keyof PoolChange, value: number) {
+    setSettings((s) => ({ ...s, pools: { ...s.pools, [pool]: { ...(s.pools[pool] ?? NO_CHANGE), [field]: value } } }));
+  }
+
+  function body(): ScenarioSettings {
+    const pools = Object.fromEntries(Object.entries(settings.pools).filter(([, c]) => changed(c)));
+    return { ...settings, pools };
+  }
+
+  async function run() {
+    setBusy(true);
+    setError(null);
+    try {
+      setSim(await updatesRequest<Simulation>(`/releases/${release}/simulate`, { method: "POST", body: JSON.stringify(body()) }));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function save() {
+    setBusy(true);
+    setError(null);
+    try {
+      const row = await updatesRequest<SavedScenario>(`/releases/${release}/scenarios`, {
+        method: "POST",
+        body: JSON.stringify(body()),
+      });
+      setSim(row.result);
+      await loadSaved();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function load(s: SavedScenario) {
+    setSettings({ ...s.settings, name: "" });
+    setSim(s.result);
+  }
+
+  const compared = useMemo(() => picked.map((id) => saved.find((s) => s.id === id)).filter(Boolean) as SavedScenario[], [picked, saved]);
+
+  if (error && !info) return <p className="rounded border border-rose-200 bg-rose-50 p-2 text-sm text-rose-800">{error}</p>;
+  if (!info) return <p className="text-sm text-slate-500">Loading…</p>;
+
+  return (
+    <div className="space-y-4">
+      {!info.validated && <NotValidated info={info} />}
+      <Assumptions info={info} />
+
+      <div className="rounded-lg border bg-white p-4">
+        <div className="flex flex-wrap items-end gap-4 text-sm">
+          <label className="flex flex-col">
+            <span className="text-xs text-slate-500">New PRs vs measured rate</span>
+            <input
+              type="range"
+              min={0.5}
+              max={2}
+              step={0.1}
+              value={settings.arrival_multiplier}
+              onChange={(e) => setSettings((s) => ({ ...s, arrival_multiplier: Number(e.target.value) }))}
+            />
+            <span>×{settings.arrival_multiplier.toFixed(1)}</span>
+          </label>
+          <button
+            onClick={() => setSettings((s) => ({ ...s, pools: {}, arrival_multiplier: 1 }))}
+            className="rounded border px-3 py-1.5 text-slate-700 hover:bg-slate-50"
+          >
+            Reset to baseline
+          </button>
+        </div>
+        <table className="mt-3 w-full text-left text-sm">
+          <thead className="text-xs text-slate-500">
+            <tr>
+              <th className="py-1">Pool</th>
+              <th>Reviewers now</th>
+              <th>Add / remove experienced</th>
+              <th>New reviewers</th>
+              <th>Ramp-up (weeks)</th>
+              <th>Time lost to interruptions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {info.pools.map((p) => {
+              const c = settings.pools[p.pool] ?? NO_CHANGE;
+              return (
+                <tr key={p.pool} className={`border-t ${changed(c) ? "bg-indigo-50/50" : ""}`}>
+                  <td className="py-1 font-medium">{p.pool}</td>
+                  <td>{p.reviewers_now}</td>
+                  <td>
+                    <input
+                      type="number"
+                      min={-p.reviewers_now}
+                      max={50}
+                      value={c.reviewers}
+                      onChange={(e) => setPool(p.pool, "reviewers", Number(e.target.value))}
+                      className="w-16 rounded border px-1"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      min={0}
+                      max={50}
+                      value={c.new_reviewers}
+                      onChange={(e) => setPool(p.pool, "new_reviewers", Number(e.target.value))}
+                      className="w-16 rounded border px-1"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      min={0}
+                      max={52}
+                      value={c.ramp_weeks}
+                      disabled={c.new_reviewers === 0}
+                      onChange={(e) => setPool(p.pool, "ramp_weeks", Number(e.target.value))}
+                      className="w-16 rounded border px-1 disabled:bg-slate-50"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="range"
+                      min={0}
+                      max={0.9}
+                      step={0.05}
+                      value={c.interruption}
+                      onChange={(e) => setPool(p.pool, "interruption", Number(e.target.value))}
+                    />{" "}
+                    {Math.round(c.interruption * 100)}%
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+          <button
+            onClick={run}
+            disabled={busy}
+            className="rounded bg-indigo-600 px-3 py-1.5 font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {busy ? "Running…" : "Run vs baseline"}
+          </button>
+          <input
+            placeholder="Scenario name"
+            value={settings.name}
+            maxLength={128}
+            onChange={(e) => setSettings((s) => ({ ...s, name: e.target.value }))}
+            className="rounded border px-2 py-1.5"
+          />
+          <button
+            onClick={save}
+            disabled={busy || !settings.name.trim()}
+            className="rounded border px-3 py-1.5 font-medium text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
+          >
+            Run and save
+          </button>
+          {error && <span className="text-rose-700">{error}</span>}
+        </div>
+      </div>
+
+      {sim && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">
+              Baseline vs {sim.scenario.scenario.name === "scenario" ? "scenario" : sim.scenario.scenario.name} · until {sim.horizon_label}
+            </h2>
+            <label className="text-sm text-slate-600">
+              <input type="checkbox" checked={onlyChanged} onChange={(e) => setOnlyChanged(e.target.checked)} /> Only changed pools
+            </label>
+          </div>
+          <Results sim={sim} onlyChanged={onlyChanged} />
+        </div>
+      )}
+
+      <div className="rounded-lg border bg-white p-4">
+        <h2 className="text-lg font-semibold">Saved scenarios</h2>
+        {saved.length === 0 ? (
+          <p className="text-sm text-slate-500">None yet. Name a scenario and choose &quot;Run and save&quot;.</p>
+        ) : (
+          <ul className="mt-2 divide-y text-sm">
+            {saved.map((s) => (
+              <li key={s.id} className="flex items-center gap-3 py-1.5">
+                <input
+                  type="checkbox"
+                  checked={picked.includes(s.id)}
+                  onChange={(e) =>
+                    setPicked((p) => (e.target.checked ? [...p.filter((x) => x !== s.id), s.id].slice(-2) : p.filter((x) => x !== s.id)))
+                  }
+                  aria-label={`Compare ${s.name}`}
+                />
+                <span className="font-medium">{s.name}</span>
+                <span className="text-slate-500">
+                  {formatUtc(s.created_at)} · {s.created_by.replace("user:", "")}
+                </span>
+                <button onClick={() => load(s)} className="ml-auto text-indigo-700 hover:underline">
+                  Load
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {compared.length === 2 && (
+          <div className="mt-3">
+            <Compare a={compared[0]} b={compared[1]} />
+          </div>
+        )}
+        {saved.length > 1 && compared.length < 2 && <p className="mt-2 text-xs text-slate-500">Tick two scenarios to compare them.</p>}
+      </div>
+    </div>
+  );
+}
