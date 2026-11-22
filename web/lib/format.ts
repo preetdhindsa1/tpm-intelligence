@@ -84,8 +84,9 @@ export function suggestionCounts(counts: Record<string, number>): string {
     .join(" · ");
 }
 
-/** A duration in days, as hours under one day ("9 h", "1.6 d"). */
+/** A duration in days: minutes under an hour, hours under a day ("29 min", "9 h", "1.6 d"). */
 export function daysLabel(d: number): string {
+  if (d * 24 < 1) return `${Math.round(d * 24 * 60)} min`;
   if (d < 1) return `${Math.round(d * 24)} h`;
   return `${d.toFixed(1)} d`;
 }

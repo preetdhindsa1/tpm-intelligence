@@ -381,3 +381,43 @@ def test_simulator_endpoints_label_not_validated_and_save_scenarios() -> None:
     assert [s["id"] for s in client.get("/releases/v1.38/scenarios").json()] == [row["id"]]
     assert client.get(f"/releases/v1.38/scenarios/{row['id']}").json()["name"] == "cut node"
     assert client.get("/releases/v1.38/scenarios/999").status_code == 404
+
+
+def test_summary_outcomes_on_the_6395_fixtures(after_readd: TestClient) -> None:
+    s = after_readd.get("/releases/v1.38/summary").json()
+    assert s["phase"] == "after_freeze"
+    by_key = {f["key"]: f["outcome"] for f in s["features"]}
+    # Removed at Code Freeze Nov 17, re-added Nov 21: not landed, back by exception.
+    assert by_key["kubernetes/enhancements#6395"] == "readded_after_freeze"
+    assert by_key["kubernetes/enhancements#2570"] == "readded_after_freeze"
+    assert sum(s["outcomes"].values()) == s["features_ever"] == len(s["features"])
+    # The tile and the chart agree: every removal at freeze is either still out or re-added.
+    flagged = {
+        f["key"]
+        for f in after_readd.get("/releases/v1.38/features").json()["features"]
+        if any(x["code"] == "removed_at_freeze" for x in f["flags"])
+    }
+    assert len(flagged) == s["removed_at_freeze"]
+    assert {by_key[k] for k in flagged} <= {"removed_at_freeze", "readded_after_freeze"}
+
+
+def test_summary_is_too_early_before_the_outcome_is_known() -> None:
+    s = client_at(utc(2026, 11, 3)).get("/releases/v1.38/summary").json()
+    assert s["phase"] == "before_freeze"
+    assert s["landed"] is None
+    assert set(s["outcomes"]) == {"too_early"}
+
+
+def test_graph_has_verified_links_only(after_readd: TestClient) -> None:
+    g = after_readd.get("/releases/v1.38/graph").json()
+    nodes = {n["id"]: n for n in g["nodes"]}
+    edges = {(e["source"], e["target"], e["kind"]) for e in g["edges"]}
+    f = "kubernetes/enhancements#6395"
+    assert nodes[f]["kind"] == "feature"
+    assert ("kubernetes:v1.38", f, "contains") in edges
+    main = "kubernetes/kubernetes#143709"
+    assert (f, main, "implemented_by") in edges
+    assert nodes[main]["state"] == "merged"
+    # #143644 only mentions #6395 in passing: a suggestion, never a graph edge.
+    assert (f, "kubernetes/kubernetes#143644", "implemented_by") not in edges
+    assert all(e["source"] in nodes and e["target"] in nodes for e in g["edges"])

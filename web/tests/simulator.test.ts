@@ -5,6 +5,7 @@ describe("simulator formatting", () => {
   it("shows waits under a day in hours", () => {
     expect(daysLabel(0.375)).toBe("9 h");
     expect(daysLabel(1.56)).toBe("1.6 d");
+    expect(daysLabel(0.02)).toBe("29 min");
   });
   it("always shows a range", () => {
     expect(rangeLabel({ median: 0.388, low: 0.362, high: 0.463 }, "days")).toBe("9 h (9 h–11 h)");

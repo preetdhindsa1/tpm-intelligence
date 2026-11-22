@@ -95,6 +95,9 @@ export const api = {
   releases: () => get<Release[]>("/releases"),
   features: (release: string) => get<FeaturesResponse>(`/releases/${release}/features`),
   feature: (release: string, n: number) => get<FeatureDetail>(`/releases/${release}/features/${n}`),
+  summary: (release: string) => get<Summary>(`/releases/${release}/summary`),
+  graph: (release: string) => get<GraphData>(`/releases/${release}/graph`),
+  updates: (release: string) => get<ExecUpdate[]>(`/releases/${release}/updates`),
 };
 
 export type VerifiedClaim = { text: string; type: string; refs: string[]; value: unknown };
@@ -283,3 +286,50 @@ export type SavedScenario = {
   settings: ScenarioSettings;
   result: Simulation;
 };
+
+// ---- dashboard (ADR-0013) ----
+
+export type Outcome =
+  | "landed"
+  | "landed_prs_after_freeze"
+  | "landed_main_pr_open"
+  | "readded_after_freeze"
+  | "removed_after_freeze"
+  | "removed_at_freeze"
+  | "removed_before_freeze"
+  | "too_early";
+
+export type Summary = {
+  release: string;
+  as_of: string;
+  phase: "before_freeze" | "after_freeze";
+  features_in_release: number;
+  features_ever: number;
+  landed: number | null;
+  removed_at_freeze: number;
+  critical_features: number;
+  open_linked_prs: number;
+  unlinked_open_prs: number;
+  outcomes: Partial<Record<Outcome, number>>;
+  features: { key: string; number: number; title: string; outcome: Outcome; sigs: string[] }[];
+};
+
+export type GraphNode = {
+  id: string;
+  kind: "release" | "feature" | "pull_request";
+  label: string;
+  title: string;
+  url: string | null;
+  sigs: string[];
+  in_release: boolean | null;
+  severity: "info" | "warning" | "critical" | null;
+  flags: string[];
+  state: "open" | "merged" | "closed" | null;
+  is_main: boolean | null;
+  on_critical_path: boolean;
+  feature: string | null;
+};
+
+export type GraphEdge = { source: string; target: string; kind: "contains" | "implemented_by" | "blocks" };
+
+export type GraphData = { release: string; as_of: string; nodes: GraphNode[]; edges: GraphEdge[] };

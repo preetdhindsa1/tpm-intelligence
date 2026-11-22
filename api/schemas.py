@@ -355,3 +355,68 @@ class SavedScenarioOut(_Out):
     calibration_id: int
     settings: dict[str, Any]
     result: SimulationOut
+
+
+# ---- dashboard (ADR-0013) -------------------------------------------------------------------
+
+
+class GraphNodeOut(_Out):
+    """A node of the release dependency graph (engine/graph.py)."""
+
+    id: str
+    kind: str  # release | feature | pull_request
+    label: str
+    title: str
+    url: str | None = None
+    sigs: list[str] = []
+    in_release: bool | None = None  # features
+    severity: str | None = None  # highest flag severity (features)
+    flags: list[str] = []
+    state: str | None = None  # PRs: open | merged | closed
+    is_main: bool | None = None
+    on_critical_path: bool = False
+    feature: str | None = None  # PRs: the feature they implement (first one)
+
+
+class GraphEdgeOut(_Out):
+    """contains (release -> feature), implemented_by (feature -> PR), blocks (PR -> PR)."""
+
+    source: str
+    target: str
+    kind: str
+
+
+class GraphOut(_Out):
+    """Release graph with verified links only."""
+
+    release: str
+    as_of: datetime
+    nodes: list[GraphNodeOut]
+    edges: list[GraphEdgeOut]
+
+
+class FeatureOutcomeOut(_Out):
+    """What happened to one feature at Code Freeze (facts), or that it is too early."""
+
+    key: str
+    number: int
+    title: str
+    outcome: str
+    sigs: list[str]
+
+
+class SummaryOut(_Out):
+    """Stat tiles and outcome counts for the dashboard. All computed facts."""
+
+    release: str
+    as_of: datetime
+    phase: str  # before_freeze | after_freeze
+    features_in_release: int
+    features_ever: int
+    landed: int | None  # None before the outcome is known
+    removed_at_freeze: int
+    critical_features: int
+    open_linked_prs: int
+    unlinked_open_prs: int
+    outcomes: dict[str, int]
+    features: list[FeatureOutcomeOut]

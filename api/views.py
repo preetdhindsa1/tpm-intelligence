@@ -6,11 +6,16 @@ from typing import Any
 
 from api.schemas import (
     FeatureDetailOut,
+    FeatureOutcomeOut,
     FeatureRowOut,
     FlagOut,
+    GraphEdgeOut,
+    GraphNodeOut,
+    GraphOut,
     OddsOut,
     PullRequestOut,
     ReleaseOut,
+    SummaryOut,
     TimelineEntryOut,
 )
 from api.service import ReleaseSummary, ReleaseView
@@ -150,3 +155,146 @@ def feature_detail(view: ReleaseView, a: FeatureAssessment) -> FeatureDetailOut:
         timeline=[TimelineEntryOut(at=e.at, kind=e.kind, ref=e.ref) for e in a.timeline],
         assumptions=assumptions,
     )
+
+
+# ---- dashboard (ADR-0013) -------------------------------------------------------------------
+
+_SEVERITY_ORDER = {"info": 0, "warning": 1, "critical": 2}
+
+OUTCOMES = (
+    "landed",
+    "landed_prs_after_freeze",
+    "landed_main_pr_open",
+    "readded_after_freeze",
+    "removed_after_freeze",
+    "removed_at_freeze",
+    "removed_before_freeze",
+    "too_early",
+)
+
+
+def _max_severity(a: FeatureAssessment) -> str | None:
+    levels = [f.severity.value for f in a.flags]
+    return max(levels, key=lambda s: _SEVERITY_ORDER[s]) if levels else None
+
+
+def feature_outcome(view: ReleaseView, a: FeatureAssessment) -> str:
+    """Fact-based outcome at Code Freeze, split by what the rule flags show.
+
+    Based on ADR-0005's outcome (still in the release 3 days after Code Freeze), except
+    that a feature removed at freeze and back in the release is always "re-added".
+    """
+    from engine.forecast import LANDED_WINDOW, landed
+
+    release = view.assessment.release
+    codes = {f.code for f in a.flags}
+    freeze = release.code_freeze_at
+    if freeze is None or view.assessment.as_of < freeze + LANDED_WINDOW:
+        return "too_early"
+    if a.in_release and "removed_at_freeze" in codes:
+        # Removed at freeze and back by exception, even when re-added inside the 3-day
+        # window the forecast's outcome uses: the dashboard tile counts every removal, so
+        # the chart must too (decision 2026-11-22, ADR-0013).
+        return "readded_after_freeze"
+    if landed(view.world.features[a.key], release):
+        if not a.in_release:
+            return "removed_after_freeze"
+        if "main_pr_not_merged" in codes:
+            return "landed_main_pr_open"
+        if "merged_after_freeze" in codes:
+            return "landed_prs_after_freeze"
+        return "landed"
+    if a.in_release:
+        return "readded_after_freeze"
+    return "removed_at_freeze" if "removed_at_freeze" in codes else "removed_before_freeze"
+
+
+def summary_out(view: ReleaseView) -> SummaryOut:
+    """Dashboard tiles: counts of computed facts only."""
+    from collections import Counter
+
+    a = view.assessment
+    outcomes = {f.key: feature_outcome(view, f) for f in a.features}
+    counts = Counter(outcomes.values())
+    early = all(o == "too_early" for o in outcomes.values())
+    return SummaryOut(
+        release=a.release.key,
+        as_of=a.as_of,
+        phase="before_freeze" if early else "after_freeze",
+        features_in_release=sum(f.in_release for f in a.features),
+        features_ever=len(a.features),
+        landed=None
+        if early
+        else sum(counts[o] for o in ("landed", "landed_prs_after_freeze", "landed_main_pr_open")),
+        removed_at_freeze=sum(
+            any(x.code == "removed_at_freeze" for x in f.flags) for f in a.features
+        ),
+        critical_features=sum(f.in_release and _max_severity(f) == "critical" for f in a.features),
+        open_linked_prs=sum(
+            p.state == "open" for f in a.features if f.in_release for p in f.pull_requests
+        ),
+        unlinked_open_prs=sum(n for _, n in a.unlinked_open_prs_by_sig),
+        outcomes={o: counts[o] for o in OUTCOMES if counts[o]},
+        features=[
+            FeatureOutcomeOut(
+                key=f.key,
+                number=_number(f.key),
+                title=f.title,
+                outcome=outcomes[f.key],
+                sigs=list(f.teams),
+            )
+            for f in a.features
+        ],
+    )
+
+
+def graph_out(view: ReleaseView) -> GraphOut:
+    """Release -> features -> linked PRs, plus stated PR dependencies (engine/graph.py)."""
+    from engine.graph import pr_dependencies
+
+    a = view.assessment
+    world = view.world
+    nodes: dict[str, GraphNodeOut] = {
+        a.release.key: GraphNodeOut(
+            id=a.release.key, kind="release", label=a.release.name, title=a.release.name
+        )
+    }
+    edges: list[GraphEdgeOut] = []
+    for f in a.features:
+        feature = world.features[f.key]
+        nodes[f.key] = GraphNodeOut(
+            id=f.key,
+            kind="feature",
+            label=f"#{_number(f.key)}",
+            title=f.title,
+            url=feature.url,
+            sigs=list(f.teams),
+            in_release=f.in_release,
+            severity=_max_severity(f),
+            flags=sorted({x.code for x in f.flags}),
+        )
+        edges.append(GraphEdgeOut(source=a.release.key, target=f.key, kind="contains"))
+        critical = set(f.critical_path)
+        for p in f.pull_requests:
+            if p.key not in nodes:
+                pr = world.pull_requests[p.key]
+                nodes[p.key] = GraphNodeOut(
+                    id=p.key,
+                    kind="pull_request",
+                    label=f"PR #{_number(p.key)}",
+                    title=p.title,
+                    url=_url(p.key),
+                    sigs=sorted(lb for lb in pr.labels if lb.startswith("sig/")),
+                    state=p.state,
+                    is_main=p.is_main,
+                    on_critical_path=p.key in critical,
+                    feature=f.key,
+                )
+            edges.append(GraphEdgeOut(source=f.key, target=p.key, kind="implemented_by"))
+    for key, node in list(nodes.items()):
+        if node.kind != "pull_request":
+            continue
+        for dep in pr_dependencies(world.pull_requests[key]):
+            if dep in nodes:
+                edges.append(GraphEdgeOut(source=dep, target=key, kind="blocks"))
+    return GraphOut(release=a.release.key, as_of=a.as_of, nodes=list(nodes.values()), edges=edges)

@@ -142,19 +142,20 @@ function ResultRow({ base, scen, bold }: { base: PoolOutcome; scen: PoolOutcome;
 
 function Results({ sim, onlyChanged }: { sim: Simulation; onlyChanged: boolean }) {
   const touched = new Set(Object.entries(sim.scenario.scenario.pools).filter(([, c]) => changed(c)).map(([p]) => p));
-  const rows = sim.baseline.pools.filter((p) => !onlyChanged || touched.has(p.pool) || sim.scenario.scenario.arrival_multiplier !== 1);
+  const order = (a: PoolOutcome, b: PoolOutcome) => Number(a.pool === "other") - Number(b.pool === "other") || a.pool.localeCompare(b.pool);
+  const rows = [...sim.baseline.pools].sort(order).filter((p) => !onlyChanged || touched.has(p.pool) || sim.scenario.scenario.arrival_multiplier !== 1);
   return (
     <div className="overflow-x-auto rounded-lg border bg-white">
-      <table className="w-full text-left text-sm">
+      <table className="w-full text-left text-sm [&_td]:px-3 [&_th]:px-3">
         <thead className="bg-slate-50 text-xs text-slate-500">
           <tr>
-            <th className="px-0 py-2">Pool</th>
+            <th className="py-2">Pool</th>
             <th>Reviewers</th>
             <th>Review wait · baseline</th>
             <th>Review wait · scenario</th>
             <th>Δ</th>
             <th>Merged by {sim.horizon_label} · baseline</th>
-            <th>· scenario</th>
+            <th>Merged · scenario</th>
             <th>Δ</th>
             <th>Not merged · scenario</th>
           </tr>
@@ -240,7 +241,12 @@ export function Simulator({ release }: { release: string }) {
   useEffect(() => {
     let cancelled = false;
     updatesRequest<SimulatorInfo>(`/releases/${release}/simulator`)
-      .then((d) => !cancelled && setInfo(d))
+      .then((d) => {
+        if (cancelled) return;
+        // Alphabetical, with the shared "other" pool last.
+        const pools = [...d.pools].sort((a, b) => Number(a.pool === "other") - Number(b.pool === "other") || a.pool.localeCompare(b.pool));
+        setInfo({ ...d, pools });
+      })
       .catch((e: Error) => !cancelled && setError(e.message));
     loadSaved().catch(() => undefined);
     return () => {

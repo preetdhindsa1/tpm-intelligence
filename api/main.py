@@ -22,6 +22,7 @@ from api.schemas import (
     ExecUpdateOut,
     FeatureDetailOut,
     FeaturesOut,
+    GraphOut,
     LinkDecisionIn,
     LinkSuggestionOut,
     LinkSuggestionsOut,
@@ -33,11 +34,19 @@ from api.schemas import (
     SimPoolOut,
     SimulationOut,
     SimulatorOut,
+    SummaryOut,
     UpdateEditIn,
     UpdateWarningOut,
 )
 from api.service import ReleaseService, ReleaseView
-from api.views import feature_detail, feature_row, release_out, release_summary_out
+from api.views import (
+    feature_detail,
+    feature_row,
+    graph_out,
+    release_out,
+    release_summary_out,
+    summary_out,
+)
 
 SERVICE_NAME = "tpm-api"
 SIM_NOTE = (
@@ -527,6 +536,16 @@ def create_app(
         if row is None:
             raise HTTPException(404, f"scenario {scenario_id} not found for {name}")
         return saved_out(row)
+
+    @app.get("/releases/{name}/summary", response_model=SummaryOut)
+    async def summary(name: str) -> SummaryOut:
+        """Dashboard tiles and feature outcomes (computed facts only)."""
+        return summary_out(await view(name))
+
+    @app.get("/releases/{name}/graph", response_model=GraphOut)
+    async def graph(name: str) -> GraphOut:
+        """Release dependency graph: features, verified PR links, stated PR dependencies."""
+        return graph_out(await view(name))
 
     @app.get("/releases/{name}/load", response_model=LoadOut)
     async def load(name: str) -> LoadOut:

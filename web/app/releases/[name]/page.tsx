@@ -1,46 +1,77 @@
 import Link from "next/link";
+import { DependencyGraph } from "@/components/DependencyGraph";
+import { ExecBrief } from "@/components/ExecBrief";
 import { FlagChips } from "@/components/Flags";
 import { LiveRefresh } from "@/components/LiveRefresh";
 import { OddsCell } from "@/components/Odds";
-import { api } from "@/lib/api";
+import { OddsPanel } from "@/components/OddsPanel";
+import { OutcomeChart } from "@/components/OutcomeChart";
+import { api, type Summary } from "@/lib/api";
+import { briefToShow } from "@/lib/dashboard";
 import { formatUtc } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
 export default async function ReleasePage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;
-  const data = await api.features(name);
+  const [data, summary, graph, updates] = await Promise.all([
+    api.features(name),
+    api.summary(name),
+    api.graph(name),
+    api.updates(name).catch(() => []),
+  ]);
   const r = data.release;
   const current = data.features.filter((f) => f.in_release);
   const removed = data.features.filter((f) => !f.in_release);
+  const before = summary.phase === "before_freeze";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">
             {r.display_name || r.project || "Team"} {r.name} release health
           </h1>
           <p className="text-sm text-slate-600">
-            Code Freeze {r.code_freeze_at ? formatUtc(r.code_freeze_at) : "unknown"} · {r.features_in_release} features in
-            the release now · {r.features_ever_in_release} ever · data as of {formatUtc(r.as_of)}
+            Code Freeze {r.code_freeze_at ? formatUtc(r.code_freeze_at) : "unknown"} · release{" "}
+            {r.release_at ? formatUtc(r.release_at) : "unknown"} · data as of {formatUtc(r.as_of)}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href={`/releases/${name}/links`} className="rounded border bg-white px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50">
-            Link review →
-          </Link>
-          <Link href={`/releases/${name}/simulate`} className="rounded border bg-white px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50">
-            Simulate →
-          </Link>
-          <Link href={`/releases/${name}/update`} className="rounded border bg-white px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50">
-            Executive update →
-          </Link>
-          <LiveRefresh release={name} />
-        </div>
+        <LiveRefresh release={name} />
       </div>
 
-      {!data.validation.validated ? (
+      <StatTiles summary={summary} />
+
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        <Panel title="Release dependency graph" subtitle="Features and their verified PRs, most severe first">
+          <div className="h-[480px]">
+            <DependencyGraph release={name} data={graph} preview />
+          </div>
+        </Panel>
+        <Panel
+          title={before ? "Odds of landing by Code Freeze" : "What happened at Code Freeze"}
+          subtitle={
+            before
+              ? "Monte Carlo forecast, ranges over runs"
+              : `Facts: in the release 3 days after Code Freeze, and what the flags show. ${summary.features_ever} features.`
+          }
+        >
+          {before ? (
+            <OddsPanel release={name} rows={data.features} validated={data.validation.validated} />
+          ) : (
+            <div className="h-[440px]">
+              <OutcomeChart summary={summary} />
+            </div>
+          )}
+        </Panel>
+        <Panel title="Verified executive brief" subtitle="AI-drafted, every line fact-checked, TPM-approved">
+          <div className="h-[480px] overflow-y-auto pr-1">
+            <ExecBrief release={name} update={briefToShow(updates)} />
+          </div>
+        </Panel>
+      </div>
+
+      {!data.validation.validated && before ? (
         <div className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
           <strong>Odds are not validated.</strong> {data.validation.reason}. Read them next to the base rate shown in each
           cell. Flags and dates are computed facts and are not affected.
@@ -49,6 +80,41 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
 
       <FeatureTable title={`In the release (${current.length})`} rows={current} release={name} />
       {removed.length ? <FeatureTable title={`Removed from the release (${removed.length})`} rows={removed} release={name} /> : null}
+    </div>
+  );
+}
+
+function Panel({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-lg border bg-white p-4 shadow-sm">
+      <h2 className="font-semibold text-slate-800">{title}</h2>
+      <p className="mb-3 text-xs text-slate-500">{subtitle}</p>
+      {children}
+    </section>
+  );
+}
+
+function StatTiles({ summary: s }: { summary: Summary }) {
+  const tiles: { label: string; value: string; note?: string }[] = [
+    { label: "Features in the release", value: `${s.features_in_release}`, note: `${s.features_ever} ever` },
+    { label: "Landed", value: s.landed === null ? "—" : `${s.landed}`, note: s.landed === null ? "known 3 days after freeze" : "never removed at freeze" },
+    {
+      label: "Removed at Code Freeze",
+      value: `${s.removed_at_freeze}`,
+      note: s.outcomes.readded_after_freeze ? `${s.outcomes.readded_after_freeze} since re-added` : undefined,
+    },
+    { label: "With a critical flag", value: `${s.critical_features}`, note: "in the release now" },
+    { label: "Open linked PRs", value: `${s.open_linked_prs}`, note: `${s.unlinked_open_prs} open PRs not linked to a feature` },
+  ];
+  return (
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      {tiles.map((t) => (
+        <div key={t.label} className="rounded-lg border bg-white px-4 py-3 shadow-sm">
+          <p className="text-xs text-slate-500">{t.label}</p>
+          <p className="text-2xl font-semibold text-slate-900">{t.value}</p>
+          {t.note && <p className="text-xs text-slate-500">{t.note}</p>}
+        </div>
+      ))}
     </div>
   );
 }

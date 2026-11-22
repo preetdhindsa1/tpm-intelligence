@@ -15,6 +15,11 @@ drafts the executive update for a human to approve.
 > forecast odds "not validated".
 > Everything else below is **TBD (not yet measured)**.
 
+![v1.38 dashboard: stat tiles, dependency graph, Code Freeze outcomes, verified executive brief](docs/images/dashboard-v1.38.png)
+
+_The v1.38 dashboard on 2026-11-22 (local Docker, real public data). Layout and decisions:
+ADR-0013._
+
 ### Plug in another team
 
 Copy `connectors/teams/_template.yaml`, point at planning + code repos + a release calendar, pick a
@@ -173,12 +178,21 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   - A scenario request takes p95 0.86 s (40 requests, local Docker, measured
     2026-11-22).
   - `make sim-calibrate RELEASE=v1.38` fits and stores the calibration.
+- **M6: dashboard redesign** (ADR-0013), in light colours, based on the owner's mockup.
+  - A sidebar, five stat tiles, and the dependency graph (React Flow): features coloured
+    by their most severe flag, verified PR links only. A full Dependencies page has search
+    and a SIG filter.
+  - A chart of what happened at Code Freeze, or each feature's odds before it.
+  - The newest executive brief: approved, or clearly marked as a draft, with every line
+    fact-checked.
+  - Not copied from the mockup: the days-of-delay curve and "reallocate TPMs" lines,
+    because nothing computes them. The curve is a candidate for M7.
 
 ## Limitations
 
 - Phase 1 runs locally only. The Terraform in `infra/` is checked with an offline plan
   (84 resources) but has never been applied, so a real deployment is untested.
-- Phase 2 so far: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, and the AI link suggester with a review queue, and a what-if simulator (not validated). Still to come: dashboard redesign, forecast improvements. Sign-in, webhooks, Jira and cloud deploy are Phase 3.
+- Phase 2 so far: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, and the AI link suggester with a review queue, a what-if simulator (not validated), and the redesigned dashboard. Still to come: forecast improvements. Sign-in, webhooks, Jira and cloud deploy are Phase 3.
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue
   description (the release team's tracking list) and from KEP references in PR text.
