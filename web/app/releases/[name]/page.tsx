@@ -26,7 +26,12 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
             the release now · {r.features_ever_in_release} ever · data as of {formatUtc(r.as_of)}
           </p>
         </div>
-        <LiveRefresh release={name} />
+        <div className="flex items-center gap-4">
+          <Link href={`/releases/${name}/update`} className="rounded border bg-white px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50">
+            Executive update →
+          </Link>
+          <LiveRefresh release={name} />
+        </div>
       </div>
 
       {!data.validation.validated ? (

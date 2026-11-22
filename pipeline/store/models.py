@@ -450,3 +450,39 @@ class RiskNoteRecord(Base):
     attempts: Mapped[int] = mapped_column(Integer)
     cost_usd: Mapped[Decimal] = mapped_column(Numeric(12, 6))
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
+UPDATE_STATUSES = ("draft", "approved", "rejected")
+
+
+class ExecUpdateRecord(Base):
+    """An executive update draft and its approval (the platform never sends it)."""
+
+    __tablename__ = "exec_updates"
+    __table_args__ = (
+        CheckConstraint(_in("status", UPDATE_STATUSES), name="status"),
+        Index(None, "release_key", "id"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    release_key: Mapped[str] = mapped_column(String(128))
+    as_of: Mapped[datetime] = mapped_column(_tz())
+    header: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    sections: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    facts: Mapped[list[dict[str, Any]]] = mapped_column(JSONB)
+    counts: Mapped[dict[str, int]] = mapped_column(JSONB)
+    removed: Mapped[list[dict[str, Any]]] = mapped_column(JSONB)
+    attempts: Mapped[int] = mapped_column(Integer)
+    model: Mapped[str] = mapped_column(String(64))
+    prompt_version: Mapped[str] = mapped_column(String(64))
+    cost_usd: Mapped[Decimal] = mapped_column(Numeric(12, 6))
+    trimmed_for_length: Mapped[int] = mapped_column(Integer, server_default="0")
+    status: Mapped[str] = mapped_column(String(16))
+    edited: Mapped[bool] = mapped_column(server_default="false")
+    warnings: Mapped[list[dict[str, Any]]] = mapped_column(JSONB)
+    decided_by: Mapped[str | None] = mapped_column(String(128))
+    decided_at: Mapped[datetime | None] = mapped_column(_tz())
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    approved_with_warnings: Mapped[bool] = mapped_column(server_default="false")
+    approved_while_stale: Mapped[bool] = mapped_column(server_default="false")
+    created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())

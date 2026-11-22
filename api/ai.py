@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import threading
 from dataclasses import dataclass, field
 from typing import Any
@@ -9,9 +10,11 @@ from typing import Any
 from agents.gateway import Gateway
 from agents.notes import NoteStore
 from agents.risk_analyst import NoteResult, risk_note
+from agents.updates import ExecUpdate, UpdateStore
 from api.service import ReleaseView
 from engine.assess import FeatureAssessment
 from verify.build import OddsFacts, build_fact_sheet
+from verify.claims import Claim
 from verify.facts import FactSheet
 
 
@@ -37,23 +40,32 @@ class AIServices:
 
     gateway: Gateway | None = None
     notes: NoteStore | None = None
+    updates: UpdateStore | None = None
+    approver_name: str = field(default_factory=lambda: os.getenv("APPROVER_NAME", "unknown"))
     _sheets: dict[tuple[str, int], FactSheet] = field(default_factory=dict)
     _lock: threading.Lock = field(default_factory=threading.Lock)
 
-    def _ensure(self) -> tuple[Gateway, NoteStore]:
+    def _ensure(self) -> tuple[Gateway, NoteStore, UpdateStore]:
         with self._lock:
-            if self.gateway is None or self.notes is None:
+            if self.gateway is None or self.notes is None or self.updates is None:
                 from sqlalchemy.orm import sessionmaker
 
                 from agents.ledger import PostgresLedger
                 from agents.notes import PostgresNoteStore
                 from agents.settings import AISettings
+                from agents.updates import PostgresUpdateStore
                 from pipeline.store.session import make_engine
 
                 factory: Any = sessionmaker(make_engine())
                 self.gateway = self.gateway or Gateway(AISettings(), PostgresLedger(factory))
                 self.notes = self.notes or PostgresNoteStore(factory)
-            return self.gateway, self.notes
+                self.updates = self.updates or PostgresUpdateStore(factory)
+            return self.gateway, self.notes, self.updates
+
+    @property
+    def approver(self) -> str:
+        """Recorded on decisions until sign-in exists (Phase 3)."""
+        return f"{self.approver_name} (local, unauthenticated)"
 
     def sheet(self, view: ReleaseView) -> FactSheet:
         """Fact sheet per (release, view version), cached."""
@@ -65,5 +77,66 @@ class AIServices:
 
     def risk_note(self, view: ReleaseView, feature: FeatureAssessment) -> NoteResult:
         """Verified risk note for a feature (may call Claude)."""
-        gateway, notes = self._ensure()
+        gateway, notes, _ = self._ensure()
         return risk_note(gateway, notes, view.assessment.release.key, feature, self.sheet(view))
+
+    # ---------------------------------------------------------------- executive updates
+
+    def draft(self, view: ReleaseView) -> ExecUpdate:
+        """Draft a new update (essential AI call)."""
+        from agents.vp_summary import draft_update
+
+        gateway, _, updates = self._ensure()
+        return draft_update(
+            gateway,
+            updates,
+            view.assessment.release.key,
+            list(view.assessment.features),
+            self.sheet(view),
+            odds_validated=view.validation.validated,
+        )
+
+    def list_updates(self, view: ReleaseView) -> list[tuple[ExecUpdate, bool]]:
+        """Updates for a release, newest first, each with whether it is stale."""
+        _, _, updates = self._ensure()
+        return [(u, self.stale(view, u)) for u in updates.list(view.assessment.release.key)]
+
+    def get_update(self, update_id: int) -> ExecUpdate | None:
+        """One update."""
+        _, _, updates = self._ensure()
+        return updates.get(update_id)
+
+    def stale(self, view: ReleaseView, update: ExecUpdate) -> bool:
+        """Facts changed meaningfully since the draft (decided drafts are never stale)."""
+        from agents.updates import UpdateStatus
+        from agents.vp_summary import is_stale
+
+        if update.status is not UpdateStatus.DRAFT:
+            return False
+        return is_stale(update, list(view.assessment.features), self.sheet(view))[0]
+
+    def edit(self, update_id: int, sections: dict[str, list[Claim]]) -> ExecUpdate:
+        """Save TPM edits and re-check them."""
+        from agents.vp_summary import edit_update
+
+        _, _, updates = self._ensure()
+        return edit_update(updates, update_id, sections)
+
+    def decide(
+        self, view: ReleaseView, update_id: int, *, approve: bool, **kwargs: Any
+    ) -> ExecUpdate:
+        """Approve or reject, recording the local approver."""
+        from agents.vp_summary import decide
+
+        _, _, updates = self._ensure()
+        update = updates.get(update_id)
+        if update is None:
+            raise KeyError(update_id)
+        return decide(
+            updates,
+            update_id,
+            approve=approve,
+            approver=self.approver,
+            stale=self.stale(view, update),
+            **kwargs,
+        )

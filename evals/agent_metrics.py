@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from verify.checker import CheckReport
+from verify.claims import Claim
 from verify.facts import FactSheet
 
 _ODDS_VALUES = ("::odds.probability", "::odds.low", "::odds.high")
@@ -47,3 +48,17 @@ def score_case(
         "odds_honest": odds_honest(best, facts),
         "claims_total": total,
     }
+
+
+def features_covered(claims: Sequence[Claim], feature_keys: Sequence[str]) -> float | None:
+    """Share of ``feature_keys`` that at least one claim cites a fact of."""
+    if not feature_keys:
+        return None
+    cited = {r for c in claims for r in c.refs}
+    hit = [k for k in feature_keys if any(r.startswith(f"feature:{k}::") for r in cited)]
+    return len(hit) / len(feature_keys)
+
+
+def asks_grounded(asks: Sequence[Claim]) -> bool:
+    """Every ask cites a rule-made ``ask.*`` fact first (the checker already matched its text)."""
+    return all(c.refs and "::ask." in c.refs[0] for c in asks)

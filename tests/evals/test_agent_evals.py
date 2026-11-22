@@ -79,11 +79,54 @@ def test_live_runner_scores_with_a_fake_client(tmp_path: Path) -> None:
 
 
 def test_gate_requires_a_passing_run_for_the_current_prompt_and_model(tmp_path: Path) -> None:
-    assert not agent_gate.run(tmp_path)["passed"]
+    from agents.risk_analyst import TASK
+
+    assert not agent_gate.check(TASK, tmp_path)["passed"]
     prompt = load_prompt("risk_analyst")
-    stale = {"prompt_sha": "old", "model": "claude-haiku-5-5", "passed": True}
+    stale = {
+        "task": "risk_analyst",
+        "prompt_sha": "old",
+        "model": "claude-haiku-5-5",
+        "passed": True,
+    }
     (tmp_path / "agent-evals-20261122T000000Z.json").write_text(json.dumps(stale))
-    assert not agent_gate.run(tmp_path)["passed"]
-    current = {"prompt_sha": prompt.sha, "model": "claude-haiku-5-5", "passed": True, "summary": {}}
+    assert not agent_gate.check(TASK, tmp_path)["passed"]
+    current = {
+        "task": "risk_analyst",
+        "prompt_sha": prompt.sha,
+        "model": "claude-haiku-5-5",
+        "passed": True,
+        "summary": {},
+    }
     (tmp_path / "agent-evals-20261122T000001Z.json").write_text(json.dumps(current))
-    assert agent_gate.run(tmp_path)["passed"]
+    assert agent_gate.check(TASK, tmp_path)["passed"]
+    other = {**current, "task": "vp_summary"}  # another agent's file never counts
+    (tmp_path / "agent-evals-20261122T000002Z.json").write_text(json.dumps(other))
+    assert agent_gate.check(TASK, tmp_path)["results_file"] == "agent-evals-20261122T000001Z.json"
+
+
+def test_vp_runner_scores_with_a_fake_client(tmp_path: Path) -> None:
+    from agents.gateway import Gateway
+    from agents.selection import update_facts
+    from tests.agents.test_gateway import FakeClient, Response
+    from tests.agents.test_vp_summary import OUTPUT, state
+
+    features, facts = state()
+    sheet, order, removed = update_facts(features, facts)
+    case = {
+        "id": "v1.38-test",
+        "release": "kubernetes:v1.38",
+        "as_of": "2026-11-21T03:00:00+00:00",
+        "at_risk_order": order,
+        "removed_at_freeze": removed,
+        "facts": sheet.to_records(),
+    }
+    path = tmp_path / "vp.json"
+    path.write_text(json.dumps([case], default=str))
+    client = FakeClient(Response(parsed_output=OUTPUT, model="claude-opus-5-5"))
+    report = agents.run_vp(Gateway(AISettings(), MemoryLedger(), client), path)
+    row = report["cases"][0]
+    assert row["asks_grounded"] is True
+    assert row["removed"][0]["reason"] == "no_supporting_data"
+    assert report["summary"]["removal_rate_shown"] > 0.10  # 1 of 4 removed: fails the gate
+    assert report["passed"] is False

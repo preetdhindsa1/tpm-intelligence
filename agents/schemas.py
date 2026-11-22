@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from verify.claims import Claim
@@ -31,3 +33,34 @@ class ClaimsOut(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     claims: list[ClaimOut]
+
+
+class SectionName(StrEnum):
+    """Sections of an executive update, in display order."""
+
+    SUMMARY = "summary"
+    AT_RISK = "at_risk"
+    REMOVED = "removed"
+    ASKS = "asks"
+
+
+class SectionOut(BaseModel):
+    """One section's claims."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: SectionName
+    claims: list[ClaimOut]
+
+
+class ExecUpdateOut(BaseModel):
+    """The VP summarizer's answer: claims grouped into sections."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    sections: list[SectionOut]
+
+    @property
+    def claims(self) -> list[ClaimOut]:
+        """Every claim in order (the fact checker checks them all)."""
+        return [c for s in self.sections for c in s.claims]

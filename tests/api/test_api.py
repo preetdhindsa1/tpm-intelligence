@@ -223,3 +223,52 @@ def test_risk_note_endpoint_returns_only_verified_claims() -> None:
     assert again["status"] == "reused"
     assert len(client.calls) == 2
     assert api.get("/releases/v1.38/features/9999/risk-note").status_code == 404
+
+
+def test_update_endpoints_draft_edit_approve() -> None:
+    from agents.gateway import Gateway
+    from agents.ledger import MemoryLedger
+    from agents.notes import MemoryNoteStore
+    from agents.settings import AISettings
+    from agents.updates import MemoryUpdateStore
+    from api.ai import AIServices
+    from tests.agents.test_gateway import FakeClient, Response
+    from tests.agents.test_vp_summary import OUTPUT
+
+    service = ReleaseService(
+        InMemoryEventSource(list(fixture_events())),
+        forecast=FAST,
+        now=lambda: utc(2026, 11, 21, 3),
+        validation=lambda: Validation(False, "test: not validated"),
+    )
+    client = FakeClient(Response(parsed_output=OUTPUT, model="claude-opus-5-5"))
+    ai = AIServices(
+        gateway=Gateway(AISettings(), MemoryLedger(), client),
+        notes=MemoryNoteStore(),
+        updates=MemoryUpdateStore(),
+        approver_name="Harpreet",
+    )
+    api = TestClient(create_app(service=service, ai=ai))
+
+    created = api.post("/releases/v1.38/updates")
+    assert created.status_code == 201
+    body = created.json()
+    uid = body["id"]
+    assert body["status"] == "draft"
+    assert body["stale"] is False
+    assert body["claims_removed"] == 1
+    assert "Reallocating" not in body["markdown"]
+
+    sections = {"summary": body["sections"]["summary"], "asks": body["sections"]["asks"]}
+    edited = api.patch(f"/releases/v1.38/updates/{uid}", json={"sections": sections}).json()
+    assert edited["edited"] is True
+    assert edited["warnings"] == []
+    assert edited["sections"]["at_risk"] == []
+
+    approved = api.post(f"/releases/v1.38/updates/{uid}/approve", json={}).json()
+    assert approved["status"] == "approved"
+    assert approved["decided_by"] == "Harpreet (local, unauthenticated)"
+    again = api.post(f"/releases/v1.38/updates/{uid}/approve", json={})
+    assert again.status_code == 409
+    assert [u["id"] for u in api.get("/releases/v1.38/updates").json()] == [uid]
+    assert api.get("/releases/v1.38/updates/999").status_code == 404

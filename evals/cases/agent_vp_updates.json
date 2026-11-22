@@ -1,0 +1,6626 @@
+[
+ {
+  "id": "v1.37-freeze-7d",
+  "release": "kubernetes:v1.37",
+  "as_of": "2026-07-16T12:00:00+00:00",
+  "at_risk_order": [
+   "kubernetes/enhancements#5547",
+   "kubernetes/enhancements#5502",
+   "kubernetes/enhancements#5598",
+   "kubernetes/enhancements#5647",
+   "kubernetes/enhancements#5732",
+   "kubernetes/enhancements#5554",
+   "kubernetes/enhancements#3257",
+   "kubernetes/enhancements#4563"
+  ],
+  "removed_at_freeze": [],
+  "facts": [
+   {
+    "key": "feature:kubernetes/enhancements#3257::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #140587 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #137035."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 8.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140587 opened 8.2 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-15T07:15:17+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140587"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#137035 has waited 148.9 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#137035"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 148.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-05-05T16:06:46+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140587"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::odds.base_rate",
+    "kind": "probability",
+    "value": 0.7444
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::odds.high",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::odds.low",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::odds.probability",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::prs.merged",
+    "kind": "count",
+    "value": 9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::prs.open",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::prs.total",
+    "kind": "count",
+    "value": 15
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::stage",
+    "kind": "label",
+    "value": "stable"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::title",
+    "kind": "label",
+    "value": "ClusterTrustBundles (previously Trust Anchor Sets)"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #137050."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#137050 has waited 36.8 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#137050"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 31
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 36.8
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-06-23T17:55:04+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-06-17T12:14:04+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#137396"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::odds.base_rate",
+    "kind": "probability",
+    "value": 0.7444
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::odds.high",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::odds.low",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::odds.probability",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::prs.merged",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::prs.open",
+    "kind": "count",
+    "value": 3
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::prs.total",
+    "kind": "count",
+    "value": 5
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::stage",
+    "kind": "label",
+    "value": "alpha"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::title",
+    "kind": "label",
+    "value": "EvictionRequest API"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #140244 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #130277."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #130277."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#130277 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#130277"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 17.3
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140244 opened 17.3 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-06T05:32:18+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140244"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#130277 has waited 157.0 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#130277"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 157.0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-06-17T07:52:27+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-06-10T12:13:18+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140244"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::odds.base_rate",
+    "kind": "probability",
+    "value": 0.7444
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::odds.high",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::odds.low",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::odds.probability",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::prs.merged",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::prs.open",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::prs.total",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5502::title",
+    "kind": "label",
+    "value": "Add stickyBit support for emptydir volumes"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #140305 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #140303."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #140303."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140303 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140303"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 15.4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140305 opened 15.4 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-08T02:24:00+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140305"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140303 has waited 8.4 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140303"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 8.4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-06-02T09:08:26+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140305"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::odds.base_rate",
+    "kind": "probability",
+    "value": 0.7444
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::odds.high",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::odds.low",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::odds.probability",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::prs.merged",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::prs.open",
+    "kind": "count",
+    "value": 5
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::prs.total",
+    "kind": "count",
+    "value": 7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::title",
+    "kind": "label",
+    "value": "WAS: Integrate Workload APIs with Job controller"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #140629 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #136015."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #129719."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#129719 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#129719"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 7.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140629 opened 7.2 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-16T07:23:12+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140629"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015 has waited 7.9 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 7.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-05-26T19:00:57+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140629"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.base_rate",
+    "kind": "probability",
+    "value": 0.7444
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.high",
+    "kind": "probability",
+    "value": 0.7357
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.low",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.probability",
+    "kind": "probability",
+    "value": 0.7357
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::prs.merged",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::prs.open",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::prs.total",
+    "kind": "count",
+    "value": 14
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::stage",
+    "kind": "label",
+    "value": "alpha"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::title",
+    "kind": "label",
+    "value": "Support In place update pod resources alongside static cpu manager policy"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #140289 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #139459."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #139459."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139459 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139459"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 15.6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140289 opened 15.6 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-07T20:33:57+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140289"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139459 has waited 43.1 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139459"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 43.1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-05-26T13:27:08+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140289"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::odds.base_rate",
+    "kind": "probability",
+    "value": 0.7444
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::odds.high",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::odds.low",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::odds.probability",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::prs.merged",
+    "kind": "count",
+    "value": 5
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::prs.open",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::prs.total",
+    "kind": "count",
+    "value": 11
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::title",
+    "kind": "label",
+    "value": "Opportunistic batching"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #138724."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138724 has waited 57.7 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138724"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 11
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 57.7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-05-28T18:24:32+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139657"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::odds.base_rate",
+    "kind": "probability",
+    "value": 0.7444
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::odds.high",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::odds.low",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::odds.probability",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::prs.merged",
+    "kind": "count",
+    "value": 13
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::prs.open",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::prs.total",
+    "kind": "count",
+    "value": 18
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::title",
+    "kind": "label",
+    "value": "Stale Controller Mitigation"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #140295 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #139859."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 15.5
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140295 opened 15.5 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-07T23:00:21+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140295"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139859 has waited 27.2 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139859"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 27.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-05-26T13:24:02+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140295"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::odds.base_rate",
+    "kind": "probability",
+    "value": 0.7444
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::odds.high",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::odds.low",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::odds.probability",
+    "kind": "probability",
+    "value": 0.5615
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::prs.merged",
+    "kind": "count",
+    "value": 11
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::prs.open",
+    "kind": "count",
+    "value": 7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::prs.total",
+    "kind": "count",
+    "value": 28
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::title",
+    "kind": "label",
+    "value": "Topology-aware workload scheduling"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137396::created_at",
+    "kind": "date",
+    "value": "2026-03-04T09:25:13+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137396::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137396::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137396::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137396::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::created_at",
+    "kind": "date",
+    "value": "2026-06-11T21:49:56+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::review_rounds",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140244::created_at",
+    "kind": "date",
+    "value": "2026-07-06T05:32:18+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140244::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140244::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140244::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140244::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140289::created_at",
+    "kind": "date",
+    "value": "2026-07-07T20:33:57+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140289::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140289::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140289::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140289::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::created_at",
+    "kind": "date",
+    "value": "2026-07-07T23:00:21+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::created_at",
+    "kind": "date",
+    "value": "2026-07-08T02:24:00+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::created_at",
+    "kind": "date",
+    "value": "2026-07-15T07:15:17+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140629::created_at",
+    "kind": "date",
+    "value": "2026-07-16T07:23:12+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140629::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140629::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140629::review_rounds",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140629::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "release::as_of",
+    "kind": "date",
+    "value": "2026-07-16T12:00:00+00:00"
+   },
+   {
+    "key": "release::code_freeze_at",
+    "kind": "date",
+    "value": "2026-07-23T12:00:00+00:00"
+   },
+   {
+    "key": "release::enhancements_freeze_at",
+    "kind": "date",
+    "value": "2026-06-17T12:00:00+00:00"
+   },
+   {
+    "key": "release::features_ever_in_release",
+    "kind": "count",
+    "value": 110
+   },
+   {
+    "key": "release::features_in_release",
+    "kind": "count",
+    "value": 91
+   },
+   {
+    "key": "release::features_removed",
+    "kind": "count",
+    "value": 19
+   },
+   {
+    "key": "release::features_tracked",
+    "kind": "count",
+    "value": 87
+   },
+   {
+    "key": "release::features_with_flag.ci_failing",
+    "kind": "count",
+    "value": 14
+   },
+   {
+    "key": "release::features_with_flag.late_main_pr",
+    "kind": "count",
+    "value": 19
+   },
+   {
+    "key": "release::features_with_flag.no_linked_prs",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "release::features_with_flag.review_waiting",
+    "kind": "count",
+    "value": 38
+   },
+   {
+    "key": "release::name",
+    "kind": "label",
+    "value": "v1.37"
+   },
+   {
+    "key": "release::release_at",
+    "kind": "date",
+    "value": "2026-08-26T00:00:00+00:00"
+   }
+  ]
+ },
+ {
+  "id": "v1.37-freeze+1d",
+  "release": "kubernetes:v1.37",
+  "as_of": "2026-07-24T12:00:00+00:00",
+  "at_risk_order": [
+   "kubernetes/enhancements#2570",
+   "kubernetes/enhancements#5855",
+   "kubernetes/enhancements#5945",
+   "kubernetes/enhancements#5547",
+   "kubernetes/enhancements#6012",
+   "kubernetes/enhancements#5647",
+   "kubernetes/enhancements#3257",
+   "kubernetes/enhancements#5732"
+  ],
+  "removed_at_freeze": [
+   "kubernetes/enhancements#2033",
+   "kubernetes/enhancements#2837",
+   "kubernetes/enhancements#3721",
+   "kubernetes/enhancements#4438",
+   "kubernetes/enhancements#4563",
+   "kubernetes/enhancements#5474",
+   "kubernetes/enhancements#5491",
+   "kubernetes/enhancements#5598",
+   "kubernetes/enhancements#5681",
+   "kubernetes/enhancements#5729"
+  ],
+  "facts": [
+   {
+    "key": "feature:kubernetes/enhancements#2033::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2033::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:13:22+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2033::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:13:22+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2033::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2033::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2033::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:13:22+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2033::title",
+    "kind": "label",
+    "value": "sig-node: Kubelet-in-UserNS, aka Rootless mode"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #137878, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #138439."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #138439."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138439 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138439"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#137878 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#137878"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.readded_after_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.readded_after_freeze.message",
+    "kind": "label",
+    "value": "Added back to v1.37 after Code Freeze (2026-07-23T12:37:42+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.readded_after_freeze.readded_at",
+    "kind": "date",
+    "value": "2026-07-23T12:37:42+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.readded_after_freeze.severity",
+    "kind": "label",
+    "value": "info"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:20:51+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:20:51+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138439 has waited 98.2 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138439"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 98.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:37:42+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:20:51+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#137878"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::prs.merged",
+    "kind": "count",
+    "value": 14
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::prs.open",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::prs.total",
+    "kind": "count",
+    "value": 23
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::title",
+    "kind": "label",
+    "value": "Support memory qos with cgroups v2"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:09:05+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:09:05+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:09:05+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::title",
+    "kind": "label",
+    "value": "Pod level resources"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #140587, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #137035."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 8.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140587 opened 8.2 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-15T07:15:17+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140587"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140587 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140587"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#137035 has waited 156.9 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#137035"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 156.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-05-05T16:06:46+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140587"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::prs.merged",
+    "kind": "count",
+    "value": 10
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::prs.open",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::prs.total",
+    "kind": "count",
+    "value": 15
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::stage",
+    "kind": "label",
+    "value": "stable"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3257::title",
+    "kind": "label",
+    "value": "ClusterTrustBundles (previously Trust Anchor Sets)"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3721::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3721::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:24:02+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3721::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:24:02+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3721::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3721::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3721::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:24:02+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3721::title",
+    "kind": "label",
+    "value": "Add FileEnvSource and FileKeySelector to add environment generated on the fly"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:21:59+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:21:59+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:21:59+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::title",
+    "kind": "label",
+    "value": "Restarting sidecar containers during Pod termination"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:11:50+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:11:50+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:11:50+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4563::title",
+    "kind": "label",
+    "value": "EvictionRequest API"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5474::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5474::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:06:40+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5474::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:06:40+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5474::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5474::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5474::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:06:40+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5474::title",
+    "kind": "label",
+    "value": "Enable Writable cgroups for unprivileged containers"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5491::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5491::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:26:24+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5491::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:26:24+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5491::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5491::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5491::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:26:24+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5491::title",
+    "kind": "label",
+    "value": "DRA: List Types for Attributes"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #140305, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #140303."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #140303."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140303 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140303"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 15.4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140305 opened 15.4 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-08T02:24:00+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140305"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140305 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140305"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140303 has waited 16.4 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140303"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 16.4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-06-02T09:08:26+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140305"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::prs.merged",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::prs.open",
+    "kind": "count",
+    "value": 3
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::prs.total",
+    "kind": "count",
+    "value": 7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5547::title",
+    "kind": "label",
+    "value": "WAS: Integrate Workload APIs with Job controller"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:06:12+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:06:12+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:06:12+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5598::title",
+    "kind": "label",
+    "value": "Opportunistic batching"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #139657, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #138724."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#139657 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139657"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138724 has waited 65.7 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138724"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 11
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 65.7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-05-28T18:24:32+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139657"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::prs.merged",
+    "kind": "count",
+    "value": 13
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::prs.open",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::prs.total",
+    "kind": "count",
+    "value": 18
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5647::title",
+    "kind": "label",
+    "value": "Stale Controller Mitigation"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5681::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5681::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:14:34+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5681::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:14:34+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5681::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5681::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5681::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:14:34+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5681::title",
+    "kind": "label",
+    "value": "Conditional Authorization"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5729::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5729::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:18:34+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5729::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:18:34+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5729::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5729::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5729::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:18:34+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5729::title",
+    "kind": "label",
+    "value": "DRA: ResourceClaim Support for Workloads"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #140295, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #140295."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 15.5
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140295 opened 15.5 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-07T23:00:21+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140295"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140295 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140295"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140295 has waited 16.5 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140295"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 16.5
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-05-26T13:24:02+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140295"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::prs.merged",
+    "kind": "count",
+    "value": 13
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::prs.open",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::prs.total",
+    "kind": "count",
+    "value": 29
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5732::title",
+    "kind": "label",
+    "value": "Topology-aware workload scheduling"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #140013, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #139413."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #139414."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139414 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139414"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.main_pr_not_merged.merged_at",
+    "kind": "date",
+    "value": "2026-07-23T16:03:52+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140013 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140013"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.merged_after_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.merged_after_freeze.exception_evidence_at",
+    "kind": "date",
+    "value": "2026-07-23T17:02:14+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.merged_after_freeze.merged_at",
+    "kind": "date",
+    "value": "2026-07-23T16:03:52+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.merged_after_freeze.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140013 merged 0.2 days after Code Freeze; exception evidence: re-added after freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.merged_after_freeze.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140013"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.merged_after_freeze.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.merged_after_freeze.status",
+    "kind": "label",
+    "value": "merged_after_freeze_with_exception"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.readded_after_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.readded_after_freeze.message",
+    "kind": "label",
+    "value": "Added back to v1.37 after Code Freeze (2026-07-23T17:02:14+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.readded_after_freeze.readded_at",
+    "kind": "date",
+    "value": "2026-07-23T17:02:14+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.readded_after_freeze.severity",
+    "kind": "label",
+    "value": "info"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:06:14+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:06:14+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139413 has waited 52.9 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139413"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 52.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-07-23T17:02:14+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:06:14+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140013"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::prs.merged",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::prs.open",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::prs.total",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5855::title",
+    "kind": "label",
+    "value": "Add bind mount options (noexec, nodev, nosuid) support on volumeMounts"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #139933, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.main_pr_not_merged.merged_at",
+    "kind": "date",
+    "value": "2026-07-24T04:09:49+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#139933 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139933"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.merged_after_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.merged_after_freeze.exception_evidence_at",
+    "kind": "date",
+    "value": "2026-07-24T06:07:31+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.merged_after_freeze.merged_at",
+    "kind": "date",
+    "value": "2026-07-24T04:09:49+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.merged_after_freeze.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139933 merged 0.7 days after Code Freeze; exception evidence: re-added after freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.merged_after_freeze.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139933"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.merged_after_freeze.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.merged_after_freeze.status",
+    "kind": "label",
+    "value": "merged_after_freeze_with_exception"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.readded_after_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.readded_after_freeze.message",
+    "kind": "label",
+    "value": "Added back to v1.37 after Code Freeze (2026-07-24T06:07:31+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.readded_after_freeze.readded_at",
+    "kind": "date",
+    "value": "2026-07-24T06:07:31+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.readded_after_freeze.severity",
+    "kind": "label",
+    "value": "info"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.37 at Code Freeze (2026-07-23T12:13:51+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-07-23T12:13:51+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-07-24T06:07:31+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-07-23T12:13:51+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139933"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::prs.merged",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::prs.open",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::prs.total",
+    "kind": "count",
+    "value": 3
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5945::title",
+    "kind": "label",
+    "value": "DRA: Optional Node Operations"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #140670, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #139882."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #139882."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139882 has 2 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139882"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 6.1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140670 opened 6.1 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-07-17T09:12:08+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140670"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#140670 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140670"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139882 has waited 22.9 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139882"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 22.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-05-26T13:24:33+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140670"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::prs.merged",
+    "kind": "count",
+    "value": 11
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::prs.open",
+    "kind": "count",
+    "value": 5
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::prs.total",
+    "kind": "count",
+    "value": 18
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::title",
+    "kind": "label",
+    "value": "CompositePodGroup API"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137878::created_at",
+    "kind": "date",
+    "value": "2026-03-19T08:14:15+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137878::failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137878::freeze_status",
+    "kind": "label",
+    "value": "closed_unmerged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137878::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#137878::state",
+    "kind": "label",
+    "value": "closed"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::created_at",
+    "kind": "date",
+    "value": "2026-06-11T21:49:56+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::review_rounds",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139657::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139933::created_at",
+    "kind": "date",
+    "value": "2026-06-22T23:09:52+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139933::failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139933::freeze_status",
+    "kind": "label",
+    "value": "merged_after_freeze_with_exception"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139933::merged_at",
+    "kind": "date",
+    "value": "2026-07-24T04:09:49+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139933::review_rounds",
+    "kind": "count",
+    "value": 30
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#139933::state",
+    "kind": "label",
+    "value": "merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140013::created_at",
+    "kind": "date",
+    "value": "2026-06-25T10:25:28+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140013::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140013::freeze_status",
+    "kind": "label",
+    "value": "merged_after_freeze_with_exception"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140013::merged_at",
+    "kind": "date",
+    "value": "2026-07-23T16:03:52+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140013::review_rounds",
+    "kind": "count",
+    "value": 8
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140013::state",
+    "kind": "label",
+    "value": "merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::created_at",
+    "kind": "date",
+    "value": "2026-07-07T23:00:21+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140295::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::created_at",
+    "kind": "date",
+    "value": "2026-07-08T02:24:00+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140305::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::created_at",
+    "kind": "date",
+    "value": "2026-07-15T07:15:17+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140587::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::created_at",
+    "kind": "date",
+    "value": "2026-07-17T09:12:08+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "release::as_of",
+    "kind": "date",
+    "value": "2026-07-24T12:00:00+00:00"
+   },
+   {
+    "key": "release::code_freeze_at",
+    "kind": "date",
+    "value": "2026-07-23T12:00:00+00:00"
+   },
+   {
+    "key": "release::enhancements_freeze_at",
+    "kind": "date",
+    "value": "2026-06-17T12:00:00+00:00"
+   },
+   {
+    "key": "release::features_ever_in_release",
+    "kind": "count",
+    "value": 110
+   },
+   {
+    "key": "release::features_in_release",
+    "kind": "count",
+    "value": 67
+   },
+   {
+    "key": "release::features_removed",
+    "kind": "count",
+    "value": 43
+   },
+   {
+    "key": "release::features_tracked",
+    "kind": "count",
+    "value": 62
+   },
+   {
+    "key": "release::features_with_flag.ci_failing",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "release::features_with_flag.late_main_pr",
+    "kind": "count",
+    "value": 19
+   },
+   {
+    "key": "release::features_with_flag.main_pr_not_merged",
+    "kind": "count",
+    "value": 14
+   },
+   {
+    "key": "release::features_with_flag.merged_after_freeze",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "release::features_with_flag.readded_after_freeze",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "release::features_with_flag.removed_at_freeze",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "release::features_with_flag.review_waiting",
+    "kind": "count",
+    "value": 16
+   },
+   {
+    "key": "release::name",
+    "kind": "label",
+    "value": "v1.37"
+   },
+   {
+    "key": "release::release_at",
+    "kind": "date",
+    "value": "2026-08-26T00:00:00+00:00"
+   }
+  ]
+ },
+ {
+  "id": "v1.38-freeze-7d",
+  "release": "kubernetes:v1.38",
+  "as_of": "2026-11-10T12:00:00+00:00",
+  "at_risk_order": [
+   "kubernetes/enhancements#3157",
+   "kubernetes/enhancements#2570",
+   "kubernetes/enhancements#5554",
+   "kubernetes/enhancements#5972",
+   "kubernetes/enhancements#5419",
+   "kubernetes/enhancements#6268",
+   "kubernetes/enhancements#6012",
+   "kubernetes/enhancements#4006"
+  ],
+  "removed_at_freeze": [],
+  "facts": [
+   {
+    "key": "feature:kubernetes/enhancements#2570::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #138439."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #138439."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138439 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138439"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138439 has waited 207.2 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138439"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 207.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-08T19:30:49+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142854"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::odds.base_rate",
+    "kind": "probability",
+    "value": 0.75
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::odds.high",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::odds.low",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::odds.probability",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::prs.merged",
+    "kind": "count",
+    "value": 15
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::prs.open",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::prs.total",
+    "kind": "count",
+    "value": 28
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::title",
+    "kind": "label",
+    "value": "Support memory qos with cgroups v2"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #143845 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #138313."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #138313."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 3
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138313 has 3 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138313"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 11.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143845 opened 11.9 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-11-05T13:24:03+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143845"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138313 has waited 151.9 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138313"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 12
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 151.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-18T12:06:01+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143845"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::odds.base_rate",
+    "kind": "probability",
+    "value": 0.75
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::odds.high",
+    "kind": "probability",
+    "value": 0.8882
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::odds.low",
+    "kind": "probability",
+    "value": 0.8882
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::odds.probability",
+    "kind": "probability",
+    "value": 0.8882
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::prs.merged",
+    "kind": "count",
+    "value": 71
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::prs.open",
+    "kind": "count",
+    "value": 9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::prs.total",
+    "kind": "count",
+    "value": 95
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::stage",
+    "kind": "label",
+    "value": "stable"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::title",
+    "kind": "label",
+    "value": "Allow informers for getting a stream of data instead of chunking"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #143780 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #142596."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 13.4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143780 opened 13.4 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-11-04T01:47:51+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143780"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142596 has waited 39.8 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142596"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 39.8
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-18T09:40:40+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143780"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::odds.base_rate",
+    "kind": "probability",
+    "value": 0.75
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::odds.high",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::odds.low",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::odds.probability",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::prs.merged",
+    "kind": "count",
+    "value": 14
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::prs.open",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::prs.total",
+    "kind": "count",
+    "value": 20
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::stage",
+    "kind": "label",
+    "value": "stable"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4006::title",
+    "kind": "label",
+    "value": "Transition from SPDY to WebSockets"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #143999 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #141813."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #141813."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 3
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141813 has 3 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141813"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 7.5
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143999 opened 7.5 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-11-10T00:29:42+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143999"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141813 has waited 68.5 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141813"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 68.5
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-08T19:31:01+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143999"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::odds.base_rate",
+    "kind": "probability",
+    "value": 0.75
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::odds.high",
+    "kind": "probability",
+    "value": 0.7083
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::odds.low",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::odds.probability",
+    "kind": "probability",
+    "value": 0.7083
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::prs.merged",
+    "kind": "count",
+    "value": 17
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::prs.open",
+    "kind": "count",
+    "value": 7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::prs.total",
+    "kind": "count",
+    "value": 29
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::stage",
+    "kind": "label",
+    "value": "stable"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::title",
+    "kind": "label",
+    "value": "Pod Level Resources Support With In Place Pod Vertical Scaling"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #143800 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #136015."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #136015."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 27
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015 has 27 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 12.8
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143800 opened 12.8 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-11-04T17:24:19+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143800"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015 has waited 83.8 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 83.8
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-08T19:31:05+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143800"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.base_rate",
+    "kind": "probability",
+    "value": 0.75
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.high",
+    "kind": "probability",
+    "value": 0.8882
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.low",
+    "kind": "probability",
+    "value": 0.8882
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.probability",
+    "kind": "probability",
+    "value": 0.8882
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::prs.merged",
+    "kind": "count",
+    "value": 9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::prs.open",
+    "kind": "count",
+    "value": 7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::prs.total",
+    "kind": "count",
+    "value": 22
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::stage",
+    "kind": "label",
+    "value": "alpha"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::title",
+    "kind": "label",
+    "value": "Support In place update pod resources alongside static cpu manager policy"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #143919 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #141327."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #142810."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142810 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142810"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 10.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143919 opened 10.2 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-11-07T08:21:42+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143919"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141327 has waited 53.7 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141327"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 53.7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-08T19:31:17+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143919"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::odds.base_rate",
+    "kind": "probability",
+    "value": 0.75
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::odds.high",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::odds.low",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::odds.probability",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::prs.merged",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::prs.open",
+    "kind": "count",
+    "value": 7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::prs.total",
+    "kind": "count",
+    "value": 10
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::stage",
+    "kind": "label",
+    "value": "alpha"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5972::title",
+    "kind": "label",
+    "value": "Dynamic Pod Mutation: Optimistic Execution & Hierarchical Resource Delegation"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #139882."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #139882."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139882 has 2 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139882"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139882 has waited 40.1 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#139882"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 40.1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-07T14:05:10+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140670"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::odds.base_rate",
+    "kind": "probability",
+    "value": 0.75
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::odds.high",
+    "kind": "probability",
+    "value": 0.8882
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::odds.low",
+    "kind": "probability",
+    "value": 0.8882
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::odds.probability",
+    "kind": "probability",
+    "value": 0.8882
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::prs.merged",
+    "kind": "count",
+    "value": 61
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::prs.open",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::prs.total",
+    "kind": "count",
+    "value": 75
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6012::title",
+    "kind": "label",
+    "value": "CompositePodGroup API"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::ask.confirm_merge_plan",
+    "kind": "label",
+    "value": "Confirm #143987 can merge before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #141451."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #141450."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141450 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141450"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 7.8
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143987 opened 7.8 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-11-09T16:49:27+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143987"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141451 has waited 80.2 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141451"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 80.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-10-02T02:53:05+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-09-30T12:09:20+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143987"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::odds.base_rate",
+    "kind": "probability",
+    "value": 0.75
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::odds.high",
+    "kind": "probability",
+    "value": 0.7083
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::odds.low",
+    "kind": "probability",
+    "value": 0.6053
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::odds.probability",
+    "kind": "probability",
+    "value": 0.7083
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::odds.validated",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::prs.merged",
+    "kind": "count",
+    "value": 42
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::prs.open",
+    "kind": "count",
+    "value": 8
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::prs.total",
+    "kind": "count",
+    "value": 52
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::title",
+    "kind": "label",
+    "value": "Stall and resume slow watch streams instead of terminating them (WatchCacheStallResume)"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::created_at",
+    "kind": "date",
+    "value": "2026-07-17T09:12:08+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::freeze_status",
+    "kind": "label",
+    "value": "merged_before_freeze"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::merged_at",
+    "kind": "date",
+    "value": "2026-09-28T17:04:34+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::review_rounds",
+    "kind": "count",
+    "value": 10
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#140670::state",
+    "kind": "label",
+    "value": "merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142854::created_at",
+    "kind": "date",
+    "value": "2026-10-08T22:03:17+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142854::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142854::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142854::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142854::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143780::created_at",
+    "kind": "date",
+    "value": "2026-11-04T01:47:51+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143780::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143780::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143780::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143780::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::created_at",
+    "kind": "date",
+    "value": "2026-11-04T17:24:19+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::failing_checks",
+    "kind": "count",
+    "value": 11
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::freeze_status",
+    "kind": "label",
+    "value": "closed_unmerged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::state",
+    "kind": "label",
+    "value": "closed"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143845::created_at",
+    "kind": "date",
+    "value": "2026-11-05T13:24:03+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143845::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143845::freeze_status",
+    "kind": "label",
+    "value": "merged_before_freeze"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143845::merged_at",
+    "kind": "date",
+    "value": "2026-11-06T22:29:49+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143845::review_rounds",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143845::state",
+    "kind": "label",
+    "value": "merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143919::created_at",
+    "kind": "date",
+    "value": "2026-11-07T08:21:42+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143919::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143919::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143919::review_rounds",
+    "kind": "count",
+    "value": 3
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143919::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143987::created_at",
+    "kind": "date",
+    "value": "2026-11-09T16:49:27+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143987::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143987::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143987::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143987::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143999::created_at",
+    "kind": "date",
+    "value": "2026-11-10T00:29:42+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143999::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143999::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143999::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143999::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "release::as_of",
+    "kind": "date",
+    "value": "2026-11-10T12:00:00+00:00"
+   },
+   {
+    "key": "release::code_freeze_at",
+    "kind": "date",
+    "value": "2026-11-17T12:00:00+00:00"
+   },
+   {
+    "key": "release::enhancements_freeze_at",
+    "kind": "date",
+    "value": "2026-09-30T12:00:00+00:00"
+   },
+   {
+    "key": "release::features_ever_in_release",
+    "kind": "count",
+    "value": 106
+   },
+   {
+    "key": "release::features_in_release",
+    "kind": "count",
+    "value": 87
+   },
+   {
+    "key": "release::features_removed",
+    "kind": "count",
+    "value": 19
+   },
+   {
+    "key": "release::features_tracked",
+    "kind": "count",
+    "value": 86
+   },
+   {
+    "key": "release::features_with_flag.ci_failing",
+    "kind": "count",
+    "value": 17
+   },
+   {
+    "key": "release::features_with_flag.late_main_pr",
+    "kind": "count",
+    "value": 29
+   },
+   {
+    "key": "release::features_with_flag.no_linked_prs",
+    "kind": "count",
+    "value": 3
+   },
+   {
+    "key": "release::features_with_flag.review_waiting",
+    "kind": "count",
+    "value": 35
+   },
+   {
+    "key": "release::name",
+    "kind": "label",
+    "value": "v1.38"
+   },
+   {
+    "key": "release::release_at",
+    "kind": "date",
+    "value": "2026-12-16T00:00:00+00:00"
+   }
+  ]
+ },
+ {
+  "id": "v1.38-freeze+1d",
+  "release": "kubernetes:v1.38",
+  "as_of": "2026-11-18T12:00:00+00:00",
+  "at_risk_order": [
+   "kubernetes/enhancements#3157",
+   "kubernetes/enhancements#5554",
+   "kubernetes/enhancements#5710",
+   "kubernetes/enhancements#6268",
+   "kubernetes/enhancements#6058",
+   "kubernetes/enhancements#6315",
+   "kubernetes/enhancements#6356",
+   "kubernetes/enhancements#5359"
+  ],
+  "removed_at_freeze": [
+   "kubernetes/enhancements#1979",
+   "kubernetes/enhancements#2172",
+   "kubernetes/enhancements#2570",
+   "kubernetes/enhancements#2837",
+   "kubernetes/enhancements#3953",
+   "kubernetes/enhancements#4438",
+   "kubernetes/enhancements#4958",
+   "kubernetes/enhancements#5365",
+   "kubernetes/enhancements#5419",
+   "kubernetes/enhancements#5440"
+  ],
+  "facts": [
+   {
+    "key": "feature:kubernetes/enhancements#1979::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#1979::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:15:41+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#1979::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:15:41+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#1979::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#1979::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#1979::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:15:41+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#1979::title",
+    "kind": "label",
+    "value": "Object Storage Support (COSI)"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2172::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2172::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:03:43+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2172::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:03:43+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2172::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2172::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2172::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:03:43+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2172::title",
+    "kind": "label",
+    "value": "Warn about quietly-insecure container UIDs/GIDs"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:38:52+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:38:52+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:38:52+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2570::title",
+    "kind": "label",
+    "value": "Support memory qos with cgroups v2"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:34:11+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:34:11+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:34:11+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#2837::title",
+    "kind": "label",
+    "value": "Pod level resources"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::ask.confirm_exception",
+    "kind": "label",
+    "value": "Confirm an approved exception exists for #143839."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #144285, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #138313."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #138313."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 3
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138313 has 3 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138313"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#144285 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#144285"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.merged_after_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.merged_after_freeze.merged_at",
+    "kind": "date",
+    "value": "2026-11-17T12:48:20+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.merged_after_freeze.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143839 merged 0.0 days after Code Freeze; no exception evidence."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.merged_after_freeze.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143839"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.merged_after_freeze.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.merged_after_freeze.status",
+    "kind": "label",
+    "value": "merged_after_freeze_no_exception"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138313 has waited 159.9 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#138313"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 12
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 159.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-18T12:06:01+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#144285"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::prs.merged",
+    "kind": "count",
+    "value": 74
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::prs.open",
+    "kind": "count",
+    "value": 9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::prs.total",
+    "kind": "count",
+    "value": 98
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::stage",
+    "kind": "label",
+    "value": "stable"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3157::title",
+    "kind": "label",
+    "value": "Allow informers for getting a stream of data instead of chunking"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3953::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3953::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:07:24+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3953::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:07:24+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3953::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3953::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3953::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:07:24+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#3953::title",
+    "kind": "label",
+    "value": "In-place Node Resource Resize"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:05:16+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:05:16+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:05:16+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4438::title",
+    "kind": "label",
+    "value": "Restarting sidecar containers during Pod termination"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4958::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4958::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:14:22+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4958::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:14:22+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4958::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4958::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4958::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:14:22+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#4958::title",
+    "kind": "label",
+    "value": "CSI Sidecars All in one"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #143588, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 18.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143588 opened 18.2 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-10-30T06:10:13+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143588"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143588 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143588"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-10-01T15:23:26+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-09-30T12:13:23+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143588"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::prs.merged",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::prs.open",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::prs.total",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::stage",
+    "kind": "label",
+    "value": "alpha"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5359::title",
+    "kind": "label",
+    "value": "Workload Controlled Swap"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5365::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5365::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:06:26+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5365::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:06:26+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5365::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5365::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5365::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:06:26+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5365::title",
+    "kind": "label",
+    "value": "ImageVolume with an image digest"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:41:51+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:41:51+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:41:51+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5419::title",
+    "kind": "label",
+    "value": "Pod Level Resources Support With In Place Pod Vertical Scaling"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5440::flag.removed_at_freeze",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5440::flag.removed_at_freeze.message",
+    "kind": "label",
+    "value": "Removed from v1.38 at Code Freeze (2026-11-17T12:26:07+00:00)."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5440::flag.removed_at_freeze.removed_at",
+    "kind": "date",
+    "value": "2026-11-17T12:26:07+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5440::flag.removed_at_freeze.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5440::in_release",
+    "kind": "boolean",
+    "value": false
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5440::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-11-17T12:26:07+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5440::title",
+    "kind": "label",
+    "value": "Mutable Container Resources when Job is suspended"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #143800, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #136015."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #136015."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 27
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015 has 27 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 12.8
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143800 opened 12.8 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-11-04T17:24:19+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143800"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143800 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143800"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015 has waited 91.8 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#136015"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 91.8
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-08T19:31:05+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143800"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::prs.merged",
+    "kind": "count",
+    "value": 10
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::prs.open",
+    "kind": "count",
+    "value": 6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::prs.total",
+    "kind": "count",
+    "value": 22
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::stage",
+    "kind": "label",
+    "value": "alpha"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5554::title",
+    "kind": "label",
+    "value": "Support In place update pod resources alongside static cpu manager policy"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #143516, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #140836."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #140836."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140836 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140836"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 19.8
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143516 opened 19.8 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-10-28T16:16:12+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143516"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143516 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143516"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140836 has waited 118.0 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#140836"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 118.0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-07T14:04:59+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143516"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::prs.merged",
+    "kind": "count",
+    "value": 26
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::prs.open",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::prs.total",
+    "kind": "count",
+    "value": 33
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#5710::title",
+    "kind": "label",
+    "value": "Workload-aware preemption"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #143995, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #143995."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 7.7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143995 opened 7.7 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-11-09T19:21:11+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143995"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143995 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143995"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143995 has waited 8.7 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143995"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 8.7
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-14T17:26:42+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143995"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::prs.merged",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::prs.open",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::prs.total",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::stage",
+    "kind": "label",
+    "value": "alpha"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6058::title",
+    "kind": "label",
+    "value": "CSI global mount fallback for volume reconstruction"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #144172, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #141452."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #141452."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141452 has 1 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141452"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 1.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#144172 opened 1.9 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-11-15T13:18:15+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#144172"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#144172 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#144172"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141452 has waited 88.2 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#141452"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 88.2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-10-02T02:53:05+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::last_removed_from_release_at",
+    "kind": "date",
+    "value": "2026-09-30T12:09:20+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#144172"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::prs.merged",
+    "kind": "count",
+    "value": 51
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::prs.open",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::prs.total",
+    "kind": "count",
+    "value": 58
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::stage",
+    "kind": "label",
+    "value": "beta"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6268::title",
+    "kind": "label",
+    "value": "Stall and resume slow watch streams instead of terminating them (WatchCacheStallResume)"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #143658, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #143658."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.late_main_pr",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.late_main_pr.days_before_freeze",
+    "kind": "duration_days",
+    "value": 16.6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.late_main_pr.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143658 opened 16.6 days before Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.late_main_pr.opened_at",
+    "kind": "date",
+    "value": "2026-10-31T20:51:53+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.late_main_pr.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143658"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.late_main_pr.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#143658 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143658"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143658 has waited 17.6 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143658"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 17.6
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-18T12:08:06+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#143658"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::prs.merged",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::prs.open",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::prs.total",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::stage",
+    "kind": "label",
+    "value": "alpha"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6315::title",
+    "kind": "label",
+    "value": "Weighted Load Balancing for kube-apiserver"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::ask.confirm_exception_or_remove",
+    "kind": "label",
+    "value": "Confirm the exception for #142947, or remove the feature from the release."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::ask.find_reviewer",
+    "kind": "label",
+    "value": "Find a reviewer for #142947."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::ask.fix_ci",
+    "kind": "label",
+    "value": "Fix the failing checks on #142947."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.ci_failing",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.ci_failing.failing_checks",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.ci_failing.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142947 has 4 failing check(s) on its latest commit."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.ci_failing.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142947"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.ci_failing.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.main_pr_not_merged",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.main_pr_not_merged.message",
+    "kind": "label",
+    "value": "Main PR kubernetes/kubernetes#142947 was not merged by Code Freeze."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.main_pr_not_merged.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142947"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.main_pr_not_merged.severity",
+    "kind": "label",
+    "value": "critical"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.review_waiting",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.review_waiting.message",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142947 has waited 36.9 days since its last review round without approval."
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.review_waiting.pull_request",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142947"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.review_waiting.review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.review_waiting.severity",
+    "kind": "label",
+    "value": "warning"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::flag.review_waiting.waiting_days",
+    "kind": "duration_days",
+    "value": 36.9
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::in_release",
+    "kind": "boolean",
+    "value": true
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::last_added_to_release_at",
+    "kind": "date",
+    "value": "2026-09-15T18:43:30+00:00"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::main_pr",
+    "kind": "label",
+    "value": "kubernetes/kubernetes#142947"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::prs.merged",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::prs.open",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::prs.total",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::stage",
+    "kind": "label",
+    "value": "stable"
+   },
+   {
+    "key": "feature:kubernetes/enhancements#6356::title",
+    "kind": "label",
+    "value": "publishing ktesting"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142947::created_at",
+    "kind": "date",
+    "value": "2026-10-12T14:25:41+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142947::failing_checks",
+    "kind": "count",
+    "value": 4
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142947::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142947::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#142947::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143516::created_at",
+    "kind": "date",
+    "value": "2026-10-28T16:16:12+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143516::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143516::freeze_status",
+    "kind": "label",
+    "value": "closed_unmerged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143516::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143516::state",
+    "kind": "label",
+    "value": "closed"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143588::created_at",
+    "kind": "date",
+    "value": "2026-10-30T06:10:13+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143588::failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143588::freeze_status",
+    "kind": "label",
+    "value": "closed_unmerged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143588::review_rounds",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143588::state",
+    "kind": "label",
+    "value": "closed"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143658::created_at",
+    "kind": "date",
+    "value": "2026-10-31T20:51:53+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143658::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143658::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143658::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143658::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::created_at",
+    "kind": "date",
+    "value": "2026-11-04T17:24:19+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::failing_checks",
+    "kind": "count",
+    "value": 11
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::freeze_status",
+    "kind": "label",
+    "value": "closed_unmerged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143800::state",
+    "kind": "label",
+    "value": "closed"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143995::created_at",
+    "kind": "date",
+    "value": "2026-11-09T19:21:11+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143995::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143995::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143995::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#143995::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144172::created_at",
+    "kind": "date",
+    "value": "2026-11-15T13:18:15+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144172::failing_checks",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144172::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144172::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144172::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144285::created_at",
+    "kind": "date",
+    "value": "2026-11-18T10:45:04+00:00"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144285::failing_checks",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144285::freeze_status",
+    "kind": "label",
+    "value": "not_merged"
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144285::review_rounds",
+    "kind": "count",
+    "value": 0
+   },
+   {
+    "key": "pr:kubernetes/kubernetes#144285::state",
+    "kind": "label",
+    "value": "open"
+   },
+   {
+    "key": "release::as_of",
+    "kind": "date",
+    "value": "2026-11-18T12:00:00+00:00"
+   },
+   {
+    "key": "release::code_freeze_at",
+    "kind": "date",
+    "value": "2026-11-17T12:00:00+00:00"
+   },
+   {
+    "key": "release::enhancements_freeze_at",
+    "kind": "date",
+    "value": "2026-09-30T12:00:00+00:00"
+   },
+   {
+    "key": "release::features_ever_in_release",
+    "kind": "count",
+    "value": 106
+   },
+   {
+    "key": "release::features_in_release",
+    "kind": "count",
+    "value": 58
+   },
+   {
+    "key": "release::features_removed",
+    "kind": "count",
+    "value": 48
+   },
+   {
+    "key": "release::features_tracked",
+    "kind": "count",
+    "value": 58
+   },
+   {
+    "key": "release::features_with_flag.ci_failing",
+    "kind": "count",
+    "value": 13
+   },
+   {
+    "key": "release::features_with_flag.late_main_pr",
+    "kind": "count",
+    "value": 23
+   },
+   {
+    "key": "release::features_with_flag.main_pr_not_merged",
+    "kind": "count",
+    "value": 15
+   },
+   {
+    "key": "release::features_with_flag.merged_after_freeze",
+    "kind": "count",
+    "value": 2
+   },
+   {
+    "key": "release::features_with_flag.no_linked_prs",
+    "kind": "count",
+    "value": 1
+   },
+   {
+    "key": "release::features_with_flag.review_waiting",
+    "kind": "count",
+    "value": 21
+   },
+   {
+    "key": "release::name",
+    "kind": "label",
+    "value": "v1.38"
+   },
+   {
+    "key": "release::release_at",
+    "kind": "date",
+    "value": "2026-12-16T00:00:00+00:00"
+   }
+  ]
+ }
+]

@@ -146,3 +146,63 @@ class RiskNoteOut(BaseModel):
     generated_at: datetime | None = None
     cost_usd: float | None = None
     odds_validated: bool | None = None
+
+
+class UpdateWarningOut(BaseModel):
+    """An edited claim that fails the fact check."""
+
+    section: str
+    text: str
+    reason: str
+    detail: str | None = None
+
+
+class ExecUpdateOut(BaseModel):
+    """An executive update. AI sections hold only verified (or TPM-edited) claims."""
+
+    id: int
+    release: str
+    status: str  # draft | approved | rejected
+    stale: bool
+    header: dict[str, Any]
+    sections: dict[str, list[ClaimOutApi]]
+    word_count: int
+    claims_removed: int
+    removed: list[dict[str, Any]]
+    trimmed_for_length: int
+    attempts: int
+    model: str
+    prompt_version: str
+    cost_usd: float
+    edited: bool
+    warnings: list[UpdateWarningOut]
+    decided_by: str | None = None
+    decided_at: datetime | None = None
+    decision_note: str | None = None
+    approved_with_warnings: bool = False
+    approved_while_stale: bool = False
+    created_at: datetime
+    markdown: str
+
+
+class ClaimIn(BaseModel):
+    """A claim as edited by the TPM (refs, type and value come from the draft)."""
+
+    text: str
+    type: str
+    refs: list[str]
+    value: Any = None
+
+
+class UpdateEditIn(BaseModel):
+    """Replace a draft's sections."""
+
+    sections: dict[str, list[ClaimIn]]
+
+
+class DecisionIn(BaseModel):
+    """Approve or reject."""
+
+    acknowledge_warnings: bool = False
+    acknowledge_stale: bool = False
+    note: str | None = None

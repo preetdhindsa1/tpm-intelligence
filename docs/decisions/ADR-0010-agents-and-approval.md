@@ -1,7 +1,6 @@
 # ADR-0010: Risk analyst and VP summarizer agents, live evals, TPM approval
 
-- **Status:** accepted. M3a (risk analyst) is done; M3b (VP summarizer and approval) is in
-  progress.
+- **Status:** accepted. M3a (risk analyst) and M3b (VP summarizer and approval) are done.
 - **Date:** 2026-11-22
 
 ## Context
@@ -74,6 +73,60 @@ First real use through the API (#6395, 2026-11-22): 4 verified claims, 0 removed
 the history verified in CLAUDE.md. $0.0013, about 8 s; the second request reused the note
 at $0.
 
+## Decision (M3b)
+
+1. **Asks come from rules, not AI** (`agents/asks.py`).
+   - Each flag type maps to one fixed action. For example, `review_waiting` gives "Find a
+     reviewer for #N", and `main_pr_not_merged` (still in the release) gives "Confirm the
+     exception for #N, or remove the feature".
+   - They are `feature:<key>::ask.<code>` facts. An "Asks" claim must cite one and repeat
+     its exact text as its value, so the AI cannot invent actions such as "reallocate 3
+     TPMs".
+2. **Update facts** (`agents/selection.py`, `update_facts`): release counts, the 8
+   highest-ranked at-risk features (most critical flags first, then most warnings, then
+   lowest odds), up to 10 features removed at freeze, and the asks.
+3. **VP summarizer** (`agents/vp_summary.py`, prompt `vp_summary.v1`, `summary` model
+   Opus 5.5, effort `medium`, essential).
+   - Output sections: Summary / At risk / Removed at Code Freeze / Asks. Only verified
+     claims are kept, each in its own section.
+   - Shown claims are capped at 220 words (owner: "at most about 200"). Claims past the
+     cap are dropped and counted.
+   - The header (release, dates, counts, "odds not validated") is computed by code.
+4. **Approval workflow** (`exec_updates`, migration 0004; API
+   `POST/GET/PATCH /releases/{r}/updates[/{id}]`, `.../approve`, `.../reject`):
+   - `draft → approved | rejected`; only drafts can be edited or decided.
+   - The TPM can remove or reword claims. Each edited claim is re-checked against the
+     stored facts, and failures are shown as warnings.
+   - Approving over warnings, or over a *stale* draft (facts changed meaningfully since
+     drafting), needs an explicit acknowledgement. Both are recorded.
+   - Decisions record `APPROVER_NAME` as "Harpreet (local, unauthenticated)" and the time.
+   - **Nothing is sent.** An approved update offers "Copy as Markdown".
+5. **Executive update page** (`/releases/{r}/update`): draft, choose a version, edit,
+   approve or reject, and copy. Each claim shows ✓ and links to its sources. The removed
+   count, model, prompt and cost are shown.
+6. **Evals and gate.** `make evals-live SUITE=vp_summary` runs 4 real release fact sheets
+   (v1.37 and v1.38, 7 days before and 1 day after freeze). Gate:
+   - removal rate ≤ 10%
+   - ≤ 220 words shown
+   - the top 3 at-risk features each cited
+   - every ask grounded in an `ask.*` fact
+   - odds honesty
+   - a non-empty summary
+
+   The CI gate now covers both agents.
+
+## Results (M3b, live, Opus 5.5, 4 cases, 2026-11-22)
+
+| Prompt | Removal rate | Max words shown | Top-3 coverage | Asks grounded | Odds honest | Cost | Gate |
+|---|---|---|---|---|---|---|---|
+| `vp_summary.v1` | **0%** | 217 (one draft trimmed by 1 claim) | 100% | 100% | 100% | $0.54 (about $0.14 per draft) | pass |
+
+On reading all 4 drafts, the developer found no wrong statements. Flags kept their meaning
+("not merged by Code Freeze"), and asks were only rule-made actions.
+
+First real draft through the API (v1.38, 2026-11-22): 197 words, 0 claims removed, $0.18,
+27 s. It is stored as draft #1 and left for the TPM to approve.
+
 ## Alternatives considered
 
 - **Background generation for every at-risk feature.** Notes would be ready on page load,
@@ -93,7 +146,10 @@ at $0.
   "AI-written · every claim checked against the data" and links each claim to its
   sources.
 - **The eval set is small** (12 cases, 2 releases). Thresholds are a starting point.
-- **The at-risk rule is broad.** Tightening it is a product decision, left for later.
+- **The at-risk rule is broad.** 53 of 70 v1.38 features count as at risk after freeze.
+  Tightening it is a product decision, left for later.
+- **A VP draft costs about $0.14–0.18** with Opus 5.5. That's affordable on demand under the
+  $2/day cap. A live eval run (4 drafts plus 12 notes) costs about $0.57.
 
 ## AI vs rules
 

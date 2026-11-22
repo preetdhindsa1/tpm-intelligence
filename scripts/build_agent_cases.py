@@ -17,7 +17,7 @@ from pathlib import Path
 
 from sqlalchemy.orm import Session
 
-from agents.selection import critical_flag_keys, feature_facts, is_at_risk
+from agents.selection import critical_flag_keys, feature_facts, is_at_risk, update_facts
 from engine.assess import assess_release
 from engine.odds import release_odds
 from engine.projection import project
@@ -26,7 +26,9 @@ from pipeline.store.events_repo import iter_events
 from pipeline.store.session import make_engine
 from verify.build import OddsFacts, build_fact_sheet
 
-OUT = Path(__file__).resolve().parent.parent / "evals" / "cases" / "agent_risk_notes.json"
+CASES_DIR = Path(__file__).resolve().parent.parent / "evals" / "cases"
+OUT = CASES_DIR / "agent_risk_notes.json"
+OUT_VP = CASES_DIR / "agent_vp_updates.json"
 POINTS = (("freeze-7d", timedelta(days=-7)), ("freeze+1d", timedelta(days=1)))
 
 
@@ -43,6 +45,7 @@ def main() -> None:
     final = project(events, max(e.occurred_at for e in events) + timedelta(days=1))
 
     cases = []
+    vp_cases = []
     for name in releases:
         key = f"kubernetes:{name}"
         freeze = final.releases[key].code_freeze_at
@@ -61,6 +64,17 @@ def main() -> None:
             }
             sheet = build_fact_sheet(report, odds)
             at_risk = [f for f in report.features if is_at_risk(f, sheet)]
+            vp_sheet, order, removed = update_facts(list(report.features), sheet)
+            vp_cases.append(
+                {
+                    "id": f"{name}-{label}",
+                    "release": key,
+                    "as_of": as_of.isoformat(),
+                    "at_risk_order": order,
+                    "removed_at_freeze": removed,
+                    "facts": vp_sheet.to_records(),
+                }
+            )
 
             def rank(f):  # type: ignore[no-untyped-def]
                 crit = sum(fl.severity is Severity.CRITICAL for fl in f.flags)
@@ -82,7 +96,8 @@ def main() -> None:
                 f"{name} {label}: {len(at_risk)} at risk, kept {min(len(at_risk), args.per_point)}"
             )
     OUT.write_text(json.dumps(cases, indent=1, default=str) + "\n")
-    print(f"wrote {len(cases)} cases to {OUT}")
+    OUT_VP.write_text(json.dumps(vp_cases, indent=1, default=str) + "\n")
+    print(f"wrote {len(cases)} cases to {OUT} and {len(vp_cases)} to {OUT_VP}")
 
 
 if __name__ == "__main__":

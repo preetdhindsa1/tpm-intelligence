@@ -121,6 +121,7 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Fact checker vs labelled claims (`make evals`) | **43 / 43 agree** (22 verified, 21 removed across all 5 reasons). Labels are proposed by the developer, pending TPM review. Measured 2026-11-22 |
 | First real AI calls (`make ai-smoke`, Haiku 5.5, #6395 fact sheet) | `smoke.v1`: 9 verified / 10 removed, mostly a checker false positive on bare feature numbers ("feature 6395"), now fixed. `smoke.v2`: **16 verified / 1 removed** (a sentence stating uncited numbers). About **$0.001 per call**; repeat call served from cache at $0. Single runs, measured 2026-11-22; not an accuracy benchmark |
 | Risk analyst live evals (12 real v1.37/v1.38 cases, Haiku 5.5, `risk_analyst.v4`) | **Removal rate 4.0%**, critical-flag coverage 100%, odds honesty 100%, 3–5 claims per note, $0.024 per run. Earlier prompts: v1 and v3 failed the gate; v2 passed it but was rejected after the notes were read (wrong wording). Measured 2026-11-22; small sample |
+| VP summarizer live evals (4 real v1.37/v1.38 release fact sheets, Opus 5.5, `vp_summary.v1`) | **0% removed**, at most 217 words, top-3 at-risk coverage 100%, asks grounded 100%, odds honesty 100%; $0.54 per run (about $0.14 per draft). Measured 2026-11-22; small sample |
 | Engine: assess all 106 v1.38 features from 60,230 events | project 0.22 s + assess 0.89 s (single run, laptop, Docker; not a p95) |
 | API `/releases` (dashboard home), 162k events, 6 releases | cold cache **6.9 s**, warm 0.06 s (was several minutes cold: it forecast every release). Single runs, laptop, Docker; measured 2026-11-21, not a p95 |
 | API v1.38 feature table, cold cache, 3 concurrent requests | **~21 s** each, sharing **one** computation (was one computation per request). Single run, measured 2026-11-21 |
@@ -145,12 +146,17 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   is opened and reused until facts change. LangGraph loop: draft → fact-check → one
   redraft if more than 30% of claims are removed. `make evals-live` runs paid agent evals;
   CI requires a passing run for the current prompt and model.
+- **M3b done: VP summarizer and TPM approval** (ADR-0010). "Executive update →" on the
+  release page. Opus drafts about 200 words in Summary / At risk / Removed / Asks, using
+  only verified claims; asks come from fixed rules. The TPM edits (edits are re-checked),
+  then approves or rejects, recorded as "Harpreet (local, unauthenticated)". Nothing is
+  ever sent: approved updates offer "Copy as Markdown".
 
 ## Limitations
 
 - Phase 1 runs locally only. The Terraform in `infra/` is checked with an offline plan
   (84 resources) but has never been applied, so a real deployment is untested.
-- No AI agents, simulator, sign-in, webhooks or Jira in phase 1.
+- Phase 2 so far: fact checker, AI gateway, risk analyst and VP summarizer with TPM approval. Still to come: link suggester, simulator, dashboard redesign. Sign-in, webhooks, Jira and cloud deploy are Phase 3.
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue
   description (the release team's tracking list) and from KEP references in PR text.

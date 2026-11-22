@@ -1,0 +1,185 @@
+{
+ "suite": "agent:vp_summary",
+ "task": "vp_summary",
+ "prompt": "vp_summary.v1",
+ "prompt_sha": "8208dc2154cada07dca6bacc391a1a039e2a9b0091a34ac5c41e665be9bef704",
+ "model": "claude-opus-5-5",
+ "thresholds": {
+  "max_removal_rate": 0.1,
+  "max_words": 220,
+  "top3_coverage": 1.0
+ },
+ "passed": true,
+ "summary": {
+  "cases": 4,
+  "errors": 0,
+  "removal_rate_shown": 0.0,
+  "words_shown_max": 217,
+  "trimmed_cases": 1,
+  "top3_coverage_min": 1.0,
+  "asks_grounded_all": true,
+  "odds_honest_all": true,
+  "summary_present_all": true,
+  "retried_cases": 0,
+  "cost_usd": 0.544633
+ },
+ "cases": [
+  {
+   "id": "v1.37-freeze-7d",
+   "attempts": 1,
+   "cost_usd": 0.118483,
+   "model": "claude-opus-5-5",
+   "claims_total": 11,
+   "claims_verified": 11,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "words_verified": 155,
+   "words_shown": 155,
+   "trimmed_for_length": 0,
+   "top3_covered": 1.0,
+   "asks_grounded": true,
+   "odds_honest": true,
+   "summary_present": true,
+   "sections": {
+    "summary": [
+     "v1.37 reaches Code Freeze on 23 July and is scheduled to release on 26 August.",
+     "91 features are in the release and 19 have been removed.",
+     "38 features have a PR waiting on review and 14 have failing checks."
+    ],
+    "at_risk": [
+     "WAS: Integrate Workload APIs with Job controller (#5547): #140303 has 1 failing check and has waited 8.4 days since its last review round without approval.",
+     "Add stickyBit support for emptydir volumes (#5502): #130277 has waited 157.0 days since its last review round without approval and has 1 failing check.",
+     "Opportunistic batching (#5598): #139459 has waited 43.1 days since its last review round without approval and has 1 failing check.",
+     "Stale Controller Mitigation (#5647): #138724 has waited 57.7 days since its last review round without approval.",
+     "Topology-aware workload scheduling (#5732): main PR #140295 opened 15.5 days before Code Freeze."
+    ],
+    "removed": [],
+    "asks": [
+     "Fix the failing checks on #140303.",
+     "Find a reviewer for #130277.",
+     "Confirm #140305 can merge before Code Freeze."
+    ]
+   },
+   "removed": []
+  },
+  {
+   "id": "v1.37-freeze+1d",
+   "attempts": 1,
+   "cost_usd": 0.155854,
+   "model": "claude-opus-5-5",
+   "claims_total": 14,
+   "claims_verified": 14,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "words_verified": 278,
+   "words_shown": 217,
+   "trimmed_for_length": 3,
+   "top3_covered": 1.0,
+   "asks_grounded": true,
+   "odds_honest": true,
+   "summary_present": true,
+   "sections": {
+    "summary": [
+     "Release v1.37 is scheduled for 26 August, and Code Freeze was on 23 July.",
+     "67 features are in the release, and 43 have been removed.",
+     "14 features are flagged because their main PR was not merged by Code Freeze."
+    ],
+    "at_risk": [
+     "Support memory qos with cgroups v2 (#2570) has a critical flag: main PR #137878 was not merged by Code Freeze, and the feature was added back on 23 July after Code Freeze.",
+     "Add bind mount options (noexec, nodev, nosuid) support on volumeMounts (#5855) had main PR #140013 merged on 23 July after Code Freeze, with exception evidence: re-added after freeze.",
+     "DRA: Optional Node Operations (#5945) had main PR #139933 merged on 24 July after Code Freeze, with exception evidence: re-added after freeze.",
+     "WAS: Integrate Workload APIs with Job controller (#5547) has a critical flag: main PR #140305 was not merged by Code Freeze, and #140303 has 1 failing check.",
+     "CompositePodGroup API (#6012) has a critical flag: main PR #140670 was not merged by Code Freeze and was opened 6.1 days before Code Freeze."
+    ],
+    "removed": [
+     "sig-node: Kubelet-in-UserNS, aka Rootless mode (#2033) was removed from v1.37 at Code Freeze on 23 July.",
+     "Pod level resources (#2837) was removed from v1.37 at Code Freeze on 23 July."
+    ],
+    "asks": [
+     "CompositePodGroup API (#6012): Confirm the exception for #140670, or remove the feature from the release."
+    ]
+   },
+   "removed": []
+  },
+  {
+   "id": "v1.38-freeze-7d",
+   "attempts": 1,
+   "cost_usd": 0.121986,
+   "model": "claude-opus-5-5",
+   "claims_total": 11,
+   "claims_verified": 11,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "words_verified": 185,
+   "words_shown": 185,
+   "trimmed_for_length": 0,
+   "top3_covered": 1.0,
+   "asks_grounded": true,
+   "odds_honest": true,
+   "summary_present": true,
+   "sections": {
+    "summary": [
+     "v1.38 reaches Code Freeze on 17 November and is scheduled to release on 16 December.",
+     "87 features are in the release and 19 have been removed.",
+     "35 features have a pull request waiting for approval after review, 29 have a late main PR and 17 have failing checks."
+    ],
+    "at_risk": [
+     "Allow informers for getting a stream of data instead of chunking (#3157): #138313 has waited 151.9 days since its last review round without approval and has 3 failing checks.",
+     "Support memory qos with cgroups v2 (#2570): #138439 has waited 207.2 days since its last review round without approval and has 1 failing check.",
+     "Support In place update pod resources alongside static cpu manager policy (#5554): #136015 has 27 failing checks on its latest commit.",
+     "Dynamic Pod Mutation: Optimistic Execution & Hierarchical Resource Delegation (#5972): main PR #143919 opened 10.2 days before Code Freeze and is still open.",
+     "Pod Level Resources Support With In Place Pod Vertical Scaling (#5419): main PR #143999 opened 7.5 days before Code Freeze and is still open."
+    ],
+    "removed": [],
+    "asks": [
+     "Find a reviewer for #138313.",
+     "Find a reviewer for #138439.",
+     "Fix the failing checks on #136015."
+    ]
+   },
+   "removed": []
+  },
+  {
+   "id": "v1.38-freeze+1d",
+   "attempts": 1,
+   "cost_usd": 0.14831,
+   "model": "claude-opus-5-5",
+   "claims_total": 13,
+   "claims_verified": 13,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "words_verified": 202,
+   "words_shown": 202,
+   "trimmed_for_length": 0,
+   "top3_covered": 1.0,
+   "asks_grounded": true,
+   "odds_honest": true,
+   "summary_present": true,
+   "sections": {
+    "summary": [
+     "v1.38 is scheduled for release on 16 December; Code Freeze was on 17 November.",
+     "58 features are in the release and 48 have been removed.",
+     "15 features have a main PR that was not merged by Code Freeze."
+    ],
+    "at_risk": [
+     "Allow informers for getting a stream of data instead of chunking (#3157): critical, main PR #144285 was not merged by Code Freeze.",
+     "Support In place update pod resources alongside static cpu manager policy (#5554): critical, main PR #143800 was not merged by Code Freeze, and #136015 has 27 failing checks.",
+     "Workload-aware preemption (#5710): critical, main PR #143516 was not merged by Code Freeze.",
+     "Stall and resume slow watch streams instead of terminating them (WatchCacheStallResume) (#6268): critical, main PR #144172 was not merged by Code Freeze."
+    ],
+    "removed": [
+     "Object Storage Support (COSI) (#1979) was removed from v1.38 at Code Freeze on 17 November.",
+     "Warn about quietly-insecure container UIDs/GIDs (#2172) was removed from v1.38 at Code Freeze on 17 November.",
+     "Support memory qos with cgroups v2 (#2570) was removed from v1.38 at Code Freeze on 17 November."
+    ],
+    "asks": [
+     "Confirm the exception for #144285, or remove the feature from the release.",
+     "Confirm an approved exception exists for #143839.",
+     "Confirm the exception for #143800, or remove the feature from the release."
+    ]
+   },
+   "removed": []
+  }
+ ],
+ "measured_at": "20261122T074426Z"
+}

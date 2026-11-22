@@ -22,7 +22,7 @@ OUT = Path(__file__).resolve().parent.parent / "docs" / "results"
 
 def run_all() -> list[dict[str, Any]]:
     """Results of every suite, in a stable order."""
-    return [fact_checker.run(), linking.run(), agent_gate.run()]
+    return [fact_checker.run(), linking.run(), *agent_gate.run()]
 
 
 def main(argv: list[str] | None = None) -> int:

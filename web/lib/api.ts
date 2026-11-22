@@ -112,3 +112,60 @@ export type RiskNote = {
   cost_usd: number | null;
   odds_validated: boolean | null;
 };
+
+export type UpdateWarning = { section: string; text: string; reason: string; detail: string | null };
+
+export type ExecUpdate = {
+  id: number;
+  release: string;
+  status: "draft" | "approved" | "rejected";
+  stale: boolean;
+  header: {
+    release: string | null;
+    data_as_of: string | null;
+    code_freeze_at: string | null;
+    release_at: string | null;
+    features_in_release: number | null;
+    features_removed: number | null;
+    features_at_risk: number | null;
+    odds_validated: boolean;
+  };
+  sections: Record<string, VerifiedClaim[]>;
+  word_count: number;
+  claims_removed: number;
+  removed: { text: string; reason: string | null; detail: string | null }[];
+  trimmed_for_length: number;
+  attempts: number;
+  model: string;
+  prompt_version: string;
+  cost_usd: number;
+  edited: boolean;
+  warnings: UpdateWarning[];
+  decided_by: string | null;
+  decided_at: string | null;
+  decision_note: string | null;
+  approved_with_warnings: boolean;
+  approved_while_stale: boolean;
+  created_at: string;
+  markdown: string;
+};
+
+export const SECTION_TITLES: Record<string, string> = {
+  summary: "Summary",
+  at_risk: "At risk",
+  removed: "Removed at Code Freeze",
+  asks: "Asks",
+};
+
+/** Browser-side calls for the update page (POST/PATCH need the public URL). */
+export async function updatesRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${publicApiUrl}${path}`, {
+    ...init,
+    headers: { "content-type": "application/json", ...(init?.headers ?? {}) },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as { detail?: string }).detail ?? `HTTP ${res.status}`);
+  }
+  return (await res.json()) as T;
+}

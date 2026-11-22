@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from typing import Any, TypedDict
 
 from langgraph.graph import END, START, StateGraph
+from pydantic import BaseModel
 
 from agents.gateway import Gateway, TaskSpec, verify_output
 from agents.prompts import Prompt
@@ -30,6 +31,7 @@ class Attempt:
     """One draft and its fact-check report."""
 
     report: CheckReport
+    output: BaseModel  # the parsed answer, e.g. ClaimsOut or ExecUpdateOut
     model: str
     cost_usd: float
     cached: bool
@@ -75,6 +77,7 @@ def run_loop(
     retry_above: float = RETRY_ABOVE,
     max_attempts: int = MAX_ATTEMPTS,
     extra_inputs: dict[str, Any] | None = None,
+    output_model: type[BaseModel] = ClaimsOut,
 ) -> LoopResult:
     """Run the graph and return the best attempt's verified claims."""
 
@@ -82,10 +85,15 @@ def run_loop(
         inputs: dict[str, Any] = {"facts": facts.as_prompt_rows(), **(extra_inputs or {})}
         if state["attempts"]:
             inputs["previous_attempt_removed"] = _feedback(state["attempts"][-1].report)
-        response = gateway.run(task, prompt, inputs, ClaimsOut)
+        response = gateway.run(task, prompt, inputs, output_model)
         report = verify_output(response, facts, gateway.ledger)
         attempt = Attempt(
-            report, response.model, response.cost_usd, response.cached, response.fingerprint
+            report,
+            response.output,
+            response.model,
+            response.cost_usd,
+            response.cached,
+            response.fingerprint,
         )
         return {"attempts": [*state["attempts"], attempt]}
 
