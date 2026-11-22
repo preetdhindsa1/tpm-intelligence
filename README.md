@@ -9,9 +9,16 @@ drafts the executive update for a human to approve.
   and (in later phases) uses AI only to explain, with every AI claim checked against the data first.
 
 > **Status: phase 1, dashboard.** Collect → link → engine → API → web dashboard runs end to end on local
-> Docker. The forecast is built and backtested, and it **does not yet beat the historical base rate** (see
-> results), so the dashboard labels forecast odds "not validated".
+> Docker. **Kubernetes is a live example team** (see `connectors/teams/`); the platform is meant for any
+> cross-functional release. The forecast is built and backtested, and it **does not yet beat the
+> historical base rate** (see results), so the dashboard labels forecast odds "not validated".
 > Everything else below is **TBD (not yet measured)**.
+
+### Plug in another team
+
+Copy `connectors/teams/_template.yaml`, point at planning + code repos + a release calendar, pick a
+`link_pack` (`kep` or `jira_key`), then `make backfill TEAM=<id> RELEASE=<name>`. Details:
+[`connectors/teams/README.md`](connectors/teams/README.md) and ADR-0003.
 
 ## Architecture
 
@@ -78,8 +85,8 @@ Load real Kubernetes data (needs `GITHUB_TOKEN` in `.env`). Events flow poller �
 worker → Postgres `events`. Projections into features, PRs and links arrive in M7.
 
 ```bash
-make backfill RELEASE=v1.38   # full window, ignores cursors
-make poll RELEASE=v1.38       # incremental from the stored cursors
+make backfill TEAM=kubernetes RELEASE=v1.38   # full window, ignores cursors
+make poll TEAM=kubernetes RELEASE=v1.38       # incremental from the stored cursors
 ```
 
 Dashboard (Next.js, `web/`): the release page shows the feature health table (odds with

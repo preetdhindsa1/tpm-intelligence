@@ -1,0 +1,9 @@
+# Minimal placeholder so TeamConfig for kafka validates. Replace with measured dates.
+project: KAFKA
+releases:
+  - name: "4.3.0"
+    cycle_start: 2025-01-01T00:00:00Z
+    enhancements_freeze: 2025-06-01T00:00:00Z
+    code_freeze: 2025-09-01T00:00:00Z
+    release: 2025-10-01T00:00:00Z
+    source_url: https://issues.apache.org/jira/projects/KAFKA

@@ -18,7 +18,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Kubernetes {r.name} release health</h1>
+          <h1 className="text-2xl font-semibold">
+            {r.display_name || r.project || "Team"} {r.name} release health
+          </h1>
           <p className="text-sm text-slate-600">
             Code Freeze {r.code_freeze_at ? formatUtc(r.code_freeze_at) : "unknown"} · {r.features_in_release} features in
             the release now · {r.features_ever_in_release} ever · data as of {formatUtc(r.as_of)}

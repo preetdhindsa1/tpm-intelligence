@@ -1,0 +1,13 @@
+# Live example team — not the product. Other teams copy _template.yaml.
+id: kubernetes
+display_name: Kubernetes
+project: kubernetes
+link_pack: kep
+planning:
+  source: github
+  repo: kubernetes/enhancements
+code:
+  repos:
+    - kubernetes/kubernetes
+calendar:
+  path: collectors/github_poller/release_calendar.yaml

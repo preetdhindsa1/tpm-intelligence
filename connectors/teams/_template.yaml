@@ -1,0 +1,18 @@
+# Copy to <your-team-id>.yaml and fill in. Then:
+#   1. Add a release calendar YAML (see collectors/github_poller/release_calendar.yaml).
+#   2. Pick link_pack: kep (KEP/enhancement issues) or jira_key (PROJ-123 in PR text).
+#   3. For GitHub planning: make poll --team <id> --release <name>
+#   4. For Jira planning: implement collectors/jira (config is ready; collector TBD).
+# No changes to engine/, api/, or pipeline/ should be required.
+id: acme
+display_name: Acme Platform
+project: acme
+link_pack: jira_key
+planning:
+  source: github
+  repo: acme/planning
+code:
+  repos:
+    - acme/service
+calendar:
+  path: connectors/teams/acme-calendar.yaml

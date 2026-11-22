@@ -3,8 +3,9 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TPM Intelligence: Kubernetes release health",
-  description: "Which features will slip, and why. Public Kubernetes data only.",
+  title: "TPM Intelligence",
+  description:
+    "Predict which release features will slip. Plug in any cross-functional team — Kubernetes is a live example.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -14,7 +15,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="border-b bg-white">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
             <Link href="/" className="font-semibold">TPM Intelligence</Link>
-            <span className="text-xs text-slate-500">Public Kubernetes data · decision support, not guarantees</span>
+            <span className="text-xs text-slate-500">
+              Cross-team release intelligence · decision support, not guarantees
+            </span>
           </div>
         </header>
         <main className="mx-auto max-w-7xl px-6 py-6">{children}</main>

@@ -47,6 +47,7 @@ packages = [
     "agents",
     "api",
     "collectors",
+    "connectors",
     "engine",
     "evals",
     "linker",
@@ -71,7 +72,7 @@ select = ["E", "W", "F", "I", "B", "UP", "SIM", "N", "RUF", "PT", "C4", "S"]
 
 [tool.ruff.lint.isort]
 known-first-party = [
-    "agents", "api", "collectors", "engine", "evals", "linker",
+    "agents", "api", "collectors", "connectors", "engine", "evals", "linker",
     "observability", "pipeline", "simulator", "verify",
 ]
 
@@ -79,7 +80,7 @@ known-first-party = [
 [tool.mypy]
 python_version = "3.12"
 packages = [
-    "agents", "api", "collectors", "engine", "evals", "linker",
+    "agents", "api", "collectors", "connectors", "engine", "evals", "linker",
     "observability", "pipeline", "simulator", "verify",
 ]
 warn_unused_configs = true
