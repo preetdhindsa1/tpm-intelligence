@@ -1,4 +1,4 @@
-# Cloud Run workloads (ADR-0003). One Python image (Dockerfile) with a different command
+# Cloud Run workloads (ADR-0007). One Python image (Dockerfile) with a different command
 # per workload, matching docker-compose.yml. Each Python workload runs the OTel Collector
 # as a sidecar on localhost:4317, exporting to Cloud Trace / Monitoring / Logging.
 

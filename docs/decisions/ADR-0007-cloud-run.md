@@ -1,4 +1,4 @@
-# ADR-0003: Run every workload on Cloud Run (plan only in phase 1)
+# ADR-0007: Run every workload on Cloud Run (plan only in phase 1)
 
 - **Status:** accepted
 - **Date:** 2026-11-21

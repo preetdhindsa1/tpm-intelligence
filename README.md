@@ -101,7 +101,7 @@ make web-test               # eslint + tsc + vitest + next build, in Node 20 via
 ```
 
 Cloud infrastructure (Terraform, **plan only, never applied**; see [`infra/README.md`](infra/README.md)
-and ADR-0003):
+and ADR-0007):
 
 ```bash
 make tf-validate            # fmt + validate, in Docker

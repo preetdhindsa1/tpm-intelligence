@@ -1,7 +1,7 @@
 # infra/: Google Cloud (Terraform, plan only in phase 1)
 
 Nothing here has been applied. Design and trade-offs are in
-[ADR-0003](../docs/decisions/ADR-0003-cloud-run.md).
+[ADR-0007](../docs/decisions/ADR-0007-cloud-run.md).
 
 | File | What |
 |---|---|
