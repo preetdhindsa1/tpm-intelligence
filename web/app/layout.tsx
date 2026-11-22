@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Source_Sans_3 } from "next/font/google";
+import { AppShell } from "@/components/shell/AppShell";
 import "./globals.css";
+
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "TPM Intelligence",
@@ -10,17 +17,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
-        <header className="border-b bg-white">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-            <Link href="/" className="font-semibold">TPM Intelligence</Link>
-            <span className="text-xs text-slate-500">
-              Cross-team release intelligence · decision support, not guarantees
-            </span>
-          </div>
-        </header>
-        <main className="mx-auto max-w-7xl px-6 py-6">{children}</main>
+    <html lang="en" className={sourceSans.variable}>
+      <body className={`${sourceSans.className} min-h-screen antialiased`}>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
