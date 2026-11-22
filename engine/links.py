@@ -8,13 +8,13 @@ from dataclasses import dataclass
 
 from engine.projection import Feature, World
 from linker.methods import LinkStatus
+from linker.packs import get_pack
 from linker.rules import (
     LinkCandidate,
     LinkIndex,
     PullRequestInfo,
     WorkItemInfo,
     best_links,
-    link_pull_request,
 )
 
 
@@ -63,8 +63,21 @@ def _info(f: Feature) -> WorkItemInfo:
     )
 
 
-def link_release(world: World, release_key: str) -> ReleaseLinks:
-    """Link every PR to features that are or were in ``release_key`` (removed ones too)."""
+def _pack_name(release_key: str, link_pack: str | None) -> str:
+    if link_pack is not None:
+        return link_pack
+    from connectors.load import link_pack_for_project
+
+    return link_pack_for_project(release_key.split(":", 1)[0])
+
+
+def link_release(world: World, release_key: str, *, link_pack: str | None = None) -> ReleaseLinks:
+    """Link every PR to features that are or were in ``release_key`` (removed ones too).
+
+    ``link_pack`` selects the team linker (``kep``, ``jira_key``, …). When omitted, the
+    pack is resolved from ``connectors/teams/`` by release project.
+    """
+    pack = get_pack(_pack_name(release_key, link_pack))
     index = LinkIndex.build(_info(f) for f in world.features_ever_in(release_key))
     best: dict[tuple[str, str], LinkCandidate] = {}
     for pr in world.pull_requests.values():
@@ -76,5 +89,5 @@ def link_release(world: World, release_key: str) -> ReleaseLinks:
             body=pr.body,
             labels=pr.labels,
         )
-        best.update(best_links(link_pull_request(info, index)))
+        best.update(best_links(list(pack.link(info, index))))
     return ReleaseLinks(best=best)

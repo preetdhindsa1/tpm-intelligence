@@ -3,6 +3,7 @@
 
 UV ?= uv
 RELEASE ?=
+TEAM ?= kubernetes
 
 help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-18s %s\n", $$1, $$2}'
@@ -35,13 +36,13 @@ web-test: ## Web: lint, typecheck, unit tests, build (runs in Node 20 via Docker
 evals: ## AI eval suite (no AI agents in phase 1)
 	@echo "No evals yet: AI agents are out of scope for phase 1."
 
-backfill: ## Load release data, e.g. make backfill RELEASE=v1.38
-	@test -n "$(RELEASE)" || (echo "usage: make backfill RELEASE=v1.38" && exit 2)
-	docker compose run --rm poller --release $(RELEASE) --backfill
+backfill: ## Load release data, e.g. make backfill TEAM=kubernetes RELEASE=v1.38
+	@test -n "$(RELEASE)" || (echo "usage: make backfill TEAM=kubernetes RELEASE=v1.38" && exit 2)
+	docker compose run --rm poller --team $(TEAM) --release $(RELEASE) --backfill
 
-poll: ## Incremental poll, e.g. make poll RELEASE=v1.38
-	@test -n "$(RELEASE)" || (echo "usage: make poll RELEASE=v1.38" && exit 2)
-	docker compose run --rm poller --release $(RELEASE)
+poll: ## Incremental poll, e.g. make poll TEAM=kubernetes RELEASE=v1.38
+	@test -n "$(RELEASE)" || (echo "usage: make poll TEAM=kubernetes RELEASE=v1.38" && exit 2)
+	docker compose run --rm poller --team $(TEAM) --release $(RELEASE)
 
 migrate: ## Apply DB migrations
 	$(UV) run alembic upgrade head

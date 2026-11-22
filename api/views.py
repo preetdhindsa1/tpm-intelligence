@@ -14,20 +14,35 @@ from api.schemas import (
     TimelineEntryOut,
 )
 from api.service import ReleaseSummary, ReleaseView
+from connectors.load import display_name_for_project
 from engine.assess import FeatureAssessment
 from engine.forecast import Forecast
+from engine.projection import ReleaseInfo
+
+
+def _project(release: ReleaseInfo) -> str:
+    return release.key.split(":", 1)[0] if ":" in release.key else release.key
+
+
+def _release_fields(release: ReleaseInfo) -> dict[str, Any]:
+    project = _project(release)
+    return {
+        "key": release.key,
+        "name": release.name,
+        "project": project,
+        "display_name": display_name_for_project(project),
+        "cycle_start_at": release.cycle_start_at,
+        "enhancements_freeze_at": release.enhancements_freeze_at,
+        "code_freeze_at": release.code_freeze_at,
+        "release_at": release.release_at,
+    }
 
 
 def release_out(view: ReleaseView) -> ReleaseOut:
     """Release header."""
     r = view.assessment.release
     return ReleaseOut(
-        key=r.key,
-        name=r.name,
-        cycle_start_at=r.cycle_start_at,
-        enhancements_freeze_at=r.enhancements_freeze_at,
-        code_freeze_at=r.code_freeze_at,
-        release_at=r.release_at,
+        **_release_fields(r),
         features_in_release=sum(1 for f in view.assessment.features if f.in_release),
         features_ever_in_release=len(view.assessment.features),
         as_of=view.assessment.as_of,
@@ -38,12 +53,7 @@ def release_summary_out(summary: ReleaseSummary) -> ReleaseOut:
     """Release header from the cheap listing (same shape as :func:`release_out`)."""
     r = summary.release
     return ReleaseOut(
-        key=r.key,
-        name=r.name,
-        cycle_start_at=r.cycle_start_at,
-        enhancements_freeze_at=r.enhancements_freeze_at,
-        code_freeze_at=r.code_freeze_at,
-        release_at=r.release_at,
+        **_release_fields(r),
         features_in_release=summary.features_in_release,
         features_ever_in_release=summary.features_ever_in_release,
         as_of=summary.as_of,

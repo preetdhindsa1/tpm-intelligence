@@ -18,6 +18,8 @@ export type Odds = {
 export type Release = {
   key: string;
   name: string;
+  project: string;
+  display_name: string;
   cycle_start_at: string | null;
   enhancements_freeze_at: string | null;
   code_freeze_at: string | null;

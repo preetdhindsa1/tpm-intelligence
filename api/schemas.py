@@ -17,6 +17,8 @@ class ReleaseOut(_Out):
 
     key: str
     name: str
+    project: str = ""  # e.g. kubernetes — from release key / team connector
+    display_name: str = ""  # e.g. Kubernetes — from connectors/teams/
     cycle_start_at: datetime | None
     enhancements_freeze_at: datetime | None
     code_freeze_at: datetime | None

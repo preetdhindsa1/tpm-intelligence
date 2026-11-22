@@ -40,3 +40,5 @@ infra/**/terraform.tfvars
 # Build / local artifacts
 *.tsbuildinfo
 .Rhistory
+dump.rdb
+*.rdb

@@ -1,0 +1,16 @@
+# Second example shape: Jira plan + GitHub code (most companies).
+# Collector for Jira is not wired yet; this file defines the plug-in contract.
+id: kafka
+display_name: Apache Kafka
+project: KAFKA
+link_pack: jira_key
+planning:
+  source: jira
+  base_url: https://issues.apache.org/jira
+  project_key: KAFKA
+code:
+  repos:
+    - apache/kafka
+calendar:
+  # Placeholder calendar path — replace with a real Kafka release calendar when collecting.
+  path: connectors/teams/kafka-calendar.yaml
