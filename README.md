@@ -92,6 +92,14 @@ the browser opens the SSE stream at `NEXT_PUBLIC_API_URL` (default `http://local
 make web-test               # eslint + tsc + vitest + next build, in Node 20 via Docker
 ```
 
+Cloud infrastructure (Terraform, **plan only, never applied**; see [`infra/README.md`](infra/README.md)
+and ADR-0003):
+
+```bash
+make tf-validate            # fmt + validate, in Docker
+make tf-plan                # offline plan: placeholder project, dummy token
+```
+
 `make help` lists all targets.
 
 ## Measured results
@@ -113,7 +121,8 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 
 ## Limitations
 
-- Phase 1 runs locally only. Terraform will be plan-only, with no cloud deployment.
+- Phase 1 runs locally only. The Terraform in `infra/` is checked with an offline plan
+  (81 resources) but has never been applied, so a real deployment is untested.
 - No AI agents, simulator, sign-in, webhooks or Jira in phase 1.
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue

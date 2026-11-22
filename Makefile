@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs
+.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan
 
 UV ?= uv
 RELEASE ?=
@@ -54,3 +54,15 @@ down: ## Stop the local stack
 
 logs: ## Tail service logs
 	docker compose logs -f api worker otel-collector
+
+TERRAFORM = docker run --rm -v "$(CURDIR)":/work -w /work/infra hashicorp/terraform:1.10
+
+tf-validate: ## Terraform fmt check + validate (Docker; no cloud credentials)
+	$(TERRAFORM) fmt -check -recursive
+	$(TERRAFORM) init -backend=false -input=false >/dev/null
+	$(TERRAFORM) validate
+
+tf-plan: tf-validate ## Offline plan with a placeholder project and dummy token: nothing is contacted or applied
+	docker run --rm -v "$(CURDIR)":/work -w /work/infra -e GOOGLE_OAUTH_ACCESS_TOKEN=offline-plan \
+	  hashicorp/terraform:1.10 plan -input=false -refresh=false -lock=false \
+	  -var project_id=tpm-demo-placeholder -var project_number=000000000000

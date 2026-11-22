@@ -1,0 +1,48 @@
+# OTel Collector config for Cloud Run sidecars (infra/run.tf). The app exports OTLP to
+# localhost:4317; the collector sends traces to Cloud Trace, metrics to Cloud Monitoring
+# and logs to Cloud Logging. Local development uses otel-collector.yaml (Jaeger) instead.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: localhost:4317
+      http:
+        endpoint: localhost:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 65
+    spike_limit_percentage: 20
+  resourcedetection:
+    detectors: [env, gcp]
+    timeout: 2s
+  batch:
+    send_batch_size: 200
+    timeout: 5s
+
+exporters:
+  googlecloud:
+    log:
+      default_log_name: tpm-intelligence
+  googlemanagedprometheus: {}
+
+extensions:
+  health_check:
+    endpoint: localhost:13133
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resourcedetection, batch]
+      exporters: [googlecloud]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, resourcedetection, batch]
+      exporters: [googlemanagedprometheus]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, resourcedetection, batch]
+      exporters: [googlecloud]

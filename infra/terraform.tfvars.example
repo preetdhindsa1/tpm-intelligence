@@ -1,0 +1,6 @@
+# Copy to terraform.tfvars (gitignored). Plan only in phase 1.
+project_id     = "my-tpm-demo"
+project_number = "123456789012"
+region         = "us-central1"
+image_tag      = "latest"
+poll_release   = "v1.38"

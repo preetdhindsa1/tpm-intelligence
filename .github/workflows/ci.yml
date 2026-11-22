@@ -77,6 +77,25 @@ jobs:
       - run: npm test
       - run: npm run build
 
+  terraform:
+    name: Terraform (fmt, validate, offline plan)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false -input=false
+      - run: terraform validate
+      # Plan only (phase 1): placeholder project and a dummy token, so nothing is contacted.
+      - run: terraform plan -input=false -refresh=false -lock=false -var project_id=tpm-demo-placeholder -var project_number=000000000000
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: offline-plan
+
   docker:
     name: Docker image builds
     runs-on: ubuntu-latest
