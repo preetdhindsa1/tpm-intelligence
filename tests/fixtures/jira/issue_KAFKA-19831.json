@@ -1,0 +1,999 @@
+{
+ "key": "KAFKA-19831",
+ "id": "13632330",
+ "fields": {
+  "resolution": {
+   "name": "Fixed"
+  },
+  "resolutiondate": "2025-11-21T23:03:55.952+0000",
+  "updated": "2026-07-31T22:38:08.141+0000",
+  "fixVersions": [
+   {
+    "name": "4.2.0",
+    "released": true,
+    "releaseDate": "2026-02-17"
+   },
+   {
+    "name": "4.0.2",
+    "released": true,
+    "releaseDate": "2026-03-16"
+   },
+   {
+    "name": "4.1.2",
+    "released": true,
+    "releaseDate": "2026-03-17"
+   }
+  ],
+  "components": [
+   {
+    "name": "streams"
+   }
+  ],
+  "subtasks": [],
+  "description": "If during rebalance a failure occurs in the StateUpdater thread, and this failure leads to the thread shutdown, the Stream thread may get into an infinite wait state during it's shutdown.\r\n\r\nSee the attached test that reproduces the issue.",
+  "issuetype": {
+   "name": "Bug",
+   "subtask": false
+  },
+  "summary": "Failures in the StateUpdater thread may lead to inability to shut down a stream thread",
+  "created": "2025-10-23T18:25:27.329+0000",
+  "status": {
+   "name": "Resolved",
+   "statusCategory": {
+    "key": "done",
+    "name": "Done"
+   }
+  },
+  "labels": [],
+  "issuelinks": [
+   {
+    "type": {
+     "name": "Completes",
+     "inward": "is fixed by",
+     "outward": "fixes"
+    },
+    "outwardIssue": {
+     "key": "KAFKA-17789"
+    }
+   },
+   {
+    "type": {
+     "name": "Regression",
+     "inward": "is broken by",
+     "outward": "breaks"
+    },
+    "outwardIssue": {
+     "key": "KAFKA-20878"
+    }
+   }
+  ]
+ },
+ "changelog": {
+  "total": 83,
+  "histories": [
+   {
+    "id": "22788900",
+    "created": "2025-10-23T18:26:32.206+0000",
+    "items": [
+     {
+      "field": "assignee",
+      "fromString": null,
+      "toString": "Nikita Shupletsov"
+     }
+    ]
+   },
+   {
+    "id": "22789055",
+    "created": "2025-10-23T21:41:46.705+0000",
+    "items": [
+     {
+      "field": "Version",
+      "fromString": null,
+      "toString": "3.8.0"
+     }
+    ]
+   },
+   {
+    "id": "22789369",
+    "created": "2025-10-24T06:33:54.680+0000",
+    "items": [
+     {
+      "field": "status",
+      "fromString": "Open",
+      "toString": "In Progress"
+     }
+    ]
+   },
+   {
+    "id": "22790383",
+    "created": "2025-10-24T23:12:00.117+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": null,
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22790384",
+    "created": "2025-10-24T23:15:05.988+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22790385",
+    "created": "2025-10-24T23:16:05.883+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803461",
+    "created": "2025-11-06T00:08:47.950+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803462",
+    "created": "2025-11-06T00:09:27.986+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803464",
+    "created": "2025-11-06T00:12:28.435+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803466",
+    "created": "2025-11-06T00:14:58.467+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803468",
+    "created": "2025-11-06T00:16:18.586+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803470",
+    "created": "2025-11-06T00:17:33.571+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803474",
+    "created": "2025-11-06T00:21:54.222+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803496",
+    "created": "2025-11-06T00:25:32.714+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803498",
+    "created": "2025-11-06T00:26:40.422+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803503",
+    "created": "2025-11-06T00:30:06.595+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803504",
+    "created": "2025-11-06T00:31:30.868+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803505",
+    "created": "2025-11-06T00:31:53.309+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803506",
+    "created": "2025-11-06T00:33:01.230+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803509",
+    "created": "2025-11-06T00:36:36.394+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803511",
+    "created": "2025-11-06T00:38:30.879+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803517",
+    "created": "2025-11-06T00:42:56.974+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803518",
+    "created": "2025-11-06T00:43:37.260+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803783",
+    "created": "2025-11-06T07:26:23.980+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803786",
+    "created": "2025-11-06T07:31:03.771+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803788",
+    "created": "2025-11-06T07:32:34.031+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803797",
+    "created": "2025-11-06T07:38:23.097+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803804",
+    "created": "2025-11-06T07:41:58.197+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803805",
+    "created": "2025-11-06T07:42:35.384+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803822",
+    "created": "2025-11-06T07:55:49.700+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803823",
+    "created": "2025-11-06T07:56:49.521+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22803825",
+    "created": "2025-11-06T07:58:29.360+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22804812",
+    "created": "2025-11-06T22:22:27.236+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": null,
+      "toString": "This issue links to \"GitHub Pull Request #20843 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22804813",
+    "created": "2025-11-06T22:23:26.651+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22804922",
+    "created": "2025-11-07T00:46:22.401+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22804924",
+    "created": "2025-11-07T00:54:42.722+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22804951",
+    "created": "2025-11-07T01:41:40.950+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22806110",
+    "created": "2025-11-07T17:40:27.794+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20843 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20843 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22806434",
+    "created": "2025-11-08T02:17:41.607+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22806435",
+    "created": "2025-11-08T02:18:05.267+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22806443",
+    "created": "2025-11-08T03:31:41.586+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22806444",
+    "created": "2025-11-08T03:32:46.652+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22813166",
+    "created": "2025-11-13T01:17:54.052+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22813168",
+    "created": "2025-11-13T01:29:35.040+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22813171",
+    "created": "2025-11-13T01:32:05.223+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22813173",
+    "created": "2025-11-13T01:33:05.570+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22813175",
+    "created": "2025-11-13T01:35:40.637+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22813176",
+    "created": "2025-11-13T01:36:18.331+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22813177",
+    "created": "2025-11-13T01:40:56.160+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22813179",
+    "created": "2025-11-13T01:43:51.628+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22813721",
+    "created": "2025-11-13T11:54:48.304+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22814238",
+    "created": "2025-11-13T18:43:14.263+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22814248",
+    "created": "2025-11-13T18:49:14.349+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22815686",
+    "created": "2025-11-14T17:32:40.876+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22815691",
+    "created": "2025-11-14T17:34:51.043+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22815721",
+    "created": "2025-11-14T17:45:47.846+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22817342",
+    "created": "2025-11-17T08:49:56.776+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22818239",
+    "created": "2025-11-17T18:48:40.902+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22818332",
+    "created": "2025-11-17T20:18:25.702+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22821412",
+    "created": "2025-11-19T23:38:26.667+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22822168",
+    "created": "2025-11-20T13:46:54.747+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22822515",
+    "created": "2025-11-20T18:06:25.792+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22822644",
+    "created": "2025-11-20T19:46:36.667+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22822966",
+    "created": "2025-11-21T00:15:34.644+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22823140",
+    "created": "2025-11-21T06:31:56.637+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22823217",
+    "created": "2025-11-21T07:46:36.837+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22824341",
+    "created": "2025-11-21T23:02:32.396+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22824343",
+    "created": "2025-11-21T23:03:55.962+0000",
+    "items": [
+     {
+      "field": "Fix Version",
+      "fromString": null,
+      "toString": "4.2.0"
+     },
+     {
+      "field": "resolution",
+      "fromString": null,
+      "toString": "Fixed"
+     },
+     {
+      "field": "status",
+      "fromString": "In Progress",
+      "toString": "Resolved"
+     }
+    ]
+   },
+   {
+    "id": "22824368",
+    "created": "2025-11-21T23:35:28.742+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22824380",
+    "created": "2025-11-22T00:11:58.060+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": null,
+      "toString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22824431",
+    "created": "2025-11-22T00:45:27.564+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20767 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22827115",
+    "created": "2025-11-25T03:12:15.019+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22827122",
+    "created": "2025-11-25T03:20:01.758+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22829801",
+    "created": "2025-11-26T22:57:47.940+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22829833",
+    "created": "2025-11-26T23:42:31.901+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22834453",
+    "created": "2025-12-02T01:00:22.155+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #20958 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22834454",
+    "created": "2025-12-02T01:01:02.690+0000",
+    "items": [
+     {
+      "field": "Fix Version",
+      "fromString": null,
+      "toString": "4.1.2"
+     }
+    ]
+   },
+   {
+    "id": "22912183",
+    "created": "2026-02-09T22:09:04.685+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": null,
+      "toString": "This issue links to \"GitHub Pull Request #21438 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22912509",
+    "created": "2026-02-10T04:14:30.517+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #21438 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #21438 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "22912510",
+    "created": "2026-02-10T04:14:39.917+0000",
+    "items": [
+     {
+      "field": "Fix Version",
+      "fromString": null,
+      "toString": "4.0.2"
+     }
+    ]
+   },
+   {
+    "id": "23047047",
+    "created": "2026-05-04T23:11:25.629+0000",
+    "items": [
+     {
+      "field": "Link",
+      "fromString": null,
+      "toString": "This issue fixes KAFKA-17789"
+     }
+    ]
+   },
+   {
+    "id": "23129633",
+    "created": "2026-07-01T22:07:53.006+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #21438 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #21438 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23183464",
+    "created": "2026-07-31T22:38:08.143+0000",
+    "items": [
+     {
+      "field": "Link",
+      "fromString": null,
+      "toString": "This issue breaks KAFKA-20878"
+     }
+    ]
+   }
+  ]
+ }
+}
