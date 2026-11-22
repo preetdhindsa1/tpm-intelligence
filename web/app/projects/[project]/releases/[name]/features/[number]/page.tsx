@@ -1,3 +1,5 @@
+import { releaseFromParams } from "@/lib/release-page";
+import { releasePath } from "@/lib/routes";
 import Link from "next/link";
 import { FlagList } from "@/components/Flags";
 import { LiveRefresh } from "@/components/LiveRefresh";
@@ -9,15 +11,18 @@ import { formatUtc } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default async function FeaturePage({ params }: { params: Promise<{ name: string; number: string }> }) {
-  const { name, number } = await params;
+export default async function FeaturePage({ params }: { params: Promise<{ project: string; name: string; number: string }> }) {
+  const release = await releaseFromParams(params);
+  const { number } = await params;
+  const name = release.name;
+  const project = release.project;
   const f = await api.feature(name, Number(number));
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href={`/releases/${name}`} className="text-sm text-indigo-700 hover:underline">← {name} release health</Link>
+          <Link href={releasePath(project, name)} className="text-sm text-indigo-700 hover:underline">← {name} release health</Link>
           <h1 className="text-2xl font-semibold">
             <a className="hover:underline" href={f.url ?? "#"}>#{f.number}</a> {f.title}
           </h1>

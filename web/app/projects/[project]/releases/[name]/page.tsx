@@ -1,3 +1,5 @@
+import { releaseFromParams } from "@/lib/release-page";
+import { releasePath } from "@/lib/routes";
 import Link from "next/link";
 import { DependencyGraph } from "@/components/DependencyGraph";
 import { ExecBrief } from "@/components/ExecBrief";
@@ -12,8 +14,10 @@ import { formatUtc } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default async function ReleasePage({ params }: { params: Promise<{ name: string }> }) {
-  const { name } = await params;
+export default async function ReleasePage({ params }: { params: Promise<{ project: string; name: string }> }) {
+  const release = await releaseFromParams(params);
+  const name = release.name;
+  const project = release.project;
   const [data, summary, graph, updates] = await Promise.all([
     api.features(name),
     api.summary(name),
@@ -45,7 +49,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]">
         <Panel title="Release dependency graph" subtitle="Features and their verified PRs, most severe first">
           <div className="h-[480px]">
-            <DependencyGraph release={name} data={graph} preview />
+            <DependencyGraph project={project} release={name} data={graph} preview />
           </div>
         </Panel>
         <Panel
@@ -57,7 +61,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
           }
         >
           {before ? (
-            <OddsPanel release={name} rows={data.features} validated={data.validation.validated} />
+            <OddsPanel project={project} release={name} rows={data.features} validated={data.validation.validated} />
           ) : (
             <div className="h-[440px]">
               <OutcomeChart summary={summary} />
@@ -66,7 +70,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
         </Panel>
         <Panel title="Verified executive brief" subtitle="AI-drafted, every line fact-checked, TPM-approved">
           <div className="h-[480px] overflow-y-auto pr-1">
-            <ExecBrief release={name} update={briefToShow(updates)} />
+            <ExecBrief project={project} release={name} update={briefToShow(updates)} />
           </div>
         </Panel>
       </div>
@@ -78,8 +82,8 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
         </div>
       ) : null}
 
-      <FeatureTable title={`In the release (${current.length})`} rows={current} release={name} />
-      {removed.length ? <FeatureTable title={`Removed from the release (${removed.length})`} rows={removed} release={name} /> : null}
+      <FeatureTable title={`In the release (${current.length})`} rows={current} project={project} release={name} />
+      {removed.length ? <FeatureTable title={`Removed from the release (${removed.length})`} rows={removed} project={project} release={name} /> : null}
     </div>
   );
 }
@@ -119,7 +123,7 @@ function StatTiles({ summary: s }: { summary: Summary }) {
   );
 }
 
-function FeatureTable({ title, rows, release }: { title: string; rows: Awaited<ReturnType<typeof api.features>>["features"]; release: string }) {
+function FeatureTable({ title, rows, project, release }: { title: string; rows: Awaited<ReturnType<typeof api.features>>["features"]; project: string; release: string }) {
   return (
     <section>
       <h2 className="mb-2 text-lg font-medium">{title}</h2>
@@ -139,7 +143,7 @@ function FeatureTable({ title, rows, release }: { title: string; rows: Awaited<R
             {rows.map((f) => (
               <tr key={f.key} className="align-top">
                 <td className="px-3 py-2">
-                  <Link className="font-medium text-indigo-700 hover:underline" href={`/releases/${release}/features/${f.number}`}>
+                  <Link className="font-medium text-indigo-700 hover:underline" href={releasePath(project, release, `/features/${f.number}`)}>
                     #{f.number}
                   </Link>{" "}
                   {f.title}

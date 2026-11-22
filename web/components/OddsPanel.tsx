@@ -2,10 +2,11 @@
 // lowest first, next to the base rate. One series in neutral ink; no colour-only meaning.
 import Link from "next/link";
 import type { FeatureRow } from "@/lib/api";
+import { releasePath } from "@/lib/routes";
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
-export function OddsPanel({ release, rows, validated }: { release: string; rows: FeatureRow[]; validated: boolean }) {
+export function OddsPanel({ project, release, rows, validated }: { project: string; release: string; rows: FeatureRow[]; validated: boolean }) {
   const withOdds = rows
     .filter((f) => f.in_release && f.odds.status === "forecast" && f.odds.probability !== null)
     .sort((a, b) => (a.odds.probability ?? 0) - (b.odds.probability ?? 0));
@@ -23,7 +24,7 @@ export function OddsPanel({ release, rows, validated }: { release: string; rows:
           const { probability: p, low, high } = f.odds;
           return (
             <li key={f.key} className="grid grid-cols-[1fr_140px_44px] items-center gap-2">
-              <Link href={`/releases/${release}/features/${f.number}`} className="truncate text-slate-700 hover:underline" title={f.title}>
+              <Link href={releasePath(project, release, `/features/${f.number}`)} className="truncate text-slate-700 hover:underline" title={f.title}>
                 #{f.number} {f.title}
               </Link>
               <div className="relative h-3 rounded-full bg-slate-100" aria-hidden>

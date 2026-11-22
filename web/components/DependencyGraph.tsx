@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { GraphData, GraphNode } from "@/lib/api";
 import { filterGraph, layoutGraph, NODE_SIZE, sigsOf, STATUS, topBadge } from "@/lib/dashboard";
+import { releasePath } from "@/lib/routes";
 
 type Data = { node: GraphNode };
 
@@ -83,10 +84,12 @@ function ReleaseNode({ data }: NodeProps<Node<Data>>) {
 const NODE_TYPES = { feature: FeatureNode, pull_request: PRNode, release: ReleaseNode };
 
 export function DependencyGraph({
+  project,
   release,
   data,
   preview = false,
 }: {
+  project: string;
   release: string;
   data: GraphData;
   preview?: boolean;
@@ -136,7 +139,7 @@ export function DependencyGraph({
   }, [data, query, sig, showMerged, inReleaseOnly, allPrs, preview]);
 
   function open(n: GraphNode) {
-    if (n.kind === "feature") router.push(`/releases/${release}/features/${n.label.replace("#", "")}`);
+    if (n.kind === "feature") router.push(releasePath(project, release, `/features/${n.label.replace("#", "")}`));
     else if (n.kind === "pull_request" && n.url) window.open(n.url, "_blank", "noopener");
   }
 
@@ -202,7 +205,7 @@ export function DependencyGraph({
           edge = stated &quot;depends on&quot;. Verified links only.
         </span>
         {preview && (
-          <Link href={`/releases/${release}/dependencies`} className="font-medium text-indigo-700 hover:underline">
+          <Link href={releasePath(project, release, "/dependencies")} className="font-medium text-indigo-700 hover:underline">
             Full graph →
           </Link>
         )}

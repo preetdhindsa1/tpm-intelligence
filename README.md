@@ -53,7 +53,7 @@ make install                # Python deps into .venv
 make test                   # ruff + mypy + pytest
 make up                     # Postgres (+ migrations), Redis, OTel Collector, Jaeger, API, worker, web
 curl localhost:8000/healthz
-open http://localhost:3000  # dashboard: releases → feature health table → feature detail
+open http://localhost:3000  # release health across projects → release dashboard → feature detail
 open http://localhost:16686 # Jaeger: traces from tpm-api and tpm-worker
 ```
 
@@ -187,6 +187,10 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
     fact-checked.
   - Not copied from the mockup: the days-of-delay curve and "reallocate TPMs" lines,
     because nothing computes them. The curve is a candidate for M7.
+- **Multi-project navigation** (ADR-0014): a "Release health" home page across projects,
+  a project/release switcher, and release URLs that carry the project
+  (`/projects/kubernetes/releases/v1.38`; old `/releases/v1.38` links redirect).
+  Kubernetes is the only project shown until Jira data for Apache Kafka is collected.
 
 ## Limitations
 

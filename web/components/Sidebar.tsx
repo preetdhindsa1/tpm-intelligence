@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { releasePath } from "@/lib/routes";
 
 // Simple 16px stroke icons (decorative; every item has a text label).
 const ICONS: Record<string, React.ReactNode> = {
@@ -20,14 +21,13 @@ const ITEMS = [
   { href: "/links", label: "Link review" },
 ];
 
-export function Sidebar({ release }: { release: string }) {
+export function Sidebar({ project, release }: { project: string; release: string }) {
   const path = usePathname();
-  const base = `/releases/${release}`;
+  const base = releasePath(project, release);
   const active = (href: string) =>
     href === "" ? path === base || path.startsWith(`${base}/features`) : path.startsWith(base + href);
   return (
     <nav aria-label="Release sections" className="sticky top-4 flex flex-col gap-1 text-sm">
-      <p className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-slate-400">{release}</p>
       {ITEMS.map((i) => (
         <Link
           key={i.label}

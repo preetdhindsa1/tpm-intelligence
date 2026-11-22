@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { SECTION_TITLES, type ExecUpdate } from "@/lib/api";
 import { formatUtc } from "@/lib/format";
+import { releasePath } from "@/lib/routes";
 
-export function ExecBrief({ release, update }: { release: string; update: ExecUpdate | null }) {
+export function ExecBrief({ project, release, update }: { project: string; release: string; update: ExecUpdate | null }) {
   if (!update) {
     return (
       <p className="text-sm text-slate-500">
         No update drafted yet.{" "}
-        <Link href={`/releases/${release}/update`} className="text-indigo-700 hover:underline">
+        <Link href={releasePath(project, release, "/update")} className="text-indigo-700 hover:underline">
           Draft one →
         </Link>
       </p>
@@ -51,7 +52,7 @@ export function ExecBrief({ release, update }: { release: string; update: ExecUp
       <p className="border-t pt-2 text-xs text-slate-500">
         ✓ = checked against the data by the fact checker. {update.claims_removed} claim{update.claims_removed === 1 ? "" : "s"} removed. Drafted{" "}
         {formatUtc(update.created_at)} by AI; nothing is sent without approval.{" "}
-        <Link href={`/releases/${release}/update`} className="font-medium text-indigo-700 hover:underline">
+        <Link href={releasePath(project, release, "/update")} className="font-medium text-indigo-700 hover:underline">
           Open report →
         </Link>
       </p>
