@@ -2,10 +2,17 @@
 
 Events are loaded incrementally (by database id). A release view is recomputed when new
 events arrive or after ``ttl`` (odds depend on the time left before Code Freeze).
+
+Stale-while-revalidate: once a release has been computed, a request never waits for a
+recompute caused by new events or the TTL. It gets the previous view (whose "data as of"
+time says how old it is) while one background thread computes the new one. A person's own
+action (``invalidate``, e.g. confirming a link) still waits, so they see its effect. A
+warmer thread keeps viewed releases fresh even when nobody is looking.
 """
 
 from __future__ import annotations
 
+import functools
 import gc
 import logging
 import threading
@@ -18,7 +25,7 @@ from typing import Protocol
 from opentelemetry import trace
 from sqlalchemy.orm import Session, sessionmaker
 
-from api.validation import Validation, load_validation
+from api.validation import Validation, load_date_validation, load_validation
 from engine.assess import FeatureAssessment, ReleaseAssessment, assess_release
 from engine.forecast import (
     DEFAULT_FORECAST,
@@ -31,6 +38,7 @@ from engine.forecast import (
     finished_releases,
     forecast_release,
 )
+from engine.merge_date import MergeDateForecast, ReleaseCurve, forecast_release_dates, release_curve
 from engine.odds import training_pairs
 from engine.projection import ReleaseInfo, World, project
 from engine.recalibrate import Recalibration, fit
@@ -102,6 +110,11 @@ class ReleaseView:
     validation: Validation
     version: int
     computed_at: float
+    merge_dates: dict[str, MergeDateForecast] = field(default_factory=dict)
+    curve: ReleaseCurve | None = None
+    date_validation: Validation = field(
+        default_factory=lambda: Validation(False, "merge dates not computed")
+    )
 
     def feature(self, key: str) -> FeatureAssessment | None:
         """Assessment for one feature key."""
@@ -121,6 +134,7 @@ class ReleaseService:
         recalibration_ttl: timedelta = timedelta(hours=6),
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
         validation: Callable[[], Validation] = load_validation,
+        date_validation: Callable[[], Validation] = load_date_validation,
         extra_links: Callable[[str], Sequence[LinkCandidate]] | None = None,
     ) -> None:
         self._source = source
@@ -135,6 +149,7 @@ class ReleaseService:
         self._recal: dict[tuple[str, int], tuple[float, Recalibration]] = {}
         self._recal_ttl = recalibration_ttl.total_seconds()
         self._validation = validation
+        self._date_validation = date_validation
         # AI link suggestions and people's decisions on them, per release (ADR-0011).
         self._extra_links = extra_links
         self._lock = threading.Lock()
@@ -144,6 +159,13 @@ class ReleaseService:
         self._key_locks_guard = threading.Lock()
         self._summaries: tuple[int, float, list[ReleaseSummary]] | None = None
         self._summaries_lock = threading.Lock()
+        # Views older than this version must be recomputed before they are served
+        # (raised by ``invalidate``: the user's own action must show).
+        self._required_version = 0
+        self._refreshing: set[str] = set()
+        self._refreshing_guard = threading.Lock()
+        self._warmer: threading.Thread | None = None
+        self._stop = threading.Event()
 
     @property
     def version(self) -> int:
@@ -161,9 +183,10 @@ class ReleaseService:
             return len(new)
 
     def invalidate(self) -> None:
-        """Recompute views on next use (e.g. after a person confirms a link)."""
+        """Recompute views before their next use (e.g. after a person confirms a link)."""
         with self._lock:
             self._version += 1
+            self._required_version = self._version
 
     def release_keys(self) -> list[str]:
         """Known release keys, oldest first."""
@@ -176,6 +199,15 @@ class ReleaseService:
         until new events arrive or ``ttl`` passes.
         """
         self.refresh()
+        hit = self._summaries
+        if hit and (hit[0] != self._version or time.monotonic() - hit[1] >= self._ttl):
+            self._in_background("__releases__", self._compute_summaries)
+            return hit[2]
+        if hit:
+            return hit[2]
+        return self._compute_summaries()
+
+    def _compute_summaries(self) -> list[ReleaseSummary]:
         with self._summaries_lock:
             hit = self._summaries
             if hit and hit[0] == self._version and time.monotonic() - hit[1] < self._ttl:
@@ -198,17 +230,91 @@ class ReleaseService:
             self._summaries = (version, time.monotonic(), summaries)
             return summaries
 
-    def view(self, release_name: str) -> ReleaseView:
-        """Current view of a release (recomputed if stale, at most once at a time)."""
+    def current_release_name(self) -> str | None:
+        """The earliest release not yet released, else the newest one (None if none)."""
+        rows = self.releases()
+        if not rows:
+            return None
+        now = self._now()
+        open_ = [r for r in rows if r.release.release_at is None or r.release.release_at > now]
+        return (open_[0] if open_ else rows[-1]).release.name
+
+    def view(self, release_name: str, *, wait: bool = False) -> ReleaseView:
+        """Current view of a release.
+
+        Fresh views are returned as they are. A stale view is returned at once while a
+        background thread recomputes it, unless ``wait`` is set, the view predates an
+        ``invalidate``, or there is no view yet: then the caller waits (one computation
+        per release at a time).
+        """
         key = f"{self._project}:{release_name}"
         self.refresh()
-        cached = self._fresh(key)
-        if cached:
+        cached = self._views.get(key)
+        if cached and self._is_fresh(cached):
             return cached
+        if cached and not wait and cached.version >= self._required_version:
+            self._in_background(key, lambda: self._compute_locked(key))
+            return cached
+        return self._compute_locked(key)
+
+    def warm(self, release_names: Sequence[str] = ()) -> None:
+        """Start background recomputes for stale views and for ``release_names``."""
+        self.refresh()
+        keys = set(self._views) | {f"{self._project}:{n}" for n in release_names}
+        for key in keys:
+            cached = self._views.get(key)
+            if cached is None or not self._is_fresh(cached):
+                self._in_background(key, functools.partial(self._compute_locked, key))
+
+    def start_warmer(self, interval: timedelta = timedelta(seconds=30)) -> None:
+        """Keep viewed releases fresh in a daemon thread, checking every ``interval``."""
+        if self._warmer is not None:
+            return
+
+        def loop() -> None:
+            while not self._stop.wait(interval.total_seconds()):
+                try:
+                    self.warm()
+                except Exception:
+                    logger.exception("release view warmer failed")
+
+        self._warmer = threading.Thread(target=loop, name="release-warmer", daemon=True)
+        self._warmer.start()
+
+    def stop_warmer(self) -> None:
+        """Stop the warmer thread (tests, shutdown)."""
+        self._stop.set()
+
+    def refreshing(self) -> set[str]:
+        """Keys being recomputed in the background right now."""
+        with self._refreshing_guard:
+            return set(self._refreshing)
+
+    def _in_background(self, key: str, compute: Callable[[], object]) -> None:
+        """Run ``compute`` in a daemon thread unless one is already running for ``key``."""
+        with self._refreshing_guard:
+            if key in self._refreshing:
+                return
+            self._refreshing.add(key)
+
+        def run() -> None:
+            try:
+                compute()
+            except KeyError:
+                pass  # release no longer known
+            except Exception:
+                logger.exception("background recompute of %s failed", key)
+            finally:
+                with self._refreshing_guard:
+                    self._refreshing.discard(key)
+
+        threading.Thread(target=run, name=f"recompute-{key}", daemon=True).start()
+
+    def _compute_locked(self, key: str) -> ReleaseView:
         with self._key_lock(key):
-            cached = self._fresh(key)  # another request may have just computed it
-            if cached:
-                return cached
+            cached = self._views.get(key)
+            if cached and self._is_fresh(cached):
+                return cached  # another thread may have just computed it
             with tracer.start_as_current_span(
                 "api.compute_release_view", attributes={"tpm.release": key}
             ):
@@ -223,15 +329,8 @@ class ReleaseService:
             gc.freeze()
             return view
 
-    def _fresh(self, key: str) -> ReleaseView | None:
-        cached = self._views.get(key)
-        if (
-            cached
-            and cached.version == self._version
-            and time.monotonic() - cached.computed_at < self._ttl
-        ):
-            return cached
-        return None
+    def _is_fresh(self, cached: ReleaseView) -> bool:
+        return cached.version == self._version and time.monotonic() - cached.computed_at < self._ttl
 
     def _key_lock(self, key: str) -> threading.Lock:
         with self._key_locks_guard:
@@ -268,6 +367,8 @@ class ReleaseService:
             )
             for f in raw
         }
+        dates = forecast_release_dates(world, key, calibration, self._forecast)
+        curve = release_curve(world.releases[key], world.as_of, dates)
         logger.info(
             "release view computed",
             extra={
@@ -286,6 +387,9 @@ class ReleaseService:
             self._validation(),
             self._version,
             time.monotonic(),
+            merge_dates={d.feature_key: d for d in dates},
+            curve=curve,
+            date_validation=self._date_validation(),
         )
 
     def _recalibration(

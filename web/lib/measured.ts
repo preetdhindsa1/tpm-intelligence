@@ -71,6 +71,14 @@ export const MEASURED: Measured[] = [
     measured: "2026-11-22",
   },
   {
+    id: "merge-dates",
+    label: "Merge-date forecasts beat the baseline",
+    value: "3 of 12",
+    detail: "Ranges are about the right width (69–84% coverage), but too pessimistic before Code Freeze. Shown as not validated.",
+    verdict: "fail",
+    measured: "2026-11-22",
+  },
+  {
     id: "freshness",
     label: "Event → dashboard latency (p95)",
     value: "TBD",

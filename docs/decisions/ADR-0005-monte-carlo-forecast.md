@@ -137,3 +137,69 @@ about 20% of the time), per-stage new-PR rates, and v1.39 as the first unseen te
 ## AI vs rules
 
 No AI. Every number comes from measured data and this simulation.
+
+## Merge dates (M7 step 2; validation rule fixed 2026-11-22, before any result was run)
+
+**What.** `engine/merge_date.py` keeps the Monte Carlo draws (`simulate_completion`, a
+refactor of `forecast_feature` that reproduces the existing odds exactly; checked on the
+87 real v1.38 features 14 days before freeze). It reports *when* a feature's required
+work (main PR, its stated prerequisites, a new PR if needed) merges, as days relative to
+Code Freeze. It also works after Code Freeze, when the question is "by release day?". A
+release curve sums the features' draws: how many features will have their required code
+merged by each day, with a 10th-90th percentile range of that count.
+
+**Truth.** The day the feature's main PR and its stated prerequisites merged, from all
+data. Never merged = later than the horizon (release day + 14 days).
+
+**Backtest.** Releases v1.35-v1.38. Forecasts made 28, 14 and 7 days before Code Freeze
+and 3 days after it, using only data before that time and calibration from releases
+finished by then. Features already done at that time are not scored.
+
+- *Coverage*: the share of features whose actual merge day falls in the forecast's
+  10th-90th percentile range (should be about 80%).
+- *CRPS* (one-day steps over the curve's days) against a **baseline**: the merge days, relative
+  to their own Code Freeze, of earlier finished releases' features that were not done at
+  the same point. Skill = 1 - CRPS / CRPS_baseline.
+
+**Validation rule (fixed before the first run).** Merge dates count as validated only if,
+for **every** backtested release and every lead time, coverage is between 70% and 90%
+**and** CRPS skill is above 0. Otherwise the API and UI label them "not validated", as for
+the odds and the simulator.
+
+### Merge dates: results (measured 2026-11-22)
+
+**Two corrections to the backtest, made after its first run and before any change to the model.**
+1. *Truth used PRs from later releases.* The "actual" main PR was the newest PR of all
+   time, so for long-lived KEPs it was a PR from a later release cycle. Only 23-30% of
+   v1.35-v1.37 features then counted as merged by the horizon, below what had already
+   merged at freeze. Truth now uses only PRs opened before the release day.
+2. *v1.38 cannot be scored yet.* Its horizon ends 2026-12-30 and the data ends
+   2026-11-22, so open features counted as "never merged". It was wrongly included in
+   the rule. The backtest now refuses releases whose horizon has not ended.
+
+The first run's file is kept: `date-backtest-20261122T193020Z.json`. Dropping v1.38
+removed three of the four passing cases, so neither correction makes passing easier.
+
+**Result** (`date-backtest-20261122T193530Z.json`, v1.35-v1.37, 218 s):
+
+| Release | Lead (days before freeze) | n | Coverage of 10-90% range | CRPS skill | Count at release day: forecast (range) / actual |
+|---|---|---|---|---|---|
+| v1.35 | 28 / 14 / 7 / -3 | 57 / 42 / 39 / 5 | 84% / 79% / 79% / 80% | +0.00 / −0.14 / −0.01 / +0.03 | 63 (59-67) / 60 · 58 (54-61) / 57 · 59 (55-63) / 57 · 47 (46-48) / 44 |
+| v1.36 | 28 / 14 / 7 / -3 | 47 / 47 / 36 / 13 | 83% / 74% / **69%** / **62%** | −0.07 / −0.36 / −0.53 / −0.16 | 54 (50-58) / 63 · 52 (48-56) / 63 · 57 (53-60) / 63 · 64 (62-66) / 61 |
+| v1.37 | 28 / 14 / 7 / -3 | 53 / 53 / 53 / 11 | 83% / 83% / 72% / 82% | −0.31 / −0.30 / −0.36 / **+0.25** | 57 (53-61) / 66 · 57 (53-61) / 67 · 56 (52-60) / 67 · 63 (61-65) / 57 |
+
+**Verdict: not validated.** The ranges are about the right width (coverage 69-84% in 10 of
+12 cases). But the forecasts do not beat the simple baseline before Code Freeze, and they are
+**too pessimistic**: for v1.36 and v1.37 the actual count at release day (63-67) was
+above the forecast range. After Code Freeze the model beats the baseline in 2 of 3
+releases. The API and UI label merge dates "not validated".
+
+Diagnosis and next candidates (not done): the pessimism matches the odds model's (PR
+durations from all linked PRs, including slow and never-merged ones, applied to main
+PRs). Candidates: durations from main PRs only, durations per stage, and blending with
+the baseline before freeze.
+
+**Known inconsistency.** Merge dates skip a main PR closed without merging (a closed PR
+cannot deliver code; six v1.38 features had one and looked "done" at once). The odds
+model keeps its backtested behaviour, which treats it as nothing left to merge. To be
+reconciled when the odds model is next changed and re-backtested.

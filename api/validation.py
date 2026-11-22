@@ -70,3 +70,35 @@ def load_validation(results_dir: Path = DEFAULT_DIR) -> Validation:
         )
         reason = f"recalibrated odds do not beat the base rate everywhere (fails: {where})"
     return Validation(not failing, reason, files[-1].name, release, leads)
+
+
+def load_date_validation(results_dir: Path = DEFAULT_DIR) -> Validation:
+    """Read the newest ``date-backtest-*.json`` (merge dates; rule in ADR-0005)."""
+    files = sorted(results_dir.glob("date-backtest-*.json"))
+    if not files:
+        return Validation(False, "merge dates have not been backtested yet")
+    data = json.loads(files[-1].read_text())
+    results = data.get("results", [])
+    if not results:
+        return Validation(False, "newest merge-date backtest has no results", files[-1].name)
+    leads = [
+        {
+            "release": r["release"],
+            "lead_days": r["lead_days"],
+            "coverage": r.get("coverage"),
+            "skill": r.get("skill"),
+            "n": r.get("n"),
+            "passes": r.get("passes"),
+        }
+        for r in sorted(results, key=lambda r: (r["release"], -r["lead_days"]))
+    ]
+    failing = [lead for lead in leads if not lead["passes"]]
+    if not failing:
+        reason = "merge-date ranges are calibrated and beat the baseline at every lead time"
+    else:
+        reason = (
+            f"merge-date forecasts fail their backtest in {len(failing)} of {len(leads)} "
+            "cases (ADR-0005)"
+        )
+    release = max(r["release"] for r in results)
+    return Validation(not failing, reason, files[-1].name, release, leads)

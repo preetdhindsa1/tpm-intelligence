@@ -1,0 +1,57 @@
+{
+ "measured_at": "2026-11-22",
+ "method": "GET summary, features, dependencies for v1.38 every 5 s for 660 s (crosses two 5-minute cache expiries); local Docker, laptop",
+ "before": {
+  "duration_s": 660.0,
+  "endpoints": {
+   "/releases/v1.38/summary": {
+    "n": 119,
+    "p50": 0.02,
+    "p95": 0.09,
+    "max": 23.06,
+    "over_2s": 2
+   },
+   "/releases/v1.38/features": {
+    "n": 119,
+    "p50": 0.01,
+    "p95": 0.02,
+    "max": 0.14,
+    "over_2s": 0
+   },
+   "/releases/v1.38/dependencies": {
+    "n": 119,
+    "p50": 0.12,
+    "p95": 0.16,
+    "max": 0.39,
+    "over_2s": 0
+   }
+  }
+ },
+ "after": {
+  "duration_s": 660.0,
+  "endpoints": {
+   "/releases/v1.38/summary": {
+    "n": 122,
+    "p50": 0.02,
+    "p95": 0.08,
+    "max": 29.58,
+    "over_2s": 1
+   },
+   "/releases/v1.38/features": {
+    "n": 122,
+    "p50": 0.01,
+    "p95": 0.04,
+    "max": 0.09,
+    "over_2s": 0
+   },
+   "/releases/v1.38/dependencies": {
+    "n": 122,
+    "p50": 0.12,
+    "p95": 0.21,
+    "max": 0.36,
+    "over_2s": 0
+   }
+  }
+ },
+ "after_notes": "The one slow 'after' request (29.6 s) was the first request after the redeploy, sent while the boot warm-up was computing (log: view computed 19:05:19, 21.4 s). The TTL expiry at about 19:10 was recomputed in the background (24.5 s) with no slow request. The merge-date backtest started during the last ~3 minutes of the run (CPU contention; makes 'after' look worse, not better)."
+}

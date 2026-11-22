@@ -75,3 +75,44 @@ Postgres: the response cache, the SSE fan-out channel, and the local event queue
 
 No AI involved. The `links` CHECK constraint is the database-level guard that AI-suggested
 links cannot become facts on their own.
+
+## Addendum (2026-11-22, M7 step 1): release views are served stale while they recompute
+
+**Problem.** The API keeps one computed view per release (projection of about 294k events,
+assessment, Monte Carlo, recalibration). It used to recompute **in the request** whenever
+new events arrived or the 5-minute TTL passed, so whoever came next waited for it.
+
+**Decision: stale-while-revalidate.**
+- Once a release has a view, requests get it at once. A single background thread
+  recomputes, and the next request gets the new view.
+- Pages show "data as of", so a stale view is labelled by its own time.
+- A person's own action (`invalidate`, e.g. confirming a link) still waits, so they see
+  its effect straight away.
+- The live-update stream waits for the new view before telling the browser to reload, so
+  a reload always shows the new data.
+- On boot, the API computes the current release in the background. A warmer thread then
+  refreshes viewed releases every 30 s when they are stale, even if nobody is looking.
+
+**Alternatives.**
+- Make the recompute incremental (re-project only new events): the larger, right fix
+  eventually, but the engine projects the world as a pure function of all events.
+- Shorter TTL: makes it worse.
+- A precomputed views table in Postgres: needs a writer service; not needed yet on one API
+  instance.
+
+**Trade-off.** For up to one recompute time (measured 23 s idle, about 40 s under load),
+a page may show data that is a few minutes old. Its "as of" time says so.
+
+**Measured** (2026-11-22, `docs/results/api-latency-swr-20261122.json`). v1.38 summary,
+feature table and dependencies were requested every 5 s for 11 minutes, which crosses two
+cache expiries. Local Docker on a laptop.
+
+| | Requests | Over 2 s | Slowest | p95 (summary / features / dependencies) |
+|---|---|---|---|---|
+| Before | 357 | 2 (one per cache expiry) | 23.1 s | 0.09 / 0.02 / 0.16 s |
+| After | 366 | 1 (cold start: first request after the redeploy, during boot warm-up) | 29.6 s | 0.08 / 0.04 / 0.21 s |
+
+After the change, the cache expiry was recomputed in the background (24.5 s) with no slow
+request. The remaining slow request was the cold start, which the boot warm-up shortens
+but cannot remove. p95 hides the problem in both runs: the waits were rare but long, so
+"requests over 2 s" is the number that matters.

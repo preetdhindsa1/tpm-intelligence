@@ -136,6 +136,8 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Engine: assess all 106 v1.38 features from 60,230 events | project 0.22 s + assess 0.89 s (single run, laptop, Docker; not a p95) |
 | API `/releases` (dashboard home), 162k events, 6 releases | cold cache **6.9 s**, warm 0.06 s (was several minutes cold: it forecast every release). Single runs, laptop, Docker; measured 2026-11-21, not a p95 |
 | API v1.38 feature table, cold cache, 3 concurrent requests | **~21 s** each, sharing **one** computation (was one computation per request). Single run, measured 2026-11-21 |
+| Merge-date forecasts (M7): 10th-90th range coverage and CRPS skill vs a baseline, v1.35-v1.37 at 28/14/7 days before freeze and 3 after | **Not validated.** Coverage 69-84% (target 70-90%; 10 of 12 cases in range), but CRPS skill is below 0 in 9 of 12 cases: too pessimistic before freeze (v1.36/v1.37 actual count at release day 63-67, above the forecast range). Beats the baseline after freeze in 2 of 3. Rule fixed before the run; two backtest bugs corrected after the first run (ADR-0005). Measured 2026-11-22 |
+| API: requests over 2 s while polling v1.38 every 5 s for 11 min (crosses 2 cache expiries) | Before **2** (one per expiry, worst 23 s). After stale-while-revalidate **0** from expiries; 1 cold start right after a redeploy (29.6 s). p50 ≤ 0.12 s both. Measured 2026-11-22; ADR-0002 |
 | Data freshness | TBD (not yet measured) |
 | Event → dashboard latency (p95) | TBD (not yet measured) |
 
@@ -195,6 +197,12 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   AI and human approval, a live pulse of the current release (computed facts from the API),
   and a scorecard of measured results with dates, including the ones that fail. Release
   health moved to `/releases`.
+- **M7 (forecast improvements), in progress.**
+  - Release views are served from the cache while they recompute in the background. A
+    cache expiry no longer makes anyone wait (ADR-0002 addendum).
+  - Merge dates: when each feature's required code will merge, before or after Code
+    Freeze, and a "When will the remaining code merge?" chart (the days-of-delay curve
+    from the mockup). **Not validated**: too pessimistic before freeze (ADR-0005).
 - **Multi-project navigation** (ADR-0014): a "Release health" home page across projects,
   a project/release switcher, and release URLs that carry the project
   (`/projects/kubernetes/releases/v1.38`; old `/releases/v1.38` links redirect).

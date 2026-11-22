@@ -7,6 +7,7 @@ import { OddsCell } from "@/components/Odds";
 import { RiskNotePanel } from "@/components/RiskNote";
 import { Timeline } from "@/components/Timeline";
 import { api } from "@/lib/api";
+import { dateOf, mergeRangeLabel, relDay } from "@/lib/delay";
 import { formatUtc } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,10 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
           <p className="mt-3 text-xs text-slate-500">If the measured inputs below hold, the odds are likely in this range. Not a guarantee.</p>
         </section>
         <section className="rounded border bg-white p-4 lg:col-span-2">
+          <h2 className="mb-2 font-medium">When will its required code merge?</h2>
+          <MergeDateText f={f} freeze={release.code_freeze_at} />
+        </section>
+        <section className="rounded border bg-white p-4 lg:col-span-3">
           <h2 className="mb-2 font-medium">Flags</h2>
           <FlagList flags={f.flags} />
         </section>
@@ -97,6 +102,35 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
           </details>
         </section>
       </div>
+    </div>
+  );
+}
+
+function MergeDateText({ f, freeze }: { f: Awaited<ReturnType<typeof api.feature>>; freeze: string | null }) {
+  const m = f.merge_date;
+  if (!m || m.status === "no_freeze_date") return <p className="text-sm text-slate-500">No Code Freeze date, so no merge-date forecast.</p>;
+  if (m.status === "done")
+    return (
+      <p className="text-sm text-slate-700">
+        Merged {m.done_day !== null ? `${dateOf(Math.floor(m.done_day), freeze)} (${relDay(Math.floor(m.done_day))})` : ""}: the main PR
+        and the PRs it depends on are all in.
+      </p>
+    );
+  const pct = (x: number | null) => (x === null ? "—" : `${Math.round(x * 100)}%`);
+  return (
+    <div className="space-y-2 text-sm text-slate-700">
+      <p>
+        {mergeRangeLabel(m.p10, m.p50, m.p90)}
+        {m.p50 !== null ? ` (${dateOf(Math.round(m.p50), freeze)})` : ""}.
+      </p>
+      <p>
+        Odds the required code merges {m.by_freeze !== null ? <>by Code Freeze: <strong>{pct(m.by_freeze)}</strong> (raw, before recalibration) · </> : null}
+        by release day: <strong>{pct(m.by_release)}</strong>
+      </p>
+      {!f.merge_date_validation.validated && (
+        <p className="text-xs text-amber-900">Not validated: {f.merge_date_validation.reason ?? "merge dates have not passed their backtest"}.</p>
+      )}
+      <p className="text-xs text-slate-500">Monte Carlo over measured PR merge times from earlier releases. Decision support, not a guarantee.</p>
     </div>
   );
 }

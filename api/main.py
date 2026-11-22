@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import threading
 from collections.abc import AsyncIterator
 from typing import Any
 
@@ -28,6 +29,7 @@ from api.schemas import (
     LinkSuggestionOut,
     LinkSuggestionsOut,
     LoadOut,
+    MergeDatesOut,
     ReleaseOut,
     RiskNoteOut,
     SavedScenarioOut,
@@ -45,6 +47,7 @@ from api.views import (
     feature_detail,
     feature_row,
     graph_out,
+    merge_dates_out,
     release_out,
     release_summary_out,
     summary_out,
@@ -102,11 +105,21 @@ def create_app(
         result: ReleaseService = state["service"]
         return result
 
-    async def view(name: str) -> ReleaseView:
+    async def view(name: str, wait: bool = False) -> ReleaseView:
         try:
-            return await run_in_threadpool(svc().view, name)
+            return await run_in_threadpool(lambda: svc().view(name, wait=wait))
         except KeyError as exc:
             raise HTTPException(404, f"unknown release {name}") from exc
+
+    def warm_on_boot() -> None:
+        """Compute the current release before the first visitor asks, then keep it fresh."""
+        s = svc()
+        s.start_warmer()
+        current = s.current_release_name()
+        if current:
+            s.warm([current])
+
+    app.state.warm_on_boot = warm_on_boot
 
     @app.get("/healthz")
     def healthz() -> dict[str, str]:
@@ -554,6 +567,11 @@ def create_app(
         """Feature-to-feature dependencies: shared PRs, stated "depends on", waiting PRs."""
         return dependencies_out(await view(name), include_removed)
 
+    @app.get("/releases/{name}/merge-dates", response_model=MergeDatesOut)
+    async def merge_dates(name: str) -> MergeDatesOut:
+        """Days-of-delay chart: when features' required code merges (ranges, ADR-0005)."""
+        return merge_dates_out(await view(name))
+
     @app.get("/releases/{name}/load", response_model=LoadOut)
     async def load(name: str) -> LoadOut:
         """Open PRs not linked to any feature, per SIG. Not per person (CLAUDE.md section 10)."""
@@ -587,7 +605,9 @@ def create_app(
                     await run_in_threadpool(svc().refresh)
                     if svc().version == before:
                         continue
-                    v = await view(name)
+                    # Wait for the recomputed view here, in the stream, so the browser
+                    # reloads only once the new data is ready (pages never wait for it).
+                    v = await view(name, wait=True)
                     yield _sse(
                         "update",
                         {
@@ -650,9 +670,12 @@ def main() -> None:
 
     telemetry = init_telemetry(SERVICE_NAME)
     origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    app = create_app(cors_origins=origins)
+    # Warm in the background so the server starts accepting requests at once.
+    threading.Thread(target=app.state.warm_on_boot, name="warm-on-boot", daemon=True).start()
     try:
         uvicorn.run(
-            create_app(cors_origins=origins),
+            app,
             host="0.0.0.0",  # noqa: S104
             port=int(os.getenv("PORT", "8000")),
             log_config=None,

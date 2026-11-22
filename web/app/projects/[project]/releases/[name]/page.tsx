@@ -1,6 +1,7 @@
 import { releaseFromParams } from "@/lib/release-page";
 import { releasePath } from "@/lib/routes";
 import Link from "next/link";
+import { DelayChart } from "@/components/DelayChart";
 import { DependencySummary } from "@/components/DependencySummary";
 import { ExecBrief } from "@/components/ExecBrief";
 import { FlagChips } from "@/components/Flags";
@@ -18,11 +19,12 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
   const release = await releaseFromParams(params);
   const name = release.name;
   const project = release.project;
-  const [data, summary, deps, updates] = await Promise.all([
+  const [data, summary, deps, updates, dates] = await Promise.all([
     api.features(name),
     api.summary(name),
     api.dependencies(name),
     api.updates(name).catch(() => []),
+    api.mergeDates(name).catch(() => null),
   ]);
   const r = data.release;
   const current = data.features.filter((f) => f.in_release);
@@ -74,6 +76,15 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
           </div>
         </Panel>
       </div>
+
+      {dates && (
+        <Panel
+          title="When will the remaining code merge?"
+          subtitle="Features whose main PR (and the PRs it depends on) has merged, by day: actual so far, then a Monte Carlo forecast"
+        >
+          <DelayChart m={dates} />
+        </Panel>
+      )}
 
       {!data.validation.validated && before ? (
         <div className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">

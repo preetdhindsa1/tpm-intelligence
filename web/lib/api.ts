@@ -69,6 +69,8 @@ export type FeatureDetail = FeatureRow & {
   critical_path: string[];
   timeline: TimelineEntry[];
   assumptions: Record<string, unknown>;
+  merge_date: MergeDate | null;
+  merge_date_validation: { validated?: boolean; reason?: string };
 };
 
 export type Validation = { validated: boolean; reason: string; source_file: string | null };
@@ -96,6 +98,7 @@ export const api = {
   features: (release: string) => get<FeaturesResponse>(`/releases/${release}/features`),
   feature: (release: string, n: number) => get<FeatureDetail>(`/releases/${release}/features/${n}`),
   summary: (release: string) => get<Summary>(`/releases/${release}/summary`),
+  mergeDates: (release: string) => get<MergeDates>(`/releases/${release}/merge-dates`),
   dependencies: (release: string, includeRemoved = false) =>
     get<Dependencies>(`/releases/${release}/dependencies${includeRemoved ? "?include_removed=true" : ""}`),
   updates: (release: string) => get<ExecUpdate[]>(`/releases/${release}/updates`),
@@ -344,4 +347,44 @@ export type Dependencies = {
   clusters: string[][];
   waiting: WaitingPR[];
   sig_pairs: { a: string; b: string; features: number }[];
+};
+
+// Merge dates and the days-of-delay chart (api/schemas.py MergeDatesOut). Days are
+// relative to Code Freeze.
+export type MergeDate = {
+  feature_key: string;
+  status: "done" | "forecast" | "no_freeze_date";
+  done_day: number | null;
+  p10: number | null;
+  p50: number | null;
+  p90: number | null;
+  by_freeze: number | null;
+  by_release: number | null;
+  cdf: [number, number, number, number][];
+};
+export type CurveFeature = {
+  key: string;
+  number: number;
+  title: string;
+  status: string;
+  done_day: number | null;
+  p10: number | null;
+  p50: number | null;
+  p90: number | null;
+  by_release: number | null;
+};
+export type MergeDates = {
+  release: string;
+  as_of: string;
+  code_freeze_at: string | null;
+  release_at: string | null;
+  as_of_day: number | null;
+  release_day: number | null;
+  features: number;
+  done_now: number;
+  forecast: [number, number, number, number][];
+  actual: [number, number][];
+  items: CurveFeature[];
+  validation: { validated?: boolean; reason?: string };
+  note: string;
 };

@@ -6,6 +6,7 @@ from typing import Any
 
 from api.schemas import (
     CouplingOut,
+    CurveFeatureOut,
     DependenciesOut,
     DepFeatureOut,
     DepPROut,
@@ -16,6 +17,8 @@ from api.schemas import (
     GraphEdgeOut,
     GraphNodeOut,
     GraphOut,
+    MergeDateOut,
+    MergeDatesOut,
     OddsOut,
     PullRequestOut,
     ReleaseOut,
@@ -29,6 +32,7 @@ from api.service import ReleaseSummary, ReleaseView
 from connectors.load import display_name_for_project
 from engine.assess import FeatureAssessment
 from engine.forecast import Forecast
+from engine.merge_date import MergeDateForecast
 from engine.projection import ReleaseInfo
 
 
@@ -138,8 +142,11 @@ def feature_detail(view: ReleaseView, a: FeatureAssessment) -> FeatureDetailOut:
         "note": "Decision support: if these measured inputs hold, the odds are likely in "
         "the range shown. Not a guarantee.",
     }
+    md = view.merge_dates.get(a.key)
     return FeatureDetailOut(
         **row.model_dump(),
+        merge_date=merge_date_out(md) if md else None,
+        merge_date_validation=view.date_validation.as_dict(),
         pull_requests=[
             PullRequestOut(
                 key=p.key,
@@ -393,4 +400,62 @@ def dependencies_out(view: ReleaseView, include_removed: bool = False) -> Depend
             for w in deps.waiting
         ],
         sig_pairs=[SigPairOut(a=x, b=y, features=n) for x, y, n in deps.sig_pairs],
+    )
+
+
+MERGE_DATE_NOTE = (
+    "Days are relative to Code Freeze. 'Required code' is the main PR and the PRs it says "
+    "it depends on. If the measured inputs hold, the count is likely inside the band. "
+    "Decision support, not a guarantee."
+)
+
+
+def merge_date_out(m: MergeDateForecast) -> MergeDateOut:
+    """One feature's merge-date forecast."""
+    return MergeDateOut(
+        feature_key=m.feature_key,
+        status=m.status,
+        done_day=m.done_day,
+        p10=m.p10,
+        p50=m.p50,
+        p90=m.p90,
+        by_freeze=m.by_freeze,
+        by_release=m.by_release,
+        cdf=list(m.cdf),
+    )
+
+
+def merge_dates_out(view: ReleaseView) -> MergeDatesOut:
+    """Release days-of-delay chart and the features on it."""
+    a = view.assessment
+    c = view.curve
+    titles = {f.key: f.title for f in a.features}
+    items = [
+        CurveFeatureOut(
+            key=k,
+            number=_number(k),
+            title=titles.get(k, ""),
+            status=m.status,
+            done_day=m.done_day,
+            p10=m.p10,
+            p50=m.p50,
+            p90=m.p90,
+            by_release=m.by_release,
+        )
+        for k, m in sorted(view.merge_dates.items())
+    ]
+    return MergeDatesOut(
+        release=a.release.key,
+        as_of=a.as_of,
+        code_freeze_at=a.release.code_freeze_at,
+        release_at=a.release.release_at,
+        as_of_day=c.as_of_day if c else None,
+        release_day=c.release_day if c else None,
+        features=c.features if c else 0,
+        done_now=c.done_now if c else 0,
+        forecast=list(c.forecast) if c else [],
+        actual=list(c.actual) if c else [],
+        items=items,
+        validation=view.date_validation.as_dict(),
+        note=MERGE_DATE_NOTE,
     )

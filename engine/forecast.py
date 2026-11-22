@@ -220,27 +220,54 @@ def _residuals(rng: np.random.Generator, pool: Array, age: float, n: int) -> Arr
     return rng.choice(survivors, size=n) - age
 
 
-def forecast_feature(
+@dataclass(frozen=True)
+class CompletionDraws:
+    """Simulated completion times, per bootstrap replication, in days after ``as_of``.
+
+    ``total[r][i]`` is when the feature's required work (main PR, its stated
+    prerequisites, and a new PR if one is needed) has all merged in draw ``i`` of
+    replication ``r``; ``inf`` = never. ``per_pr[r]`` holds each open PR's own time.
+    """
+
+    open_prs: tuple[str, ...]
+    per_pr: tuple[Array, ...]
+    total: tuple[Array, ...]
+    new_pr_rate: Rate
+
+
+def simulate_completion(
     feature: Feature,
-    release: ReleaseInfo,
     world: World,
     links: ReleaseLinks,
     calibration: Calibration,
+    days_to_freeze: float,
+    new_work_window_days: float,
     config: ForecastConfig = DEFAULT_FORECAST,
-) -> Forecast:
-    """Monte Carlo odds that ``feature`` lands by ``release``'s Code Freeze."""
-    t, freeze = world.as_of, release.code_freeze_at
-    if freeze is None:
-        return Forecast(feature.key, t, "no_freeze_date", None, None, None)
-    if t >= freeze:
-        return Forecast(feature.key, t, "after_freeze", None, None, None)
-    horizon = _days(freeze - t)
+    skip_closed_main: bool = False,
+) -> CompletionDraws:
+    """The Monte Carlo of ADR-0005, keeping each draw's completion time.
+
+    A needed new PR opens uniformly within ``new_work_window_days`` (Code Freeze before
+    it, release day after it). The new-PR rate comes from the days-to-freeze bucket.
+
+    ``skip_closed_main`` (merge dates): a PR closed without merging cannot deliver the
+    code, so the main PR is chosen among the others, and if every PR was closed a new
+    one is needed. Off for the odds, whose backtested model treats a closed main PR as
+    nothing left to merge (ADR-0005).
+    """
+    t = world.as_of
     prs = [
         world.pull_requests[k] for k in links.verified_prs(feature.key) if k in world.pull_requests
     ]
     open_prs = sorted((p for p in prs if p.is_open), key=lambda p: p.key)
     has_prs = bool(prs)
-    main = main_pr([p.key for p in prs], world, links, feature.key)
+    force_new = False
+    if skip_closed_main:
+        live = [p.key for p in prs if p.state != "closed"]
+        main = main_pr(live, world, links, feature.key)
+        force_new = has_prs and main is None
+    else:
+        main = main_pr([p.key for p in prs], world, links, feature.key)
     if config.required_prs == "main":
         # Only the main PR (plus anything it depends on) blocks; others are reported only.
         required_keys = {main.key} if main is not None and main.is_open else set()
@@ -257,7 +284,7 @@ def forecast_feature(
     else:
         required_keys = {p.key for p in open_prs}
     new_work_possible = config.required_prs == "all" or main is None
-    rate = calibration.new_pr.get((bucket(horizon), has_prs), Rate(0, 0))
+    rate = calibration.new_pr.get((bucket(max(days_to_freeze, 0.0)), has_prs), Rate(0, 0))
     pool = np.asarray(calibration.durations_days, dtype=np.float64)
     if pool.size == 0:
         pool = np.array([np.inf])
@@ -265,11 +292,12 @@ def forecast_feature(
     deps = [
         (keys.index(d), i) for i, p in enumerate(open_prs) for d in pr_dependencies(p) if d in keys
     ]
+    required = np.array([k in required_keys for k in keys], dtype=bool)
 
     rng = np.random.default_rng(_seed(config, feature.key))
     n = config.sims
-    probs: list[float] = []
-    on_time = np.zeros(len(open_prs))
+    per_pr: list[Array] = []
+    total: list[Array] = []
     for _ in range(config.replications):
         boot = rng.choice(pool, size=pool.size)
         q = rng.beta(rate.k + 1, rate.n - rate.k + 1)
@@ -281,17 +309,42 @@ def forecast_feature(
         for _ in range(len(deps)):  # propagate along chains (at most len(deps) hops)
             for parent, child in deps:
                 done[child] = np.maximum(done[child], done[parent])
-        on_time += (done <= horizon).mean(axis=1) if open_prs else 0.0
         needs_new = rng.random(n) < q
-        new_done = rng.random(n) * horizon + rng.choice(boot, size=n)
-        required = np.array([k in required_keys for k in keys], dtype=bool)
+        if force_new:
+            needs_new[:] = True  # every PR was closed without merging
+        new_done = rng.random(n) * new_work_window_days + rng.choice(boot, size=n)
         blocking = done[required] if open_prs else done
-        ok = (blocking <= horizon).all(axis=0)
+        when = blocking.max(axis=0) if blocking.shape[0] else np.zeros(n)
         if new_work_possible:
-            ok &= ~needs_new | (new_done <= horizon)
+            when = np.where(needs_new, np.maximum(when, new_done), when)
         if not has_prs:
-            ok &= needs_new  # nothing exists yet: a PR must be opened
-        probs.append(float(ok.mean()))
+            when = np.where(needs_new, when, np.inf)  # nothing exists yet: a PR must open
+        per_pr.append(done)
+        total.append(when)
+    return CompletionDraws(tuple(keys), tuple(per_pr), tuple(total), rate)
+
+
+def forecast_feature(
+    feature: Feature,
+    release: ReleaseInfo,
+    world: World,
+    links: ReleaseLinks,
+    calibration: Calibration,
+    config: ForecastConfig = DEFAULT_FORECAST,
+) -> Forecast:
+    """Monte Carlo odds that ``feature`` lands by ``release``'s Code Freeze."""
+    t, freeze = world.as_of, release.code_freeze_at
+    if freeze is None:
+        return Forecast(feature.key, t, "no_freeze_date", None, None, None)
+    if t >= freeze:
+        return Forecast(feature.key, t, "after_freeze", None, None, None)
+    horizon = _days(freeze - t)
+    draws = simulate_completion(feature, world, links, calibration, horizon, horizon, config)
+    probs = [float((when <= horizon).mean()) for when in draws.total]
+    on_time = np.zeros(len(draws.open_prs))
+    for done in draws.per_pr:
+        if draws.open_prs:
+            on_time += (done <= horizon).mean(axis=1)
     lo, hi = np.percentile(probs, config.interval)
     return Forecast(
         feature_key=feature.key,
@@ -300,11 +353,12 @@ def forecast_feature(
         probability=round(float(np.mean(probs)), 3),
         low=round(float(lo), 3),
         high=round(float(hi), 3),
-        open_prs=tuple(keys),
+        open_prs=draws.open_prs,
         pr_on_time={
-            k: round(float(v / config.replications), 3) for k, v in zip(keys, on_time, strict=True)
+            k: round(float(v / config.replications), 3)
+            for k, v in zip(draws.open_prs, on_time, strict=True)
         },
-        new_pr_needed=round(rate.mean, 3),
+        new_pr_needed=round(draws.new_pr_rate.mean, 3),
     )
 
 

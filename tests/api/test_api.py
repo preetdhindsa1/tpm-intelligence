@@ -439,3 +439,44 @@ def test_dependencies_page_data_on_the_6395_fixtures(after_readd: TestClient) ->
     for f in d["features"]:
         assert (f["cluster"] is None) == all(f["key"] not in c for c in d["clusters"])
     assert all(e["kind"] == "blocks" for e in d["pr_edges"])
+
+
+def test_merge_dates_for_6395_after_its_main_pr_merged(after_readd: TestClient) -> None:
+    d = after_readd.get("/releases/v1.38/merge-dates").json()
+    item = next(i for i in d["items"] if i["number"] == 6395)
+    # #143709 merged Nov 20 23:28 UTC: 3.48 days after Code Freeze.
+    assert item["status"] == "done"
+    assert abs(item["done_day"] - 3.48) < 0.01
+    assert d["done_now"] >= 1
+    assert d["validation"]["validated"] in (True, False)
+    assert "not a guarantee" in d["note"]
+    days = [row[0] for row in d["forecast"]]
+    assert days == sorted(days)
+    detail = after_readd.get("/releases/v1.38/features/6395").json()
+    assert detail["merge_date"]["status"] == "done"
+
+
+def test_merge_date_validation_reads_the_newest_date_backtest(tmp_path: Path) -> None:
+    from api.validation import load_date_validation
+
+    assert not load_date_validation(tmp_path).validated
+    rows = [
+        {
+            "release": "kubernetes:v1.36",
+            "lead_days": 7,
+            "coverage": 0.69,
+            "skill": -0.5,
+            "passes": False,
+        },
+        {
+            "release": "kubernetes:v1.37",
+            "lead_days": -3,
+            "coverage": 0.82,
+            "skill": 0.25,
+            "passes": True,
+        },
+    ]
+    (tmp_path / "date-backtest-20261122T000000Z.json").write_text(json.dumps({"results": rows}))
+    v = load_date_validation(tmp_path)
+    assert not v.validated
+    assert v.reason == "merge-date forecasts fail their backtest in 1 of 2 cases (ADR-0005)"

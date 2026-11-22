@@ -96,6 +96,21 @@ class FeatureRowOut(_Out):
     suggested_prs: int
 
 
+class MergeDateOut(_Out):
+    """When a feature's required code merges, in days relative to Code Freeze (ADR-0005)."""
+
+    feature_key: str
+    status: str  # done | forecast | no_freeze_date
+    done_day: float | None = None
+    p10: float | None = None
+    p50: float | None = None
+    p90: float | None = None
+    by_freeze: float | None = None
+    by_release: float | None = None
+    # [day, P(merged by day), low, high]
+    cdf: list[tuple[int, float, float, float]] = []
+
+
 class FeatureDetailOut(FeatureRowOut):
     """Feature page: everything in the row plus PRs, critical path, timeline and inputs."""
 
@@ -104,6 +119,8 @@ class FeatureDetailOut(FeatureRowOut):
     critical_path: list[str]
     timeline: list[TimelineEntryOut]
     assumptions: dict[str, Any]
+    merge_date: MergeDateOut | None = None
+    merge_date_validation: dict[str, Any] = {}
 
 
 class FeaturesOut(_Out):
@@ -499,3 +516,37 @@ class DependenciesOut(_Out):
     clusters: list[list[str]]
     waiting: list[WaitingPROut]
     sig_pairs: list[SigPairOut]
+
+
+class CurveFeatureOut(_Out):
+    """One feature on the days-of-delay chart."""
+
+    key: str
+    number: int
+    title: str
+    status: str
+    done_day: float | None
+    p10: float | None
+    p50: float | None
+    p90: float | None
+    by_release: float | None
+
+
+class MergeDatesOut(_Out):
+    """Days-of-delay chart: features with required code merged, by day (ADR-0005)."""
+
+    release: str
+    as_of: datetime
+    code_freeze_at: datetime | None
+    release_at: datetime | None
+    as_of_day: float | None
+    release_day: float | None
+    features: int
+    done_now: int
+    # [day relative to Code Freeze, expected count, low, high]
+    forecast: list[tuple[int, float, float, float]]
+    # [day, count] of features whose required code had merged by that day
+    actual: list[tuple[int, int]]
+    items: list[CurveFeatureOut]
+    validation: dict[str, Any]
+    note: str
