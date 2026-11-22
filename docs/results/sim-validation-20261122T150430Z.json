@@ -1,0 +1,214 @@
+{
+ "suite": "simulator_validation",
+ "measured_at": "2026-11-22T15:04:30+00:00",
+ "data_until": "2026-11-22T13:59:13+00:00",
+ "tolerance": 0.2,
+ "passed": false,
+ "releases": [
+  {
+   "release": "kubernetes:v1.37",
+   "passed": false,
+   "source_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35",
+    "kubernetes:v1.36"
+   ],
+   "replications": 8,
+   "checks": [
+    {
+     "name": "median review wait (days)",
+     "real": 0.125,
+     "simulated": 0.381,
+     "simulated_low": 0.363,
+     "simulated_high": 0.394,
+     "error": 2.048,
+     "passed": false
+    },
+    {
+     "name": "median time to merge (days)",
+     "real": 3.782,
+     "simulated": 3.312,
+     "simulated_low": 3.066,
+     "simulated_high": 3.913,
+     "error": -0.124,
+     "passed": true
+    }
+   ],
+   "work_scale_fitted": {
+    "sig/api-machinery": [
+     0.915,
+     1.0227
+    ],
+    "sig/apps": [
+     0.9838,
+     1.0659
+    ],
+    "sig/architecture": [
+     0.4109,
+     0.8734
+    ],
+    "sig/auth": [
+     0.9736,
+     1.0522
+    ],
+    "sig/cli": [
+     1.7494,
+     0.8577
+    ],
+    "sig/cluster-lifecycle": [
+     0.113,
+     0.7674
+    ],
+    "sig/network": [
+     0.7546,
+     1.17
+    ],
+    "sig/node": [
+     0.9992,
+     1.0031
+    ],
+    "sig/release": [
+     0.3667,
+     1.2242
+    ],
+    "sig/scheduling": [
+     0.98,
+     0.9293
+    ],
+    "sig/storage": [
+     1.0953,
+     0.9091
+    ],
+    "sig/testing": [
+     0.6128,
+     0.9222
+    ],
+    "other": [
+     0.4277,
+     1.091
+    ]
+   },
+   "reviewers_per_week": {
+    "sig/api-machinery": 24.52,
+    "sig/apps": 5.68,
+    "sig/architecture": 0.27,
+    "sig/auth": 1.26,
+    "sig/cli": 0.55,
+    "sig/cluster-lifecycle": 2.38,
+    "sig/network": 1.2,
+    "sig/node": 17.15,
+    "sig/release": 0.0,
+    "sig/scheduling": 8.66,
+    "sig/storage": 1.14,
+    "sig/testing": 2.34,
+    "other": 4.74
+   },
+   "effort_days": 0.02,
+   "seconds": 97.3
+  },
+  {
+   "release": "kubernetes:v1.38",
+   "passed": false,
+   "source_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35",
+    "kubernetes:v1.36",
+    "kubernetes:v1.37"
+   ],
+   "replications": 8,
+   "checks": [
+    {
+     "name": "median review wait (days)",
+     "real": 0.054,
+     "simulated": 0.243,
+     "simulated_low": 0.234,
+     "simulated_high": 0.255,
+     "error": 3.5,
+     "passed": false
+    },
+    {
+     "name": "median time to merge (days)",
+     "real": 2.548,
+     "simulated": 2.427,
+     "simulated_low": 2.195,
+     "simulated_high": 2.747,
+     "error": -0.047,
+     "passed": true
+    }
+   ],
+   "work_scale_fitted": {
+    "sig/api-machinery": [
+     0.7744,
+     0.9009
+    ],
+    "sig/apps": [
+     0.7373,
+     1.077
+    ],
+    "sig/architecture": [
+     0.4712,
+     0.8599
+    ],
+    "sig/auth": [
+     0.9293,
+     1.0347
+    ],
+    "sig/cli": [
+     0.4299,
+     0.8176
+    ],
+    "sig/cluster-lifecycle": [
+     0.3962,
+     0.6571
+    ],
+    "sig/network": [
+     0.7335,
+     0.939
+    ],
+    "sig/node": [
+     0.6682,
+     0.9876
+    ],
+    "sig/release": [
+     0.5106,
+     0.8522
+    ],
+    "sig/scheduling": [
+     0.1623,
+     0.985
+    ],
+    "sig/storage": [
+     1.0427,
+     1.1386
+    ],
+    "sig/testing": [
+     0.6752,
+     0.9021
+    ],
+    "other": [
+     0.2758,
+     1.0214
+    ]
+   },
+   "reviewers_per_week": {
+    "sig/api-machinery": 29.04,
+    "sig/apps": 6.36,
+    "sig/architecture": 1.13,
+    "sig/auth": 2.14,
+    "sig/cli": 4.08,
+    "sig/cluster-lifecycle": 1.59,
+    "sig/network": 2.34,
+    "sig/node": 21.49,
+    "sig/release": 0.12,
+    "sig/scheduling": 9.74,
+    "sig/storage": 2.56,
+    "sig/testing": 1.47,
+    "other": 5.74
+   },
+   "effort_days": 0.02,
+   "seconds": 134.1
+  }
+ ]
+}

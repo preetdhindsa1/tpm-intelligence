@@ -1,7 +1,7 @@
 # ADR-0012: Review simulator (SimPy) and its validation
 
 - **Status:** in progress (Phase 2 M5). The model and validation are done; the simulator is
-  **not validated**. Scenarios, API and page are not built yet, pending the owner's decision.
+  **not validated** (failed both releases on review wait after comments were collected). Scenarios, API and page are not built yet, pending the owner's decision.
 - **Date:** 2026-11-22
 
 ## Context
@@ -78,9 +78,35 @@ Version 6 was chosen **before** its result was known, as the most principled: ev
 parameter is fitted on source releases only. It was then kept whatever its result.
 Choosing among versions by their held-out results would be tuning to the test.
 
-## Why it fails, as far as the data shows
+## Re-run after collecting PR comments (2026-11-22, `docs/results/sim-validation-20261122T150430Z.json`)
 
-1. **Kubernetes approves through comments.** `/lgtm` and `/approve` are Prow comments, not
+The first suspected cause (below) was fixed in the data, not the model:
+- The collector now fetches PR comments. `/lgtm` and `/approve` count as approvals; other
+  comments by people other than the author count as review activity (ADR-0006 update).
+- v1.33–v1.38 were backfilled again.
+- Validation was run **once** with the model (version 6) unchanged, as the owner chose.
+
+| Release | Fitted on | Median review wait: real → sim | Median time to merge: real → sim | Result |
+|---|---|---|---|---|
+| v1.37 | v1.33–v1.36 | 0.125 → 0.381 days (**+205%**) | 3.78 → 3.31 days (−12%) | **fail** |
+| v1.38 | v1.33–v1.37 | 0.054 → 0.243 days (**+350%**) | 2.55 → 2.43 days (−5%) | **fail** |
+
+**The simulator is still not validated; it is now further off on review wait.**
+
+- Counting comments changed what a "review round" is. The real median wait dropped from
+  about 0.7–0.9 days to 1–3 hours, because many rounds are now quick comment replies.
+- Time to merge does not depend on how rounds are counted, and it passes on both releases.
+- The simulated wait stays far above the real one, although the delay scales are fitted
+  so that pooled median waits match on the source releases. Reviewer effort is again at
+  the floor (0.02 days), and several fitted scales are near 1. So the error is probably
+  not reviewer capacity. A likely place is a mismatch between how the fit groups waits
+  (first or later round per pool) and the overall median used for validation, now that
+  short and long rounds are mixed. This was **not** investigated or changed, because any
+  change chosen after seeing the held-out result would be tuning to the test.
+
+## Why the first run failed, as far as the data showed
+
+1. **Kubernetes approves through comments** (since fixed in the data; see the re-run above). `/lgtm` and `/approve` are Prow comments, not
    GitHub reviews, and the collector does not fetch PR comments. So "review rounds" and
    "active reviewers" miss a large part of real reviewer work, and the staffing input is
    mismeasured.
