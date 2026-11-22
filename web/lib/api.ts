@@ -169,3 +169,32 @@ export async function updatesRequest<T>(path: string, init?: RequestInit): Promi
   }
   return (await res.json()) as T;
 }
+
+export type LinkSuggestion = {
+  id: number;
+  status: "suggested" | "confirmed" | "rejected";
+  pull_request: string;
+  pull_request_title: string | null;
+  pull_request_url: string | null;
+  pull_request_state: string | null;
+  feature: string;
+  feature_number: number | null;
+  feature_title: string | null;
+  pr_quote: string;
+  feature_quote: string;
+  shortlist_rank: number | null;
+  shortlist_size: number | null;
+  model: string;
+  prompt_version: string;
+  created_at: string;
+  decided_by: string | null;
+  decided_at: string | null;
+  decision_note: string | null;
+};
+
+export type LinkSuggestions = {
+  release: string;
+  counts: Record<string, number>;
+  cost_usd: number;
+  suggestions: LinkSuggestion[];
+};

@@ -130,3 +130,30 @@ def test_vp_runner_scores_with_a_fake_client(tmp_path: Path) -> None:
     assert row["removed"][0]["reason"] == "no_supporting_data"
     assert report["summary"]["removal_rate_shown"] > 0.10  # 1 of 4 removed: fails the gate
     assert report["passed"] is False
+
+
+def test_link_suggester_scoring_and_gate() -> None:
+    from evals.link_suggester import gate, summarize, verdict
+    from linker.suggestions import Outcome
+
+    key = "kubernetes/enhancements#6395"
+    assert verdict("positive", key, Outcome.SUGGESTED, key) == "correct"
+    assert verdict("positive", key, Outcome.SUGGESTED, "other") == "wrong_feature"
+    assert verdict("negative", None, Outcome.SUGGESTED, key) == "false_link"
+    assert verdict("negative", None, Outcome.NONE, None) == "none"
+    assert verdict("positive", key, Outcome.DROPPED, key) == "dropped"
+
+    rows = [
+        *({"kind": "positive", "verdict": "correct", "cost_usd": 0.0} for _ in range(8)),
+        {"kind": "positive", "verdict": "none", "cost_usd": 0.0},
+        {"kind": "positive", "verdict": "wrong_feature", "cost_usd": 0.0},
+        *({"kind": "negative", "verdict": "none", "cost_usd": 0.0} for _ in range(4)),
+        {"kind": "negative", "verdict": "false_link", "cost_usd": 0.0},
+    ]
+    s = summarize(rows)
+    assert s["precision"] == 0.8
+    assert s["recall_positive"] == 0.8
+    assert s["false_link_rate_negative"] == 0.2
+    assert gate(s)
+    always_null = summarize([{"kind": "positive", "verdict": "none", "cost_usd": 0.0}] * 5)
+    assert not gate(always_null)

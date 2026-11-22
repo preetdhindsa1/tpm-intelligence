@@ -68,3 +68,18 @@ export function removedSummary(removed: number, byReason: Record<string, number>
   const parts = Object.entries(byReason).map(([reason, n]) => `${n} ${reason.replaceAll("_", " ")}`);
   return `${removed} claim${removed === 1 ? "" : "s"} removed by the fact checker (${parts.join(", ")}).`;
 }
+
+/** "104 waiting · 3 confirmed · 1 rejected · 1,636 no match · 11 dropped by checks". */
+export function suggestionCounts(counts: Record<string, number>): string {
+  const parts: [string, string][] = [
+    ["suggested", "waiting"],
+    ["confirmed", "confirmed"],
+    ["rejected", "rejected"],
+    ["none", "no match"],
+    ["dropped", "dropped by checks"],
+  ];
+  return parts
+    .filter(([k]) => (counts[k] ?? 0) > 0)
+    .map(([k, label]) => `${(counts[k] ?? 0).toLocaleString("en-US")} ${label}`)
+    .join(" · ");
+}

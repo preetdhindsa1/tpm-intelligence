@@ -20,10 +20,11 @@ RESULTS = Path(__file__).resolve().parent.parent / "docs" / "results"
 
 
 def _tasks() -> list[TaskSpec]:
+    from agents.link_suggester import TASK as LINKS
     from agents.risk_analyst import TASK as RISK
     from agents.vp_summary import TASK as VP
 
-    return [RISK, VP]
+    return [RISK, VP, LINKS]
 
 
 def check(task: TaskSpec, results_dir: Path = RESULTS) -> dict[str, Any]:

@@ -22,6 +22,9 @@ from api.schemas import (
     ExecUpdateOut,
     FeatureDetailOut,
     FeaturesOut,
+    LinkDecisionIn,
+    LinkSuggestionOut,
+    LinkSuggestionsOut,
     LoadOut,
     ReleaseOut,
     RiskNoteOut,
@@ -43,6 +46,7 @@ def create_app(
     updates: Updates | None = None,
     cors_origins: list[str] | None = None,
     ai: AIServices | None = None,
+    link_store: Any = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis."""
     app = FastAPI(title="TPM Intelligence API", version="0.1.0")
@@ -52,7 +56,7 @@ def create_app(
         allow_methods=["GET", "POST", "PATCH"],
         allow_headers=["*"],
     )
-    state: dict[str, Any] = {"service": service, "updates": updates}
+    state: dict[str, Any] = {"service": service, "updates": updates, "links": link_store}
     ai_services = ai or AIServices()
 
     def svc() -> ReleaseService:
@@ -247,6 +251,109 @@ def create_app(
         """TPM rejection, with an optional note."""
         return await _decide(name, update_id, body, approve=False)
 
+    def links() -> Any:
+        if state["links"] is None:
+            from sqlalchemy.orm import sessionmaker
+
+            from agents.link_store import PostgresLinkSuggestionStore
+            from pipeline.store.session import make_engine
+
+            state["links"] = PostgresLinkSuggestionStore(sessionmaker(make_engine()))
+        return state["links"]
+
+    def suggestion_out(v: ReleaseView, row: Any) -> LinkSuggestionOut:
+        pr = v.world.pull_requests.get(row.pull_request_key)
+        feature = v.world.features.get(row.feature_key)
+        return LinkSuggestionOut(
+            id=row.id,
+            status=row.status.value,
+            pull_request=row.pull_request_key,
+            pull_request_title=pr.title if pr else None,
+            pull_request_url=f"https://github.com/{pr.repo}/pull/{pr.number}" if pr else None,
+            pull_request_state=pr.state if pr else None,
+            feature=row.feature_key,
+            feature_number=feature.number if feature else None,
+            feature_title=feature.title if feature else None,
+            pr_quote=row.evidence.get("pr_quote", ""),
+            feature_quote=row.evidence.get("feature_quote", ""),
+            shortlist_rank=row.evidence.get("shortlist_rank"),
+            shortlist_size=row.evidence.get("shortlist_size"),
+            model=row.model,
+            prompt_version=row.prompt_version,
+            created_at=row.created_at,
+            decided_by=row.decided_by,
+            decided_at=row.decided_at,
+            decision_note=row.decision_note,
+        )
+
+    @app.get("/releases/{name}/link-suggestions", response_model=LinkSuggestionsOut)
+    async def list_link_suggestions(name: str, status: str | None = None) -> LinkSuggestionsOut:
+        """AI link suggestions for a release. None count as links until a person confirms."""
+        from collections import Counter
+
+        from agents.link_store import SuggestionStatus
+
+        v = await view(name)
+        key = v.assessment.release.key
+        rows = await run_in_threadpool(links().list, key)
+        shown = {"suggested", "confirmed", "rejected"}
+        if status is not None:
+            if status not in shown:
+                raise HTTPException(422, f"status must be one of {sorted(shown)}")
+            shown = {status}
+        return LinkSuggestionsOut(
+            release=key,
+            counts=dict(Counter(r.status.value for r in rows)),
+            cost_usd=round(sum(r.cost_usd for r in rows), 6),
+            suggestions=[
+                suggestion_out(v, r)
+                for r in rows
+                if r.status.value in shown and r.status is not SuggestionStatus.NONE
+            ],
+        )
+
+    async def _decide_link(
+        name: str, suggestion_id: int, body: LinkDecisionIn, confirm: bool
+    ) -> LinkSuggestionOut:
+        from agents.link_store import SuggestionError
+
+        v = await view(name)
+        key = v.assessment.release.key
+        try:
+            row = await run_in_threadpool(
+                lambda: links().decide(
+                    key,
+                    suggestion_id,
+                    confirm=confirm,
+                    by=f"user:{ai_services.approver}",
+                    note=body.note,
+                )
+            )
+        except KeyError as exc:
+            raise HTTPException(404, f"suggestion {suggestion_id} not found for {name}") from exc
+        except SuggestionError as exc:
+            raise HTTPException(409, str(exc)) from exc
+        svc().invalidate()  # a confirmed link changes the facts and the forecast
+        return suggestion_out(v, row)
+
+    @app.post(
+        "/releases/{name}/link-suggestions/{suggestion_id}/confirm",
+        response_model=LinkSuggestionOut,
+    )
+    async def confirm_link(
+        name: str, suggestion_id: int, body: LinkDecisionIn
+    ) -> LinkSuggestionOut:
+        """A person confirms: the link becomes verified and counts from now on."""
+        return await _decide_link(name, suggestion_id, body, confirm=True)
+
+    @app.post(
+        "/releases/{name}/link-suggestions/{suggestion_id}/reject",
+        response_model=LinkSuggestionOut,
+    )
+    async def reject_link(name: str, suggestion_id: int, body: LinkDecisionIn) -> LinkSuggestionOut:
+        """A person rejects: the suggestion is hidden from the feature for good."""
+        return await _decide_link(name, suggestion_id, body, confirm=False)
+
     @app.get("/releases/{name}/load", response_model=LoadOut)
     async def load(name: str) -> LoadOut:
         """Open PRs not linked to any feature, per SIG. Not per person (CLAUDE.md section 10)."""
@@ -305,10 +412,15 @@ def _sse(event: str, data: dict[str, Any]) -> str:
 def _default_service() -> ReleaseService:
     from sqlalchemy.orm import sessionmaker
 
+    from agents.link_store import PostgresLinkSuggestionStore, engine_links
     from api.service import PostgresEventSource
     from pipeline.store.session import make_engine
 
-    return ReleaseService(PostgresEventSource(sessionmaker(make_engine())))
+    factory = sessionmaker(make_engine())
+    links = PostgresLinkSuggestionStore(factory)
+    return ReleaseService(
+        PostgresEventSource(factory), extra_links=lambda key: engine_links(links.list(key))
+    )
 
 
 def _default_updates() -> Updates:

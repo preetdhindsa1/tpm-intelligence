@@ -206,3 +206,42 @@ class DecisionIn(BaseModel):
     acknowledge_warnings: bool = False
     acknowledge_stale: bool = False
     note: str | None = None
+
+
+class LinkSuggestionOut(BaseModel):
+    """One AI link suggestion in the review queue (ADR-0011)."""
+
+    id: int
+    status: str  # suggested | confirmed | rejected
+    pull_request: str
+    pull_request_title: str | None
+    pull_request_url: str | None
+    pull_request_state: str | None
+    feature: str
+    feature_number: int | None
+    feature_title: str | None
+    pr_quote: str
+    feature_quote: str
+    shortlist_rank: int | None
+    shortlist_size: int | None
+    model: str
+    prompt_version: str
+    created_at: datetime
+    decided_by: str | None
+    decided_at: datetime | None
+    decision_note: str | None
+
+
+class LinkSuggestionsOut(BaseModel):
+    """The queue plus what the suggester has done for the release."""
+
+    release: str
+    counts: dict[str, int]  # per status, incl. none and dropped
+    cost_usd: float
+    suggestions: list[LinkSuggestionOut]
+
+
+class LinkDecisionIn(BaseModel):
+    """Confirm or reject a suggestion."""
+
+    note: str | None = None

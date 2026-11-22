@@ -27,6 +27,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <Link href={`/releases/${name}/links`} className="rounded border bg-white px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50">
+            Link review →
+          </Link>
           <Link href={`/releases/${name}/update`} className="rounded border bg-white px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50">
             Executive update →
           </Link>

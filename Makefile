@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live
+.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links
 
 UV ?= uv
 RELEASE ?=
@@ -76,12 +76,17 @@ langfuse-up: ## Start self-hosted Langfuse (LLM traces) on http://localhost:3001
 langfuse-down: ## Stop Langfuse (data kept in its volumes)
 	$(LANGFUSE) down
 
-evals-live: ## Paid agent evals (risk analyst ~$0.03, VP summary ~$0.40); SUITE=all|risk_analyst|vp_summary
+evals-live: ## Paid agent evals (risk analyst ~$0.03, VP summary ~$0.40); SUITE=all|risk_analyst|vp_summary|link_suggester
 	docker compose build -q api
 	docker run --rm --network tpm-intelligence_default --env-file .env \
 	  -e DATABASE_URL=postgresql+psycopg://tpm:tpm@postgres:5432/tpm \
 	  -e OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317 -e OTEL_EXPORTER_OTLP_INSECURE=true \
 	  -v "$(CURDIR)/docs/results:/app/docs/results" tpm-intelligence-api python -m evals.agents --suite $(or $(SUITE),all)
+
+suggest-links: ## Paid AI link suggestions for unlinked PRs (~$0.0004 each); RELEASE=v1.38 LIMIT=
+	docker compose build -q api
+	docker compose run --rm --no-deps -e OTEL_SERVICE_NAME=tpm-link-suggester api \
+	  python scripts/suggest_links.py --release $(or $(RELEASE),v1.38) $(if $(LIMIT),--limit $(LIMIT),)
 
 ai-smoke: ## One real Claude call on #6395 facts, fact-checked (costs < $0.01; needs ANTHROPIC_API_KEY)
 	docker compose run --rm --no-deps -e OTEL_SERVICE_NAME=tpm-ai-smoke api python scripts/ai_smoke.py

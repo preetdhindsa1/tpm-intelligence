@@ -51,4 +51,5 @@ def test_run_evals_reports_every_suite() -> None:
         "linking",
         "agent_gate:risk_analyst",
         "agent_gate:vp_summary",
+        "agent_gate:link_suggester",
     ]

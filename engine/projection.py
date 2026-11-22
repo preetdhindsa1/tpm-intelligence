@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Literal
 
+from linker.rules import LinkCandidate
 from pipeline.events import (
     ChangeAction,
     CheckCompleted,
@@ -156,6 +157,10 @@ class World:
     releases: Mapping[str, ReleaseInfo]
     features: Mapping[str, Feature]
     pull_requests: Mapping[str, PullRequest]
+    # Links from outside the event log: AI suggestions and people's decisions on them
+    # (ADR-0011). ``engine.links.link_release`` merges them; only a person's confirmation
+    # makes one verified.
+    extra_links: tuple[LinkCandidate, ...] = ()
 
     def features_in(self, release_key: str) -> list[Feature]:
         """Features currently in a release (removed ones excluded), sorted by key."""

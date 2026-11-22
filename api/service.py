@@ -33,6 +33,7 @@ from engine.forecast import (
 from engine.odds import training_pairs
 from engine.projection import ReleaseInfo, World, project
 from engine.recalibrate import Recalibration, fit
+from linker.rules import LinkCandidate
 from pipeline.events import NormalizedEvent
 
 logger = logging.getLogger(__name__)
@@ -119,6 +120,7 @@ class ReleaseService:
         recalibration_ttl: timedelta = timedelta(hours=6),
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
         validation: Callable[[], Validation] = load_validation,
+        extra_links: Callable[[str], Sequence[LinkCandidate]] | None = None,
     ) -> None:
         self._source = source
         self._project = project_name
@@ -132,6 +134,8 @@ class ReleaseService:
         self._recal: dict[tuple[str, int], tuple[float, Recalibration]] = {}
         self._recal_ttl = recalibration_ttl.total_seconds()
         self._validation = validation
+        # AI link suggestions and people's decisions on them, per release (ADR-0011).
+        self._extra_links = extra_links
         self._lock = threading.Lock()
         # One lock per release key: concurrent requests wait for a running computation
         # instead of starting their own (single flight).
@@ -154,6 +158,11 @@ class ReleaseService:
                 self._last_id = last
                 self._version += 1
             return len(new)
+
+    def invalidate(self) -> None:
+        """Recompute views on next use (e.g. after a person confirms a link)."""
+        with self._lock:
+            self._version += 1
 
     def release_keys(self) -> list[str]:
         """Known release keys, oldest first."""
@@ -230,6 +239,8 @@ class ReleaseService:
         world = project(events, now)
         if key not in world.releases:
             raise KeyError(key)
+        if self._extra_links is not None:
+            world = replace(world, extra_links=tuple(self._extra_links(key)))
         started = time.perf_counter()
         assessment = assess_release(world, key)
         calibration = calibrate(world, finished_releases(world, now, exclude=key))

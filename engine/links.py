@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 
 from engine.projection import Feature, World
+from linker.candidates import CandidateIndex, FeatureDoc
 from linker.methods import LinkStatus
 from linker.packs import get_pack
 from linker.rules import (
@@ -90,4 +91,60 @@ def link_release(world: World, release_key: str, *, link_pack: str | None = None
             labels=pr.labels,
         )
         best.update(best_links(list(pack.link(info, index))))
+    in_release = {f.key for f in world.features_ever_in(release_key)}
+    merge_extra_links(
+        best,
+        [
+            c
+            for c in world.extra_links
+            if c.work_item_key in in_release and c.pull_request_key in world.pull_requests
+        ],
+    )
     return ReleaseLinks(best=best)
+
+
+def merge_extra_links(
+    best: dict[tuple[str, str], LinkCandidate], extra: Iterable[LinkCandidate]
+) -> None:
+    """Merge stored links into the rule links, in place.
+
+    * A rule-verified link is never changed.
+    * ``rejected`` (a person said no) removes a suggested link for that pair.
+    * ``verified`` (a person confirmed) replaces a suggested link or adds one.
+    * ``suggested`` is added only where no link exists for the pair.
+    """
+    for c in extra:
+        pair = (c.pull_request_key, c.work_item_key)
+        current = best.get(pair)
+        if current is not None and current.status is LinkStatus.VERIFIED:
+            continue
+        if c.status is LinkStatus.REJECTED:
+            best.pop(pair, None)
+        elif c.status is LinkStatus.VERIFIED or current is None:
+            best[pair] = c
+
+
+def unlinked_pull_requests(world: World, release_key: str, links: ReleaseLinks) -> list[str]:
+    """PRs opened during the release cycle with no link of any kind to its features.
+
+    These are what the AI link suggester looks at. PRs that already have a rule-made
+    ``suggested`` link are left out: they are waiting for a person already.
+    """
+    start = world.releases[release_key].cycle_start_at
+    has_link = {pr for (pr, _), c in links.best.items() if c.status is not LinkStatus.REJECTED}
+    return sorted(
+        pr.key
+        for pr in world.pull_requests.values()
+        if pr.key not in has_link and (start is None or pr.created_at >= start)
+    )
+
+
+def candidate_index(world: World, release_key: str) -> CandidateIndex:
+    """Shortlist index over every feature that is or was in the release (ADR-0011)."""
+    return CandidateIndex.build(
+        (
+            FeatureDoc.build(f.key, f.title, f.description, f.feature_flags, f.labels, f.stage),
+            f.description,
+        )
+        for f in world.features_ever_in(release_key)
+    )

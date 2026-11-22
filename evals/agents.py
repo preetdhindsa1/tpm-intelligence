@@ -242,13 +242,17 @@ def main(argv: list[str] | None = None) -> int:
     from pipeline.store.session import make_engine
 
     parser = argparse.ArgumentParser(prog="evals.agents")
-    parser.add_argument("--suite", choices=["all", "risk_analyst", "vp_summary"], default="all")
+    parser.add_argument(
+        "--suite", choices=["all", "risk_analyst", "vp_summary", "link_suggester"], default="all"
+    )
     args = parser.parse_args(argv)
 
     telemetry = init_telemetry("tpm-agent-evals")
     try:
         gateway = Gateway(AISettings(), PostgresLedger(sessionmaker(make_engine())))
-        runners = {"risk_analyst": run, "vp_summary": run_vp}
+        from evals.link_suggester import run as run_links
+
+        runners = {"risk_analyst": run, "vp_summary": run_vp, "link_suggester": run_links}
         chosen = list(runners) if args.suite == "all" else [args.suite]
         all_passed = True
         for name in chosen:

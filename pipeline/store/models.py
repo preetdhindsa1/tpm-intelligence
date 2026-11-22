@@ -486,3 +486,51 @@ class ExecUpdateRecord(Base):
     approved_with_warnings: Mapped[bool] = mapped_column(server_default="false")
     approved_while_stale: Mapped[bool] = mapped_column(server_default="false")
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
+SUGGESTION_STATUSES = ("suggested", "confirmed", "rejected", "none", "dropped")
+
+
+class LinkSuggestionRecord(Base):
+    """One AI link-suggester answer for an unlinked PR, and a person's decision (ADR-0011).
+
+    Only ``confirmed`` rows become verified links, and only with ``decided_by`` set
+    (CLAUDE.md section 2.2). ``none`` and ``dropped`` rows record that the PR was looked at.
+    """
+
+    __tablename__ = "link_suggestions"
+    __table_args__ = (
+        CheckConstraint(_in("status", SUGGESTION_STATUSES), name="status"),
+        CheckConstraint(
+            "status NOT IN ('confirmed', 'rejected') OR "
+            "(decided_by IS NOT NULL AND decided_at IS NOT NULL)",
+            name="decision_has_person",
+        ),
+        CheckConstraint(
+            "status NOT IN ('suggested', 'confirmed', 'rejected') OR feature_key IS NOT NULL",
+            name="link_has_feature",
+        ),
+        UniqueConstraint(
+            "release_key",
+            "pull_request_key",
+            "input_sha",
+            "prompt_version",
+            name="uq_link_suggestions_input",  # the generated name passes Postgres's 63 chars
+        ),
+        Index(None, "release_key", "status"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    release_key: Mapped[str] = mapped_column(String(128))
+    pull_request_key: Mapped[str] = mapped_column(String(256))
+    feature_key: Mapped[str | None] = mapped_column(String(256))
+    status: Mapped[str] = mapped_column(String(16))
+    evidence: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    input_sha: Mapped[str] = mapped_column(String(64))
+    prompt_version: Mapped[str] = mapped_column(String(64))
+    model: Mapped[str] = mapped_column(String(64))
+    cost_usd: Mapped[Decimal] = mapped_column(Numeric(12, 6))
+    decided_by: Mapped[str | None] = mapped_column(String(128))
+    decided_at: Mapped[datetime | None] = mapped_column(_tz())
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())

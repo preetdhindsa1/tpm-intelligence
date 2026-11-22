@@ -1,0 +1,13 @@
+{
+ "release": "kubernetes:v1.38",
+ "prompt": "link_suggester.v1",
+ "model": "claude-haiku-5-5",
+ "measured_at": "2026-11-22",
+ "note": "Two runs of make suggest-links (LIMIT=200, then the rest); counts summed from the run reports.",
+ "unlinked_prs": 1797,
+ "no_candidates_no_call": 46,
+ "answers": {"suggested": 104, "none": 1636, "dropped": 11},
+ "cost_usd": 0.540123,
+ "wall_time_minutes": 8.2,
+ "reviewed_precision": "TBD (not yet reviewed: confirmed / (confirmed + rejected) in the review queue)"
+}

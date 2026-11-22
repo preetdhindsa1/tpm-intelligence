@@ -35,7 +35,7 @@ Deterministic rules in `linker/` (pure, mypy-strict), applied per PR:
 | `explicit_key` | any other KEP mention (passing) | **suggested** | 0.50 |
 | `feature_gate` | gate name shared by several KEPs | **suggested** | 0.40 |
 | `labels` | SIG overlap | never creates a link; stored as `sig_overlap` evidence | n/a |
-| `ai_suggested` | later phase | suggested until a rule or person verifies (DB-enforced) | n/a |
+| `ai_suggested` | Phase 2 M4 (ADR-0011) | suggested (0.30) until a person confirms it (verified, 0.85; DB-enforced) | n/a |
 
 - HTML comments are stripped first: the PR template has example text inside them.
 - A reference only links to KEPs in the release being analysed.

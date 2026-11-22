@@ -1,0 +1,1379 @@
+{
+ "suite": "agent:link_suggester",
+ "task": "link_suggester",
+ "prompt": "link_suggester.v1",
+ "prompt_sha": "5a3b008bf0e80bc12c74acca0c8b0ccfdfbe83d54c88004f2e3326bfb6e08102",
+ "model": "claude-haiku-5-5",
+ "thresholds": {
+  "min_precision": 0.8,
+  "max_false_link_rate": 0.2,
+  "max_drop_rate": 0.15,
+  "min_recall": 0.4
+ },
+ "passed": true,
+ "summary": {
+  "cases": 60,
+  "errors": 0,
+  "positives": {
+   "correct": 28,
+   "dropped": 2,
+   "none": 9,
+   "wrong_feature": 1
+  },
+  "negatives": {
+   "none": 16,
+   "false_link": 4
+  },
+  "suggestions_shown": 33,
+  "precision": 0.848,
+  "recall_positive": 0.7,
+  "false_link_rate_negative": 0.2,
+  "drop_rate": 0.057,
+  "cost_usd": 0.025259
+ },
+ "cases": [
+  {
+   "id": "v1.37-positive-139853",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6164",
+   "picked": "kubernetes/enhancements#6164",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 2,
+   "evidence": {
+    "pr_quote": "Internal conversions: PodSpec(3): Move fields from PodSecurityContext to PodSpec",
+    "feature_quote": "Eliminating Internal API Types",
+    "shortlist_rank": 2,
+    "shortlist_size": 12,
+    "shared_words": [
+     "conversions",
+     "internal"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000694
+  },
+  {
+   "id": "v1.37-positive-132626",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#3721",
+   "picked": "kubernetes/enhancements#3721",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Add a new `FileKeyRef` field to containers, allowing them to load variables from files",
+    "feature_quote": "Add FileEnvSource and FileKeySelector to add environment generated on the fly",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "env",
+     "environment",
+     "file",
+     "files",
+     "key"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.00032
+  },
+  {
+   "id": "v1.37-positive-123413",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#4006",
+   "picked": "kubernetes/enhancements#4006",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Implements PortForward over WebSockets",
+    "feature_quote": "Transition from SPDY to WebSockets",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "create",
+     "forward",
+     "kubectl",
+     "port",
+     "protocol",
+     "sockets",
+     "spdy",
+     "transition",
+     "upgrade",
+     "web",
+     "websockets"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000477
+  },
+  {
+   "id": "v1.37-positive-139648",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#2021",
+   "picked": "kubernetes/enhancements#2021",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Enable scaling to and from zero by default.",
+    "feature_quote": "Support scaling to/from zero pods for object/external metrics",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "hpa",
+     "scaling",
+     "zero"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000462
+  },
+  {
+   "id": "v1.37-positive-141530",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6178",
+   "picked": "kubernetes/enhancements#6178",
+   "outcome": "dropped",
+   "verdict": "dropped",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "apiserver",
+     "concurrent",
+     "decode",
+     "kube",
+     "watch"
+    ],
+    "drop_reason": "pr_quote_not_found"
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000363
+  },
+  {
+   "id": "v1.37-positive-135462",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#5647",
+   "picked": "kubernetes/enhancements#5647",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Adds atomic replacement as a feature gated option",
+    "feature_quote": "AtomicFIFO",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "atomic",
+     "controller",
+     "informer"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000561
+  },
+  {
+   "id": "v1.37-positive-142950",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6012",
+   "picked": "kubernetes/enhancements#6012",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 2,
+   "evidence": {
+    "pr_quote": "keeping the scheduler's cache and queue hierarchy consistent",
+    "feature_quote": "hierarchical scheduling requirements",
+    "shortlist_rank": 2,
+    "shortlist_size": 12,
+    "shared_words": [
+     "api",
+     "composite",
+     "group",
+     "pod",
+     "scheduler"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000697
+  },
+  {
+   "id": "v1.37-positive-140429",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#2371",
+   "picked": "kubernetes/enhancements#2371",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "When the container runtime provides stats via CRI",
+    "feature_quote": "cAdvisor-less, CRI-full Container and Pod Stats",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "advisor",
+     "container",
+     "cri",
+     "full",
+     "pod",
+     "stats"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.0005
+  },
+  {
+   "id": "v1.37-positive-142468",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#5808",
+   "picked": "kubernetes/enhancements#5808",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 9,
+   "evidence": {
+    "pr_quote": "Histograms stayed classic",
+    "feature_quote": "Native Histogram Support for Kubernetes Metrics",
+    "shortlist_rank": 9,
+    "shortlist_size": 12,
+    "shared_words": [
+     "histograms"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000541
+  },
+  {
+   "id": "v1.37-positive-142108",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#4317",
+   "picked": "kubernetes/enhancements#4317",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "update podcertificaterequest and podcertificateprojection to allow setting ML-DSA algorithms",
+    "feature_quote": "Pod Certificates",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "certificate",
+     "certificates",
+     "pod"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000292
+  },
+  {
+   "id": "v1.37-positive-143078",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6164",
+   "picked": "kubernetes/enhancements#6164",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Make all types memory identical with internal",
+    "feature_quote": "eliminating needless conversions to the internal type",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "internal",
+     "memory",
+     "types"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000402
+  },
+  {
+   "id": "v1.37-positive-128240",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#4817",
+   "picked": "kubernetes/enhancements#4817",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "DRA: Implementation of ResourceClaim.Status.Devices",
+    "feature_quote": "DRA: Resource Claim Status with possible standardized network interface data",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "claim",
+     "data",
+     "device",
+     "dra",
+     "interface",
+     "network",
+     "resource",
+     "status"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000287
+  },
+  {
+   "id": "v1.37-positive-132999",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#2837",
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": 2,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.00053
+  },
+  {
+   "id": "v1.37-positive-135732",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#5055",
+   "picked": "kubernetes/enhancements#5055",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "DRA: upgrade/downgrade device taints",
+    "feature_quote": "DRA: device taints and tolerations",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "device",
+     "dra",
+     "taints"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000289
+  },
+  {
+   "id": "v1.37-positive-140116",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#5808",
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": 7,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 10,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000228
+  },
+  {
+   "id": "v1.37-positive-140006",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#4317",
+   "picked": "kubernetes/enhancements#4317",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 3,
+   "evidence": {
+    "pr_quote": "Pod Certificates: Node-restriction support for signer names",
+    "feature_quote": "Pod Certificates",
+    "shortlist_rank": 3,
+    "shortlist_size": 12,
+    "shared_words": [
+     "certificate",
+     "certificates",
+     "pod"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000316
+  },
+  {
+   "id": "v1.37-positive-141926",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6012",
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": 12,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000399
+  },
+  {
+   "id": "v1.37-positive-132627",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#2837",
+   "picked": "kubernetes/enhancements#2837",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "rejects Pods with Pod-level resources and a",
+    "feature_quote": "Pod level resources",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "kubelet",
+     "level",
+     "pod",
+     "resources",
+     "spec"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000563
+  },
+  {
+   "id": "v1.37-positive-139556",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6089",
+   "picked": "kubernetes/enhancements#6089",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Adds reusable API building block types",
+    "feature_quote": "standard API building blocks",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "api",
+     "aware",
+     "blocks",
+     "building",
+     "controller",
+     "controllers",
+     "integration",
+     "job",
+     "scheduling",
+     "shared",
+     "workload"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000403
+  },
+  {
+   "id": "v1.37-positive-137050",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#4563",
+   "picked": "kubernetes/enhancements#4563",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Add a new declarative EvictionRequest API to manage graceful eviction of pods.",
+    "feature_quote": "introduce EvictionRequest API to allow managed graceful pod termination",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "api",
+     "eviction",
+     "graceful",
+     "pod"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000333
+  },
+  {
+   "id": "v1.37-negative-138572",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000422
+  },
+  {
+   "id": "v1.37-negative-137820",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000518
+  },
+  {
+   "id": "v1.37-negative-138531",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000415
+  },
+  {
+   "id": "v1.37-negative-137012",
+   "kind": "negative",
+   "expected": null,
+   "picked": "kubernetes/enhancements#4671",
+   "outcome": "suggested",
+   "verdict": "false_link",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "`GangSchedulingPolicy` APIs now support a `desiredCount` field",
+    "feature_quote": "Support gang scheduling primitive in Kubernetes",
+    "shortlist_rank": 3,
+    "shortlist_size": 12,
+    "shared_words": [
+     "gang",
+     "scheduling",
+     "workload"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000832
+  },
+  {
+   "id": "v1.37-negative-142768",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000418
+  },
+  {
+   "id": "v1.37-negative-141706",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000398
+  },
+  {
+   "id": "v1.37-negative-136185",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000267
+  },
+  {
+   "id": "v1.37-negative-142626",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000322
+  },
+  {
+   "id": "v1.37-negative-143534",
+   "kind": "negative",
+   "expected": null,
+   "picked": "kubernetes/enhancements#6089",
+   "outcome": "suggested",
+   "verdict": "false_link",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "The Job controller finds the Workload and PodGroup for a Job by name",
+    "feature_quote": "enabling workload controllers to design native APIs",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "controller",
+     "job",
+     "scheduling",
+     "workload"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.00068
+  },
+  {
+   "id": "v1.37-negative-143876",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 8,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000243
+  },
+  {
+   "id": "v1.38-positive-142719",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6012",
+   "picked": "kubernetes/enhancements#6012",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Validate pod group runtime hierarchies in kube-scheduler",
+    "feature_quote": "CompositePodGroup API",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "api",
+     "group",
+     "pod",
+     "scheduler",
+     "scheduling"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000513
+  },
+  {
+   "id": "v1.38-positive-143276",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6404",
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": 2,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 6,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000216
+  },
+  {
+   "id": "v1.38-positive-141958",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6061",
+   "picked": "kubernetes/enhancements#6061",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "This is a prerequisite for",
+    "feature_quote": "OCI Artifact-Based Security Profile Distribution",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "app",
+     "armor",
+     "artifact",
+     "container",
+     "oci",
+     "profile",
+     "profiles",
+     "runtime",
+     "seccomp",
+     "security"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000349
+  },
+  {
+   "id": "v1.38-positive-142595",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#3953",
+   "picked": "kubernetes/enhancements#3953",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 9,
+   "evidence": {
+    "pr_quote": "Part of   ([In-place Node Resource Resize](  scheduler side.",
+    "feature_quote": "In-place Node Resource Resize",
+    "shortlist_rank": 9,
+    "shortlist_size": 12,
+    "shared_words": [
+     "node",
+     "place",
+     "resize",
+     "resource"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000333
+  },
+  {
+   "id": "v1.38-positive-142647",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#2570",
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": 7,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000292
+  },
+  {
+   "id": "v1.38-positive-143800",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#5554",
+   "picked": "kubernetes/enhancements#5554",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "The allocation of exclusive CPU resizes",
+    "feature_quote": "In place update pod resources alongside static cpu manager policy",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "cpu",
+     "exclusive",
+     "manager",
+     "place",
+     "pod",
+     "policy",
+     "resources",
+     "static"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.00083
+  },
+  {
+   "id": "v1.38-positive-140631",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#2837",
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": 7,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000281
+  },
+  {
+   "id": "v1.38-positive-142872",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#3157",
+   "picked": "kubernetes/enhancements#6315",
+   "outcome": "suggested",
+   "verdict": "wrong_feature",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Measure allocation per request",
+    "feature_quote": "Weighted Load Balancing for kube-apiserver",
+    "shortlist_rank": 2,
+    "shortlist_size": 12,
+    "shared_words": [
+     "apiserver",
+     "cost"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000422
+  },
+  {
+   "id": "v1.38-positive-142724",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6012",
+   "picked": "kubernetes/enhancements#6012",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Refactor tests for CPG's event handlers",
+    "feature_quote": "CompositePodGroup API",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "composite",
+     "group",
+     "pod",
+     "scheduler",
+     "scheduling"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000579
+  },
+  {
+   "id": "v1.38-positive-143882",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6264",
+   "picked": "kubernetes/enhancements#6264",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Every etcd3 store can now read storage-compressed values",
+    "feature_quote": "Storage object compression in kube-apiserver",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "apiserver",
+     "storage"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000437
+  },
+  {
+   "id": "v1.38-positive-138327",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#3157",
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 4,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000179
+  },
+  {
+   "id": "v1.38-positive-138274",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#5732",
+   "picked": "kubernetes/enhancements#5732",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 7,
+   "evidence": {
+    "pr_quote": "Added PlacementCycleState as a third state scope for WAS",
+    "feature_quote": "Topology-aware workload scheduling",
+    "shortlist_rank": 7,
+    "shortlist_size": 12,
+    "shared_words": [
+     "scheduler",
+     "scheduling"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.00062
+  },
+  {
+   "id": "v1.38-positive-143635",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#5710",
+   "picked": "kubernetes/enhancements#5710",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 2,
+   "evidence": {
+    "pr_quote": "Copy workload templates' preemptionPolicy to PodGroups and CompositePodGroups",
+    "feature_quote": "Workload-aware preemption",
+    "shortlist_rank": 2,
+    "shortlist_size": 12,
+    "shared_words": [
+     "aware",
+     "preemption",
+     "workload"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.00053
+  },
+  {
+   "id": "v1.38-positive-137795",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#5007",
+   "picked": "kubernetes/enhancements#5007",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "DRA Device Binding Conditions: graduate to beta",
+    "feature_quote": "DRA: Device Binding Conditions",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "binding",
+     "conditions",
+     "device",
+     "dra"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000313
+  },
+  {
+   "id": "v1.38-positive-131619",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#3104",
+   "picked": "kubernetes/enhancements#3104",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "Promote kuberc to beta",
+    "feature_quote": "Implement a .kuberc file to separate user preferences from cluster configs.",
+    "shortlist_rank": 1,
+    "shortlist_size": 9,
+    "shared_words": [
+     "file",
+     "kuberc"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000231
+  },
+  {
+   "id": "v1.38-positive-143845",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#3157",
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 8,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000303
+  },
+  {
+   "id": "v1.38-positive-143995",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6058",
+   "picked": "kubernetes/enhancements#6058",
+   "outcome": "dropped",
+   "verdict": "dropped",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "csimock e2e test for CSI global mount reconstruction",
+    "feature_quote": "CSI global mount fallback for volume reconstruction",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "csi",
+     "data",
+     "directory",
+     "global",
+     "json",
+     "kubelet",
+     "local",
+     "mount",
+     "mounts",
+     "pod",
+     "reconstruction",
+     "restart",
+     "vol",
+     "volume"
+    ],
+    "drop_reason": "pr_quote_not_found"
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000357
+  },
+  {
+   "id": "v1.38-positive-143044",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6416",
+   "picked": "kubernetes/enhancements#6416",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 7,
+   "evidence": {
+    "pr_quote": "Split out of the WIP",
+    "feature_quote": "Kubelet parallel container operations",
+    "shortlist_rank": 7,
+    "shortlist_size": 12,
+    "shared_words": [
+     "container",
+     "kubelet",
+     "operations",
+     "parallel",
+     "pod"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000597
+  },
+  {
+   "id": "v1.38-positive-138916",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6132",
+   "picked": "kubernetes/enhancements#6132",
+   "outcome": "suggested",
+   "verdict": "correct",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "add PreQueueingHint extension point to narrow pod evaluation",
+    "feature_quote": "Add PreQueueingHintFn extension point to",
+    "shortlist_rank": 1,
+    "shortlist_size": 12,
+    "shared_words": [
+     "event",
+     "extension",
+     "hint",
+     "point",
+     "pre",
+     "queueing",
+     "scheduler"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000674
+  },
+  {
+   "id": "v1.38-positive-142226",
+   "kind": "positive",
+   "expected": "kubernetes/enhancements#6007",
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": 1,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.00043
+  },
+  {
+   "id": "v1.38-negative-143226",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000512
+  },
+  {
+   "id": "v1.38-negative-143669",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000491
+  },
+  {
+   "id": "v1.38-negative-137676",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 3,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 9.6e-05
+  },
+  {
+   "id": "v1.38-negative-143980",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 1,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 6e-05
+  },
+  {
+   "id": "v1.38-negative-143309",
+   "kind": "negative",
+   "expected": null,
+   "picked": "kubernetes/enhancements#5941",
+   "outcome": "suggested",
+   "verdict": "false_link",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "DRA: Promote ConsumableCapacity, DRAFractionalCapacityRange to GA",
+    "feature_quote": "DRA: Shared Consumable Capacity",
+    "shortlist_rank": 2,
+    "shortlist_size": 12,
+    "shared_words": [
+     "capacity",
+     "consumable",
+     "dra"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000574
+  },
+  {
+   "id": "v1.38-negative-130015",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000332
+  },
+  {
+   "id": "v1.38-negative-134971",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000302
+  },
+  {
+   "id": "v1.38-negative-134931",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000322
+  },
+  {
+   "id": "v1.38-negative-143632",
+   "kind": "negative",
+   "expected": null,
+   "picked": null,
+   "outcome": "none",
+   "verdict": "none",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "",
+    "feature_quote": "",
+    "shortlist_rank": null,
+    "shortlist_size": 12,
+    "shared_words": [],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000388
+  },
+  {
+   "id": "v1.38-negative-140463",
+   "kind": "negative",
+   "expected": null,
+   "picked": "kubernetes/enhancements#5419",
+   "outcome": "suggested",
+   "verdict": "false_link",
+   "expected_rank": null,
+   "evidence": {
+    "pr_quote": "implements instrumentation for Pod Level Resources (PLR)",
+    "feature_quote": "Pod Level Resources Support",
+    "shortlist_rank": 3,
+    "shortlist_size": 12,
+    "shared_words": [
+     "level",
+     "pod",
+     "resources"
+    ],
+    "drop_reason": null
+   },
+   "model": "claude-haiku-5-5",
+   "cost_usd": 0.000524
+  }
+ ],
+ "measured_at": "20261122T120044Z"
+}

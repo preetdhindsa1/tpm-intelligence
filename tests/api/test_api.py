@@ -272,3 +272,63 @@ def test_update_endpoints_draft_edit_approve() -> None:
     assert again.status_code == 409
     assert [u["id"] for u in api.get("/releases/v1.38/updates").json()] == [uid]
     assert api.get("/releases/v1.38/updates/999").status_code == 404
+
+
+def test_link_review_queue_confirm_changes_the_facts() -> None:
+    from agents.link_store import (
+        LinkSuggestion,
+        MemoryLinkSuggestionStore,
+        SuggestionStatus,
+        engine_links,
+    )
+    from api.ai import AIServices
+
+    store = MemoryLinkSuggestionStore()
+    for pr, status in (
+        ("kubernetes/kubernetes#143644", SuggestionStatus.SUGGESTED),
+        ("kubernetes/kubernetes#143442", SuggestionStatus.DROPPED),
+    ):
+        store.save(
+            LinkSuggestion(
+                release_key="kubernetes:v1.38",
+                pull_request_key=pr,
+                feature_key="kubernetes/enhancements#6395",
+                status=status,
+                evidence={"pr_quote": "as discussed in", "feature_quote": "ephemeral volumes"},
+                input_sha="s",
+                prompt_version="link_suggester.v1",
+                model="claude-haiku-5-5",
+                cost_usd=0.0004,
+            )
+        )
+    service = ReleaseService(
+        InMemoryEventSource(list(fixture_events())),
+        forecast=FAST,
+        now=lambda: utc(2026, 11, 21, 3),
+        validation=lambda: Validation(False, "test: not validated"),
+        extra_links=lambda key: engine_links(store.list(key)),
+    )
+    client = TestClient(
+        create_app(service=service, link_store=store, ai=AIServices(approver_name="Harpreet"))
+    )
+
+    def row_6395() -> dict[str, int]:
+        rows = client.get("/releases/v1.38/features").json()["features"]
+        return next(f for f in rows if f["number"] == 6395)
+
+    queue = client.get("/releases/v1.38/link-suggestions").json()
+    assert queue["counts"] == {"suggested": 1, "dropped": 1}
+    (item,) = queue["suggestions"]  # dropped answers are never shown as links
+    assert item["pull_request_title"]
+    assert item["feature_number"] == 6395
+    assert (row_6395()["prs_total"], row_6395()["suggested_prs"]) == (5, 1)
+
+    done = client.post(f"/releases/v1.38/link-suggestions/{item['id']}/confirm", json={})
+    assert done.status_code == 200
+    assert done.json()["decided_by"] == "user:Harpreet (local, unauthenticated)"
+    assert (row_6395()["prs_total"], row_6395()["suggested_prs"]) == (6, 0)
+
+    again = client.post(f"/releases/v1.38/link-suggestions/{item['id']}/reject", json={})
+    assert again.status_code == 409
+    assert client.post("/releases/v1.38/link-suggestions/99/confirm", json={}).status_code == 404
+    assert client.get("/releases/v1.38/link-suggestions?status=bogus").status_code == 422
