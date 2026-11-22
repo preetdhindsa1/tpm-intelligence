@@ -15,7 +15,7 @@ Conventions
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -23,7 +23,9 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     CheckConstraint,
+    Date,
     DateTime,
+    Float,
     ForeignKey,
     Identity,
     Index,
@@ -571,3 +573,50 @@ class SimScenarioRecord(Base):
     result: Mapped[dict[str, Any]] = mapped_column(JSONB)
     created_by: Mapped[str] = mapped_column(String(128))
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
+class ForecastSnapshotRunRecord(Base):
+    """One day's recorded forecast of a release (ADR-0015). Never updated or deleted.
+
+    ``body`` holds the model settings, calibration inputs, validation labels and the
+    release curve, so a later score can show exactly what was predicted and how.
+    """
+
+    __tablename__ = "forecast_snapshot_runs"
+    __table_args__ = (UniqueConstraint("release_key", "snapshot_date", "model_version"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    release_key: Mapped[str] = mapped_column(String(128))
+    snapshot_date: Mapped[date] = mapped_column(Date)
+    as_of: Mapped[datetime] = mapped_column(_tz())
+    model_version: Mapped[str] = mapped_column(String(64))
+    code_freeze_at: Mapped[datetime | None] = mapped_column(_tz())
+    release_at: Mapped[datetime | None] = mapped_column(_tz())
+    body: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
+class ForecastSnapshotRecord(Base):
+    """One feature's recorded odds and merge-date forecast in a snapshot run (ADR-0015)."""
+
+    __tablename__ = "forecast_snapshots"
+    __table_args__ = (UniqueConstraint("run_id", "feature_key"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    run_id: Mapped[int] = mapped_column(ForeignKey("forecast_snapshot_runs.id"))
+    feature_key: Mapped[str] = mapped_column(String(128))
+    in_release: Mapped[bool] = mapped_column(Boolean)
+    odds_status: Mapped[str] = mapped_column(String(32))
+    probability: Mapped[float | None] = mapped_column(Float)
+    low: Mapped[float | None] = mapped_column(Float)
+    high: Mapped[float | None] = mapped_column(Float)
+    raw_probability: Mapped[float | None] = mapped_column(Float)
+    merge_status: Mapped[str] = mapped_column(String(32))
+    done_day: Mapped[float | None] = mapped_column(Float)
+    p10: Mapped[float | None] = mapped_column(Float)
+    p50: Mapped[float | None] = mapped_column(Float)
+    p90: Mapped[float | None] = mapped_column(Float)
+    by_freeze: Mapped[float | None] = mapped_column(Float)
+    by_release: Mapped[float | None] = mapped_column(Float)
+    # [day, P(merged by day), low, high] for scoring merge dates later (CRPS).
+    cdf: Mapped[list[Any]] = mapped_column(JSONB)

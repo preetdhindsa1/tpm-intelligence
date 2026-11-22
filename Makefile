@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links sim-validate sim-calibrate
+.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links sim-validate sim-calibrate snapshot score-snapshots
 
 UV ?= uv
 RELEASE ?=
@@ -88,6 +88,13 @@ sim-validate: ## Fit the simulator on earlier releases, replay v1.37 and v1.38 (
 
 sim-calibrate: ## Fit the simulator for RELEASE and store it for the API (~2 min, no AI)
 	$(UV) run python scripts/calibrate_simulator.py --release $(or $(RELEASE),v1.38)
+
+snapshot: ## Record today's forecast of the current release (append-only; ADR-0015)
+	$(UV) run python scripts/snapshot_forecasts.py $(if $(RELEASE),--release $(RELEASE),)
+
+score-snapshots: ## Score a finished release on its recorded forecasts, e.g. RELEASE=v1.39
+	@test -n "$(RELEASE)" || (echo "usage: make score-snapshots RELEASE=v1.39" && exit 2)
+	$(UV) run python scripts/score_snapshots.py --release $(RELEASE)
 
 suggest-links: ## Paid AI link suggestions for unlinked PRs (~$0.0004 each); RELEASE=v1.38 LIMIT=
 	docker compose build -q api

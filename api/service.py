@@ -136,6 +136,7 @@ class ReleaseService:
         validation: Callable[[], Validation] = load_validation,
         date_validation: Callable[[], Validation] = load_date_validation,
         extra_links: Callable[[str], Sequence[LinkCandidate]] | None = None,
+        on_computed: Callable[[ReleaseView], None] | None = None,
     ) -> None:
         self._source = source
         self._project = project_name
@@ -150,6 +151,8 @@ class ReleaseService:
         self._recal_ttl = recalibration_ttl.total_seconds()
         self._validation = validation
         self._date_validation = date_validation
+        # Called after each new view (e.g. to store the day's forecast snapshot).
+        self._on_computed = on_computed
         # AI link suggestions and people's decisions on them, per release (ADR-0011).
         self._extra_links = extra_links
         self._lock = threading.Lock()
@@ -327,6 +330,8 @@ class ReleaseService:
             # by reference counting; only reference cycles among them are kept.
             gc.collect()
             gc.freeze()
+            if self._on_computed is not None:
+                self._on_computed(view)
             return view
 
     def _is_fresh(self, cached: ReleaseView) -> bool:

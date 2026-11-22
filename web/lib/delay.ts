@@ -52,3 +52,11 @@ export function mergeRangeLabel(p10: number | null, p50: number | null, p90: num
   if (p50 === null) return "median after the chart ends (or never)";
   return `median ${f(p50)}, likely ${f(p10)} to ${f(p90)}`;
 }
+
+/** "Recorded daily since Nov 22 (12 days) by model X; never edited." from snapshot runs. */
+export function recordedLabel(runs: { snapshot_date: string; model_version: string }[], current: string): string {
+  const mine = runs.filter((r) => r.model_version === current).map((r) => r.snapshot_date).sort();
+  if (!mine.length) return `Not recorded yet for model ${current}.`;
+  const first = new Date(`${mine[0]}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  return `Recorded daily since ${first} (${mine.length} day${mine.length === 1 ? "" : "s"}) by model ${current}; stored forecasts are never edited.`;
+}

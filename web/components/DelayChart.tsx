@@ -42,7 +42,7 @@ function Tip({ active, payload, m }: { active?: boolean; payload?: { payload: De
   );
 }
 
-export function DelayChart({ m }: { m: MergeDates }) {
+export function DelayChart({ m, recorded }: { m: MergeDates; recorded?: string }) {
   const rows = delayRows(m);
   const late = likelyLate(m.items).filter((f) => (f.by_release ?? 1) < 0.5);
   const open = m.items.filter((f) => f.status === "forecast").length;
@@ -150,7 +150,10 @@ export function DelayChart({ m }: { m: MergeDates }) {
           </tbody>
         </table>
       </details>
-      <p className="text-[11px] text-slate-500">{m.note}</p>
+      <p className="text-[11px] text-slate-500">
+        {m.note}
+        {recorded ? ` ${recorded}` : ""}
+      </p>
     </div>
   );
 }

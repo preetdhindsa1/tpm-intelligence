@@ -24,9 +24,11 @@ Calibration uses only releases that finished before ``t`` and data as of ``t``.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import zlib
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from typing import Literal
 
@@ -230,6 +232,16 @@ class ForecastConfig:
 
 
 DEFAULT_FORECAST = ForecastConfig()
+
+# Name of the forecast model. Bump it whenever the model's code changes what it outputs
+# (ADR-0015): snapshots only count as a test of the version that made them.
+MODEL_NAME = "forecast-m7.1"
+
+
+def model_version(config: ForecastConfig = DEFAULT_FORECAST) -> str:
+    """``MODEL_NAME`` plus a short hash of every setting that changes the output."""
+    settings = json.dumps(asdict(config), sort_keys=True)
+    return f"{MODEL_NAME}+{hashlib.sha256(settings.encode()).hexdigest()[:8]}"
 
 
 @dataclass(frozen=True)

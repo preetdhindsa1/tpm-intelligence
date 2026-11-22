@@ -99,6 +99,7 @@ export const api = {
   feature: (release: string, n: number) => get<FeatureDetail>(`/releases/${release}/features/${n}`),
   summary: (release: string) => get<Summary>(`/releases/${release}/summary`),
   mergeDates: (release: string) => get<MergeDates>(`/releases/${release}/merge-dates`),
+  snapshots: (release: string) => get<Snapshots>(`/releases/${release}/snapshots`),
   dependencies: (release: string, includeRemoved = false) =>
     get<Dependencies>(`/releases/${release}/dependencies${includeRemoved ? "?include_removed=true" : ""}`),
   updates: (release: string) => get<ExecUpdate[]>(`/releases/${release}/updates`),
@@ -387,4 +388,11 @@ export type MergeDates = {
   items: CurveFeature[];
   validation: { validated?: boolean; reason?: string };
   note: string;
+};
+
+// Forecasts recorded daily, append-only (ADR-0015).
+export type Snapshots = {
+  release: string;
+  current_model_version: string;
+  runs: { snapshot_date: string; as_of: string; model_version: string; features: number }[];
 };

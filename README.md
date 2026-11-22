@@ -139,6 +139,7 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Merge-date forecasts (M7): 10th-90th range coverage and CRPS skill vs a baseline, v1.35-v1.37 at 28/14/7 days before freeze and 3 after | **Not validated.** With main-PR merge times (adopted in step 4): coverage 75-92%, CRPS skill > 0 in 3 of 12 cases, full rule passed in 2 of 12. Before step 4 the model was too pessimistic before freeze; v1.36/v1.37 release-day counts are now inside or near the range, v1.35 is too high. Rule fixed before the run; two backtest bugs corrected after the first run (ADR-0005). Measured 2026-11-22 |
 | Odds with main-PR merge times (M7 step 4) vs all-PR merge times, v1.35-v1.38 × 3 lead times | Mean Brier **0.1885 vs 0.1897**, better in 9 of 12 (in-sample, adopted). Still beats the base rate in 9 of 12, so odds stay "not validated". Adding a per-stage non-code removal rate made Brier worse (0.1955) and was rejected. Measured 2026-11-22; ADR-0005 |
 | API: requests over 2 s while polling v1.38 every 5 s for 11 min (crosses 2 cache expiries) | Before **2** (one per expiry, worst 23 s). After stale-while-revalidate **0** from expiries; 1 cold start right after a redeploy (29.6 s). p50 ≤ 0.12 s both. Measured 2026-11-22; ADR-0002 |
+| Unseen test: v1.39 scored on forecasts recorded daily while it runs (model `forecast-m7.1+1a53f2d9`, frozen 2026-11-22) | TBD (not yet measured): v1.39 has not started. Rules and model fixed in ADR-0015; snapshots are append-only (a Postgres trigger refuses edits) |
 | Data freshness | TBD (not yet measured) |
 | Event → dashboard latency (p95) | TBD (not yet measured) |
 
@@ -198,7 +199,7 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   AI and human approval, a live pulse of the current release (computed facts from the API),
   and a scorecard of measured results with dates, including the ones that fail. Release
   health moved to `/releases`.
-- **M7 (forecast improvements), in progress.**
+- **M7 (forecast improvements).**
   - Release views are served from the cache while they recompute in the background. A
     cache expiry no longer makes anyone wait (ADR-0002 addendum).
   - Merge dates: when each feature's required code will merge, before or after Code
@@ -206,6 +207,9 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
     from the mockup). **Not validated** (ADR-0005).
   - Merge times now come from main PRs only, a small in-sample gain for odds and merge
     dates. A per-stage non-code removal rate was tested and rejected.
+  - Every forecast is recorded daily in append-only tables, with its model version
+    (ADR-0015). v1.39 will be the first test on a release the model has never seen:
+    `make score-snapshots RELEASE=v1.39` once it finishes.
 - **Multi-project navigation** (ADR-0014): a "Release health" home page across projects,
   a project/release switcher, and release URLs that carry the project
   (`/projects/kubernetes/releases/v1.38`; old `/releases/v1.38` links redirect).

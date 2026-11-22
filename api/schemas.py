@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -550,3 +550,20 @@ class MergeDatesOut(_Out):
     items: list[CurveFeatureOut]
     validation: dict[str, Any]
     note: str
+
+
+class SnapshotRunOut(_Out):
+    """One day's recorded forecast."""
+
+    snapshot_date: date
+    as_of: datetime
+    model_version: str
+    features: int
+
+
+class SnapshotsOut(_Out):
+    """Forecasts recorded for a release (append-only; ADR-0015)."""
+
+    release: str
+    current_model_version: str
+    runs: list[SnapshotRunOut]

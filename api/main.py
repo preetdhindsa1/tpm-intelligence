@@ -37,6 +37,8 @@ from api.schemas import (
     SimPoolOut,
     SimulationOut,
     SimulatorOut,
+    SnapshotRunOut,
+    SnapshotsOut,
     SummaryOut,
     UpdateEditIn,
     UpdateWarningOut,
@@ -52,6 +54,7 @@ from api.views import (
     release_summary_out,
     summary_out,
 )
+from engine.forecast import DEFAULT_FORECAST, model_version
 
 SERVICE_NAME = "tpm-api"
 SIM_NOTE = (
@@ -81,6 +84,7 @@ def create_app(
     ai: AIServices | None = None,
     link_store: Any = None,
     sim_store: Any = None,
+    snapshot_store: Any = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis."""
     app = FastAPI(title="TPM Intelligence API", version="0.1.0")
@@ -95,6 +99,7 @@ def create_app(
         "updates": updates,
         "links": link_store,
         "sim_store": sim_store,
+        "snapshots": snapshot_store,
         "sim": None,
     }
     ai_services = ai or AIServices()
@@ -572,6 +577,27 @@ def create_app(
         """Days-of-delay chart: when features' required code merges (ranges, ADR-0005)."""
         return merge_dates_out(await view(name))
 
+    @app.get("/releases/{name}/snapshots", response_model=SnapshotsOut)
+    async def snapshots(name: str) -> SnapshotsOut:
+        """Forecasts recorded each day for this release (append-only; ADR-0015)."""
+        v = await view(name)
+        store = state["snapshots"] or _default_snapshot_store()
+        state["snapshots"] = store
+        runs = await run_in_threadpool(store.runs, v.assessment.release.key)
+        return SnapshotsOut(
+            release=v.assessment.release.key,
+            current_model_version=model_version(DEFAULT_FORECAST),
+            runs=[
+                SnapshotRunOut(
+                    snapshot_date=r.snapshot_date,
+                    as_of=r.as_of,
+                    model_version=r.model_version,
+                    features=len(r.features),
+                )
+                for r in runs
+            ],
+        )
+
     @app.get("/releases/{name}/load", response_model=LoadOut)
     async def load(name: str) -> LoadOut:
         """Open PRs not linked to any feature, per SIG. Not per person (CLAUDE.md section 10)."""
@@ -634,13 +660,26 @@ def _default_service() -> ReleaseService:
 
     from agents.link_store import PostgresLinkSuggestionStore, engine_links
     from api.service import PostgresEventSource
+    from api.snapshots import PostgresSnapshotStore, recorder
     from pipeline.store.session import make_engine
 
     factory = sessionmaker(make_engine())
     links = PostgresLinkSuggestionStore(factory)
     return ReleaseService(
-        PostgresEventSource(factory), extra_links=lambda key: engine_links(links.list(key))
+        PostgresEventSource(factory),
+        extra_links=lambda key: engine_links(links.list(key)),
+        # The day's forecast is recorded once, append-only, for the unseen test (ADR-0015).
+        on_computed=recorder(PostgresSnapshotStore(factory)),
     )
+
+
+def _default_snapshot_store() -> Any:
+    from sqlalchemy.orm import sessionmaker
+
+    from api.snapshots import PostgresSnapshotStore
+    from pipeline.store.session import make_engine
+
+    return PostgresSnapshotStore(sessionmaker(make_engine()))
 
 
 def _default_sim_store() -> Any:

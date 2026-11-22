@@ -11,6 +11,7 @@ import { OddsPanel } from "@/components/OddsPanel";
 import { OutcomeChart } from "@/components/OutcomeChart";
 import { api, type Summary } from "@/lib/api";
 import { briefToShow } from "@/lib/dashboard";
+import { recordedLabel } from "@/lib/delay";
 import { formatUtc } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -19,12 +20,13 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
   const release = await releaseFromParams(params);
   const name = release.name;
   const project = release.project;
-  const [data, summary, deps, updates, dates] = await Promise.all([
+  const [data, summary, deps, updates, dates, snaps] = await Promise.all([
     api.features(name),
     api.summary(name),
     api.dependencies(name),
     api.updates(name).catch(() => []),
     api.mergeDates(name).catch(() => null),
+    api.snapshots(name).catch(() => null),
   ]);
   const r = data.release;
   const current = data.features.filter((f) => f.in_release);
@@ -82,7 +84,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
           title="When will the remaining code merge?"
           subtitle="Features whose main PR (and the PRs it depends on) has merged, by day: actual so far, then a Monte Carlo forecast"
         >
-          <DelayChart m={dates} />
+          <DelayChart m={dates} recorded={snaps ? recordedLabel(snaps.runs, snaps.current_model_version) : undefined} />
         </Panel>
       )}
 

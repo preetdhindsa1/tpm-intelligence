@@ -79,6 +79,14 @@ export const MEASURED: Measured[] = [
     measured: "2026-11-22",
   },
   {
+    id: "unseen-test",
+    label: "First unseen test: v1.39, scored on forecasts recorded while it runs",
+    value: "TBD",
+    detail: "Model frozen and rules fixed in advance (ADR-0015). Forecasts are stored daily and can never be edited.",
+    verdict: "pending",
+    measured: "",
+  },
+  {
     id: "freshness",
     label: "Event → dashboard latency (p95)",
     value: "TBD",

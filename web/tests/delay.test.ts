@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { MergeDates } from "@/lib/api";
-import { dateOf, delayRows, expectedOn, likelyLate, mergeRangeLabel, relDay } from "@/lib/delay";
+import { dateOf, delayRows, expectedOn, likelyLate, mergeRangeLabel, recordedLabel, relDay } from "@/lib/delay";
 
 const M: MergeDates = {
   release: "kubernetes:v1.38",
@@ -59,5 +59,17 @@ describe("days-of-delay helpers", () => {
   it("describes a range honestly when it runs past the chart", () => {
     expect(mergeRangeLabel(4.8, 5.2, 9)).toBe("median freeze +5 d, likely freeze +5 d to freeze +9 d");
     expect(mergeRangeLabel(6, null, null)).toBe("median after the chart ends (or never)");
+  });
+});
+
+describe("recorded forecasts", () => {
+  it("counts days recorded by the current model only", () => {
+    const runs = [
+      { snapshot_date: "2026-11-22", model_version: "m+1" },
+      { snapshot_date: "2026-11-23", model_version: "m+1" },
+      { snapshot_date: "2026-11-23", model_version: "old" },
+    ];
+    expect(recordedLabel(runs, "m+1")).toBe("Recorded daily since Nov 22 (2 days) by model m+1; stored forecasts are never edited.");
+    expect(recordedLabel([], "m+1")).toBe("Not recorded yet for model m+1.");
   });
 });
