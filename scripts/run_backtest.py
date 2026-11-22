@@ -32,10 +32,17 @@ def main() -> None:
     parser.add_argument("--replications", type=int, default=20)
     parser.add_argument("--sims", type=int, default=500)
     parser.add_argument("--required-prs", choices=["main", "all"], default="main")
+    parser.add_argument("--durations", choices=["all", "main"], default="all")
+    parser.add_argument("--non-code-removal", action="store_true")
+    parser.add_argument("--tag", default="", help="suffix for the results file name")
     args = parser.parse_args()
     leads = args.lead or [28, 14, 7]
     config = ForecastConfig(
-        replications=args.replications, sims=args.sims, required_prs=args.required_prs
+        replications=args.replications,
+        sims=args.sims,
+        required_prs=args.required_prs,
+        durations=args.durations,
+        non_code_removal=args.non_code_removal,
     )
 
     with Session(make_engine(instrument=False)) as session:
@@ -48,7 +55,7 @@ def main() -> None:
 
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     OUT.mkdir(parents=True, exist_ok=True)
-    path = OUT / f"backtest-{stamp}.json"
+    path = OUT / f"backtest-{stamp}{'-' + args.tag if args.tag else ''}.json"
     path.write_text(
         json.dumps(
             {

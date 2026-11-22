@@ -203,3 +203,44 @@ the baseline before freeze.
 cannot deliver code; six v1.38 features had one and looked "done" at once). The odds
 model keeps its backtested behaviour, which treats it as nothing left to merge. To be
 reconciled when the odds model is next changed and re-backtested.
+
+## Step 4 (M7): main-PR merge times and non-code removals (measured 2026-11-22)
+
+**Variants and rule, fixed before running.**
+- **A (previous):** residual merge times drawn from all linked PRs.
+- **B:** drawn from **main PRs only**, the PRs that decide the outcome. Side PRs include
+  slow and abandoned ones, the suspected cause of the merge-date pessimism.
+- **C:** B, plus a measured per-stage rate of features removed even though their code
+  merged by Code Freeze (docs, PRR, the release team's call), applied to the odds.
+
+A variant is adopted only if it lowers the mean score (Brier for odds, CRPS for merge
+dates) and is better than A in at least 8 of 12 cases. Every release has already been
+seen, so any gain is **in-sample**. The validation rules are unchanged.
+
+**Odds** (v1.35-v1.38 × 28/14/7 days; files `backtest-20261122T200418Z-A-all-durations.json`,
+`...T200949Z-B-main-durations.json`, `...T200418Z-C-main-durations-noncode.json`):
+
+| Variant | Mean Brier | Better than A | Skill > 0 | AUC range |
+|---|---|---|---|---|
+| A | 0.1897 | — | 9 of 12 | 0.51-0.76 |
+| **B** | **0.1885** | **9 of 12** | 9 of 12 | 0.53-0.76 |
+| C | 0.1955 | 3 of 12 | 7 of 12 | 0.60-0.78 |
+
+**Merge dates** (v1.35-v1.37 × 28/14/7/-3; `date-backtest-20261122T200838Z-B-main-durations.json`
+against `...T193530Z.json`): B's mean CRPS is 14.63 against 15.78, better in 8 of 12. Coverage
+is 75-92%. The release-day count is no longer too low for v1.36/v1.37 (forecast 58-69,
+actual 63-67), but v1.35 is now too high (forecast 63-67, actual 57-60). Skill > 0 in 3 of 12.
+
+**Decision.**
+- **B adopted** for both odds and merge dates (`ForecastConfig.durations = "main"`). The
+  improvement is small and in-sample.
+- **C rejected.** It ranks features better (AUC up in 11 of 12) but its probabilities
+  are worse, so it fails the rule. The ranking signal may be worth adding as a
+  recalibration input later, not as a multiplier.
+- **Neither is validated.**
+  - Odds still fail v1.36 at 14 and 7 days and v1.37 at 7 days.
+  - Merge dates pass the full rule in 2 of 12 cases.
+  - Both stay labelled.
+
+`api/validation.py` now reads only backtests whose recorded settings match the deployed
+model, so a variant's file cannot decide the label of another model.

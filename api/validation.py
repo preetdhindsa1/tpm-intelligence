@@ -12,9 +12,12 @@ times, and v1.38 was used to choose the model variant (ADR-0005).
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+from engine.forecast import DEFAULT_FORECAST, ForecastConfig
 
 DEFAULT_DIR = Path(__file__).resolve().parent.parent / "docs" / "results"
 
@@ -40,9 +43,33 @@ class Validation:
         }
 
 
-def load_validation(results_dir: Path = DEFAULT_DIR) -> Validation:
-    """Read the newest ``backtest-*.json`` and decide."""
-    files = sorted(results_dir.glob("backtest-*.json"))
+_STAMP = re.compile(r"\d{8}T\d{6}Z")
+# Settings that change the model; a backtest only speaks for the model it ran.
+# Defaults are what a results file means when it predates the setting.
+MODEL_KEYS = {"required_prs": "main", "durations": "all", "non_code_removal": False}
+
+
+def _matches(path: Path, config: ForecastConfig) -> bool:
+    ran = json.loads(path.read_text()).get("config", {})
+    return all(ran.get(k, default) == getattr(config, k) for k, default in MODEL_KEYS.items())
+
+
+def newest_for(pattern: str, results_dir: Path, config: ForecastConfig) -> list[Path]:
+    """Files for ``pattern`` that backtested the deployed model, oldest first."""
+
+    def stamp(p: Path) -> str:
+        m = _STAMP.search(p.name)
+        return m.group(0) if m else ""
+
+    stamped = sorted(results_dir.glob(pattern), key=stamp)
+    return [p for p in stamped if _matches(p, config)]
+
+
+def load_validation(
+    results_dir: Path = DEFAULT_DIR, config: ForecastConfig = DEFAULT_FORECAST
+) -> Validation:
+    """Read the newest ``backtest-*.json`` of the deployed model and decide."""
+    files = newest_for("backtest-*.json", results_dir, config)
     if not files:
         return Validation(False, "no backtest has been run")
     data = json.loads(files[-1].read_text())
@@ -72,9 +99,11 @@ def load_validation(results_dir: Path = DEFAULT_DIR) -> Validation:
     return Validation(not failing, reason, files[-1].name, release, leads)
 
 
-def load_date_validation(results_dir: Path = DEFAULT_DIR) -> Validation:
-    """Read the newest ``date-backtest-*.json`` (merge dates; rule in ADR-0005)."""
-    files = sorted(results_dir.glob("date-backtest-*.json"))
+def load_date_validation(
+    results_dir: Path = DEFAULT_DIR, config: ForecastConfig = DEFAULT_FORECAST
+) -> Validation:
+    """Read the newest ``date-backtest-*.json`` of the deployed model (rule in ADR-0005)."""
+    files = newest_for("date-backtest-*.json", results_dir, config)
     if not files:
         return Validation(False, "merge dates have not been backtested yet")
     data = json.loads(files[-1].read_text())

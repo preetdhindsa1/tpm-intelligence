@@ -20,6 +20,8 @@ from engine.forecast import ForecastConfig
 from pipeline.notify import notification
 from tests.engine.conftest import fixture_events, utc
 
+# Results files without a recorded config describe the pre-M7 model (all-PR durations).
+OLD = ForecastConfig(durations="all")
 FAST = ForecastConfig(replications=5, sims=100)
 
 
@@ -162,11 +164,11 @@ def test_validation_gate_reads_newest_backtest(tmp_path: Path) -> None:
         ]
         (tmp_path / name).write_text(json.dumps({"results": results}))
 
-    assert load_validation(tmp_path).validated is False  # nothing run yet
+    assert load_validation(tmp_path, OLD).validated is False  # nothing run yet
     write("backtest-20261101T000000Z.json", [0.1, 0.2, 0.05])
-    assert load_validation(tmp_path).validated is True
+    assert load_validation(tmp_path, OLD).validated is True
     write("backtest-20261121T000000Z.json", [0.1, -0.02, 0.05])  # newest wins
-    v = load_validation(tmp_path)
+    v = load_validation(tmp_path, OLD)
     assert v.validated is False
     assert v.source_file == "backtest-20261121T000000Z.json"
 
@@ -186,7 +188,7 @@ def test_validation_gate_requires_every_backtested_release(tmp_path: Path) -> No
         for lead, s in zip((28, 14, 7), row, strict=True)
     ]
     (tmp_path / "backtest-20261122T000000Z.json").write_text(json.dumps({"results": results}))
-    v = load_validation(tmp_path)
+    v = load_validation(tmp_path, OLD)
     assert v.validated is False
     assert v.release == "kubernetes:v1.38"
     assert "v1.36 at 14 days" in v.reason
@@ -459,7 +461,7 @@ def test_merge_dates_for_6395_after_its_main_pr_merged(after_readd: TestClient) 
 def test_merge_date_validation_reads_the_newest_date_backtest(tmp_path: Path) -> None:
     from api.validation import load_date_validation
 
-    assert not load_date_validation(tmp_path).validated
+    assert not load_date_validation(tmp_path, OLD).validated
     rows = [
         {
             "release": "kubernetes:v1.36",
@@ -477,6 +479,20 @@ def test_merge_date_validation_reads_the_newest_date_backtest(tmp_path: Path) ->
         },
     ]
     (tmp_path / "date-backtest-20261122T000000Z.json").write_text(json.dumps({"results": rows}))
-    v = load_date_validation(tmp_path)
+    v = load_date_validation(tmp_path, OLD)
     assert not v.validated
     assert v.reason == "merge-date forecasts fail their backtest in 1 of 2 cases (ADR-0005)"
+
+
+def test_validation_only_counts_backtests_of_the_deployed_model(tmp_path: Path) -> None:
+    from api.validation import load_validation
+
+    def write(name: str, skill: float, **config: object) -> None:
+        rows = [{"release": "kubernetes:v1.37", "lead_days": 7, "skill": skill}]
+        (tmp_path / name).write_text(json.dumps({"config": config, "results": rows}))
+
+    write("backtest-20261122T010000Z.json", -0.1, required_prs="main")
+    write("backtest-20261122T020000Z-B.json", 0.2, required_prs="main", durations="main")
+    # The deployed model uses main-PR durations: only the B file speaks for it.
+    assert load_validation(tmp_path).validated
+    assert not load_validation(tmp_path, ForecastConfig(durations="all")).validated

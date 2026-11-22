@@ -136,7 +136,8 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Engine: assess all 106 v1.38 features from 60,230 events | project 0.22 s + assess 0.89 s (single run, laptop, Docker; not a p95) |
 | API `/releases` (dashboard home), 162k events, 6 releases | cold cache **6.9 s**, warm 0.06 s (was several minutes cold: it forecast every release). Single runs, laptop, Docker; measured 2026-11-21, not a p95 |
 | API v1.38 feature table, cold cache, 3 concurrent requests | **~21 s** each, sharing **one** computation (was one computation per request). Single run, measured 2026-11-21 |
-| Merge-date forecasts (M7): 10th-90th range coverage and CRPS skill vs a baseline, v1.35-v1.37 at 28/14/7 days before freeze and 3 after | **Not validated.** Coverage 69-84% (target 70-90%; 10 of 12 cases in range), but CRPS skill is below 0 in 9 of 12 cases: too pessimistic before freeze (v1.36/v1.37 actual count at release day 63-67, above the forecast range). Beats the baseline after freeze in 2 of 3. Rule fixed before the run; two backtest bugs corrected after the first run (ADR-0005). Measured 2026-11-22 |
+| Merge-date forecasts (M7): 10th-90th range coverage and CRPS skill vs a baseline, v1.35-v1.37 at 28/14/7 days before freeze and 3 after | **Not validated.** With main-PR merge times (adopted in step 4): coverage 75-92%, CRPS skill > 0 in 3 of 12 cases, full rule passed in 2 of 12. Before step 4 the model was too pessimistic before freeze; v1.36/v1.37 release-day counts are now inside or near the range, v1.35 is too high. Rule fixed before the run; two backtest bugs corrected after the first run (ADR-0005). Measured 2026-11-22 |
+| Odds with main-PR merge times (M7 step 4) vs all-PR merge times, v1.35-v1.38 × 3 lead times | Mean Brier **0.1885 vs 0.1897**, better in 9 of 12 (in-sample, adopted). Still beats the base rate in 9 of 12, so odds stay "not validated". Adding a per-stage non-code removal rate made Brier worse (0.1955) and was rejected. Measured 2026-11-22; ADR-0005 |
 | API: requests over 2 s while polling v1.38 every 5 s for 11 min (crosses 2 cache expiries) | Before **2** (one per expiry, worst 23 s). After stale-while-revalidate **0** from expiries; 1 cold start right after a redeploy (29.6 s). p50 ≤ 0.12 s both. Measured 2026-11-22; ADR-0002 |
 | Data freshness | TBD (not yet measured) |
 | Event → dashboard latency (p95) | TBD (not yet measured) |
@@ -202,7 +203,9 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
     cache expiry no longer makes anyone wait (ADR-0002 addendum).
   - Merge dates: when each feature's required code will merge, before or after Code
     Freeze, and a "When will the remaining code merge?" chart (the days-of-delay curve
-    from the mockup). **Not validated**: too pessimistic before freeze (ADR-0005).
+    from the mockup). **Not validated** (ADR-0005).
+  - Merge times now come from main PRs only, a small in-sample gain for odds and merge
+    dates. A per-stage non-code removal rate was tested and rejected.
 - **Multi-project navigation** (ADR-0014): a "Release health" home page across projects,
   a project/release switcher, and release URLs that carry the project
   (`/projects/kubernetes/releases/v1.38`; old `/releases/v1.38` links redirect).

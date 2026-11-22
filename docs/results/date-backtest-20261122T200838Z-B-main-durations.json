@@ -1,0 +1,4893 @@
+{
+ "measured_at": "20261122T200838Z",
+ "events": 294328,
+ "seconds": 245.2,
+ "config": {
+  "replications": 20,
+  "sims": 500,
+  "seed": 1338,
+  "interval": [
+   10.0,
+   90.0
+  ],
+  "required_prs": "main",
+  "durations": "main",
+  "non_code_removal": false
+ },
+ "validated": false,
+ "rule": "every release and lead: 10th-90th coverage in [0.70, 0.90] and CRPS skill > 0",
+ "results": [
+  {
+   "release": "kubernetes:v1.35",
+   "lead_days": 28,
+   "as_of": "2025-10-10T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34"
+   ],
+   "baseline_samples": 81,
+   "n": 57,
+   "merged_within_horizon": 0.474,
+   "coverage": 0.86,
+   "crps": 19.295,
+   "crps_baseline": 19.118,
+   "skill": -0.009,
+   "passes": false,
+   "count_at_release_forecast": [
+    67.34,
+    63.0,
+    72.0
+   ],
+   "count_at_release_actual": 60,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1287",
+     "p10": -27.2,
+     "p50": -13.0,
+     "p90": null,
+     "actual": -2.678935185185185,
+     "covered": true,
+     "crps": 8.236,
+     "crps_baseline": 6.958
+    },
+    {
+     "feature_key": "kubernetes/enhancements#1979",
+     "p10": -13.5,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.845,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2021",
+     "p10": -13.5,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.736,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2535",
+     "p10": 11.1,
+     "p50": null,
+     "p90": null,
+     "actual": 3.5964583333333335,
+     "covered": false,
+     "crps": 38.617,
+     "crps_baseline": 7.13
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3015",
+     "p10": -25.8,
+     "p50": -13.0,
+     "p90": null,
+     "actual": -14.596145833333333,
+     "covered": true,
+     "crps": 6.091,
+     "crps_baseline": 15.13
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3077",
+     "p10": -25.3,
+     "p50": -10.9,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 40.29,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3104",
+     "p10": -20.3,
+     "p50": null,
+     "p90": null,
+     "actual": -2.0909722222222222,
+     "covered": true,
+     "crps": 32.162,
+     "crps_baseline": 6.958
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3386",
+     "p10": -25.3,
+     "p50": -11.6,
+     "p90": null,
+     "actual": -422.7631944444444,
+     "covered": false,
+     "crps": 17.165,
+     "crps_baseline": 28.019
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "p10": -13.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.508,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3721",
+     "p10": -26.6,
+     "p50": -12.4,
+     "p90": null,
+     "actual": -1.2521875,
+     "covered": true,
+     "crps": 8.313,
+     "crps_baseline": 6.624
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "p10": -26.5,
+     "p50": 17.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 18.575,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3953",
+     "p10": -13.1,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.542,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3973",
+     "p10": 31.5,
+     "p50": null,
+     "p90": null,
+     "actual": -6.890231481481481,
+     "covered": false,
+     "crps": 50.284,
+     "crps_baseline": 9.18
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "p10": -26.1,
+     "p50": -10.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 26.753,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4192",
+     "p10": -27.2,
+     "p50": -16.4,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 46.524,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4381",
+     "p10": -26.1,
+     "p50": -13.3,
+     "p90": null,
+     "actual": 28.22425925925926,
+     "covered": true,
+     "crps": 24.046,
+     "crps_baseline": 15.316
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4540",
+     "p10": -25.4,
+     "p50": -7.8,
+     "p90": null,
+     "actual": -22.95861111111111,
+     "covered": true,
+     "crps": 10.365,
+     "crps_baseline": 22.217
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "p10": -25.7,
+     "p50": -9.8,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 32.591,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4639",
+     "p10": -25.8,
+     "p50": -12.8,
+     "p90": null,
+     "actual": 5.166550925925926,
+     "covered": true,
+     "crps": 10.791,
+     "crps_baseline": 7.674
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "p10": -13.9,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 10.464,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4781",
+     "p10": -23.7,
+     "p50": null,
+     "p90": null,
+     "actual": -2.091064814814815,
+     "covered": true,
+     "crps": 31.352,
+     "crps_baseline": 6.958
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4827",
+     "p10": -24.2,
+     "p50": -10.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 32.961,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4951",
+     "p10": 33.3,
+     "p50": null,
+     "p90": null,
+     "actual": -21.70505787037037,
+     "covered": false,
+     "crps": 66.494,
+     "crps_baseline": 21.291
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5004",
+     "p10": -27.3,
+     "p50": -16.2,
+     "p90": null,
+     "actual": -2.011886574074074,
+     "covered": true,
+     "crps": 8.157,
+     "crps_baseline": 6.958
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5030",
+     "p10": -13.7,
+     "p50": null,
+     "p90": null,
+     "actual": -1.7618055555555556,
+     "covered": true,
+     "crps": 21.297,
+     "crps_baseline": 6.624
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5194",
+     "p10": -13.4,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.741,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5207",
+     "p10": -13.1,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.525,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5233",
+     "p10": -13.3,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 11.05,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5237",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": -0.7452199074074074,
+     "covered": false,
+     "crps": 55.0,
+     "crps_baseline": 6.538
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5284",
+     "p10": 15.7,
+     "p50": null,
+     "p90": null,
+     "actual": -2.519178240740741,
+     "covered": false,
+     "crps": 43.955,
+     "crps_baseline": 6.958
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5303",
+     "p10": -13.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.744,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5304",
+     "p10": -12.4,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.933,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5311",
+     "p10": -26.1,
+     "p50": -13.0,
+     "p90": null,
+     "actual": -9.497222222222222,
+     "covered": true,
+     "crps": 6.131,
+     "crps_baseline": 11.217
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5322",
+     "p10": -12.9,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.899,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5325",
+     "p10": 14.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 1.737,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "p10": 4.8,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 1.267,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5334",
+     "p10": -18.0,
+     "p50": 0.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 33.997,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5343",
+     "p10": -13.9,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 10.306,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5365",
+     "p10": 18.9,
+     "p50": null,
+     "p90": null,
+     "actual": 40.51756944444445,
+     "covered": true,
+     "crps": 9.07,
+     "crps_baseline": 19.859
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5381",
+     "p10": -25.0,
+     "p50": -8.6,
+     "p90": null,
+     "actual": -1.1019328703703704,
+     "covered": true,
+     "crps": 8.852,
+     "crps_baseline": 6.624
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5419",
+     "p10": 24.5,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 1.096,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5440",
+     "p10": 5.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 1.151,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5471",
+     "p10": -13.7,
+     "p50": null,
+     "p90": null,
+     "actual": 3.363125,
+     "covered": true,
+     "crps": 18.187,
+     "crps_baseline": 7.13
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "p10": -13.0,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.23,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5489",
+     "p10": -13.7,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.803,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5495",
+     "p10": -13.1,
+     "p50": null,
+     "p90": null,
+     "actual": -17.934224537037036,
+     "covered": false,
+     "crps": 32.441,
+     "crps_baseline": 17.686
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5501",
+     "p10": -13.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 10.132,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "p10": -13.0,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.328,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5532",
+     "p10": -25.8,
+     "p50": -9.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 35.101,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5538",
+     "p10": -13.8,
+     "p50": null,
+     "p90": null,
+     "actual": -13.626666666666667,
+     "covered": true,
+     "crps": 27.777,
+     "crps_baseline": 14.303
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "p10": -13.5,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.345,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "p10": -13.3,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 10.285,
+     "crps_baseline": 25.908
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5573",
+     "p10": -25.0,
+     "p50": -6.8,
+     "p90": null,
+     "actual": -23.72391203703704,
+     "covered": true,
+     "crps": 14.514,
+     "crps_baseline": 23.143
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5593",
+     "p10": 29.4,
+     "p50": null,
+     "p90": null,
+     "actual": -0.6729282407407408,
+     "covered": false,
+     "crps": 42.86,
+     "crps_baseline": 6.538
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5598",
+     "p10": -14.0,
+     "p50": null,
+     "p90": null,
+     "actual": 5.744189814814815,
+     "covered": true,
+     "crps": 16.648,
+     "crps_baseline": 7.674
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5607",
+     "p10": -13.8,
+     "p50": null,
+     "p90": null,
+     "actual": -0.6366203703703703,
+     "covered": true,
+     "crps": 19.183,
+     "crps_baseline": 6.538
+    },
+    {
+     "feature_key": "kubernetes/enhancements#859",
+     "p10": -13.9,
+     "p50": null,
+     "p90": null,
+     "actual": -9.666574074074074,
+     "covered": true,
+     "crps": 24.36,
+     "crps_baseline": 11.217
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.35",
+   "lead_days": 14,
+   "as_of": "2025-10-24T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34"
+   ],
+   "baseline_samples": 88,
+   "n": 42,
+   "merged_within_horizon": 0.595,
+   "coverage": 0.857,
+   "crps": 18.508,
+   "crps_baseline": 15.96,
+   "skill": -0.16,
+   "passes": false,
+   "count_at_release_forecast": [
+    63.18,
+    60.0,
+    67.0
+   ],
+   "count_at_release_actual": 57,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1287",
+     "p10": -13.3,
+     "p50": -1.4,
+     "p90": null,
+     "actual": -2.678935185185185,
+     "covered": true,
+     "crps": 4.781,
+     "crps_baseline": 6.924
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2021",
+     "p10": -5.0,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.707,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2033",
+     "p10": -11.9,
+     "p50": 1.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 29.708,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2535",
+     "p10": 11.1,
+     "p50": null,
+     "p90": null,
+     "actual": 3.5964583333333335,
+     "covered": false,
+     "crps": 32.391,
+     "crps_baseline": 6.878
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3077",
+     "p10": -11.5,
+     "p50": 0.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 33.222,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3104",
+     "p10": 11.1,
+     "p50": null,
+     "p90": null,
+     "actual": -2.0909722222222222,
+     "covered": false,
+     "crps": 35.765,
+     "crps_baseline": 6.924
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3386",
+     "p10": -12.2,
+     "p50": 1.8,
+     "p90": null,
+     "actual": -422.7631944444444,
+     "covered": false,
+     "crps": 12.699,
+     "crps_baseline": 16.765
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3721",
+     "p10": -12.4,
+     "p50": 3.1,
+     "p90": null,
+     "actual": -1.2521875,
+     "covered": true,
+     "crps": 10.067,
+     "crps_baseline": 6.515
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "p10": -7.2,
+     "p50": 42.8,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.573,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3973",
+     "p10": -10.6,
+     "p50": null,
+     "p90": null,
+     "actual": -6.890231481481481,
+     "covered": true,
+     "crps": 40.274,
+     "crps_baseline": 9.583
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "p10": -11.5,
+     "p50": 5.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 29.645,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4188",
+     "p10": -12.5,
+     "p50": -0.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 31.433,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4192",
+     "p10": -6.1,
+     "p50": 19.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 15.811,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4368",
+     "p10": -11.6,
+     "p50": 0.3,
+     "p90": null,
+     "actual": -2.5956944444444443,
+     "covered": true,
+     "crps": 5.379,
+     "crps_baseline": 6.924
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4639",
+     "p10": -11.7,
+     "p50": 4.9,
+     "p90": null,
+     "actual": 5.166550925925926,
+     "covered": true,
+     "crps": 7.91,
+     "crps_baseline": 7.401
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "p10": -11.2,
+     "p50": 1.3,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 32.908,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4781",
+     "p10": -11.9,
+     "p50": -0.1,
+     "p90": null,
+     "actual": -2.091064814814815,
+     "covered": true,
+     "crps": 5.364,
+     "crps_baseline": 6.924
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4827",
+     "p10": -12.4,
+     "p50": 8.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 19.379,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5004",
+     "p10": -11.2,
+     "p50": 2.0,
+     "p90": null,
+     "actual": -2.011886574074074,
+     "covered": true,
+     "crps": 8.316,
+     "crps_baseline": 6.924
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5030",
+     "p10": -4.6,
+     "p50": null,
+     "p90": null,
+     "actual": -1.7618055555555556,
+     "covered": true,
+     "crps": 23.515,
+     "crps_baseline": 6.515
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5207",
+     "p10": -4.4,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.764,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5237",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": -0.7452199074074074,
+     "covered": false,
+     "crps": 55.0,
+     "crps_baseline": 6.333
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5284",
+     "p10": -11.2,
+     "p50": 0.7,
+     "p90": null,
+     "actual": -2.519178240740741,
+     "covered": true,
+     "crps": 5.214,
+     "crps_baseline": 6.924
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5307",
+     "p10": -11.9,
+     "p50": 1.0,
+     "p90": null,
+     "actual": -1.3799652777777778,
+     "covered": true,
+     "crps": 6.256,
+     "crps_baseline": 6.515
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5311",
+     "p10": -11.9,
+     "p50": 5.8,
+     "p90": null,
+     "actual": -9.497222222222222,
+     "covered": true,
+     "crps": 12.608,
+     "crps_baseline": 12.015
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5325",
+     "p10": 11.3,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.461,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "p10": -13.4,
+     "p50": 0.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 32.322,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5365",
+     "p10": 21.9,
+     "p50": null,
+     "p90": null,
+     "actual": 40.51756944444445,
+     "covered": true,
+     "crps": 8.663,
+     "crps_baseline": 19.447
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5381",
+     "p10": -10.2,
+     "p50": 13.4,
+     "p90": null,
+     "actual": -1.1019328703703704,
+     "covered": true,
+     "crps": 12.369,
+     "crps_baseline": 6.515
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5419",
+     "p10": -12.5,
+     "p50": 0.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 31.526,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5440",
+     "p10": 5.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.496,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5471",
+     "p10": -11.4,
+     "p50": 5.8,
+     "p90": null,
+     "actual": 3.363125,
+     "covered": true,
+     "crps": 6.558,
+     "crps_baseline": 6.878
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5501",
+     "p10": -4.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.201,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "p10": -11.6,
+     "p50": 0.3,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 34.393,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5532",
+     "p10": -12.5,
+     "p50": 0.4,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 33.208,
+     "crps_baseline": 25.492
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5538",
+     "p10": -13.2,
+     "p50": 0.1,
+     "p90": null,
+     "actual": -13.626666666666667,
+     "covered": false,
+     "crps": 10.456,
+     "crps_baseline": 15.765
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5589",
+     "p10": -11.5,
+     "p50": 2.3,
+     "p90": null,
+     "actual": -29.634027777777778,
+     "covered": false,
+     "crps": 15.241,
+     "crps_baseline": 16.765
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5593",
+     "p10": -12.7,
+     "p50": null,
+     "p90": null,
+     "actual": -0.6729282407407408,
+     "covered": true,
+     "crps": 38.08,
+     "crps_baseline": 6.333
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5598",
+     "p10": -11.6,
+     "p50": 0.9,
+     "p90": null,
+     "actual": 5.744189814814815,
+     "covered": true,
+     "crps": 5.382,
+     "crps_baseline": 7.401
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5607",
+     "p10": -4.9,
+     "p50": null,
+     "p90": null,
+     "actual": -0.6366203703703703,
+     "covered": true,
+     "crps": 20.005,
+     "crps_baseline": 6.333
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "p10": -13.4,
+     "p50": -1.4,
+     "p90": null,
+     "actual": 40.811875,
+     "covered": true,
+     "crps": 24.633,
+     "crps_baseline": 19.447
+    },
+    {
+     "feature_key": "kubernetes/enhancements#859",
+     "p10": -11.4,
+     "p50": 0.2,
+     "p90": null,
+     "actual": -9.666574074074074,
+     "covered": true,
+     "crps": 7.656,
+     "crps_baseline": 12.015
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.35",
+   "lead_days": 7,
+   "as_of": "2025-10-31T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34"
+   ],
+   "baseline_samples": 76,
+   "n": 39,
+   "merged_within_horizon": 0.59,
+   "coverage": 0.846,
+   "crps": 15.47,
+   "crps_baseline": 15.545,
+   "skill": 0.005,
+   "passes": true,
+   "count_at_release_forecast": [
+    64.77,
+    61.0,
+    68.0
+   ],
+   "count_at_release_actual": 57,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1287",
+     "p10": -6.6,
+     "p50": 5.5,
+     "p90": null,
+     "actual": -2.678935185185185,
+     "covered": true,
+     "crps": 6.507,
+     "crps_baseline": 6.478
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2021",
+     "p10": -1.8,
+     "p50": 33.9,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 10.857,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2033",
+     "p10": -5.3,
+     "p50": 7.9,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 21.756,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2535",
+     "p10": 11.1,
+     "p50": null,
+     "p90": null,
+     "actual": 3.5964583333333335,
+     "covered": false,
+     "crps": 32.243,
+     "crps_baseline": 6.163
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3077",
+     "p10": -5.4,
+     "p50": 11.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 24.592,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3104",
+     "p10": -6.2,
+     "p50": 4.8,
+     "p90": null,
+     "actual": -2.0909722222222222,
+     "covered": true,
+     "crps": 6.253,
+     "crps_baseline": 6.478
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3386",
+     "p10": -4.6,
+     "p50": 8.1,
+     "p90": null,
+     "actual": -422.7631944444444,
+     "covered": false,
+     "crps": 14.579,
+     "crps_baseline": 10.952
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3721",
+     "p10": -5.8,
+     "p50": 17.5,
+     "p90": null,
+     "actual": -1.2521875,
+     "covered": true,
+     "crps": 13.75,
+     "crps_baseline": 5.926
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "p10": 2.3,
+     "p50": 42.8,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 5.596,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3973",
+     "p10": -4.5,
+     "p50": 7.7,
+     "p90": null,
+     "actual": -6.890231481481481,
+     "covered": false,
+     "crps": 10.876,
+     "crps_baseline": 9.952
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "p10": -4.4,
+     "p50": 8.3,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 21.924,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4188",
+     "p10": -5.4,
+     "p50": 7.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 22.967,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4368",
+     "p10": -5.0,
+     "p50": 11.6,
+     "p90": null,
+     "actual": -2.5956944444444443,
+     "covered": true,
+     "crps": 9.518,
+     "crps_baseline": 6.478
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4639",
+     "p10": -1.2,
+     "p50": 19.9,
+     "p90": null,
+     "actual": 5.166550925925926,
+     "covered": true,
+     "crps": 10.71,
+     "crps_baseline": 6.768
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "p10": -4.8,
+     "p50": 10.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 23.182,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4781",
+     "p10": -4.7,
+     "p50": 11.3,
+     "p90": null,
+     "actual": -2.091064814814815,
+     "covered": true,
+     "crps": 9.66,
+     "crps_baseline": 6.478
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "p10": -4.3,
+     "p50": 7.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 28.257,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4828",
+     "p10": -6.3,
+     "p50": 6.0,
+     "p90": null,
+     "actual": -2.373553240740741,
+     "covered": true,
+     "crps": 6.695,
+     "crps_baseline": 6.478
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5004",
+     "p10": -5.8,
+     "p50": 12.0,
+     "p90": null,
+     "actual": -2.011886574074074,
+     "covered": true,
+     "crps": 12.804,
+     "crps_baseline": 6.478
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5007",
+     "p10": -5.2,
+     "p50": 7.9,
+     "p90": null,
+     "actual": -2.8650810185185187,
+     "covered": true,
+     "crps": 7.354,
+     "crps_baseline": 6.478
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5030",
+     "p10": -1.5,
+     "p50": null,
+     "p90": null,
+     "actual": -1.7618055555555556,
+     "covered": false,
+     "crps": 20.994,
+     "crps_baseline": 5.926
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5207",
+     "p10": -1.5,
+     "p50": 30.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 11.12,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5237",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": -0.7452199074074074,
+     "covered": false,
+     "crps": 55.0,
+     "crps_baseline": 5.636
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5284",
+     "p10": -5.3,
+     "p50": 11.3,
+     "p90": null,
+     "actual": -2.519178240740741,
+     "covered": true,
+     "crps": 8.707,
+     "crps_baseline": 6.478
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5307",
+     "p10": -4.3,
+     "p50": 9.2,
+     "p90": null,
+     "actual": -1.3799652777777778,
+     "covered": true,
+     "crps": 10.578,
+     "crps_baseline": 5.926
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5325",
+     "p10": 14.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.741,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "p10": -4.6,
+     "p50": 9.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 21.915,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5365",
+     "p10": 18.9,
+     "p50": null,
+     "p90": null,
+     "actual": 40.51756944444445,
+     "covered": true,
+     "crps": 8.03,
+     "crps_baseline": 20.084
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5381",
+     "p10": -3.1,
+     "p50": 47.9,
+     "p90": null,
+     "actual": -1.1019328703703704,
+     "covered": true,
+     "crps": 21.854,
+     "crps_baseline": 5.926
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5419",
+     "p10": -4.6,
+     "p50": 9.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 21.697,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5440",
+     "p10": 2.7,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 3.861,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5471",
+     "p10": -4.8,
+     "p50": 12.3,
+     "p90": null,
+     "actual": 3.363125,
+     "covered": true,
+     "crps": 8.95,
+     "crps_baseline": 6.163
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5501",
+     "p10": -1.5,
+     "p50": 28.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 11.575,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "p10": -4.3,
+     "p50": 11.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 25.42,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5532",
+     "p10": -4.6,
+     "p50": 8.8,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 23.486,
+     "crps_baseline": 26.347
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5589",
+     "p10": -5.5,
+     "p50": 9.5,
+     "p90": null,
+     "actual": -29.634027777777778,
+     "covered": false,
+     "crps": 16.447,
+     "crps_baseline": 10.952
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5598",
+     "p10": -5.0,
+     "p50": 9.8,
+     "p90": null,
+     "actual": 5.744189814814815,
+     "covered": true,
+     "crps": 5.223,
+     "crps_baseline": 6.768
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5607",
+     "p10": -4.8,
+     "p50": 8.6,
+     "p90": null,
+     "actual": -0.6366203703703703,
+     "covered": true,
+     "crps": 7.219,
+     "crps_baseline": 5.636
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "p10": -4.6,
+     "p50": 7.4,
+     "p90": null,
+     "actual": 40.811875,
+     "covered": true,
+     "crps": 18.424,
+     "crps_baseline": 20.084
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.35",
+   "lead_days": -3,
+   "as_of": "2025-11-10T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34"
+   ],
+   "baseline_samples": 5,
+   "n": 5,
+   "merged_within_horizon": 0.4,
+   "coverage": 0.8,
+   "crps": 12.306,
+   "crps_baseline": 12.16,
+   "skill": -0.012,
+   "passes": false,
+   "count_at_release_forecast": [
+    47.72,
+    46.0,
+    49.0
+   ],
+   "count_at_release_actual": 44,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#4381",
+     "p10": 5.0,
+     "p50": 17.7,
+     "p90": null,
+     "actual": 28.22425925925926,
+     "covered": true,
+     "crps": 6.757,
+     "crps_baseline": 9.6
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4827",
+     "p10": 4.2,
+     "p50": 18.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 21.024,
+     "crps_baseline": 12.0
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5207",
+     "p10": 32.1,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 0.57,
+     "crps_baseline": 12.0
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "p10": 7.4,
+     "p50": 30.8,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 11.581,
+     "crps_baseline": 12.0
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5589",
+     "p10": 7.3,
+     "p50": 46.1,
+     "p90": null,
+     "actual": -29.634027777777778,
+     "covered": false,
+     "crps": 21.6,
+     "crps_baseline": 15.2
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.36",
+   "lead_days": 28,
+   "as_of": "2026-02-19T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35"
+   ],
+   "baseline_samples": 138,
+   "n": 47,
+   "merged_within_horizon": 0.702,
+   "coverage": 0.915,
+   "crps": 13.905,
+   "crps_baseline": 14.749,
+   "skill": 0.057,
+   "passes": false,
+   "count_at_release_forecast": [
+    59.44,
+    55.0,
+    63.0
+   ],
+   "count_at_release_actual": 63,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1710",
+     "p10": -25.8,
+     "p50": -9.1,
+     "p90": null,
+     "actual": -15.807291666666666,
+     "covered": true,
+     "crps": 8.643,
+     "crps_baseline": 19.63
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2021",
+     "p10": 6.5,
+     "p50": null,
+     "p90": null,
+     "actual": -0.5788194444444444,
+     "covered": false,
+     "crps": 33.023,
+     "crps_baseline": 9.702
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3314",
+     "p10": -25.8,
+     "p50": -12.7,
+     "p90": null,
+     "actual": 32.591574074074074,
+     "covered": true,
+     "crps": 25.249,
+     "crps_baseline": 13.253
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3386",
+     "p10": -12.8,
+     "p50": null,
+     "p90": null,
+     "actual": 34.48763888888889,
+     "covered": true,
+     "crps": 9.874,
+     "crps_baseline": 13.543
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "p10": -13.3,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.263,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3695",
+     "p10": -26.2,
+     "p50": -6.4,
+     "p90": null,
+     "actual": -7.426678240740741,
+     "covered": true,
+     "crps": 10.868,
+     "crps_baseline": 13.427
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 0.57,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4006",
+     "p10": -25.6,
+     "p50": null,
+     "p90": null,
+     "actual": -7.603055555555556,
+     "covered": true,
+     "crps": 24.432,
+     "crps_baseline": 13.427
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "p10": -9.7,
+     "p50": null,
+     "p90": null,
+     "actual": -2.865497685185185,
+     "covered": true,
+     "crps": 31.71,
+     "crps_baseline": 10.325
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4188",
+     "p10": -13.6,
+     "p50": null,
+     "p90": null,
+     "actual": -0.4010416666666667,
+     "covered": true,
+     "crps": 29.287,
+     "crps_baseline": 9.702
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4192",
+     "p10": -26.5,
+     "p50": null,
+     "p90": null,
+     "actual": 35.17571759259259,
+     "covered": true,
+     "crps": 7.73,
+     "crps_baseline": 13.716
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4205",
+     "p10": -23.8,
+     "p50": 24.4,
+     "p90": null,
+     "actual": -0.5246759259259259,
+     "covered": true,
+     "crps": 14.832,
+     "crps_baseline": 9.702
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4317",
+     "p10": -26.2,
+     "p50": -12.4,
+     "p90": null,
+     "actual": -26.608541666666667,
+     "covered": false,
+     "crps": 12.489,
+     "crps_baseline": 29.76
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "p10": -25.9,
+     "p50": -11.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 32.871,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4639",
+     "p10": -26.0,
+     "p50": -7.0,
+     "p90": null,
+     "actual": -7.697418981481482,
+     "covered": true,
+     "crps": 11.6,
+     "crps_baseline": 13.427
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4680",
+     "p10": -25.6,
+     "p50": -7.3,
+     "p90": null,
+     "actual": -21.509467592592593,
+     "covered": true,
+     "crps": 15.054,
+     "crps_baseline": 24.948
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "p10": 0.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.489,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4827",
+     "p10": -26.0,
+     "p50": -9.8,
+     "p90": null,
+     "actual": -13.272025462962963,
+     "covered": true,
+     "crps": 8.029,
+     "crps_baseline": 17.963
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5004",
+     "p10": -23.1,
+     "p50": 20.1,
+     "p90": null,
+     "actual": -14.467847222222222,
+     "covered": true,
+     "crps": 16.63,
+     "crps_baseline": 18.789
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5073",
+     "p10": -25.4,
+     "p50": -12.9,
+     "p90": null,
+     "actual": -34.42638888888889,
+     "covered": false,
+     "crps": 13.372,
+     "crps_baseline": 31.745
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5109",
+     "p10": -25.8,
+     "p50": -12.7,
+     "p90": null,
+     "actual": -2.1641435185185185,
+     "covered": true,
+     "crps": 8.103,
+     "crps_baseline": 10.325
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5194",
+     "p10": -14.1,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.044,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5304",
+     "p10": -25.5,
+     "p50": -13.0,
+     "p90": null,
+     "actual": 34.577222222222225,
+     "covered": true,
+     "crps": 26.579,
+     "crps_baseline": 13.543
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "p10": -25.8,
+     "p50": -7.3,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 22.319,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5366",
+     "p10": -24.7,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.175,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5394",
+     "p10": -13.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.838,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5419",
+     "p10": -11.7,
+     "p50": null,
+     "p90": null,
+     "actual": 10.58763888888889,
+     "covered": true,
+     "crps": 22.506,
+     "crps_baseline": 10.325
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "p10": -26.3,
+     "p50": -8.4,
+     "p90": null,
+     "actual": 12.570983796296296,
+     "covered": true,
+     "crps": 13.299,
+     "crps_baseline": 10.586
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "p10": -11.7,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 3.141,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5532",
+     "p10": -25.3,
+     "p50": -8.1,
+     "p90": null,
+     "actual": -8.097418981481482,
+     "covered": true,
+     "crps": 7.797,
+     "crps_baseline": 14.137
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "p10": -13.4,
+     "p50": null,
+     "p90": null,
+     "actual": -0.43137731481481484,
+     "covered": true,
+     "crps": 19.86,
+     "crps_baseline": 9.702
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "p10": -26.0,
+     "p50": -12.7,
+     "p90": null,
+     "actual": -0.013530092592592592,
+     "covered": true,
+     "crps": 9.016,
+     "crps_baseline": 9.702
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "p10": -15.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 4.321,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5589",
+     "p10": -25.3,
+     "p50": -12.8,
+     "p90": null,
+     "actual": -27.304421296296297,
+     "covered": false,
+     "crps": 12.466,
+     "crps_baseline": 30.745
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5677",
+     "p10": -26.0,
+     "p50": -12.1,
+     "p90": null,
+     "actual": 1.6154282407407408,
+     "covered": true,
+     "crps": 9.532,
+     "crps_baseline": 9.615
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5679",
+     "p10": -12.9,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.792,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5681",
+     "p10": -14.0,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.304,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "p10": -22.3,
+     "p50": 23.8,
+     "p90": null,
+     "actual": 4.293252314814815,
+     "covered": true,
+     "crps": 14.167,
+     "crps_baseline": 9.615
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5729",
+     "p10": -25.9,
+     "p50": -11.1,
+     "p90": null,
+     "actual": 4.258541666666667,
+     "covered": true,
+     "crps": 10.685,
+     "crps_baseline": 9.615
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "p10": -25.8,
+     "p50": -5.3,
+     "p90": null,
+     "actual": -1.5070949074074074,
+     "covered": true,
+     "crps": 12.192,
+     "crps_baseline": 9.919
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "p10": -26.0,
+     "p50": -11.9,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 32.688,
+     "crps_baseline": 16.47
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5793",
+     "p10": -13.1,
+     "p50": null,
+     "p90": null,
+     "actual": -6.908599537037037,
+     "covered": true,
+     "crps": 23.297,
+     "crps_baseline": 12.76
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5808",
+     "p10": -25.5,
+     "p50": -12.4,
+     "p90": null,
+     "actual": -0.7559027777777778,
+     "covered": true,
+     "crps": 8.433,
+     "crps_baseline": 9.702
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5825",
+     "p10": -26.0,
+     "p50": -11.2,
+     "p90": null,
+     "actual": 0.040740740740740744,
+     "covered": true,
+     "crps": 9.401,
+     "crps_baseline": 9.644
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5832",
+     "p10": -25.4,
+     "p50": -8.4,
+     "p90": null,
+     "actual": -0.6854166666666667,
+     "covered": true,
+     "crps": 9.013,
+     "crps_baseline": 9.702
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5866",
+     "p10": -25.6,
+     "p50": 1.5,
+     "p90": null,
+     "actual": -1.5071875,
+     "covered": true,
+     "crps": 12.144,
+     "crps_baseline": 9.919
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "p10": -13.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.429,
+     "crps_baseline": 16.47
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.36",
+   "lead_days": 14,
+   "as_of": "2026-03-05T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35"
+   ],
+   "baseline_samples": 130,
+   "n": 47,
+   "merged_within_horizon": 0.745,
+   "coverage": 0.894,
+   "crps": 14.888,
+   "crps_baseline": 12.936,
+   "skill": -0.151,
+   "passes": false,
+   "count_at_release_forecast": [
+    57.97,
+    54.0,
+    62.0
+   ],
+   "count_at_release_actual": 63,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#2021",
+     "p10": 6.5,
+     "p50": null,
+     "p90": null,
+     "actual": -0.5788194444444444,
+     "covered": false,
+     "crps": 29.95,
+     "crps_baseline": 7.713
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3104",
+     "p10": -12.1,
+     "p50": 2.1,
+     "p90": null,
+     "actual": -6.777997685185185,
+     "covered": true,
+     "crps": 8.032,
+     "crps_baseline": 11.236
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3314",
+     "p10": -13.4,
+     "p50": -1.3,
+     "p90": null,
+     "actual": 32.591574074074074,
+     "covered": true,
+     "crps": 19.104,
+     "crps_baseline": 14.097
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3386",
+     "p10": -9.9,
+     "p50": null,
+     "p90": null,
+     "actual": 34.48763888888889,
+     "covered": true,
+     "crps": 9.793,
+     "crps_baseline": 14.559
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "p10": -11.3,
+     "p50": 4.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 18.92,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3695",
+     "p10": -10.7,
+     "p50": null,
+     "p90": null,
+     "actual": -7.426678240740741,
+     "covered": true,
+     "crps": 23.664,
+     "crps_baseline": 12.02
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "p10": -11.7,
+     "p50": 1.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 25.029,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4006",
+     "p10": -4.2,
+     "p50": null,
+     "p90": null,
+     "actual": -7.603055555555556,
+     "covered": false,
+     "crps": 34.843,
+     "crps_baseline": 12.02
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "p10": -9.7,
+     "p50": null,
+     "p90": null,
+     "actual": -2.865497685185185,
+     "covered": true,
+     "crps": 32.188,
+     "crps_baseline": 8.39
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4188",
+     "p10": -10.7,
+     "p50": null,
+     "p90": null,
+     "actual": -0.4010416666666667,
+     "covered": true,
+     "crps": 31.072,
+     "crps_baseline": 7.713
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4192",
+     "p10": -8.6,
+     "p50": null,
+     "p90": null,
+     "actual": 35.17571759259259,
+     "covered": true,
+     "crps": 7.839,
+     "crps_baseline": 14.82
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4205",
+     "p10": -2.7,
+     "p50": null,
+     "p90": null,
+     "actual": -0.5246759259259259,
+     "covered": true,
+     "crps": 27.97,
+     "crps_baseline": 7.713
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "p10": -12.5,
+     "p50": 1.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 27.468,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4639",
+     "p10": -9.1,
+     "p50": null,
+     "p90": null,
+     "actual": -7.697418981481482,
+     "covered": true,
+     "crps": 25.153,
+     "crps_baseline": 12.02
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "p10": -11.2,
+     "p50": 4.3,
+     "p90": null,
+     "actual": -30.089537037037037,
+     "covered": false,
+     "crps": 15.04,
+     "crps_baseline": 18.482
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "p10": 0.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.939,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4827",
+     "p10": -13.3,
+     "p50": -1.3,
+     "p90": null,
+     "actual": -13.272025462962963,
+     "covered": true,
+     "crps": 9.663,
+     "crps_baseline": 17.482
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5018",
+     "p10": -11.6,
+     "p50": 1.0,
+     "p90": null,
+     "actual": -13.741423611111111,
+     "covered": false,
+     "crps": 11.45,
+     "crps_baseline": 17.482
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5030",
+     "p10": -11.8,
+     "p50": 1.3,
+     "p90": null,
+     "actual": -8.567164351851853,
+     "covered": true,
+     "crps": 8.272,
+     "crps_baseline": 12.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5073",
+     "p10": -12.4,
+     "p50": 5.4,
+     "p90": null,
+     "actual": -34.42638888888889,
+     "covered": false,
+     "crps": 17.381,
+     "crps_baseline": 18.482
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5109",
+     "p10": -11.4,
+     "p50": 6.3,
+     "p90": null,
+     "actual": -2.1641435185185185,
+     "covered": true,
+     "crps": 11.074,
+     "crps_baseline": 8.39
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5284",
+     "p10": -11.6,
+     "p50": 0.7,
+     "p90": null,
+     "actual": -1.5064583333333332,
+     "covered": true,
+     "crps": 5.689,
+     "crps_baseline": 7.944
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5304",
+     "p10": -12.8,
+     "p50": 5.3,
+     "p90": null,
+     "actual": 34.577222222222225,
+     "covered": true,
+     "crps": 14.326,
+     "crps_baseline": 14.559
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "p10": -11.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.221,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5366",
+     "p10": -3.4,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.947,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5394",
+     "p10": -11.6,
+     "p50": 1.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 26.659,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5419",
+     "p10": -11.1,
+     "p50": 7.7,
+     "p90": null,
+     "actual": 10.58763888888889,
+     "covered": true,
+     "crps": 8.722,
+     "crps_baseline": 9.19
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "p10": -11.2,
+     "p50": 5.1,
+     "p90": null,
+     "actual": 1.8668171296296296,
+     "covered": true,
+     "crps": 8.306,
+     "crps_baseline": 7.744
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "p10": -9.8,
+     "p50": null,
+     "p90": null,
+     "actual": 12.570983796296296,
+     "covered": true,
+     "crps": 14.644,
+     "crps_baseline": 9.62
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "p10": -7.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.749,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5532",
+     "p10": -11.3,
+     "p50": 0.9,
+     "p90": null,
+     "actual": -8.097418981481482,
+     "covered": true,
+     "crps": 7.938,
+     "crps_baseline": 12.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "p10": -11.7,
+     "p50": -0.3,
+     "p90": null,
+     "actual": -0.43137731481481484,
+     "covered": true,
+     "crps": 5.461,
+     "crps_baseline": 7.713
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "p10": -10.7,
+     "p50": 19.5,
+     "p90": null,
+     "actual": -0.013530092592592592,
+     "covered": true,
+     "crps": 12.449,
+     "crps_baseline": 7.713
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "p10": 10.9,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.282,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "p10": -13.4,
+     "p50": -1.6,
+     "p90": null,
+     "actual": 35.39496527777778,
+     "covered": true,
+     "crps": 21.156,
+     "crps_baseline": 14.82
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5677",
+     "p10": -10.8,
+     "p50": 19.0,
+     "p90": null,
+     "actual": 1.6154282407407408,
+     "covered": true,
+     "crps": 12.057,
+     "crps_baseline": 7.744
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5679",
+     "p10": -12.0,
+     "p50": 2.4,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 23.922,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5681",
+     "p10": -5.6,
+     "p50": 21.3,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 11.351,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "p10": -13.4,
+     "p50": -3.8,
+     "p90": null,
+     "actual": 4.293252314814815,
+     "covered": true,
+     "crps": 6.126,
+     "crps_baseline": 7.974
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5729",
+     "p10": -9.8,
+     "p50": 18.9,
+     "p90": null,
+     "actual": 4.258541666666667,
+     "covered": true,
+     "crps": 11.843,
+     "crps_baseline": 7.974
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "p10": -4.5,
+     "p50": 37.8,
+     "p90": null,
+     "actual": -1.5070949074074074,
+     "covered": true,
+     "crps": 17.576,
+     "crps_baseline": 7.944
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "p10": -11.9,
+     "p50": 9.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 14.959,
+     "crps_baseline": 18.867
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5793",
+     "p10": -11.8,
+     "p50": 1.1,
+     "p90": null,
+     "actual": -6.908599537037037,
+     "covered": true,
+     "crps": 7.091,
+     "crps_baseline": 11.236
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5808",
+     "p10": -12.4,
+     "p50": 6.6,
+     "p90": null,
+     "actual": -0.7559027777777778,
+     "covered": true,
+     "crps": 10.495,
+     "crps_baseline": 7.713
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5825",
+     "p10": -9.9,
+     "p50": 18.8,
+     "p90": null,
+     "actual": 0.040740740740740744,
+     "covered": true,
+     "crps": 12.753,
+     "crps_baseline": 7.697
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5832",
+     "p10": -10.2,
+     "p50": 16.5,
+     "p90": null,
+     "actual": -0.6854166666666667,
+     "covered": true,
+     "crps": 12.137,
+     "crps_baseline": 7.713
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5866",
+     "p10": -10.3,
+     "p50": null,
+     "p90": null,
+     "actual": -1.5071875,
+     "covered": true,
+     "crps": 22.047,
+     "crps_baseline": 7.944
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.36",
+   "lead_days": 7,
+   "as_of": "2026-03-12T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35"
+   ],
+   "baseline_samples": 115,
+   "n": 36,
+   "merged_within_horizon": 0.694,
+   "coverage": 0.75,
+   "crps": 16.801,
+   "crps_baseline": 12.184,
+   "skill": -0.379,
+   "passes": false,
+   "count_at_release_forecast": [
+    61.07,
+    58.0,
+    65.0
+   ],
+   "count_at_release_actual": 63,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#2021",
+     "p10": 6.5,
+     "p50": null,
+     "p90": null,
+     "actual": -0.5788194444444444,
+     "covered": false,
+     "crps": 33.139,
+     "crps_baseline": 7.467
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3104",
+     "p10": -4.8,
+     "p50": 10.5,
+     "p90": null,
+     "actual": -6.777997685185185,
+     "covered": false,
+     "crps": 14.108,
+     "crps_baseline": 11.902
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3314",
+     "p10": -6.4,
+     "p50": 4.7,
+     "p90": null,
+     "actual": 32.591574074074074,
+     "covered": true,
+     "crps": 15.301,
+     "crps_baseline": 14.137
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3386",
+     "p10": 11.3,
+     "p50": null,
+     "p90": null,
+     "actual": 34.48763888888889,
+     "covered": true,
+     "crps": 10.869,
+     "crps_baseline": 14.606
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "p10": -3.7,
+     "p50": 23.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 11.539,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "p10": -4.7,
+     "p50": 7.8,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 21.136,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "p10": 11.5,
+     "p50": null,
+     "p90": null,
+     "actual": -2.865497685185185,
+     "covered": false,
+     "crps": 43.351,
+     "crps_baseline": 8.319
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4188",
+     "p10": 10.5,
+     "p50": null,
+     "p90": null,
+     "actual": -0.4010416666666667,
+     "covered": false,
+     "crps": 38.868,
+     "crps_baseline": 7.467
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4205",
+     "p10": 2.0,
+     "p50": null,
+     "p90": null,
+     "actual": -0.5246759259259259,
+     "covered": false,
+     "crps": 32.193,
+     "crps_baseline": 7.467
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4265",
+     "p10": -4.7,
+     "p50": 10.1,
+     "p90": null,
+     "actual": -4.397511574074074,
+     "covered": true,
+     "crps": 11.224,
+     "crps_baseline": 10.041
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "p10": -4.9,
+     "p50": 11.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 18.531,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "p10": -5.1,
+     "p50": 7.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 21.429,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5073",
+     "p10": -1.9,
+     "p50": 41.4,
+     "p90": null,
+     "actual": -34.42638888888889,
+     "covered": false,
+     "crps": 22.314,
+     "crps_baseline": 12.902
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5109",
+     "p10": -2.7,
+     "p50": 45.3,
+     "p90": null,
+     "actual": -2.1641435185185185,
+     "covered": true,
+     "crps": 18.206,
+     "crps_baseline": 8.319
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5284",
+     "p10": -4.3,
+     "p50": 7.9,
+     "p90": null,
+     "actual": -1.5064583333333332,
+     "covered": true,
+     "crps": 7.504,
+     "crps_baseline": 7.771
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5304",
+     "p10": -1.8,
+     "p50": 41.2,
+     "p90": null,
+     "actual": 34.577222222222225,
+     "covered": true,
+     "crps": 9.559,
+     "crps_baseline": 14.606
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "p10": -4.7,
+     "p50": 7.9,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 21.552,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5394",
+     "p10": -4.4,
+     "p50": 11.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 18.007,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5419",
+     "p10": -5.6,
+     "p50": 6.4,
+     "p90": null,
+     "actual": 10.58763888888889,
+     "covered": true,
+     "crps": 5.674,
+     "crps_baseline": 8.971
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "p10": -4.1,
+     "p50": 18.3,
+     "p90": null,
+     "actual": 1.8668171296296296,
+     "covered": true,
+     "crps": 12.755,
+     "crps_baseline": 7.45
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "p10": -3.5,
+     "p50": null,
+     "p90": null,
+     "actual": 12.570983796296296,
+     "covered": true,
+     "crps": 19.597,
+     "crps_baseline": 9.441
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "p10": 14.4,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 0.892,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "p10": -4.6,
+     "p50": 11.5,
+     "p90": null,
+     "actual": -0.43137731481481484,
+     "covered": true,
+     "crps": 8.679,
+     "crps_baseline": 7.467
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "p10": -3.9,
+     "p50": 44.0,
+     "p90": null,
+     "actual": -0.013530092592592592,
+     "covered": true,
+     "crps": 17.428,
+     "crps_baseline": 7.467
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "p10": 10.9,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.282,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5677",
+     "p10": -4.4,
+     "p50": 43.5,
+     "p90": null,
+     "actual": 1.6154282407407408,
+     "covered": true,
+     "crps": 15.804,
+     "crps_baseline": 7.45
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5679",
+     "p10": -4.7,
+     "p50": 11.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 16.13,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5681",
+     "p10": 3.5,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 5.438,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "p10": -4.4,
+     "p50": 7.8,
+     "p90": null,
+     "actual": 4.293252314814815,
+     "covered": true,
+     "crps": 5.682,
+     "crps_baseline": 7.65
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5729",
+     "p10": -5.2,
+     "p50": null,
+     "p90": null,
+     "actual": 4.258541666666667,
+     "covered": true,
+     "crps": 15.765,
+     "crps_baseline": 7.65
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "p10": 5.3,
+     "p50": null,
+     "p90": null,
+     "actual": -1.5070949074074074,
+     "covered": false,
+     "crps": 30.255,
+     "crps_baseline": 7.771
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "p10": -4.9,
+     "p50": 43.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.132,
+     "crps_baseline": 18.884
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5793",
+     "p10": -4.1,
+     "p50": 12.1,
+     "p90": null,
+     "actual": -6.908599537037037,
+     "covered": false,
+     "crps": 14.339,
+     "crps_baseline": 11.902
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5825",
+     "p10": -5.2,
+     "p50": null,
+     "p90": null,
+     "actual": 0.040740740740740744,
+     "covered": true,
+     "crps": 18.099,
+     "crps_baseline": 7.424
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5832",
+     "p10": -6.3,
+     "p50": 5.6,
+     "p90": null,
+     "actual": -0.6854166666666667,
+     "covered": true,
+     "crps": 5.926,
+     "crps_baseline": 7.467
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5866",
+     "p10": 6.2,
+     "p50": null,
+     "p90": null,
+     "actual": -1.5071875,
+     "covered": false,
+     "crps": 32.124,
+     "crps_baseline": 7.771
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.36",
+   "lead_days": -3,
+   "as_of": "2026-03-22T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35"
+   ],
+   "baseline_samples": 10,
+   "n": 13,
+   "merged_within_horizon": 0.538,
+   "coverage": 0.615,
+   "crps": 12.893,
+   "crps_baseline": 11.183,
+   "skill": -0.153,
+   "passes": false,
+   "count_at_release_forecast": [
+    65.6,
+    63.0,
+    68.0
+   ],
+   "count_at_release_actual": 61,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#2570",
+     "p10": 4.2,
+     "p50": 18.5,
+     "p90": null,
+     "actual": -0.49115740740740743,
+     "covered": false,
+     "crps": 12.305,
+     "crps_baseline": 18.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3314",
+     "p10": 5.5,
+     "p50": 17.9,
+     "p90": null,
+     "actual": 32.591574074074074,
+     "covered": true,
+     "crps": 7.858,
+     "crps_baseline": 7.26
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3926",
+     "p10": 5.3,
+     "p50": 25.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 10.372,
+     "crps_baseline": 6.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "p10": 5.4,
+     "p50": 22.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 11.381,
+     "crps_baseline": 6.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5073",
+     "p10": 5.6,
+     "p50": null,
+     "p90": null,
+     "actual": -34.42638888888889,
+     "covered": false,
+     "crps": 25.412,
+     "crps_baseline": 18.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5304",
+     "p10": 6.0,
+     "p50": 22.5,
+     "p90": null,
+     "actual": 34.577222222222225,
+     "covered": true,
+     "crps": 7.921,
+     "crps_baseline": 6.86
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "p10": 5.3,
+     "p50": 20.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 13.281,
+     "crps_baseline": 6.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "p10": 5.1,
+     "p50": 18.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 15.36,
+     "crps_baseline": 6.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "p10": 5.3,
+     "p50": 26.3,
+     "p90": null,
+     "actual": -0.43137731481481484,
+     "covered": false,
+     "crps": 17.28,
+     "crps_baseline": 18.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5681",
+     "p10": 13.3,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 1.482,
+     "crps_baseline": 6.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "p10": 5.2,
+     "p50": 20.7,
+     "p90": null,
+     "actual": 4.293252314814815,
+     "covered": false,
+     "crps": 12.181,
+     "crps_baseline": 17.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5729",
+     "p10": 14.2,
+     "p50": null,
+     "p90": null,
+     "actual": 4.258541666666667,
+     "covered": false,
+     "crps": 30.94,
+     "crps_baseline": 17.66
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "p10": 9.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 1.84,
+     "crps_baseline": 6.66
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.37",
+   "lead_days": 28,
+   "as_of": "2026-06-25T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35",
+    "kubernetes:v1.36"
+   ],
+   "baseline_samples": 185,
+   "n": 53,
+   "merged_within_horizon": 0.679,
+   "coverage": 0.887,
+   "crps": 15.954,
+   "crps_baseline": 13.867,
+   "skill": -0.151,
+   "passes": false,
+   "count_at_release_forecast": [
+    65.48,
+    61.0,
+    70.0
+   ],
+   "count_at_release_actual": 66,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1710",
+     "p10": -25.2,
+     "p50": -10.6,
+     "p90": null,
+     "actual": -27.75800925925926,
+     "covered": false,
+     "crps": 13.29,
+     "crps_baseline": 29.733
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2033",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": 1.0512962962962964,
+     "covered": false,
+     "crps": 47.0,
+     "crps_baseline": 9.101
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3257",
+     "p10": -23.0,
+     "p50": 4.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 18.644,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "p10": -10.2,
+     "p50": null,
+     "p90": null,
+     "actual": -4.4920486111111115,
+     "covered": true,
+     "crps": 24.291,
+     "crps_baseline": 10.949
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4192",
+     "p10": -21.4,
+     "p50": null,
+     "p90": null,
+     "actual": -22.519247685185185,
+     "covered": false,
+     "crps": 36.579,
+     "crps_baseline": 24.982
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4438",
+     "p10": -18.2,
+     "p50": 0.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 27.762,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "p10": -7.1,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.358,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4762",
+     "p10": -21.0,
+     "p50": null,
+     "p90": null,
+     "actual": -0.43070601851851853,
+     "covered": true,
+     "crps": 19.778,
+     "crps_baseline": 9.166
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "p10": -15.4,
+     "p50": null,
+     "p90": null,
+     "actual": -2.4832060185185183,
+     "covered": true,
+     "crps": 21.692,
+     "crps_baseline": 9.814
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4939",
+     "p10": 4.7,
+     "p50": null,
+     "p90": null,
+     "actual": -0.6959606481481482,
+     "covered": false,
+     "crps": 25.0,
+     "crps_baseline": 9.166
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4951",
+     "p10": -26.0,
+     "p50": -6.5,
+     "p90": null,
+     "actual": 40.63175925925926,
+     "covered": true,
+     "crps": 22.881,
+     "crps_baseline": 15.225
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5207",
+     "p10": -26.4,
+     "p50": 36.1,
+     "p90": null,
+     "actual": -12.286296296296296,
+     "covered": true,
+     "crps": 21.866,
+     "crps_baseline": 16.43
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5303",
+     "p10": -13.0,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.464,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5328",
+     "p10": -24.8,
+     "p50": -7.8,
+     "p90": null,
+     "actual": -3.141412037037037,
+     "covered": true,
+     "crps": 8.426,
+     "crps_baseline": 10.36
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5343",
+     "p10": -25.3,
+     "p50": -11.8,
+     "p90": null,
+     "actual": -21.692893518518517,
+     "covered": true,
+     "crps": 8.497,
+     "crps_baseline": 24.068
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5366",
+     "p10": -25.3,
+     "p50": -9.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 32.91,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "p10": -2.0,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 6.305,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "p10": -24.7,
+     "p50": 4.2,
+     "p90": null,
+     "actual": -0.8167129629629629,
+     "covered": true,
+     "crps": 12.68,
+     "crps_baseline": 9.166
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5502",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": -0.36247685185185186,
+     "covered": false,
+     "crps": 49.0,
+     "crps_baseline": 9.166
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "p10": -27.2,
+     "p50": -14.9,
+     "p90": null,
+     "actual": -0.20291666666666666,
+     "covered": true,
+     "crps": 8.891,
+     "crps_baseline": 9.166
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "p10": -25.3,
+     "p50": -12.6,
+     "p90": null,
+     "actual": -0.3619560185185185,
+     "covered": true,
+     "crps": 8.217,
+     "crps_baseline": 9.166
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "p10": -24.4,
+     "p50": -5.8,
+     "p90": null,
+     "actual": -2.662326388888889,
+     "covered": true,
+     "crps": 10.121,
+     "crps_baseline": 9.814
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": -1.1486689814814814,
+     "covered": false,
+     "crps": 42.177,
+     "crps_baseline": 9.409
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "p10": -24.8,
+     "p50": -5.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 23.459,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5683",
+     "p10": -27.3,
+     "p50": -14.7,
+     "p90": null,
+     "actual": -13.76898148148148,
+     "covered": true,
+     "crps": 6.115,
+     "crps_baseline": 17.203
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "p10": -26.0,
+     "p50": 36.5,
+     "p90": null,
+     "actual": -8.101863425925925,
+     "covered": true,
+     "crps": 19.194,
+     "crps_baseline": 13.457
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "p10": -16.3,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 6.51,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5808",
+     "p10": -25.8,
+     "p50": 1.4,
+     "p90": null,
+     "actual": -2.661840277777778,
+     "covered": true,
+     "crps": 11.55,
+     "crps_baseline": 9.814
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5823",
+     "p10": -18.6,
+     "p50": 1.0,
+     "p90": null,
+     "actual": -0.6194675925925925,
+     "covered": true,
+     "crps": 5.736,
+     "crps_baseline": 9.166
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5836",
+     "p10": -27.5,
+     "p50": -14.5,
+     "p90": null,
+     "actual": -2.8539814814814815,
+     "covered": true,
+     "crps": 8.065,
+     "crps_baseline": 9.814
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5855",
+     "p10": -27.1,
+     "p50": -15.3,
+     "p90": null,
+     "actual": 0.16935185185185186,
+     "covered": true,
+     "crps": 9.516,
+     "crps_baseline": 9.117
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "p10": -13.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.226,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5936",
+     "p10": -24.8,
+     "p50": -8.6,
+     "p90": null,
+     "actual": -1.3265856481481482,
+     "covered": true,
+     "crps": 8.815,
+     "crps_baseline": 9.409
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5941",
+     "p10": -13.5,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.809,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5943",
+     "p10": -13.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.085,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5945",
+     "p10": -25.6,
+     "p50": -10.8,
+     "p90": null,
+     "actual": 0.6734837962962963,
+     "covered": true,
+     "crps": 8.516,
+     "crps_baseline": 9.117
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5958",
+     "p10": -24.6,
+     "p50": -5.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 23.028,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5963",
+     "p10": -25.5,
+     "p50": -7.8,
+     "p90": null,
+     "actual": 2.8346412037037036,
+     "covered": true,
+     "crps": 9.26,
+     "crps_baseline": 9.095
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5996",
+     "p10": -12.7,
+     "p50": null,
+     "p90": null,
+     "actual": -0.36258101851851854,
+     "covered": true,
+     "crps": 20.176,
+     "crps_baseline": 9.166
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5999",
+     "p10": -25.1,
+     "p50": -6.5,
+     "p90": null,
+     "actual": -1.7973958333333333,
+     "covered": true,
+     "crps": 9.0,
+     "crps_baseline": 9.409
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "p10": -24.8,
+     "p50": -6.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 23.306,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6030",
+     "p10": -23.5,
+     "p50": 3.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 18.62,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6032",
+     "p10": -20.7,
+     "p50": null,
+     "p90": null,
+     "actual": -1.8307291666666667,
+     "covered": true,
+     "crps": 23.316,
+     "crps_baseline": 9.409
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6035",
+     "p10": -13.4,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 5.808,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6063",
+     "p10": -24.1,
+     "p50": 26.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 13.954,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6072",
+     "p10": -25.7,
+     "p50": -11.6,
+     "p90": null,
+     "actual": -6.744861111111111,
+     "covered": true,
+     "crps": 6.7,
+     "crps_baseline": 12.128
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6080",
+     "p10": -12.8,
+     "p50": null,
+     "p90": null,
+     "actual": 1.0151620370370371,
+     "covered": true,
+     "crps": 18.97,
+     "crps_baseline": 9.101
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6089",
+     "p10": -25.1,
+     "p50": -7.4,
+     "p90": null,
+     "actual": -0.36216435185185186,
+     "covered": true,
+     "crps": 8.193,
+     "crps_baseline": 9.166
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6122",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 0.14,
+     "crps_baseline": 17.344
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6132",
+     "p10": -20.5,
+     "p50": null,
+     "p90": null,
+     "actual": 27.111967592592592,
+     "covered": true,
+     "crps": 10.934,
+     "crps_baseline": 12.549
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6154",
+     "p10": -24.7,
+     "p50": -5.8,
+     "p90": null,
+     "actual": -2.6622916666666665,
+     "covered": true,
+     "crps": 10.252,
+     "crps_baseline": 9.814
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6164",
+     "p10": -24.5,
+     "p50": -8.0,
+     "p90": null,
+     "actual": -21.33734953703704,
+     "covered": true,
+     "crps": 10.874,
+     "crps_baseline": 24.068
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6178",
+     "p10": -26.0,
+     "p50": -6.6,
+     "p90": null,
+     "actual": 36.01671296296296,
+     "covered": true,
+     "crps": 21.618,
+     "crps_baseline": 14.209
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.37",
+   "lead_days": 14,
+   "as_of": "2026-07-09T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35",
+    "kubernetes:v1.36"
+   ],
+   "baseline_samples": 177,
+   "n": 53,
+   "merged_within_horizon": 0.66,
+   "coverage": 0.887,
+   "crps": 12.635,
+   "crps_baseline": 12.614,
+   "skill": -0.002,
+   "passes": false,
+   "count_at_release_forecast": [
+    68.51,
+    64.0,
+    73.0
+   ],
+   "count_at_release_actual": 67,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1432",
+     "p10": -11.7,
+     "p50": 3.0,
+     "p90": null,
+     "actual": -0.8708101851851852,
+     "covered": true,
+     "crps": 6.531,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2033",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": 1.0512962962962964,
+     "covered": false,
+     "crps": 47.0,
+     "crps_baseline": 7.096
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "p10": -8.4,
+     "p50": null,
+     "p90": null,
+     "actual": -4.4920486111111115,
+     "covered": true,
+     "crps": 19.828,
+     "crps_baseline": 8.927
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4438",
+     "p10": -11.9,
+     "p50": 6.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 22.727,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "p10": -4.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.572,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "p10": -11.8,
+     "p50": 5.4,
+     "p90": null,
+     "actual": -1.830636574074074,
+     "covered": true,
+     "crps": 6.882,
+     "crps_baseline": 7.26
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4762",
+     "p10": -8.5,
+     "p50": null,
+     "p90": null,
+     "actual": -0.43070601851851853,
+     "covered": true,
+     "crps": 26.632,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "p10": 4.0,
+     "p50": 28.1,
+     "p90": null,
+     "actual": -2.4832060185185183,
+     "covered": false,
+     "crps": 21.058,
+     "crps_baseline": 7.684
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4939",
+     "p10": 4.7,
+     "p50": 35.9,
+     "p90": null,
+     "actual": -0.6959606481481482,
+     "covered": false,
+     "crps": 23.204,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4951",
+     "p10": -11.7,
+     "p50": 5.4,
+     "p90": null,
+     "actual": 40.63175925925926,
+     "covered": true,
+     "crps": 18.869,
+     "crps_baseline": 17.158
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5207",
+     "p10": -9.2,
+     "p50": null,
+     "p90": null,
+     "actual": -12.286296296296296,
+     "covered": false,
+     "crps": 32.216,
+     "crps_baseline": 15.232
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5303",
+     "p10": -5.3,
+     "p50": 47.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.801,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5366",
+     "p10": -10.8,
+     "p50": 6.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 18.914,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "p10": 0.5,
+     "p50": 29.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.321,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5491",
+     "p10": -13.3,
+     "p50": -0.6,
+     "p90": null,
+     "actual": -0.8167129629629629,
+     "covered": true,
+     "crps": 5.425,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5502",
+     "p10": -11.6,
+     "p50": 2.9,
+     "p90": null,
+     "actual": -0.36247685185185186,
+     "covered": true,
+     "crps": 6.002,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "p10": -11.2,
+     "p50": 6.8,
+     "p90": null,
+     "actual": -0.20291666666666666,
+     "covered": true,
+     "crps": 8.239,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5541",
+     "p10": -9.1,
+     "p50": 14.2,
+     "p90": null,
+     "actual": -0.3619560185185185,
+     "covered": true,
+     "crps": 10.952,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "p10": -11.6,
+     "p50": 1.6,
+     "p90": null,
+     "actual": -2.662326388888889,
+     "covered": true,
+     "crps": 5.82,
+     "crps_baseline": 7.684
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "p10": -13.1,
+     "p50": -0.1,
+     "p90": null,
+     "actual": -1.1486689814814814,
+     "covered": true,
+     "crps": 5.466,
+     "crps_baseline": 7.26
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5598",
+     "p10": -11.3,
+     "p50": 2.2,
+     "p90": null,
+     "actual": 4.868032407407408,
+     "covered": true,
+     "crps": 5.781,
+     "crps_baseline": 7.418
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "p10": -11.9,
+     "p50": 16.9,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 13.617,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5683",
+     "p10": -10.8,
+     "p50": 7.6,
+     "p90": null,
+     "actual": -13.76898148148148,
+     "covered": false,
+     "crps": 17.661,
+     "crps_baseline": 16.141
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5710",
+     "p10": -13.3,
+     "p50": -1.3,
+     "p90": null,
+     "actual": -8.101863425925925,
+     "covered": true,
+     "crps": 6.211,
+     "crps_baseline": 11.763
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5729",
+     "p10": -13.4,
+     "p50": -0.4,
+     "p90": null,
+     "actual": 4.544409722222222,
+     "covered": true,
+     "crps": 5.854,
+     "crps_baseline": 7.418
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "p10": -11.0,
+     "p50": 2.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 25.632,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "p10": -8.3,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 5.685,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5808",
+     "p10": -12.4,
+     "p50": 6.0,
+     "p90": null,
+     "actual": -2.661840277777778,
+     "covered": true,
+     "crps": 7.952,
+     "crps_baseline": 7.684
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5823",
+     "p10": -11.9,
+     "p50": 5.3,
+     "p90": null,
+     "actual": -0.6194675925925925,
+     "covered": true,
+     "crps": 6.589,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5836",
+     "p10": -10.9,
+     "p50": 6.6,
+     "p90": null,
+     "actual": -2.8539814814814815,
+     "covered": true,
+     "crps": 9.464,
+     "crps_baseline": 7.684
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5855",
+     "p10": -10.2,
+     "p50": 7.0,
+     "p90": null,
+     "actual": 0.16935185185185186,
+     "covered": true,
+     "crps": 8.308,
+     "crps_baseline": 7.034
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "p10": -5.6,
+     "p50": 38.3,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.197,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5936",
+     "p10": -9.6,
+     "p50": 16.2,
+     "p90": null,
+     "actual": -1.3265856481481482,
+     "covered": true,
+     "crps": 12.007,
+     "crps_baseline": 7.26
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5941",
+     "p10": -11.0,
+     "p50": 5.4,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 22.133,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5943",
+     "p10": -5.8,
+     "p50": 32.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.774,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5945",
+     "p10": -10.8,
+     "p50": 6.6,
+     "p90": null,
+     "actual": 0.6734837962962963,
+     "covered": true,
+     "crps": 9.052,
+     "crps_baseline": 7.034
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5958",
+     "p10": -10.5,
+     "p50": 32.3,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 10.873,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5963",
+     "p10": -8.6,
+     "p50": 14.5,
+     "p90": null,
+     "actual": 2.8346412037037036,
+     "covered": true,
+     "crps": 10.139,
+     "crps_baseline": 7.181
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5996",
+     "p10": -12.3,
+     "p50": 7.3,
+     "p90": null,
+     "actual": -0.36258101851851854,
+     "covered": true,
+     "crps": 7.849,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5999",
+     "p10": -10.6,
+     "p50": 15.0,
+     "p90": null,
+     "actual": -1.7973958333333333,
+     "covered": true,
+     "crps": 12.255,
+     "crps_baseline": 7.26
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "p10": -9.6,
+     "p50": 32.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 10.925,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6030",
+     "p10": -5.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 5.358,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6032",
+     "p10": 0.8,
+     "p50": 45.2,
+     "p90": null,
+     "actual": -1.8307291666666667,
+     "covered": false,
+     "crps": 24.524,
+     "crps_baseline": 7.26
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6035",
+     "p10": -3.9,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 5.081,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6060",
+     "p10": -11.6,
+     "p50": 5.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 23.219,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6063",
+     "p10": -5.3,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 4.208,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6072",
+     "p10": -10.9,
+     "p50": 5.8,
+     "p90": null,
+     "actual": -6.744861111111111,
+     "covered": true,
+     "crps": 11.119,
+     "crps_baseline": 10.249
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6080",
+     "p10": -11.3,
+     "p50": 6.7,
+     "p90": null,
+     "actual": 1.0151620370370371,
+     "covered": true,
+     "crps": 7.686,
+     "crps_baseline": 7.096
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6089",
+     "p10": -9.1,
+     "p50": 14.2,
+     "p90": null,
+     "actual": -0.36216435185185186,
+     "covered": true,
+     "crps": 10.728,
+     "crps_baseline": 7.028
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6122",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 0.538,
+     "crps_baseline": 20.277
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6132",
+     "p10": 1.4,
+     "p50": null,
+     "p90": null,
+     "actual": 27.111967592592592,
+     "covered": true,
+     "crps": 10.185,
+     "crps_baseline": 13.119
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6154",
+     "p10": -10.6,
+     "p50": 31.2,
+     "p90": null,
+     "actual": -2.6622916666666665,
+     "covered": true,
+     "crps": 16.097,
+     "crps_baseline": 7.684
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6178",
+     "p10": -11.6,
+     "p50": 12.8,
+     "p90": null,
+     "actual": 36.01671296296296,
+     "covered": true,
+     "crps": 12.474,
+     "crps_baseline": 15.689
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.37",
+   "lead_days": 7,
+   "as_of": "2026-07-16T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35",
+    "kubernetes:v1.36"
+   ],
+   "baseline_samples": 151,
+   "n": 53,
+   "merged_within_horizon": 0.623,
+   "coverage": 0.83,
+   "crps": 14.285,
+   "crps_baseline": 12.902,
+   "skill": -0.107,
+   "passes": false,
+   "count_at_release_forecast": [
+    67.02,
+    63.0,
+    71.0
+   ],
+   "count_at_release_actual": 67,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#1432",
+     "p10": -4.4,
+     "p50": 14.4,
+     "p90": null,
+     "actual": -0.8708101851851852,
+     "covered": true,
+     "crps": 11.113,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2033",
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "actual": 1.0512962962962964,
+     "covered": false,
+     "crps": 47.0,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#2837",
+     "p10": -5.2,
+     "p50": 9.5,
+     "p90": null,
+     "actual": -0.25849537037037035,
+     "covered": true,
+     "crps": 7.655,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3257",
+     "p10": -5.5,
+     "p50": 8.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 22.547,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#3541",
+     "p10": -0.5,
+     "p50": null,
+     "p90": null,
+     "actual": -4.4920486111111115,
+     "covered": false,
+     "crps": 28.951,
+     "crps_baseline": 9.252
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4138",
+     "p10": -4.7,
+     "p50": 10.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 20.92,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4412",
+     "p10": -6.4,
+     "p50": 6.3,
+     "p90": null,
+     "actual": 34.79739583333333,
+     "covered": true,
+     "crps": 15.036,
+     "crps_baseline": 14.994
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4438",
+     "p10": -4.1,
+     "p50": 13.9,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 15.624,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4563",
+     "p10": 1.8,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.008,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4671",
+     "p10": -4.0,
+     "p50": 14.0,
+     "p90": null,
+     "actual": -1.830636574074074,
+     "covered": true,
+     "crps": 11.611,
+     "crps_baseline": 7.113
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4762",
+     "p10": 10.1,
+     "p50": null,
+     "p90": null,
+     "actual": -0.43070601851851853,
+     "covered": false,
+     "crps": 32.799,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4817",
+     "p10": -0.6,
+     "p50": 28.1,
+     "p90": null,
+     "actual": -2.4832060185185183,
+     "covered": false,
+     "crps": 19.586,
+     "crps_baseline": 7.649
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4939",
+     "p10": 7.2,
+     "p50": 35.9,
+     "p90": null,
+     "actual": -0.6959606481481482,
+     "covered": false,
+     "crps": 23.671,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4951",
+     "p10": -4.8,
+     "p50": 12.4,
+     "p90": null,
+     "actual": 40.63175925925926,
+     "covered": true,
+     "crps": 13.304,
+     "crps_baseline": 17.086
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5030",
+     "p10": -6.3,
+     "p50": 6.5,
+     "p90": null,
+     "actual": -2.330416666666667,
+     "covered": true,
+     "crps": 7.349,
+     "crps_baseline": 7.649
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5303",
+     "p10": -1.5,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.885,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5366",
+     "p10": -2.7,
+     "p50": 21.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 12.31,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5474",
+     "p10": 0.5,
+     "p50": 29.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.276,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5502",
+     "p10": -3.9,
+     "p50": 12.5,
+     "p90": null,
+     "actual": -0.36247685185185186,
+     "covered": true,
+     "crps": 9.761,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5517",
+     "p10": -2.1,
+     "p50": 17.8,
+     "p90": null,
+     "actual": -0.20291666666666666,
+     "covered": true,
+     "crps": 13.065,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5526",
+     "p10": -4.5,
+     "p50": 8.3,
+     "p90": null,
+     "actual": 41.19329861111111,
+     "covered": true,
+     "crps": 18.124,
+     "crps_baseline": 17.464
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "p10": -5.0,
+     "p50": 12.4,
+     "p90": null,
+     "actual": -2.662326388888889,
+     "covered": true,
+     "crps": 9.946,
+     "crps_baseline": 7.649
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5554",
+     "p10": -6.1,
+     "p50": 6.1,
+     "p90": null,
+     "actual": -1.1486689814814814,
+     "covered": true,
+     "crps": 6.406,
+     "crps_baseline": 7.113
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5598",
+     "p10": -4.5,
+     "p50": 12.6,
+     "p90": null,
+     "actual": 4.868032407407408,
+     "covered": true,
+     "crps": 7.332,
+     "crps_baseline": 7.073
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "p10": -5.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 7.399,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5729",
+     "p10": -4.6,
+     "p50": 14.2,
+     "p90": null,
+     "actual": 4.544409722222222,
+     "covered": true,
+     "crps": 7.527,
+     "crps_baseline": 7.073
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "p10": -4.4,
+     "p50": 12.3,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 19.36,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5758",
+     "p10": 3.5,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 3.273,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5823",
+     "p10": -4.9,
+     "p50": 11.1,
+     "p90": null,
+     "actual": -0.6194675925925925,
+     "covered": true,
+     "crps": 8.165,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5836",
+     "p10": -1.9,
+     "p50": 20.2,
+     "p90": null,
+     "actual": -2.8539814814814815,
+     "covered": false,
+     "crps": 15.557,
+     "crps_baseline": 7.649
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5855",
+     "p10": -3.1,
+     "p50": 15.0,
+     "p90": null,
+     "actual": 0.16935185185185186,
+     "covered": true,
+     "crps": 11.642,
+     "crps_baseline": 6.768
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5894",
+     "p10": -1.6,
+     "p50": 42.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 8.348,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5936",
+     "p10": -3.2,
+     "p50": 29.1,
+     "p90": null,
+     "actual": -1.3265856481481482,
+     "covered": true,
+     "crps": 15.68,
+     "crps_baseline": 7.113
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5941",
+     "p10": -4.1,
+     "p50": 12.7,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 14.946,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5943",
+     "p10": -1.9,
+     "p50": 32.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 9.363,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5945",
+     "p10": -2.5,
+     "p50": 21.1,
+     "p90": null,
+     "actual": 0.6734837962962963,
+     "covered": true,
+     "crps": 12.681,
+     "crps_baseline": 6.768
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5958",
+     "p10": -0.4,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 4.015,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5963",
+     "p10": -2.8,
+     "p50": 34.4,
+     "p90": null,
+     "actual": 2.8346412037037036,
+     "covered": true,
+     "crps": 14.603,
+     "crps_baseline": 6.861
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5996",
+     "p10": -4.8,
+     "p50": 13.6,
+     "p90": null,
+     "actual": -0.36258101851851854,
+     "covered": true,
+     "crps": 12.124,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5999",
+     "p10": -3.7,
+     "p50": 38.4,
+     "p90": null,
+     "actual": -1.7973958333333333,
+     "covered": true,
+     "crps": 18.204,
+     "crps_baseline": 7.113
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "p10": -6.1,
+     "p50": 6.0,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 24.904,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6030",
+     "p10": 2.1,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 3.432,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6032",
+     "p10": 1.3,
+     "p50": 46.3,
+     "p90": null,
+     "actual": -1.8307291666666667,
+     "covered": false,
+     "crps": 27.694,
+     "crps_baseline": 7.113
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6035",
+     "p10": 5.0,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 4.004,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6060",
+     "p10": -4.6,
+     "p50": 12.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 15.734,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6063",
+     "p10": 7.6,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.386,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6072",
+     "p10": -2.8,
+     "p50": 18.3,
+     "p90": null,
+     "actual": -6.744861111111111,
+     "covered": false,
+     "crps": 18.01,
+     "crps_baseline": 10.987
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6080",
+     "p10": -1.5,
+     "p50": 16.8,
+     "p90": null,
+     "actual": 1.0151620370370371,
+     "covered": true,
+     "crps": 11.212,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6089",
+     "p10": -2.8,
+     "p50": 36.9,
+     "p90": null,
+     "actual": -0.36216435185185186,
+     "covered": true,
+     "crps": 16.28,
+     "crps_baseline": 6.801
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6122",
+     "p10": -6.2,
+     "p50": 5.6,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 25.041,
+     "crps_baseline": 20.106
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6132",
+     "p10": 1.4,
+     "p50": null,
+     "p90": null,
+     "actual": 27.111967592592592,
+     "covered": true,
+     "crps": 10.596,
+     "crps_baseline": 13.066
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6154",
+     "p10": 1.1,
+     "p50": null,
+     "p90": null,
+     "actual": -2.6622916666666665,
+     "covered": false,
+     "crps": 27.66,
+     "crps_baseline": 7.649
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6178",
+     "p10": -5.8,
+     "p50": 36.2,
+     "p90": null,
+     "actual": 36.01671296296296,
+     "covered": true,
+     "crps": 8.962,
+     "crps_baseline": 15.682
+    }
+   ]
+  },
+  {
+   "release": "kubernetes:v1.37",
+   "lead_days": -3,
+   "as_of": "2026-07-26T12:00:00+00:00",
+   "calibration_releases": [
+    "kubernetes:v1.33",
+    "kubernetes:v1.34",
+    "kubernetes:v1.35",
+    "kubernetes:v1.36"
+   ],
+   "baseline_samples": 23,
+   "n": 11,
+   "merged_within_horizon": 0.364,
+   "coverage": 0.818,
+   "crps": 8.628,
+   "crps_baseline": 10.043,
+   "skill": 0.141,
+   "passes": true,
+   "count_at_release_forecast": [
+    64.34,
+    62.0,
+    66.0
+   ],
+   "count_at_release_actual": 57,
+   "cases": [
+    {
+     "feature_key": "kubernetes/enhancements#3257",
+     "p10": 5.6,
+     "p50": 23.2,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 12.456,
+     "crps_baseline": 9.474
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4412",
+     "p10": 5.5,
+     "p50": 22.2,
+     "p90": null,
+     "actual": 34.79739583333333,
+     "covered": true,
+     "crps": 7.444,
+     "crps_baseline": 7.735
+    },
+    {
+     "feature_key": "kubernetes/enhancements#4951",
+     "p10": 5.0,
+     "p50": 18.9,
+     "p90": null,
+     "actual": 40.63175925925926,
+     "covered": true,
+     "crps": 11.085,
+     "crps_baseline": 8.431
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5303",
+     "p10": 24.2,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 0.938,
+     "crps_baseline": 9.474
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5366",
+     "p10": 5.0,
+     "p50": 46.9,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 6.071,
+     "crps_baseline": 9.474
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5547",
+     "p10": 5.9,
+     "p50": 21.8,
+     "p90": null,
+     "actual": -2.662326388888889,
+     "covered": false,
+     "crps": 15.605,
+     "crps_baseline": 14.431
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5598",
+     "p10": 5.8,
+     "p50": 24.5,
+     "p90": null,
+     "actual": 4.868032407407408,
+     "covered": false,
+     "crps": 14.696,
+     "crps_baseline": 13.561
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5647",
+     "p10": 12.1,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 2.098,
+     "crps_baseline": 9.474
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5732",
+     "p10": 5.7,
+     "p50": 23.5,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 10.228,
+     "crps_baseline": 9.474
+    },
+    {
+     "feature_key": "kubernetes/enhancements#5943",
+     "p10": 21.4,
+     "p50": null,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 1.344,
+     "crps_baseline": 9.474
+    },
+    {
+     "feature_key": "kubernetes/enhancements#6012",
+     "p10": 6.2,
+     "p50": 22.1,
+     "p90": null,
+     "actual": Infinity,
+     "covered": true,
+     "crps": 12.942,
+     "crps_baseline": 9.474
+    }
+   ]
+  }
+ ]
+}

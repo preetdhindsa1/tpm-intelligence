@@ -74,7 +74,7 @@ export const MEASURED: Measured[] = [
     id: "merge-dates",
     label: "Merge-date forecasts beat the baseline",
     value: "3 of 12",
-    detail: "Ranges are about the right width (69–84% coverage), but too pessimistic before Code Freeze. Shown as not validated.",
+    detail: "Ranges are about the right width (75–92% coverage), but the forecast beats a simple baseline in only 3 of 12 backtests. Shown as not validated.",
     verdict: "fail",
     measured: "2026-11-22",
   },

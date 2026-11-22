@@ -97,6 +97,10 @@ class Calibration:
     durations_days: tuple[float, ...]  # inf = never merged
     new_pr: Mapping[tuple[int, bool], Rate]  # (bucket, has_prs) -> needed a new PR
     landing: Mapping[int, Rate]  # bucket -> landed (climatology baseline)
+    # M7 step 4: merge times of main PRs only (inf = never merged), and features removed
+    # although their required code merged by Code Freeze, per stage ("" = unknown).
+    main_durations_days: tuple[float, ...] = ()
+    removed_despite_code: Mapping[str, Rate] = field(default_factory=dict)
 
     def describe(self) -> dict[str, object]:
         """Summary for display and logs."""
@@ -113,14 +117,21 @@ class Calibration:
                 f"{b}:{h}": round(r.mean, 3) for (b, h), r in sorted(self.new_pr.items())
             },
             "landing_rate": {str(b): round(r.mean, 3) for b, r in sorted(self.landing.items())},
+            "main_pr_samples": len(self.main_durations_days),
+            "removed_despite_code_rate": {
+                (k or "unknown"): {"rate": round(r.mean, 3), "k": r.k, "n": r.n}
+                for k, r in sorted(self.removed_despite_code.items())
+            },
         }
 
 
 def calibrate(world: World, release_keys: Sequence[str]) -> Calibration:
     """Measure durations, new-PR rates and landing rates on finished releases."""
     durations: list[float] = []
+    main_durations: list[float] = []
     new_pr: dict[tuple[int, bool], list[int]] = {}
     landing: dict[int, list[int]] = {}
+    removed: dict[str, list[int]] = {}
     for key in release_keys:
         release = world.releases[key]
         freeze = release.code_freeze_at
@@ -129,6 +140,7 @@ def calibrate(world: World, release_keys: Sequence[str]) -> Calibration:
         links = link_release(world, key)
         features = world.features_ever_in(key)
         seen_prs: set[str] = set()
+        seen_main: set[str] = set()
         for f in features:
             prs = [
                 world.pull_requests[k]
@@ -143,6 +155,25 @@ def calibrate(world: World, release_keys: Sequence[str]) -> Calibration:
                     _days(pr.merged_at - pr.created_at) if pr.merged_at else float("inf")
                 )
             outcome = landed(f, release)
+            in_cycle = [pr for pr in prs if release.cycle_start_at <= pr.created_at <= freeze]
+            main = main_pr([pr.key for pr in in_cycle if pr.state != "closed"], world, links, f.key)
+            if main is not None and main.key not in seen_main:
+                seen_main.add(main.key)
+                main_durations.append(
+                    _days(main.merged_at - main.created_at) if main.merged_at else float("inf")
+                )
+            if (
+                main is not None
+                and outcome is not None
+                and main.merged_at is not None
+                and main.merged_at <= freeze
+                and key in releases_at(f, freeze)
+            ):
+                # In the release at freeze with its main PR merged: did it still go?
+                stage = f.stage or ""
+                removed.setdefault(stage, [0, 0])
+                removed[stage][0] += int(not outcome)
+                removed[stage][1] += 1
             for b, days in enumerate(BUCKET_SAMPLE_DAYS):
                 t = freeze - timedelta(days=days)
                 if key not in releases_at(f, t) or outcome is None:
@@ -161,6 +192,8 @@ def calibrate(world: World, release_keys: Sequence[str]) -> Calibration:
         durations_days=tuple(sorted(durations)),
         new_pr={k: Rate(*v) for k, v in new_pr.items()},
         landing={k: Rate(*v) for k, v in landing.items()},
+        main_durations_days=tuple(sorted(main_durations)),
+        removed_despite_code={k: Rate(*v) for k, v in removed.items()},
     )
 
 
@@ -188,6 +221,12 @@ class ForecastConfig:
     # linked PRs. "all" failed its backtest (2026-11-21): 36-51% of features that landed
     # still had linked PRs open at freeze (ADR-0005).
     required_prs: Literal["main", "all"] = "main"
+    # M7 step 4 variants (ADR-0005): which PRs' merge times feed the residual draws, and
+    # whether features can be removed for non-code reasons after their code merged.
+    # "main" adopted 2026-11-22 (lower Brier in 9 of 12 odds cases and CRPS in 8 of 12
+    # merge-date cases; in-sample). Non-code removal rejected (worse Brier in 9 of 12).
+    durations: Literal["all", "main"] = "main"
+    non_code_removal: bool = False
 
 
 DEFAULT_FORECAST = ForecastConfig()
@@ -285,7 +324,12 @@ def simulate_completion(
         required_keys = {p.key for p in open_prs}
     new_work_possible = config.required_prs == "all" or main is None
     rate = calibration.new_pr.get((bucket(max(days_to_freeze, 0.0)), has_prs), Rate(0, 0))
-    pool = np.asarray(calibration.durations_days, dtype=np.float64)
+    source = (
+        calibration.main_durations_days
+        if config.durations == "main" and calibration.main_durations_days
+        else calibration.durations_days
+    )
+    pool = np.asarray(source, dtype=np.float64)
     if pool.size == 0:
         pool = np.array([np.inf])
     keys = [p.key for p in open_prs]
@@ -341,6 +385,13 @@ def forecast_feature(
     horizon = _days(freeze - t)
     draws = simulate_completion(feature, world, links, calibration, horizon, horizon, config)
     probs = [float((when <= horizon).mean()) for when in draws.total]
+    if config.non_code_removal:
+        # A feature whose code is in can still be removed (docs, PRR, release team call):
+        # measured per stage on earlier releases, drawn from its Beta posterior.
+        rate = calibration.removed_despite_code.get(feature.stage or "") or Rate(0, 0)
+        rng = np.random.default_rng(_seed(config, feature.key) ^ 0x5EED)
+        keep = 1 - rng.beta(rate.k + 1, rate.n - rate.k + 1, size=len(probs))
+        probs = [p * float(k) for p, k in zip(probs, keep, strict=True)]
     on_time = np.zeros(len(draws.open_prs))
     for done in draws.per_pr:
         if draws.open_prs:

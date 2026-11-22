@@ -181,3 +181,52 @@ def test_brier() -> None:
     assert brier([(1.0, True), (0.0, False)]) == 0.0
     assert brier([(0.5, True), (0.5, False)]) == 0.25
     assert brier([]) is None
+
+
+# --- M7 step 4 variants: main-PR durations and non-code removal (ADR-0005) -------------
+
+
+def with_side_pr_and_late_removal() -> tuple[Stream, str, str]:
+    """R1 as above, plus feature 120: its main PR merged in 5 days, a side PR never merged,
+    and it was still removed at Code Freeze (a non-code removal)."""
+    s, r1, r2 = two_releases()
+    s.feature(120, r1, [(utc(2026, 5, 20), True), (utc(2026, 7, 23, 13), False)])
+    s.pr(5100, 120, utc(2026, 6, 1), merged=utc(2026, 6, 6))
+    s.pr(5101, 120, utc(2026, 5, 25))  # older side PR, never merged
+    return s, r1, r2
+
+
+def test_main_pr_durations_leave_out_side_prs() -> None:
+    s, r1, _ = with_side_pr_and_late_removal()
+    cal = calibrate(project(s.events, utc(2026, 10, 1)), [r1])
+    assert sorted(cal.durations_days) == [5.0] + [10.0] * 6 + [float("inf")] * 5
+    # Main PR = the newest one: #5100 (5 days), not the never-merged side PR #5101.
+    assert sorted(cal.main_durations_days) == [5.0] + [10.0] * 6 + [float("inf")] * 4
+
+
+def test_removal_despite_merged_code_is_measured() -> None:
+    s, r1, _ = with_side_pr_and_late_removal()
+    cal = calibrate(project(s.events, utc(2026, 10, 1)), [r1])
+    # 6 features landed with code in; feature 120 had its code in and was removed anyway.
+    assert cal.removed_despite_code[""] == Rate(1, 7)
+
+
+def test_non_code_removal_lowers_odds_of_a_feature_with_its_code_in() -> None:
+    s, r1, r2 = with_side_pr_and_late_removal()
+    cal = calibrate(project(s.events, utc(2026, 10, 1)), [r1])
+    s.feature(3, r2, [(utc(2026, 9, 1), True)])
+    s.pr(9003, 3, utc(2026, 9, 5), merged=utc(2026, 9, 15))
+    world = project(s.events, utc(2026, 10, 27))
+    args = (
+        world.features["kubernetes/enhancements#3"],
+        world.releases[r2],
+        world,
+        link_release(world, r2),
+        cal,
+    )
+    plain = forecast_feature(*args, FAST)
+    adjusted = forecast_feature(*args, ForecastConfig(10, 300, non_code_removal=True))
+    assert plain.probability is not None
+    assert adjusted.probability is not None
+    # Posterior removal rate (1 + 1) / (7 + 2) = 0.22: odds drop by about that share.
+    assert adjusted.probability == pytest.approx(plain.probability * (1 - 2 / 9), abs=0.08)
