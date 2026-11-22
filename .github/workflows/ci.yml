@@ -27,6 +27,8 @@ jobs:
         run: uv sync --frozen
       - name: make test (ruff + mypy + pytest)
         run: make test
+      - name: Evals (must pass before merge, CLAUDE.md section 8)
+        run: uv run python -m evals.run_evals --no-save
 
   integration:
     name: Integration tests (Postgres, Redis)

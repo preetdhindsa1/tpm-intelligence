@@ -33,8 +33,8 @@ test-integration: ## Tests that need docker compose services running
 web-test: ## Web: lint, typecheck, unit tests, build (runs in Node 20 via Docker)
 	docker run --rm -v "$(CURDIR)/web":/app -w /app node:20-alpine sh -c "npm ci --no-audit --no-fund && npm run lint && npm run typecheck && npm test && npm run build"
 
-evals: ## AI eval suite (no AI agents in phase 1)
-	@echo "No evals yet: AI agents are out of scope for phase 1."
+evals: ## Eval suites (fact checker, linking); saves docs/results/evals-*.json
+	$(UV) run python -m evals.run_evals
 
 backfill: ## Load release data, e.g. make backfill TEAM=kubernetes RELEASE=v1.38
 	@test -n "$(RELEASE)" || (echo "usage: make backfill TEAM=kubernetes RELEASE=v1.38" && exit 2)

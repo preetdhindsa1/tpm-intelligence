@@ -1,0 +1,161 @@
+{
+ "k8s": [
+  {
+   "key": "release::code_freeze_at",
+   "kind": "date",
+   "value": "2026-11-17T12:00:00+00:00"
+  },
+  {
+   "key": "release::enhancements_freeze_at",
+   "kind": "date",
+   "value": "2026-09-30T12:00:00+00:00"
+  },
+  {
+   "key": "release::release_at",
+   "kind": "date",
+   "value": "2026-12-16T00:00:00+00:00"
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::last_removed_from_release_at",
+   "kind": "date",
+   "value": "2026-11-17T12:05:57+00:00"
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::last_added_to_release_at",
+   "kind": "date",
+   "value": "2026-11-21T00:33:55+00:00"
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::last_tracked_at",
+   "kind": "date",
+   "value": "2026-11-21T00:33:55+00:00"
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::in_release",
+   "kind": "boolean",
+   "value": true
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::stage",
+   "kind": "label",
+   "value": "alpha"
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::main_pr",
+   "kind": "label",
+   "value": "kubernetes/kubernetes#143709"
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::prs.total",
+   "kind": "count",
+   "value": 6
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::prs.merged",
+   "kind": "count",
+   "value": 4
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::prs.open",
+   "kind": "count",
+   "value": 0
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::prs.suggested",
+   "kind": "count",
+   "value": 2
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::flag.late_main_pr.days_before_freeze",
+   "kind": "duration_days",
+   "value": 14.8
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::odds.validated",
+   "kind": "boolean",
+   "value": false
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::odds.probability",
+   "kind": "probability",
+   "value": 0.384
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::odds.low",
+   "kind": "probability",
+   "value": 0.3
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::odds.high",
+   "kind": "probability",
+   "value": 0.46
+  },
+  {
+   "key": "feature:kubernetes/enhancements#6395::odds.base_rate",
+   "kind": "probability",
+   "value": 0.72
+  },
+  {
+   "key": "pr:kubernetes/kubernetes#143709::created_at",
+   "kind": "date",
+   "value": "2026-11-02T16:44:28+00:00"
+  },
+  {
+   "key": "pr:kubernetes/kubernetes#143709::merged_at",
+   "kind": "date",
+   "value": "2026-11-20T23:28:24+00:00"
+  },
+  {
+   "key": "pr:kubernetes/kubernetes#143709::freeze_status",
+   "kind": "label",
+   "value": "merged_after_freeze_with_exception"
+  },
+  {
+   "key": "pr:kubernetes/kubernetes#143709::review_rounds",
+   "kind": "count",
+   "value": 3
+  },
+  {
+   "key": "feature:kubernetes/enhancements#2570::last_removed_from_release_at",
+   "kind": "date",
+   "value": "2026-11-17T12:38:00+00:00"
+  },
+  {
+   "key": "sig:sig/node::unlinked_open_prs",
+   "kind": "count",
+   "value": 212
+  },
+  {
+   "key": "release::features_with_flag.removed_at_freeze",
+   "kind": "count",
+   "value": 9
+  }
+ ],
+ "kafka": [
+  {
+   "key": "feature:KAFKA-21181::status_category",
+   "kind": "label",
+   "value": "In Progress"
+  },
+  {
+   "key": "feature:KAFKA-21181::fix_versions.count",
+   "kind": "count",
+   "value": 4
+  },
+  {
+   "key": "feature:KAFKA-21181::fix_versions.released.count",
+   "kind": "count",
+   "value": 4
+  },
+  {
+   "key": "feature:KAFKA-19831::fix_version_changes",
+   "kind": "count",
+   "value": 3
+  },
+  {
+   "key": "feature:KAFKA-19831::links_to",
+   "kind": "label",
+   "value": "KAFKA-17789"
+  }
+ ]
+}

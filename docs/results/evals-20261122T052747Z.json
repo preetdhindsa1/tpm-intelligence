@@ -1,0 +1,32 @@
+{
+ "measured_at": "20261122T052747Z",
+ "suites": [
+  {
+   "suite": "fact_checker",
+   "cases": 36,
+   "labels": {
+    "proposed": 36
+   },
+   "agreement": 1.0,
+   "threshold": 1.0,
+   "passed": true,
+   "verdicts": {
+    "no_supporting_data": 3,
+    "text_mismatch": 2,
+    "type_mismatch": 1,
+    "verified": 19,
+    "wrong_value": 11
+   },
+   "failures": []
+  },
+  {
+   "suite": "linking",
+   "rows": 70,
+   "labelled": 0,
+   "status": "TBD (not yet labelled)",
+   "verified_precision": null,
+   "by_method": {},
+   "passed": true
+  }
+ ]
+}

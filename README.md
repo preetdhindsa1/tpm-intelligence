@@ -117,7 +117,8 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Forecast backtest, v1.35-v1.38 at 28/14/7 days before freeze, recalibrated | **Beats the base rate in 9 of 12 cases, not all**: skill −0.29 to +0.25 (v1.36 fails at 14 and 7 days, v1.37 at 7 days); improves on raw odds everywhere; AUC 0.51-0.76. Odds stay "not validated". Measured 2026-11-22; details in ADR-0005 |
 | Linking coverage: tracked v1.38 features with ≥1 verified PR | **68 / 69 (98.6%)**, measured 2026-11-21 21:36 UTC |
 | PRs in the v1.38 window with a verified link | **609 / 2,757 (22.1%)**; 24 suggested-only; 2,124 unlinked (count as load) |
-| Linking precision per method | TBD (not yet measured): needs a hand-labelled sample |
+| Linking precision per method | TBD (not yet labelled): 70-row stratified v1.38 sample ready in `evals/cases/linking.csv` |
+| Fact checker vs labelled claims (`make evals`) | **36 / 36 agree** (19 verified, 17 removed across all 4 reasons). Labels are proposed by the developer, pending TPM review. Measured 2026-11-22 |
 | Engine: assess all 106 v1.38 features from 60,230 events | project 0.22 s + assess 0.89 s (single run, laptop, Docker; not a p95) |
 | API `/releases` (dashboard home), 162k events, 6 releases | cold cache **6.9 s**, warm 0.06 s (was several minutes cold: it forecast every release). Single runs, laptop, Docker; measured 2026-11-21, not a p95 |
 | API v1.38 feature table, cold cache, 3 concurrent requests | **~21 s** each, sharing **one** computation (was one computation per request). Single run, measured 2026-11-21 |
@@ -126,6 +127,12 @@ make tf-plan                # offline plan: placeholder project, dummy token
 
 Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 `DATABASE_URL=... uv run python scripts/measure_linking.py --release v1.38`.
+
+## Phase 2 progress
+
+- **M1 done: fact checker and evals** (`verify/`, `evals/`, ADR-0008). Engine output becomes
+  a typed fact sheet. AI claims must cite fact keys and are verified or removed with a
+  reason. No AI agents yet.
 
 ## Limitations
 
