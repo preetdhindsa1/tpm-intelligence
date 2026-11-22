@@ -46,7 +46,8 @@ finished releases (v1.36, v1.37).
    bin) and forced to be monotone (pool-adjacent-violators), so ranking is unchanged. Raw
    odds are kept and shown.
 8. **Validation gate** (`api/validation.py`). Odds count as validated only if the newest
-   backtest shows recalibrated skill > 0 at every lead time. Otherwise the API and dashboard
+   backtest shows recalibrated skill > 0 at every lead time for every backtested release
+   (tightened 2026-11-22; see results). Otherwise the API and dashboard
    label them "not validated" and show the base rate next to them (same rule as CLAUDE.md §14
    for the simulator).
 
@@ -108,7 +109,30 @@ features are also removed for non-code reasons.
 **Caveat:** variant 2 was chosen after looking at v1.36-v1.38 outcomes, so its backtest is
 not fully out-of-sample. v1.39 will be the first unseen test.
 
-**Variant 2 + recalibration, with v1.33-v1.38 backfilled:** TBD (not yet measured).
+**Variant 2 + recalibration, v1.33-v1.38 backfilled** (`backtest-20261122T014032Z.json`,
+measured 2026-11-22, 245 s on a laptop). Each release is recalibrated only on releases before
+it (v1.33 has no earlier release, so it serves only as calibration data).
+
+| Release (recalibrated on) | Landed | Recalibrated skill 28 / 14 / 7 d | Raw skill | AUC |
+|---|---|---|---|---|
+| v1.35 (v1.34) | 52-63% | **+0.07 / +0.10 / +0.25** | −0.15 / −0.11 / +0.15 | 0.65 / 0.67 / 0.76 |
+| v1.36 (v1.34-v1.35) | 89-91% | +0.09 / **−0.15 / −0.29** | −0.10 / −1.27 / −1.42 | 0.69 / 0.51 / 0.64 |
+| v1.37 (v1.34-v1.36) | 77% | +0.13 / +0.07 / **−0.01** | −0.39 / −0.69 / −1.00 | 0.64 / 0.66 / 0.65 |
+| v1.38 (v1.34-v1.37) | 72% | +0.09 / +0.02 / +0.04 | −0.47 / −0.74 / −0.73 | 0.59 / 0.63 / 0.64 |
+
+**Verdict: recalibration helps, but does not beat the base rate everywhere.** It improves on
+the raw odds at every release and lead time. It beats the base rate in 9 of 12 cases, by small
+margins (+0.02 to +0.25). It fails on v1.36 at 14 and 7 days: 91% of v1.36 features landed,
+well above the earlier releases' rate, so the recalibration was too pessimistic. It also fails
+narrowly on v1.37 at 7 days. Ranking stays modest (AUC 0.51-0.76).
+
+**Validation gate tightened (2026-11-22, `api/validation.py`).** The old gate checked only the
+newest release, and this run passed it on v1.38 alone. v1.38 was also used to choose
+variant 2. The gate now requires skill > 0 at every lead time for **every** backtested
+release, so the odds stay "not validated".
+
+Next candidates (not done): non-code removals (features with the main PR merged still slip
+about 20% of the time), per-stage new-PR rates, and v1.39 as the first unseen test.
 
 ## AI vs rules
 

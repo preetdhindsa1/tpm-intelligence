@@ -10,8 +10,9 @@ drafts the executive update for a human to approve.
 
 > **Status: phase 1, dashboard.** Collect → link → engine → API → web dashboard runs end to end on local
 > Docker. **Kubernetes is a live example team** (see `connectors/teams/`); the platform is meant for any
-> cross-functional release. The forecast is built and backtested, and it **does not yet beat the
-> historical base rate** (see results), so the dashboard labels forecast odds "not validated".
+> cross-functional release. The forecast is built and backtested. After recalibration it beats the
+> historical base rate in 9 of 12 backtest cases but not all (see results), so the dashboard labels
+> forecast odds "not validated".
 > Everything else below is **TBD (not yet measured)**.
 
 ### Plug in another team
@@ -113,7 +114,7 @@ make tf-plan                # offline plan: placeholder project, dummy token
 
 | Metric | Value |
 |---|---|
-| Forecast backtest, v1.37 and v1.38 at 28/14/7 days before freeze | **Does not beat the base rate yet**: Brier 0.31-0.37 vs baseline 0.18-0.21 (skill −0.6 to −0.9); ranking AUC 0.60-0.68. Measured 2026-11-21; details and diagnosis in ADR-0005 |
+| Forecast backtest, v1.35-v1.38 at 28/14/7 days before freeze, recalibrated | **Beats the base rate in 9 of 12 cases, not all**: skill −0.29 to +0.25 (v1.36 fails at 14 and 7 days, v1.37 at 7 days); improves on raw odds everywhere; AUC 0.51-0.76. Odds stay "not validated". Measured 2026-11-22; details in ADR-0005 |
 | Linking coverage: tracked v1.38 features with ≥1 verified PR | **68 / 69 (98.6%)**, measured 2026-11-21 21:36 UTC |
 | PRs in the v1.38 window with a verified link | **609 / 2,757 (22.1%)**; 24 suggested-only; 2,124 unlinked (count as load) |
 | Linking precision per method | TBD (not yet measured): needs a hand-labelled sample |

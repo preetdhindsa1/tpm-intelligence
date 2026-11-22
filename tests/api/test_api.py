@@ -169,3 +169,27 @@ def test_validation_gate_reads_newest_backtest(tmp_path: Path) -> None:
     v = load_validation(tmp_path)
     assert v.validated is False
     assert v.source_file == "backtest-20261121T000000Z.json"
+
+
+def test_validation_gate_requires_every_backtested_release(tmp_path: Path) -> None:
+    """Shape of the 2026-11-22 backtest: newest release passes, an earlier one fails."""
+    import json
+
+    skills = {
+        "kubernetes:v1.36": (0.085, -0.154, -0.285),
+        "kubernetes:v1.37": (0.127, 0.07, -0.013),
+        "kubernetes:v1.38": (0.086, 0.02, 0.035),
+    }
+    results = [
+        {"release": rel, "lead_days": lead, "skill": s, "skill_raw": -0.5, "auc": 0.6, "n": 80}
+        for rel, row in skills.items()
+        for lead, s in zip((28, 14, 7), row, strict=True)
+    ]
+    (tmp_path / "backtest-20261122T000000Z.json").write_text(json.dumps({"results": results}))
+    v = load_validation(tmp_path)
+    assert v.validated is False
+    assert v.release == "kubernetes:v1.38"
+    assert "v1.36 at 14 days" in v.reason
+    assert "v1.37 at 7 days" in v.reason
+    assert "v1.38" not in v.reason
+    assert len(v.leads) == 9

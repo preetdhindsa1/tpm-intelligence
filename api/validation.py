@@ -1,8 +1,12 @@
 """Forecast validation gate (mirrors CLAUDE.md section 14 for the simulator).
 
 Odds are shown as validated only if the newest backtest file reports recalibrated skill > 0
-at every lead time for its most recent target release. Otherwise the dashboard labels them
+at every lead time for **every** release it backtested. Otherwise the dashboard labels them
 "not validated" and shows the base rate next to them.
+
+Decision 2026-11-22: checking only the newest release was too lenient. The v1.35-v1.38
+backtest passed on v1.38 alone (+0.02 to +0.09) while v1.36 and v1.37 failed at some lead
+times, and v1.38 was used to choose the model variant (ADR-0005).
 """
 
 from __future__ import annotations
@@ -48,19 +52,21 @@ def load_validation(results_dir: Path = DEFAULT_DIR) -> Validation:
     release = max(r["release"] for r in results)
     leads = [
         {
+            "release": r["release"],
             "lead_days": r["lead_days"],
             "skill": r.get("skill"),
             "skill_raw": r.get("skill_raw"),
             "auc": r.get("auc"),
             "n": r.get("n"),
         }
-        for r in results
-        if r["release"] == release
+        for r in sorted(results, key=lambda r: (r["release"], -r["lead_days"]))
     ]
-    ok = all(lead["skill"] is not None and lead["skill"] > 0 for lead in leads)
-    reason = (
-        "recalibrated odds beat the base rate at every lead time"
-        if ok
-        else "recalibrated odds do not beat the base rate at every lead time"
-    )
-    return Validation(ok, reason, files[-1].name, release, leads)
+    failing = [lead for lead in leads if lead["skill"] is None or lead["skill"] <= 0]
+    if not failing:
+        reason = "recalibrated odds beat the base rate at every lead time in every release"
+    else:
+        where = ", ".join(
+            f"{str(lead['release']).split(':')[-1]} at {lead['lead_days']} days" for lead in failing
+        )
+        reason = f"recalibrated odds do not beat the base rate everywhere (fails: {where})"
+    return Validation(not failing, reason, files[-1].name, release, leads)
