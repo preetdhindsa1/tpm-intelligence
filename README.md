@@ -125,6 +125,7 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Link suggester: shortlist recall (rule-linked PRs with keys hidden, no AI) | Right feature in the 12-item shortlist **88.1%** (v1.37, 1,040 PRs) and **86.8%** (v1.38, 949 PRs). Measured 2026-11-22; ADR-0011 |
 | Link suggester live eval (60 hidden-key cases, Haiku 5.5, `link_suggester.v1`) | **Precision 84.8%**, recall 70%, false links on negatives 20%, 5.7% dropped by checks, $0.025 per run. Measured 2026-11-22; small sample |
 | Link suggester on real v1.38 unlinked PRs | 1,797 unlinked → **104 suggestions** waiting for review, 1,636 "none", 11 dropped, 46 with no shortlist; **$0.54** in total. Reviewed precision: TBD (not yet reviewed). None of these count until a person confirms them |
+| Simulator validation (replay with real arrivals and staffing, fitted only on earlier releases, ±20% on medians) | **Not validated.** v1.37 passes (review wait −13%, time to merge −16%); **v1.38 fails** on review wait (−38%; time to merge −8%). Measured 2026-11-22; ADR-0012 |
 | Engine: assess all 106 v1.38 features from 60,230 events | project 0.22 s + assess 0.89 s (single run, laptop, Docker; not a p95) |
 | API `/releases` (dashboard home), 162k events, 6 releases | cold cache **6.9 s**, warm 0.06 s (was several minutes cold: it forecast every release). Single runs, laptop, Docker; measured 2026-11-21, not a p95 |
 | API v1.38 feature table, cold cache, 3 concurrent requests | **~21 s** each, sharing **one** computation (was one computation per request). Single run, measured 2026-11-21 |
@@ -160,6 +161,9 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   are checked word for word. "Link review →" on the release page lists suggestions; only a
   person's confirmation makes a link count. `make suggest-links RELEASE=v1.38` runs it
   within the daily budget.
+- **M5 in progress: review simulator** (ADR-0012). SimPy model of PRs queueing for SIG
+  reviewer pools, fitted on earlier releases and validated by replay. It passes on v1.37
+  but fails on v1.38, so it is **not validated**; scenarios are not built yet.
 
 ## Limitations
 

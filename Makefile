@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links
+.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links sim-validate
 
 UV ?= uv
 RELEASE ?=
@@ -82,6 +82,9 @@ evals-live: ## Paid agent evals (risk analyst ~$0.03, VP summary ~$0.40); SUITE=
 	  -e DATABASE_URL=postgresql+psycopg://tpm:tpm@postgres:5432/tpm \
 	  -e OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317 -e OTEL_EXPORTER_OTLP_INSECURE=true \
 	  -v "$(CURDIR)/docs/results:/app/docs/results" tpm-intelligence-api python -m evals.agents --suite $(or $(SUITE),all)
+
+sim-validate: ## Fit the simulator on earlier releases, replay v1.37 and v1.38 (~3 min, no AI)
+	$(UV) run python scripts/validate_simulator.py
 
 suggest-links: ## Paid AI link suggestions for unlinked PRs (~$0.0004 each); RELEASE=v1.38 LIMIT=
 	docker compose build -q api

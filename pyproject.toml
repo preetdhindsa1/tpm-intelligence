@@ -28,6 +28,7 @@ dependencies = [
     "anthropic>=1.0",
     "opentelemetry-exporter-otlp-proto-http>=1.28",
     "langgraph>=0.2",
+    "simpy>=4.1",
 ]
 
 [dependency-groups]
@@ -94,11 +95,11 @@ disallow_incomplete_defs = true
 
 # CLAUDE.md section 4: strict for the fact-producing packages.
 [[tool.mypy.overrides]]
-module = ["engine.*", "linker.*", "verify.*"]
+module = ["engine.*", "linker.*", "verify.*", "simulator.*"]
 strict = true
 
 [[tool.mypy.overrides]]
-module = ["opentelemetry.instrumentation.*", "google.cloud.*"]
+module = ["opentelemetry.instrumentation.*", "google.cloud.*", "simpy.*"]
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------- pytest
