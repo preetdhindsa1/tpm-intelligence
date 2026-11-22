@@ -179,9 +179,11 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
     2026-11-22).
   - `make sim-calibrate RELEASE=v1.38` fits and stores the calibration.
 - **M6: dashboard redesign** (ADR-0013), in light colours, based on the owner's mockup.
-  - A sidebar, five stat tiles, and the dependency graph (React Flow): features coloured
-    by their most severe flag, verified PR links only. A full Dependencies page has search
-    and a SIG filter.
+  - A sidebar, five stat tiles, and a summary of how features depend on each other.
+  - A Dependencies page (rebuilt, see the ADR-0013 addendum): groups of features that share
+    verified PRs or state a "depends on", a map with a per-feature side panel, open PRs
+    waiting on an unmerged PR, and SIGs that share features. In v1.38: 28 of 70 features
+    are tied to another, in 3 groups.
   - A chart of what happened at Code Freeze, or each feature's odds before it.
   - The newest executive brief: approved, or clearly marked as a draft, with every line
     fact-checked.

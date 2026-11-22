@@ -19,6 +19,7 @@ from api.live import Updates
 from api.schemas import (
     ClaimOutApi,
     DecisionIn,
+    DependenciesOut,
     ExecUpdateOut,
     FeatureDetailOut,
     FeaturesOut,
@@ -40,6 +41,7 @@ from api.schemas import (
 )
 from api.service import ReleaseService, ReleaseView
 from api.views import (
+    dependencies_out,
     feature_detail,
     feature_row,
     graph_out,
@@ -546,6 +548,11 @@ def create_app(
     async def graph(name: str) -> GraphOut:
         """Release dependency graph: features, verified PR links, stated PR dependencies."""
         return graph_out(await view(name))
+
+    @app.get("/releases/{name}/dependencies", response_model=DependenciesOut)
+    async def dependencies(name: str, include_removed: bool = False) -> DependenciesOut:
+        """Feature-to-feature dependencies: shared PRs, stated "depends on", waiting PRs."""
+        return dependencies_out(await view(name), include_removed)
 
     @app.get("/releases/{name}/load", response_model=LoadOut)
     async def load(name: str) -> LoadOut:

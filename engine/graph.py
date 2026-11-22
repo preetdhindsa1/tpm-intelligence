@@ -13,8 +13,10 @@ one or two PRs. We report what the data shows, nothing deeper.
 
 from __future__ import annotations
 
+import itertools
 import re
 from collections.abc import Callable, Iterable, Mapping
+from dataclasses import dataclass
 
 import networkx as nx
 
@@ -113,3 +115,119 @@ def critical_path(
         best[node] = (base[0] + own, [*base[1], node])
     # Ties resolve to the first path in lexicographic topological order (deterministic).
     return max(best.values(), key=lambda t: t[0])[1]
+
+
+# --- Feature-to-feature dependencies (ADR-0013 addendum) ---------------------------------
+
+
+@dataclass(frozen=True)
+class StatedDependency:
+    """A PR of ``downstream`` says it depends on a PR that only ``upstream`` owns."""
+
+    upstream: str
+    downstream: str
+    blocker: str
+    dependent: str
+
+
+@dataclass(frozen=True)
+class Coupling:
+    """Two features tied by shared PRs and/or stated cross-feature dependencies.
+
+    A shared PR means the same verified PR is listed for both features: shared code, not
+    proof that one blocks the other. ``a < b`` so each pair appears once.
+    """
+
+    a: str
+    b: str
+    shared_prs: tuple[str, ...]
+    stated: tuple[StatedDependency, ...]
+
+
+@dataclass(frozen=True)
+class WaitingPR:
+    """An open PR that says it depends on a PR that has not merged."""
+
+    pr: str
+    waits_on: str
+    waits_on_state: str  # open | closed (closed = never merged)
+    features: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class FeatureDependencies:
+    """How the given features depend on each other, from verified links and PR text."""
+
+    couplings: tuple[Coupling, ...]
+    clusters: tuple[tuple[str, ...], ...]  # connected groups (2+ features), largest first
+    standalone: tuple[str, ...]  # features with no coupling
+    waiting: tuple[WaitingPR, ...]
+    sig_pairs: tuple[tuple[str, str, int], ...]  # (sig, sig, features owned by both)
+
+
+def feature_dependencies(
+    feature_prs: Mapping[str, Iterable[str]],
+    feature_sigs: Mapping[str, Iterable[str]],
+    pr_state: Mapping[str, str],
+    pr_deps: Mapping[str, Iterable[str]],
+) -> FeatureDependencies:
+    """Couplings, clusters, waiting PRs and SIG pairs for a set of features.
+
+    ``feature_prs`` maps feature key -> verified PR keys; ``pr_state`` gives each known PR's
+    state (open | merged | closed); ``pr_deps`` maps PR key -> PR keys it says it depends
+    on (:func:`pr_dependencies`). Deterministic: every output is sorted.
+    """
+    prs = {f: set(p) for f, p in feature_prs.items()}
+    owners: dict[str, set[str]] = {}
+    for f, keys in prs.items():
+        for k in keys:
+            owners.setdefault(k, set()).add(f)
+
+    shared: dict[tuple[str, str], set[str]] = {}
+    for pr, fs in owners.items():
+        for a, b in itertools.combinations(sorted(fs), 2):
+            shared.setdefault((a, b), set()).add(pr)
+
+    stated: dict[tuple[str, str], set[StatedDependency]] = {}
+    waiting: list[WaitingPR] = []
+    for pr in sorted(owners):
+        for dep in sorted(set(pr_deps.get(pr, ()))):
+            for down in owners[pr]:
+                for up in owners.get(dep, ()):
+                    if up != down and dep not in prs[down]:
+                        pair = (min(up, down), max(up, down))
+                        stated.setdefault(pair, set()).add(StatedDependency(up, down, dep, pr))
+            state = pr_state.get(dep)
+            if pr_state.get(pr) == "open" and state is not None and state != "merged":
+                waiting.append(WaitingPR(pr, dep, state, tuple(sorted(owners[pr]))))
+
+    couplings = tuple(
+        Coupling(
+            a,
+            b,
+            tuple(sorted(shared.get((a, b), ()))),
+            tuple(
+                sorted(stated.get((a, b), ()), key=lambda d: (d.upstream, d.blocker, d.dependent))
+            ),
+        )
+        for a, b in sorted(set(shared) | set(stated))
+    )
+
+    g: nx.Graph[str] = nx.Graph()
+    g.add_edges_from((c.a, c.b) for c in couplings)
+    clusters = tuple(
+        sorted(
+            (tuple(sorted(c)) for c in nx.connected_components(g)),
+            key=lambda c: (-len(c), c),
+        )
+    )
+    standalone = tuple(sorted(f for f in prs if f not in g))
+
+    pairs: dict[tuple[str, str], int] = {}
+    for f in prs:
+        for a, b in itertools.combinations(sorted(set(feature_sigs.get(f, ()))), 2):
+            pairs[(a, b)] = pairs.get((a, b), 0) + 1
+    sig_pairs = tuple(
+        sorted(((a, b, n) for (a, b), n in pairs.items()), key=lambda t: (-t[2], t[0], t[1]))
+    )
+    return FeatureDependencies(couplings, clusters, standalone, tuple(waiting), sig_pairs)

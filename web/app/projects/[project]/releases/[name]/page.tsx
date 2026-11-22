@@ -1,7 +1,7 @@
 import { releaseFromParams } from "@/lib/release-page";
 import { releasePath } from "@/lib/routes";
 import Link from "next/link";
-import { DependencyGraph } from "@/components/DependencyGraph";
+import { DependencySummary } from "@/components/DependencySummary";
 import { ExecBrief } from "@/components/ExecBrief";
 import { FlagChips } from "@/components/Flags";
 import { LiveRefresh } from "@/components/LiveRefresh";
@@ -18,10 +18,10 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
   const release = await releaseFromParams(params);
   const name = release.name;
   const project = release.project;
-  const [data, summary, graph, updates] = await Promise.all([
+  const [data, summary, deps, updates] = await Promise.all([
     api.features(name),
     api.summary(name),
-    api.graph(name),
+    api.dependencies(name),
     api.updates(name).catch(() => []),
   ]);
   const r = data.release;
@@ -47,9 +47,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
       <StatTiles summary={summary} />
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]">
-        <Panel title="Release dependency graph" subtitle="Features and their verified PRs, most severe first">
+        <Panel title="Feature dependencies" subtitle="Features tied by shared PRs or a stated &quot;depends on&quot;">
           <div className="h-[480px]">
-            <DependencyGraph project={project} release={name} data={graph} preview />
+            <DependencySummary project={project} release={name} data={deps} />
           </div>
         </Panel>
         <Panel

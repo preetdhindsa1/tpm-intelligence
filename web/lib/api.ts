@@ -96,7 +96,8 @@ export const api = {
   features: (release: string) => get<FeaturesResponse>(`/releases/${release}/features`),
   feature: (release: string, n: number) => get<FeatureDetail>(`/releases/${release}/features/${n}`),
   summary: (release: string) => get<Summary>(`/releases/${release}/summary`),
-  graph: (release: string) => get<GraphData>(`/releases/${release}/graph`),
+  dependencies: (release: string, includeRemoved = false) =>
+    get<Dependencies>(`/releases/${release}/dependencies${includeRemoved ? "?include_removed=true" : ""}`),
   updates: (release: string) => get<ExecUpdate[]>(`/releases/${release}/updates`),
 };
 
@@ -314,22 +315,33 @@ export type Summary = {
   features: { key: string; number: number; title: string; outcome: Outcome; sigs: string[] }[];
 };
 
-export type GraphNode = {
-  id: string;
-  kind: "release" | "feature" | "pull_request";
-  label: string;
+
+// Feature-to-feature dependencies (api/schemas.py DependenciesOut).
+export type DepPR = { key: string; number: number; title: string; url: string; state: string; is_main: boolean; freeze_status: string };
+export type DepFeature = {
+  key: string;
+  number: number;
   title: string;
   url: string | null;
   sigs: string[];
-  in_release: boolean | null;
-  severity: "info" | "warning" | "critical" | null;
+  in_release: boolean;
+  severity: string | null;
   flags: string[];
-  state: "open" | "merged" | "closed" | null;
-  is_main: boolean | null;
-  on_critical_path: boolean;
-  feature: string | null;
+  outcome: Outcome;
+  cluster: number | null;
+  prs: DepPR[];
 };
-
-export type GraphEdge = { source: string; target: string; kind: "contains" | "implemented_by" | "blocks" };
-
-export type GraphData = { release: string; as_of: string; nodes: GraphNode[]; edges: GraphEdge[] };
+export type StatedDependency = { upstream: string; downstream: string; blocker: string; dependent: string };
+export type Coupling = { a: string; b: string; shared_prs: string[]; stated: StatedDependency[] };
+export type WaitingPR = { pr: string; pr_title: string; waits_on: string; waits_on_title: string; waits_on_state: string; features: string[] };
+export type Dependencies = {
+  release: string;
+  as_of: string;
+  include_removed: boolean;
+  features: DepFeature[];
+  pr_edges: { source: string; target: string; kind: string }[];
+  couplings: Coupling[];
+  clusters: string[][];
+  waiting: WaitingPR[];
+  sig_pairs: { a: string; b: string; features: number }[];
+};

@@ -420,3 +420,82 @@ class SummaryOut(_Out):
     unlinked_open_prs: int
     outcomes: dict[str, int]
     features: list[FeatureOutcomeOut]
+
+
+class DepPROut(_Out):
+    """A verified PR of a feature on the dependencies page."""
+
+    key: str
+    number: int
+    title: str
+    url: str
+    state: str  # open | merged | closed
+    is_main: bool
+    freeze_status: str
+
+
+class DepFeatureOut(_Out):
+    """A feature on the dependencies page."""
+
+    key: str
+    number: int
+    title: str
+    url: str | None
+    sigs: list[str]
+    in_release: bool
+    severity: str | None
+    flags: list[str]
+    outcome: str
+    cluster: int | None  # index into ``clusters``; None = stand-alone
+    prs: list[DepPROut]
+
+
+class StatedDependencyOut(_Out):
+    """A PR of ``downstream`` says it depends on a PR only ``upstream`` owns."""
+
+    upstream: str
+    downstream: str
+    blocker: str
+    dependent: str
+
+
+class CouplingOut(_Out):
+    """Two features tied by shared PRs (shared code) and/or stated dependencies."""
+
+    a: str
+    b: str
+    shared_prs: list[str]
+    stated: list[StatedDependencyOut]
+
+
+class WaitingPROut(_Out):
+    """An open PR that says it depends on a PR that has not merged."""
+
+    pr: str
+    pr_title: str
+    waits_on: str
+    waits_on_title: str
+    waits_on_state: str
+    features: list[str]
+
+
+class SigPairOut(_Out):
+    """Features owned by both SIGs (coordination load). Per SIG, never per person."""
+
+    a: str
+    b: str
+    features: int
+
+
+class DependenciesOut(_Out):
+    """Feature-to-feature dependencies from verified links and PR text (engine/graph.py)."""
+
+    release: str
+    as_of: datetime
+    include_removed: bool
+    features: list[DepFeatureOut]
+    pr_edges: list[GraphEdgeOut]  # blocks edges between the PRs listed above
+    couplings: list[CouplingOut]
+    clusters: list[list[str]]
+    waiting: list[WaitingPROut]
+    sig_pairs: list[SigPairOut]

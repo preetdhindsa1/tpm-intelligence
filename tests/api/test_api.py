@@ -421,3 +421,21 @@ def test_graph_has_verified_links_only(after_readd: TestClient) -> None:
     # #143644 only mentions #6395 in passing: a suggestion, never a graph edge.
     assert (f, "kubernetes/kubernetes#143644", "implemented_by") not in edges
     assert all(e["source"] in nodes and e["target"] in nodes for e in g["edges"])
+
+
+def test_dependencies_page_data_on_the_6395_fixtures(after_readd: TestClient) -> None:
+    d = after_readd.get("/releases/v1.38/dependencies").json()
+    keys = {f["key"] for f in d["features"]}
+    assert "kubernetes/enhancements#6395" in keys
+    f = next(x for x in d["features"] if x["key"] == "kubernetes/enhancements#6395")
+    assert f["outcome"] == "readded_after_freeze"
+    prs = {p["number"] for p in f["prs"]}
+    assert 143709 in prs
+    # #143644 only mentions #6395 in passing: never a verified PR of the feature.
+    assert 143644 not in prs
+    # Every coupling and cluster refers to listed features; stand-alone ones have none.
+    for c in d["couplings"]:
+        assert {c["a"], c["b"]} <= keys
+    for f in d["features"]:
+        assert (f["cluster"] is None) == all(f["key"] not in c for c in d["clusters"])
+    assert all(e["kind"] == "blocks" for e in d["pr_edges"])

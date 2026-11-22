@@ -92,3 +92,41 @@ CLAUDE.md rules that shape it:
 The only AI content is the executive brief. It was generated earlier, fact-checked claim by
 claim (ADR-0008, ADR-0010), and is shown as stored. Every count, colour and graph edge comes
 from rules and the engine.
+
+## Addendum (2026-11-22): dependencies page rebuilt around feature-to-feature ties
+
+**Why.** The first Dependencies page drew release → every feature → each feature's main
+PR. That is a hierarchy, not dependencies: it showed almost nothing a TPM could act on,
+and it did not show what the v1.38 data does contain:
+
+- 42 pairs of in-release features share verified PRs;
+- 4 PRs say they depend on a PR of another feature (#6268 → #3157 → #6404 is a chain);
+- 2 open PRs wait on an unmerged PR, one of them on a PR closed without merging;
+- 26 of 70 features carry labels from 2 to 5 SIGs.
+
+**Decision.**
+- `engine/graph.py::feature_dependencies` (pure, tested) computes, from verified links
+  and the existing "depends on" parser:
+  - couplings (shared PRs, and stated cross-feature dependencies with a direction);
+  - connected groups of features;
+  - stand-alone features;
+  - open PRs waiting on an unmerged PR;
+  - SIG pairs that share features.
+  
+  `GET /releases/{r}/dependencies` serves it.
+- The page shows:
+  - tiles for these facts;
+  - a map of **features only**, one group at a time (the largest first), as rings around
+    the most connected feature, with arrows for stated dependencies;
+  - a side panel for the clicked feature: who it is tied to and why, its PRs, and its PR
+    "depends on" edges;
+  - tables for waiting PRs, SIG pairs (per SIG, never per person) and stand-alone
+    features.
+- The dashboard panel is a text summary of the groups and waiting PRs, not a shrunken
+  graph: a 17-feature map is unreadable in a third of the page.
+- The release → feature → PR graph (`/graph`) stays in the API. The web no longer uses it,
+  so the dagre dependency was removed.
+
+**Honest limits.** A shared PR means the same verified PR is listed for both features:
+shared code, not proof that one blocks the other. The page says so. Stated dependencies
+come only from PR text, so most real dependencies are not visible.

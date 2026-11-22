@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 from api.schemas import (
+    CouplingOut,
+    DependenciesOut,
+    DepFeatureOut,
+    DepPROut,
     FeatureDetailOut,
     FeatureOutcomeOut,
     FeatureRowOut,
@@ -15,8 +19,11 @@ from api.schemas import (
     OddsOut,
     PullRequestOut,
     ReleaseOut,
+    SigPairOut,
+    StatedDependencyOut,
     SummaryOut,
     TimelineEntryOut,
+    WaitingPROut,
 )
 from api.service import ReleaseSummary, ReleaseView
 from connectors.load import display_name_for_project
@@ -298,3 +305,92 @@ def graph_out(view: ReleaseView) -> GraphOut:
             if dep in nodes:
                 edges.append(GraphEdgeOut(source=dep, target=key, kind="blocks"))
     return GraphOut(release=a.release.key, as_of=a.as_of, nodes=list(nodes.values()), edges=edges)
+
+
+def dependencies_out(view: ReleaseView, include_removed: bool = False) -> DependenciesOut:
+    """Feature-to-feature dependencies: shared PRs, stated "depends on", waiting PRs."""
+    from engine.graph import feature_dependencies, pr_dependencies
+
+    a = view.assessment
+    world = view.world
+    feats = [f for f in a.features if include_removed or f.in_release]
+    feature_prs = {f.key: [p.key for p in f.pull_requests] for f in feats}
+    owned = {k for keys in feature_prs.values() for k in keys}
+    pr_deps = {k: pr_dependencies(world.pull_requests[k]) for k in owned}
+    known = owned | {d for deps in pr_deps.values() for d in deps if d in world.pull_requests}
+    pr_state = {k: world.pull_requests[k].state for k in known}
+    deps = feature_dependencies(feature_prs, {f.key: f.teams for f in feats}, pr_state, pr_deps)
+    cluster_of = {k: i for i, members in enumerate(deps.clusters) for k in members}
+
+    def title(key: str) -> str:
+        pr = world.pull_requests.get(key)
+        return pr.title if pr else ""
+
+    return DependenciesOut(
+        release=a.release.key,
+        as_of=a.as_of,
+        include_removed=include_removed,
+        features=[
+            DepFeatureOut(
+                key=f.key,
+                number=_number(f.key),
+                title=f.title,
+                url=world.features[f.key].url,
+                sigs=list(f.teams),
+                in_release=f.in_release,
+                severity=_max_severity(f),
+                flags=sorted({x.code for x in f.flags}),
+                outcome=feature_outcome(view, f),
+                cluster=cluster_of.get(f.key),
+                prs=[
+                    DepPROut(
+                        key=p.key,
+                        number=_number(p.key),
+                        title=p.title,
+                        url=_url(p.key),
+                        state=p.state,
+                        is_main=p.is_main,
+                        freeze_status=p.freeze.status.value,
+                    )
+                    for p in f.pull_requests
+                ],
+            )
+            for f in feats
+        ],
+        pr_edges=[
+            GraphEdgeOut(source=d, target=k, kind="blocks")
+            for k in sorted(owned)
+            for d in pr_deps[k]
+            if d in known
+        ],
+        couplings=[
+            CouplingOut(
+                a=c.a,
+                b=c.b,
+                shared_prs=list(c.shared_prs),
+                stated=[
+                    StatedDependencyOut(
+                        upstream=d.upstream,
+                        downstream=d.downstream,
+                        blocker=d.blocker,
+                        dependent=d.dependent,
+                    )
+                    for d in c.stated
+                ],
+            )
+            for c in deps.couplings
+        ],
+        clusters=[list(c) for c in deps.clusters],
+        waiting=[
+            WaitingPROut(
+                pr=w.pr,
+                pr_title=title(w.pr),
+                waits_on=w.waits_on,
+                waits_on_title=title(w.waits_on),
+                waits_on_state=w.waits_on_state,
+                features=list(w.features),
+            )
+            for w in deps.waiting
+        ],
+        sig_pairs=[SigPairOut(a=x, b=y, features=n) for x, y, n in deps.sig_pairs],
+    )
