@@ -118,7 +118,7 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Linking coverage: tracked v1.38 features with ≥1 verified PR | **68 / 69 (98.6%)**, measured 2026-11-21 21:36 UTC |
 | PRs in the v1.38 window with a verified link | **609 / 2,757 (22.1%)**; 24 suggested-only; 2,124 unlinked (count as load) |
 | Linking precision per method | TBD (not yet labelled): 70-row stratified v1.38 sample ready in `evals/cases/linking.csv` |
-| Fact checker vs labelled claims (`make evals`) | **38 / 38 agree** (19 verified, 17 removed across all 4 reasons). Labels are proposed by the developer, pending TPM review. Measured 2026-11-22 |
+| Fact checker vs labelled claims (`make evals`) | **38 / 38 agree** (20 verified, 18 removed across all 4 reasons). Labels are proposed by the developer, pending TPM review. Measured 2026-11-22 |
 | First real AI calls (`make ai-smoke`, Haiku 5.5, #6395 fact sheet) | `smoke.v1`: 9 verified / 10 removed, mostly a checker false positive on bare feature numbers ("feature 6395"), now fixed. `smoke.v2`: **16 verified / 1 removed** (a sentence stating uncited numbers). About **$0.001 per call**; repeat call served from cache at $0. Single runs, measured 2026-11-22; not an accuracy benchmark |
 | Engine: assess all 106 v1.38 features from 60,230 events | project 0.22 s + assess 0.89 s (single run, laptop, Docker; not a p95) |
 | API `/releases` (dashboard home), 162k events, 6 releases | cold cache **6.9 s**, warm 0.06 s (was several minutes cold: it forecast every release). Single runs, laptop, Docker; measured 2026-11-21, not a p95 |
