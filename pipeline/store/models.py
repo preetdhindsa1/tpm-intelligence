@@ -431,3 +431,22 @@ class AIResult(Base):
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
     output: Mapped[dict[str, Any]] = mapped_column(JSONB)
     check_counts: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+
+
+class RiskNoteRecord(Base):
+    """A verified risk note for one feature (only verified claims are stored)."""
+
+    __tablename__ = "risk_notes"
+    __table_args__ = (Index(None, "release_key", "feature_key", "id"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    release_key: Mapped[str] = mapped_column(String(128))
+    feature_key: Mapped[str] = mapped_column(String(256))
+    prompt_version: Mapped[str] = mapped_column(String(64))
+    model: Mapped[str] = mapped_column(String(64))
+    facts: Mapped[list[dict[str, Any]]] = mapped_column(JSONB)
+    claims: Mapped[list[dict[str, Any]]] = mapped_column(JSONB)
+    counts: Mapped[dict[str, int]] = mapped_column(JSONB)
+    attempts: Mapped[int] = mapped_column(Integer)
+    cost_usd: Mapped[Decimal] = mapped_column(Numeric(12, 6))
+    created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())

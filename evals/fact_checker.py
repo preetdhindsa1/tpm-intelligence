@@ -9,32 +9,21 @@ from __future__ import annotations
 
 import json
 from collections import Counter
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from verify.checker import check_claim
 from verify.claims import Claim
-from verify.facts import Fact, FactKind, FactSheet
+from verify.facts import FactSheet
 
 CASES = Path(__file__).parent / "cases"
 MIN_AGREEMENT = 1.0  # the checker is deterministic: every labelled case must agree
 
 
-def _fact_value(kind: FactKind, value: Any) -> Any:
-    return datetime.fromisoformat(value) if kind is FactKind.DATE and value is not None else value
-
-
 def load_fact_sets(path: Path = CASES / "fact_sets.json") -> dict[str, FactSheet]:
     """Named fact sheets the cases refer to."""
     raw = json.loads(path.read_text())
-    return {
-        name: FactSheet(
-            Fact(f["key"], FactKind(f["kind"]), _fact_value(FactKind(f["kind"]), f["value"]))
-            for f in facts
-        )
-        for name, facts in raw.items()
-    }
+    return {name: FactSheet.from_records(facts) for name, facts in raw.items()}
 
 
 def load_cases(path: Path = CASES / "fact_checker.jsonl") -> list[dict[str, Any]]:

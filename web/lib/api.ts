@@ -96,3 +96,19 @@ export const api = {
   features: (release: string) => get<FeaturesResponse>(`/releases/${release}/features`),
   feature: (release: string, n: number) => get<FeatureDetail>(`/releases/${release}/features/${n}`),
 };
+
+export type VerifiedClaim = { text: string; type: string; refs: string[]; value: unknown };
+
+export type RiskNote = {
+  status: "not_at_risk" | "fresh" | "reused" | "stale" | "paused" | "failed";
+  reason: string | null;
+  claims: VerifiedClaim[];
+  claims_removed: number;
+  removed_by_reason: Record<string, number>;
+  attempts: number;
+  model: string | null;
+  prompt_version: string | null;
+  generated_at: string | null;
+  cost_usd: number | null;
+  odds_validated: boolean | null;
+};

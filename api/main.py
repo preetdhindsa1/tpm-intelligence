@@ -14,8 +14,16 @@ from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from starlette.concurrency import run_in_threadpool
 
+from api.ai import AIServices
 from api.live import Updates
-from api.schemas import FeatureDetailOut, FeaturesOut, LoadOut, ReleaseOut
+from api.schemas import (
+    ClaimOutApi,
+    FeatureDetailOut,
+    FeaturesOut,
+    LoadOut,
+    ReleaseOut,
+    RiskNoteOut,
+)
 from api.service import ReleaseService, ReleaseView
 from api.views import feature_detail, feature_row, release_out, release_summary_out
 
@@ -30,6 +38,7 @@ def create_app(
     service: ReleaseService | None = None,
     updates: Updates | None = None,
     cors_origins: list[str] | None = None,
+    ai: AIServices | None = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis."""
     app = FastAPI(title="TPM Intelligence API", version="0.1.0")
@@ -40,6 +49,7 @@ def create_app(
         allow_headers=["*"],
     )
     state: dict[str, Any] = {"service": service, "updates": updates}
+    ai_services = ai or AIServices()
 
     def svc() -> ReleaseService:
         if state["service"] is None:
@@ -83,6 +93,36 @@ def create_app(
         if a is None:
             raise HTTPException(404, f"feature #{number} was never in {name}")
         return feature_detail(v, a)
+
+    @app.get("/releases/{name}/features/{number}/risk-note", response_model=RiskNoteOut)
+    async def feature_risk_note(name: str, number: int) -> RiskNoteOut:
+        """Why this feature is at risk, in verified claims. May call Claude (on demand only)."""
+        v = await view(name)
+        a = v.feature(f"{ENHANCEMENTS_REPO}#{number}")
+        if a is None:
+            raise HTTPException(404, f"feature #{number} was never in {name}")
+        result = await run_in_threadpool(ai_services.risk_note, v, a)
+        note = result.note
+        if note is None:
+            return RiskNoteOut(status=result.status.value, reason=result.reason)
+        removed = {k.removeprefix("removed."): n for k, n in note.counts.items() if k != "verified"}
+        validated = note.facts.get(f"feature:{a.key}::odds.validated")
+        return RiskNoteOut(
+            status=result.status.value,
+            reason=result.reason,
+            claims=[
+                ClaimOutApi(text=c.text, type=c.type.value, refs=list(c.refs), value=c.value)
+                for c in note.claims
+            ],
+            claims_removed=sum(removed.values()),
+            removed_by_reason={k: n for k, n in removed.items() if n},
+            attempts=note.attempts,
+            model=note.model,
+            prompt_version=note.prompt_version,
+            generated_at=note.created_at,
+            cost_usd=round(note.cost_usd, 6),
+            odds_validated=validated.value if validated is not None else None,  # type: ignore[arg-type]
+        )
 
     @app.get("/releases/{name}/load", response_model=LoadOut)
     async def load(name: str) -> LoadOut:

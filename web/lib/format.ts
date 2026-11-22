@@ -49,3 +49,22 @@ export function timelineLabel(kind: string): string {
 export function formatUtc(iso: string): string {
   return new Date(iso).toISOString().replace("T", " ").slice(0, 16) + " UTC";
 }
+
+/** A short, human label and optional link for a fact key a claim cites. */
+export function refLabel(ref: string): { label: string; href?: string } {
+  const [subject, field = ""] = ref.split("::");
+  const prMatch = subject.match(/^pr:(.+)#(\d+)$/);
+  if (prMatch) {
+    return { label: `PR #${prMatch[2]} · ${field.replaceAll("_", " ")}`, href: `https://github.com/${prMatch[1]}/pull/${prMatch[2]}` };
+  }
+  if (subject.startsWith("feature:")) return { label: field.replace(/^flag\./, "flag: ").replaceAll("_", " ") };
+  if (subject.startsWith("sig:")) return { label: `${subject.slice(4)} · ${field.replaceAll("_", " ")}` };
+  return { label: field.replaceAll("_", " ") };
+}
+
+/** One line under the claims: what the fact checker removed. */
+export function removedSummary(removed: number, byReason: Record<string, number>): string {
+  if (removed === 0) return "No claims were removed by the fact checker.";
+  const parts = Object.entries(byReason).map(([reason, n]) => `${n} ${reason.replaceAll("_", " ")}`);
+  return `${removed} claim${removed === 1 ? "" : "s"} removed by the fact checker (${parts.join(", ")}).`;
+}

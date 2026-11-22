@@ -121,3 +121,28 @@ class LoadOut(_Out):
     release: str
     as_of: datetime
     by_sig: list[dict[str, Any]]
+
+
+class ClaimOutApi(BaseModel):
+    """One verified claim and the facts it cites."""
+
+    text: str
+    type: str
+    refs: list[str]
+    value: Any = None
+
+
+class RiskNoteOut(BaseModel):
+    """Why a feature is at risk: AI-written, every claim verified against engine facts."""
+
+    status: str  # not_at_risk | fresh | reused | stale | paused | failed
+    reason: str | None = None
+    claims: list[ClaimOutApi] = []
+    claims_removed: int = 0  # by the fact checker, best attempt
+    removed_by_reason: dict[str, int] = {}
+    attempts: int = 0
+    model: str | None = None
+    prompt_version: str | None = None
+    generated_at: datetime | None = None
+    cost_usd: float | None = None
+    odds_validated: bool | None = None

@@ -1,0 +1,257 @@
+{
+ "suite": "agent:risk_analyst",
+ "task": "risk_analyst",
+ "prompt": "risk_analyst.v3",
+ "prompt_sha": "d689d08ec0824732d88241649bcf2032a22570bfc27ed8739731d5a09d667f02",
+ "model": "claude-haiku-5-5",
+ "thresholds": {
+  "max_removal_rate": 0.1,
+  "critical_coverage": 1.0
+ },
+ "passed": false,
+ "summary": {
+  "cases": 12,
+  "errors": 0,
+  "removal_rate_shown": 0.0435,
+  "removal_rate_first_attempt_mean": 0.0417,
+  "critical_coverage_min": 0.5,
+  "odds_honest_all": true,
+  "claims_shown_range": [
+   3,
+   4
+  ],
+  "retried_cases": 0,
+  "cost_usd": 0.022573
+ },
+ "cases": [
+  {
+   "id": "v1.37-freeze-7d-5547",
+   "attempts": 1,
+   "cost_usd": 0.001478,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Main PR #140305 opened 15.4 days before Code Freeze and was not merged by Code Freeze.",
+    "Feature PR #140303 has 1 failing check on its latest commit (warning).",
+    "Feature PR #140303 has waited 8.4 days since its last review round without approval (warning).",
+    "The feature's odds are 56%, and these odds are not validated."
+   ]
+  },
+  {
+   "id": "v1.37-freeze-7d-5502",
+   "attempts": 1,
+   "cost_usd": 0.000927,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Main PR #140244 was opened 17.3 days before Code Freeze, on 23 July, and is not merged by Code Freeze.",
+    "Feature PR #130277 has waited 157 days since its last review round without approval, across 4 review rounds.",
+    "#130277 has 1 failing check on its latest commit.",
+    "Estimated odds are 56%, and these odds are not validated."
+   ]
+  },
+  {
+   "id": "v1.37-freeze-7d-5554",
+   "attempts": 1,
+   "cost_usd": 0.001368,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Main PR #140629 was opened 7.2 days before Code Freeze, which is a warning.",
+    "PR #136015 has waited 7.9 days since its last review round without approval, which is a warning.",
+    "PR #129719 has 1 failing check on its latest commit, which is a warning.",
+    "The 74% odds for this feature are not validated."
+   ]
+  },
+  {
+   "id": "v1.37-freeze+1d-2570",
+   "attempts": 1,
+   "cost_usd": 0.00178,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 1.0,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Main PR #137878 was not merged by Code Freeze.",
+    "#2570 was removed from v1.37 on 23 July, after Code Freeze.",
+    "#138439 has 1 failing check on its latest commit.",
+    "#138439 has waited 98.2 days since its last review round without approval."
+   ]
+  },
+  {
+   "id": "v1.37-freeze+1d-5855",
+   "attempts": 1,
+   "cost_usd": 0.001099,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 3,
+   "removal_rate_first_attempt": 0.25,
+   "removal_rate_shown_attempt": 0.25,
+   "removed_by_reason": {
+    "removed.no_supporting_data": 1
+   },
+   "critical_coverage": 0.5,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Main PR #140013 was not merged by Code Freeze.",
+    "Main PR #140013 merged after Code Freeze under an exception.",
+    "Its PR #139414 has 1 failing check on its latest commit."
+   ]
+  },
+  {
+   "id": "v1.37-freeze+1d-5945",
+   "attempts": 1,
+   "cost_usd": 0.000594,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 3,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 1.0,
+   "odds_honest": true,
+   "claims_total": 3,
+   "claims": [
+    "PR #139933 was not merged by Code Freeze, so the feature was at risk of missing v1.37.",
+    "PR #139933 merged on 24 July, after Code Freeze on 23 July, with exception evidence of re-adding after freeze.",
+    "The feature was removed from v1.37 at Code Freeze on 23 July and added back on 24 July."
+   ]
+  },
+  {
+   "id": "v1.38-freeze-7d-3157",
+   "attempts": 1,
+   "cost_usd": 0.004271,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Main PR #143845 was opened 11.9 days before Code Freeze, a warning.",
+    "Pull request #138313 has waited 151.9 days since its last review round without approval, a warning.",
+    "Pull request #138313 has 3 failing checks on its latest commit, a warning.",
+    "The feature's odds of 89% are not validated."
+   ]
+  },
+  {
+   "id": "v1.38-freeze-7d-2570",
+   "attempts": 1,
+   "cost_usd": 0.001774,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Feature #2570's pull request #138439 has waited 207.2 days since its last review round without approval.",
+    "Feature #2570's pull request #138439 has 1 failing check on its latest commit.",
+    "The main pull request #142854 for feature #2570 is still open as of 10 November, with no review rounds yet.",
+    "Feature #2570 has a 61% chance of making the release, but these odds are not validated."
+   ]
+  },
+  {
+   "id": "v1.38-freeze-7d-5554",
+   "attempts": 1,
+   "cost_usd": 0.001613,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 3,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 3,
+   "claims": [
+    "Main PR #143800 was opened 12.8 days before Code Freeze.",
+    "#136015 has 27 failing checks on its latest commit.",
+    "#136015 has waited 83.8 days since its last review round without approval, after 6 review rounds."
+   ]
+  },
+  {
+   "id": "v1.38-freeze+1d-3157",
+   "attempts": 1,
+   "cost_usd": 0.004189,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 3,
+   "removal_rate_first_attempt": 0.25,
+   "removal_rate_shown_attempt": 0.25,
+   "removed_by_reason": {
+    "removed.text_mismatch": 1
+   },
+   "critical_coverage": 1.0,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Main PR #144285 was not merged by Code Freeze on 17 November.",
+    "#138313 has waited 159.9 days since its last review round without approval, across 12 review rounds.",
+    "#138313 has 3 failing checks on its latest commit."
+   ]
+  },
+  {
+   "id": "v1.38-freeze+1d-5554",
+   "attempts": 1,
+   "cost_usd": 0.001578,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 1.0,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Main PR #143800 was not merged by Code Freeze on 17 November.",
+    "Main PR #143800 opened 12.8 days before Code Freeze.",
+    "Pull request #136015 has waited 91.8 days since its last review round without approval, after 6 review rounds.",
+    "Pull request #136015 has 27 failing checks on its latest commit."
+   ]
+  },
+  {
+   "id": "v1.38-freeze+1d-5710",
+   "attempts": 1,
+   "cost_usd": 0.001902,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 1.0,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Main PR #143516 was not merged by Code Freeze.",
+    "Main PR #143516 was opened 19.8 days before Code Freeze.",
+    "#140836 has 1 failing check on its latest commit.",
+    "#140836 has waited 118 days since its last review round without approval, across 4 review rounds."
+   ]
+  }
+ ],
+ "measured_at": "20261122T071500Z"
+}

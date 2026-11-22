@@ -38,3 +38,43 @@ def stated_numbers(text: str) -> list[float]:
     for pattern in _MASKS:
         masked = pattern.sub(" ", masked)
     return [float(m.group().replace(",", "")) for m in _NUMBER.finditer(masked)]
+
+
+_MONTH_NUM = {
+    m: i
+    for i, names in enumerate(
+        (
+            ("jan", "january"),
+            ("feb", "february"),
+            ("mar", "march"),
+            ("apr", "april"),
+            ("may",),
+            ("jun", "june"),
+            ("jul", "july"),
+            ("aug", "august"),
+            ("sep", "sept", "september"),
+            ("oct", "october"),
+            ("nov", "november"),
+            ("dec", "december"),
+        ),
+        start=1,
+    )
+    for m in names
+}
+_DAY_MONTH = re.compile(rf"\b(\d{{1,2}})(?:st|nd|rd|th)?\s+({_MONTHS})\b", re.IGNORECASE)
+_MONTH_DAY = re.compile(rf"\b({_MONTHS})\.?\s+(\d{{1,2}})(?:st|nd|rd|th)?\b", re.IGNORECASE)
+_ISO_DATE = re.compile(r"\b\d{4}-(\d{2})-(\d{2})")
+
+
+def stated_dates(text: str) -> list[tuple[int, int]]:
+    """(month, day) for each calendar date written in ``text``."""
+    found: list[tuple[int, int]] = []
+    for m in _ISO_DATE.finditer(text):
+        found.append((int(m.group(1)), int(m.group(2))))
+    rest = _ISO_DATE.sub(" ", text)
+    for m in _DAY_MONTH.finditer(rest):
+        found.append((_MONTH_NUM[m.group(2).lower()], int(m.group(1))))
+    rest = _DAY_MONTH.sub(" ", rest)
+    for m in _MONTH_DAY.finditer(rest):
+        found.append((_MONTH_NUM[m.group(1).lower()], int(m.group(2))))
+    return found

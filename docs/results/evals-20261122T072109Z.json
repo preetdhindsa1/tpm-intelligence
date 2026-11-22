@@ -1,0 +1,54 @@
+{
+ "measured_at": "20261122T072109Z",
+ "suites": [
+  {
+   "suite": "fact_checker",
+   "cases": 43,
+   "labels": {
+    "proposed": 43
+   },
+   "agreement": 1.0,
+   "threshold": 1.0,
+   "passed": true,
+   "verdicts": {
+    "no_supporting_data": 3,
+    "relation_mismatch": 2,
+    "text_mismatch": 4,
+    "type_mismatch": 1,
+    "verified": 22,
+    "wrong_value": 11
+   },
+   "failures": []
+  },
+  {
+   "suite": "linking",
+   "rows": 70,
+   "labelled": 0,
+   "status": "TBD (not yet labelled)",
+   "verified_precision": null,
+   "by_method": {},
+   "passed": true
+  },
+  {
+   "suite": "agent_gate:risk_analyst",
+   "passed": true,
+   "results_file": "agent-evals-20261122T071756Z.json",
+   "prompt": "risk_analyst.v4",
+   "model": "claude-haiku-5-5",
+   "summary": {
+    "cases": 12,
+    "errors": 0,
+    "removal_rate_shown": 0.04,
+    "removal_rate_first_attempt_mean": 0.0417,
+    "critical_coverage_min": 1.0,
+    "odds_honest_all": true,
+    "claims_shown_range": [
+     3,
+     5
+    ],
+    "retried_cases": 0,
+    "cost_usd": 0.023625
+   }
+  }
+ ]
+}

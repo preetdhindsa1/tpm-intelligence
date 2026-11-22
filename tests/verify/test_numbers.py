@@ -21,3 +21,14 @@ from verify.numbers import stated_numbers
 )
 def test_stated_numbers(text: str, numbers: list[float]) -> None:
     assert stated_numbers(text) == numbers
+
+
+def test_stated_dates() -> None:
+    from verify.numbers import stated_dates
+
+    assert stated_dates("opened on 23 July, merged Nov 17 and 2026-11-20T23:28Z") == [
+        (11, 20),
+        (7, 23),
+        (11, 17),
+    ]
+    assert stated_dates("v1.38 has 3 PRs") == []

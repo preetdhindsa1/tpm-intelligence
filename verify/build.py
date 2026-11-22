@@ -118,6 +118,11 @@ def _feature_facts(f: FeatureAssessment, odds: OddsFacts | None) -> Iterator[Fac
         if key not in emitted:
             emitted.add(key)
             yield Fact(key, FactKind.BOOLEAN, True)
+            # Severity is a fact too, so a summary never calls a warning "critical".
+            yield Fact(key + ".severity", FactKind.LABEL, flag.severity.value)
+            # The rule's own sentence, so the meaning is not reinterpreted (e.g. "not
+            # merged by Code Freeze" is not "not merged").
+            yield Fact(key + ".message", FactKind.LABEL, flag.message)
         for name, value in flag.facts.items():
             fact_kind = _FLAG_FACT_KINDS.get(name)
             key = fact_key("feature", f"flag.{flag.code}.{name}", f.key)
@@ -126,8 +131,7 @@ def _feature_facts(f: FeatureAssessment, odds: OddsFacts | None) -> Iterator[Fac
             if fact_kind is None or value is None or key in emitted:
                 continue
             emitted.add(key)
-            parsed = datetime.fromisoformat(value) if fact_kind is FactKind.DATE else value
-            yield Fact(key, fact_kind, parsed)
+            yield Fact(key, fact_kind, _coerce(fact_kind, value))
 
     if odds is not None:
         yield fact("odds.validated", FactKind.BOOLEAN, odds.validated)
@@ -139,6 +143,15 @@ def _feature_facts(f: FeatureAssessment, odds: OddsFacts | None) -> Iterator[Fac
         ):
             if value is not None:
                 yield fact(f"odds.{name}", FactKind.PROBABILITY, value)
+
+
+def _coerce(kind: FactKind, value: object) -> FactValue:
+    """Typed flag fact. A list (e.g. names of failing checks) counts as its length."""
+    if kind is FactKind.DATE and isinstance(value, str):
+        return datetime.fromisoformat(value)
+    if kind is FactKind.COUNT and isinstance(value, list | tuple | set):
+        return len(value)
+    return value  # type: ignore[return-value]
 
 
 def _pr_facts(f: FeatureAssessment, pr_key: str) -> Iterator[Fact]:

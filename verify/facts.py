@@ -35,11 +35,27 @@ class FactKind(StrEnum):
 
 @dataclass(frozen=True)
 class Fact:
-    """One computed fact."""
+    """One computed fact. The value's type must match its kind (checked on creation)."""
 
     key: str
     kind: FactKind
     value: FactValue
+
+    def __post_init__(self) -> None:
+        v = self.value
+        ok = (
+            v is None
+            or {
+                FactKind.COUNT: isinstance(v, int) and not isinstance(v, bool),
+                FactKind.PROBABILITY: isinstance(v, int | float) and not isinstance(v, bool),
+                FactKind.DURATION_DAYS: isinstance(v, int | float) and not isinstance(v, bool),
+                FactKind.DATE: isinstance(v, datetime),
+                FactKind.BOOLEAN: isinstance(v, bool),
+                FactKind.LABEL: isinstance(v, str),
+            }[self.kind]
+        )
+        if not ok:
+            raise TypeError(f"{self.key}: {self.kind.value} fact cannot hold {v!r}")
 
 
 def fact_key(scope: str, field: str, subject: str | None = None) -> str:
@@ -70,6 +86,29 @@ class FactSheet(Mapping[str, Fact]):
     def subset(self, prefix: str) -> FactSheet:
         """Facts whose key starts with ``prefix`` (e.g. one feature, for one agent call)."""
         return FactSheet(f for k, f in self._facts.items() if k.startswith(prefix))
+
+    def to_records(self) -> list[dict[str, object]]:
+        """JSON-safe rows (dates as ISO 8601), sorted by key. Inverse of ``from_records``."""
+        return [
+            {
+                "key": f.key,
+                "kind": f.kind.value,
+                "value": f.value.isoformat() if isinstance(f.value, datetime) else f.value,
+            }
+            for f in sorted(self._facts.values(), key=lambda f: f.key)
+        ]
+
+    @classmethod
+    def from_records(cls, rows: Iterable[Mapping[str, object]]) -> FactSheet:
+        """Rebuild from ``to_records`` output."""
+        facts: list[Fact] = []
+        for row in rows:
+            kind = FactKind(str(row["kind"]))
+            value = row["value"]
+            if kind is FactKind.DATE and isinstance(value, str):
+                value = datetime.fromisoformat(value)
+            facts.append(Fact(str(row["key"]), kind, value))  # type: ignore[arg-type]
+        return cls(facts)
 
     def as_prompt_rows(self) -> list[dict[str, str]]:
         """Plain rows for an agent prompt: key, kind, value (dates in ISO 8601 UTC)."""

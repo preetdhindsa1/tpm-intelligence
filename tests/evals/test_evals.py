@@ -20,6 +20,7 @@ def test_fact_checker_suite_agrees_with_every_label() -> None:
         "text_mismatch",
         "no_supporting_data",
         "type_mismatch",
+        "relation_mismatch",
     }
 
 
@@ -43,5 +44,6 @@ def test_linking_suite_is_tbd_until_labelled(tmp_path: Path) -> None:
     assert result["verified_precision"] == round(2 / 3, 3)
 
 
-def test_run_evals_exit_code() -> None:
-    assert run_evals.main(["--no-save"]) == 0
+def test_run_evals_reports_every_suite() -> None:
+    names = [r["suite"] for r in run_evals.run_all()]
+    assert names == ["fact_checker", "linking", "agent_gate:risk_analyst"]

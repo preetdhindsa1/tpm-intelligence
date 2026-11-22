@@ -1,0 +1,89 @@
+"""Agent eval scoring and the CI gate (no paid calls)."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from agents.gateway import Gateway
+from agents.ledger import MemoryLedger
+from agents.prompts import load_prompt
+from agents.settings import AISettings
+from evals import agent_gate, agents
+from evals.agent_metrics import critical_coverage, odds_honest
+from tests.agents.test_risk_analyst import F, Sequenced
+from verify.checker import check_claims
+from verify.claims import Claim
+from verify.facts import Fact, FactKind, FactSheet
+
+FACTS = FactSheet(
+    [
+        Fact(F + "flag.main_pr_not_merged", FactKind.BOOLEAN, True),
+        Fact(F + "odds.probability", FactKind.PROBABILITY, 0.2),
+        Fact(F + "odds.validated", FactKind.BOOLEAN, False),
+    ]
+)
+
+
+def claim(text: str, refs: list[str], value: object, kind: FactKind) -> Claim:
+    return Claim(text=text, type=kind, refs=tuple(refs), value=value)  # type: ignore[arg-type]
+
+
+def test_coverage_and_honesty() -> None:
+    honest = check_claims(
+        [
+            claim("Main PR not merged.", [F + "flag.main_pr_not_merged"], True, FactKind.BOOLEAN),
+            claim(
+                "Odds 20%, not validated.",
+                [F + "odds.probability", F + "odds.validated"],
+                0.2,
+                FactKind.PROBABILITY,
+            ),
+        ],
+        FACTS,
+    )
+    assert critical_coverage(honest, [F + "flag.main_pr_not_merged"]) == 1.0
+    assert odds_honest(honest, FACTS)
+    dishonest = check_claims(
+        [claim("Odds are 20%.", [F + "odds.probability"], 0.2, FactKind.PROBABILITY)], FACTS
+    )
+    assert not odds_honest(dishonest, FACTS)
+    assert critical_coverage(dishonest, [F + "flag.main_pr_not_merged"]) == 0.0
+
+
+def test_live_runner_scores_with_a_fake_client(tmp_path: Path) -> None:
+    from tests.agents.test_risk_analyst import GOOD
+
+    case = {
+        "id": "c1",
+        "release": "kubernetes:v1.38",
+        "as_of": "2026-11-10T00:00:00+00:00",
+        "feature_key": "kubernetes/enhancements#6395",
+        "critical_flag_keys": [],
+        "facts": [
+            {
+                "key": F + "flag.late_main_pr.days_before_freeze",
+                "kind": "duration_days",
+                "value": 14.8,
+            },
+            {"key": F + "odds.probability", "kind": "probability", "value": 0.384},
+            {"key": F + "odds.validated", "kind": "boolean", "value": False},
+        ],
+    }
+    path = tmp_path / "cases.json"
+    path.write_text(json.dumps([case]))
+    report = agents.run(Gateway(AISettings(), MemoryLedger(), Sequenced(GOOD)), path)
+    assert report["summary"]["removal_rate_shown"] == 0.0
+    assert report["summary"]["odds_honest_all"] is True
+    assert report["passed"] is True
+
+
+def test_gate_requires_a_passing_run_for_the_current_prompt_and_model(tmp_path: Path) -> None:
+    assert not agent_gate.run(tmp_path)["passed"]
+    prompt = load_prompt("risk_analyst")
+    stale = {"prompt_sha": "old", "model": "claude-haiku-5-5", "passed": True}
+    (tmp_path / "agent-evals-20261122T000000Z.json").write_text(json.dumps(stale))
+    assert not agent_gate.run(tmp_path)["passed"]
+    current = {"prompt_sha": prompt.sha, "model": "claude-haiku-5-5", "passed": True, "summary": {}}
+    (tmp_path / "agent-evals-20261122T000001Z.json").write_text(json.dumps(current))
+    assert agent_gate.run(tmp_path)["passed"]

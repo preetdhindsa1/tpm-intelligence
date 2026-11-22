@@ -118,8 +118,9 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Linking coverage: tracked v1.38 features with ≥1 verified PR | **68 / 69 (98.6%)**, measured 2026-11-21 21:36 UTC |
 | PRs in the v1.38 window with a verified link | **609 / 2,757 (22.1%)**; 24 suggested-only; 2,124 unlinked (count as load) |
 | Linking precision per method | TBD (not yet labelled): 70-row stratified v1.38 sample ready in `evals/cases/linking.csv` |
-| Fact checker vs labelled claims (`make evals`) | **38 / 38 agree** (20 verified, 18 removed across all 4 reasons). Labels are proposed by the developer, pending TPM review. Measured 2026-11-22 |
+| Fact checker vs labelled claims (`make evals`) | **43 / 43 agree** (22 verified, 21 removed across all 5 reasons). Labels are proposed by the developer, pending TPM review. Measured 2026-11-22 |
 | First real AI calls (`make ai-smoke`, Haiku 5.5, #6395 fact sheet) | `smoke.v1`: 9 verified / 10 removed, mostly a checker false positive on bare feature numbers ("feature 6395"), now fixed. `smoke.v2`: **16 verified / 1 removed** (a sentence stating uncited numbers). About **$0.001 per call**; repeat call served from cache at $0. Single runs, measured 2026-11-22; not an accuracy benchmark |
+| Risk analyst live evals (12 real v1.37/v1.38 cases, Haiku 5.5, `risk_analyst.v4`) | **Removal rate 4.0%**, critical-flag coverage 100%, odds honesty 100%, 3–5 claims per note, $0.024 per run. Earlier prompts: v1 and v3 failed the gate; v2 passed it but was rejected after the notes were read (wrong wording). Measured 2026-11-22; small sample |
 | Engine: assess all 106 v1.38 features from 60,230 events | project 0.22 s + assess 0.89 s (single run, laptop, Docker; not a p95) |
 | API `/releases` (dashboard home), 162k events, 6 releases | cold cache **6.9 s**, warm 0.06 s (was several minutes cold: it forecast every release). Single runs, laptop, Docker; measured 2026-11-21, not a p95 |
 | API v1.38 feature table, cold cache, 3 concurrent requests | **~21 s** each, sharing **one** computation (was one computation per request). Single run, measured 2026-11-21 |
@@ -139,6 +140,11 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   a hash of the input facts, versioned prompts, OTel spans and metrics, and self-hosted
   Langfuse for AI traces (`make langfuse-up` → http://localhost:3001). `make ai-smoke` makes
   one real, fact-checked call.
+- **M3a done: risk analyst** (ADR-0010). The feature page has a "Why this feature is at risk"
+  panel: 2–5 AI-written claims, each verified against the data, generated when the page
+  is opened and reused until facts change. LangGraph loop: draft → fact-check → one
+  redraft if more than 30% of claims are removed. `make evals-live` runs paid agent evals;
+  CI requires a passing run for the current prompt and model.
 
 ## Limitations
 

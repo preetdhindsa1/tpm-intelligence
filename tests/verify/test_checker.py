@@ -234,3 +234,27 @@ def test_bare_subject_number_is_an_identifier_not_a_value() -> None:
         value=0.384,
     )
     assert verdict(wrong_feature) == (Verdict.REMOVED, Reason.TEXT_MISMATCH)
+
+
+def test_fact_sheet_round_trips_through_json() -> None:
+    import json
+
+    s = sheet(NOV21)
+    again = FactSheet.from_records(json.loads(json.dumps(s.to_records())))
+    assert dict(again) == dict(s)
+
+
+def test_fact_kind_and_value_type_must_agree() -> None:
+    """Found by the first live agent eval (2026-11-22): a list stored as a count."""
+    with pytest.raises(TypeError, match="count fact cannot hold"):
+        Fact("release::x", FactKind.COUNT, ["pull-kubernetes-unit"])  # type: ignore[arg-type]
+    with pytest.raises(TypeError):
+        Fact("release::x", FactKind.BOOLEAN, 1)
+
+
+def test_failing_check_names_become_a_count() -> None:
+    from engine.rules import Flag, Severity
+    from verify.build import _coerce
+
+    flag = Flag("ci_failing", Severity.WARNING, "m", {"failing_checks": ["unit", "verify"]})
+    assert _coerce(FactKind.COUNT, flag.facts["failing_checks"]) == 2

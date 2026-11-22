@@ -26,14 +26,16 @@ class AISettings(BaseSettings):
 
     model_simple: str = "claude-haiku-5-5"
     model_summary: str = "claude-opus-5-5"
-    daily_budget_usd: float = Field(2.0, gt=0)
-    slow_at: float = Field(0.8, gt=0, le=1)  # fraction of the cap where non-essential calls slow
-    slow_interval_s: float = Field(60.0, ge=0)  # min gap between non-essential calls when slow
-    essential_overage: float = Field(0.0, ge=0)  # essential calls may exceed the cap by this share
-    odds_change_points: float = Field(10.0, gt=0)  # re-run only if odds move this much
+    daily_budget_usd: float = Field(default=2.0, gt=0)
+    # Share of the cap at which non-essential calls slow down, and their minimum spacing.
+    slow_at: float = Field(default=0.8, gt=0, le=1)
+    slow_interval_s: float = Field(default=60.0, ge=0)
+    # Share by which essential calls may exceed the cap (0 = the cap is hard).
+    essential_overage: float = Field(default=0.0, ge=0)
+    odds_change_points: float = Field(default=10.0, gt=0)  # re-run only if odds move this much
     trace_content: bool = True  # record prompts/outputs in spans (public data only)
-    timeout_s: float = Field(120.0, gt=0)
-    max_retries: int = Field(3, ge=0)
+    timeout_s: float = Field(default=120.0, gt=0)
+    max_retries: int = Field(default=3, ge=0)
 
     def model_for(self, role: ModelRole) -> str:
         """Model ID for a role."""

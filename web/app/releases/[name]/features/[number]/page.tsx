@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FlagList } from "@/components/Flags";
 import { LiveRefresh } from "@/components/LiveRefresh";
 import { OddsCell } from "@/components/Odds";
+import { RiskNotePanel } from "@/components/RiskNote";
 import { Timeline } from "@/components/Timeline";
 import { api } from "@/lib/api";
 import { formatUtc } from "@/lib/format";
@@ -27,6 +28,8 @@ export default async function FeaturePage({ params }: { params: Promise<{ name: 
         </div>
         <LiveRefresh release={name} />
       </div>
+
+      <RiskNotePanel release={name} number={f.number} />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <section className="rounded border bg-white p-4">

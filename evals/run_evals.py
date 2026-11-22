@@ -15,14 +15,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from evals import fact_checker, linking
+from evals import agent_gate, fact_checker, linking
 
 OUT = Path(__file__).resolve().parent.parent / "docs" / "results"
 
 
 def run_all() -> list[dict[str, Any]]:
     """Results of every suite, in a stable order."""
-    return [fact_checker.run(), linking.run()]
+    return [fact_checker.run(), linking.run(), agent_gate.run()]
 
 
 def main(argv: list[str] | None = None) -> int:

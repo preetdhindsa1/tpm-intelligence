@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke
+.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live
 
 UV ?= uv
 RELEASE ?=
@@ -75,6 +75,13 @@ langfuse-up: ## Start self-hosted Langfuse (LLM traces) on http://localhost:3001
 
 langfuse-down: ## Stop Langfuse (data kept in its volumes)
 	$(LANGFUSE) down
+
+evals-live: ## Paid agent evals on the golden cases (~$0.03); commit the docs/results file it writes
+	docker compose build -q api
+	docker run --rm --network tpm-intelligence_default --env-file .env \
+	  -e DATABASE_URL=postgresql+psycopg://tpm:tpm@postgres:5432/tpm \
+	  -e OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317 -e OTEL_EXPORTER_OTLP_INSECURE=true \
+	  -v "$(CURDIR)/docs/results:/app/docs/results" tpm-intelligence-api python -m evals.agents
 
 ai-smoke: ## One real Claude call on #6395 facts, fact-checked (costs < $0.01; needs ANTHROPIC_API_KEY)
 	docker compose run --rm --no-deps -e OTEL_SERVICE_NAME=tpm-ai-smoke api python scripts/ai_smoke.py

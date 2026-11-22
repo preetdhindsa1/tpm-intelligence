@@ -8,7 +8,10 @@ Verdicts:
   * ``no_supporting_data``: no refs, an unknown ref, or no value to check.
   * ``type_mismatch``: the claim's type is not the primary fact's kind.
   * ``wrong_value``: the value does not match the primary fact.
-  * ``text_mismatch``: the sentence states a number no cited fact supports.
+  * ``text_mismatch``: the sentence states a number or a calendar date that no cited fact
+    supports.
+  * ``relation_mismatch``: the sentence says "before/after Code Freeze" but the date it
+    cites is on the other side of Code Freeze.
 
 Removed claims are never shown. Their counts are kept and published.
 """
@@ -24,7 +27,7 @@ from enum import StrEnum
 
 from verify.claims import Claim, ClaimValue
 from verify.facts import Fact, FactKind, FactSheet
-from verify.numbers import stated_numbers
+from verify.numbers import stated_dates, stated_numbers
 
 PROBABILITY_TOLERANCE = 0.01  # one percentage point: summaries round odds to whole percents
 DURATION_TOLERANCE_DAYS = 0.5
@@ -45,6 +48,7 @@ class Reason(StrEnum):
     TYPE_MISMATCH = "type_mismatch"
     WRONG_VALUE = "wrong_value"
     TEXT_MISMATCH = "text_mismatch"
+    RELATION_MISMATCH = "relation_mismatch"
 
 
 @dataclass(frozen=True)
@@ -121,7 +125,39 @@ def check_claim(claim: Claim, facts: FactSheet) -> CheckedClaim:
     if unsupported:
         shown = ", ".join(f"{n:g}" for n in unsupported)
         return removed(Reason.TEXT_MISMATCH, f"text states {shown}, not in the cited facts")
+    cited_days = {
+        (f.value.astimezone(UTC).month, f.value.astimezone(UTC).day)
+        for f in cited
+        if isinstance(f.value, datetime)
+    }
+    wrong_dates = [d for d in stated_dates(claim.text) if d not in cited_days]
+    if wrong_dates:
+        shown = ", ".join(f"{m:02d}-{d:02d}" for m, d in wrong_dates)
+        return removed(Reason.TEXT_MISMATCH, f"text states date(s) {shown}, not in the cited facts")
+    relation = _freeze_relation_error(claim.text, cited, facts)
+    if relation is not None:
+        return removed(Reason.RELATION_MISMATCH, relation)
     return CheckedClaim(claim, Verdict.VERIFIED)
+
+
+_FREEZE_RELATION = re.compile(r"\b(before|after)\s+(?:the\s+)?code\s+freeze\b", re.IGNORECASE)
+CODE_FREEZE_KEY = "release::code_freeze_at"
+
+
+def _freeze_relation_error(text: str, cited: Sequence[Fact], facts: FactSheet) -> str | None:
+    """Check "before/after Code Freeze" against the first cited date (other than freeze)."""
+    match = _FREEZE_RELATION.search(text)
+    freeze = facts.get(CODE_FREEZE_KEY)
+    if match is None or freeze is None or not isinstance(freeze.value, datetime):
+        return None
+    dated = [f for f in cited if f.kind is FactKind.DATE and f.key != CODE_FREEZE_KEY]
+    if not dated or not isinstance(dated[0].value, datetime):
+        return None
+    said, at = match.group(1).lower(), dated[0].value
+    actual = "before" if at < freeze.value else "after"
+    if said != actual:
+        return f"says {said} Code Freeze, but {dated[0].key} = {at.isoformat()} is {actual}"
+    return None
 
 
 # ---------------------------------------------------------------- value comparison

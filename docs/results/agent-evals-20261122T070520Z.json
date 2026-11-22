@@ -1,0 +1,260 @@
+{
+ "suite": "agent:risk_analyst",
+ "task": "risk_analyst",
+ "prompt": "risk_analyst.v1",
+ "prompt_sha": "1114f19c6674f973f4a4a2448495be89aaf4be677e09f1b6b6667296ec114e6e",
+ "model": "claude-haiku-5-5",
+ "thresholds": {
+  "max_removal_rate": 0.1,
+  "critical_coverage": 1.0
+ },
+ "passed": false,
+ "summary": {
+  "cases": 12,
+  "errors": 0,
+  "removal_rate_shown": 0.0408,
+  "removal_rate_first_attempt_mean": 0.0417,
+  "critical_coverage_min": 0.5,
+  "odds_honest_all": true,
+  "claims_shown_range": [
+   3,
+   5
+  ],
+  "retried_cases": 0,
+  "cost_usd": 0.018983
+ },
+ "cases": [
+  {
+   "id": "v1.37-freeze-7d-5547",
+   "attempts": 1,
+   "cost_usd": 0.000686,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 3,
+   "removal_rate_first_attempt": 0.25,
+   "removal_rate_shown_attempt": 0.25,
+   "removed_by_reason": {
+    "removed.text_mismatch": 1
+   },
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "The feature has a critical CI failure: its PR kubernetes/kubernetes#140303 has 1 failing check.",
+    "The main PR kubernetes/kubernetes#140305 was opened on 2026-07-08 and is 15.4 days before Code Freeze, which is a late main PR warning.",
+    "The odds of making Code Freeze are 0.5615, but these odds are not validated."
+   ]
+  },
+  {
+   "id": "v1.37-freeze-7d-5502",
+   "attempts": 1,
+   "cost_usd": 0.000621,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 5,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 5,
+   "claims": [
+    "The main pull request kubernetes/kubernetes#140244 is still open and not merged, opened 2026-07-06 and 17.3 days before Code Freeze.",
+    "Pull request kubernetes/kubernetes#130277 has 1 failing check, so CI is failing for this feature.",
+    "Pull request kubernetes/kubernetes#130277 has been waiting 157 days for review across 4 review rounds.",
+    "The feature was removed from the release on 2026-06-10 and added back on 2026-06-17.",
+    "The odds of landing in the release are 0.5615, but these odds are not validated."
+   ]
+  },
+  {
+   "id": "v1.37-freeze-7d-5554",
+   "attempts": 1,
+   "cost_usd": 0.000947,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 3,
+   "removal_rate_first_attempt": 0.25,
+   "removal_rate_shown_attempt": 0.25,
+   "removed_by_reason": {
+    "removed.text_mismatch": 1
+   },
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "The feature has a critical risk flag: its main pull request kubernetes/kubernetes#140629 was opened 7.2 days before Code Freeze and is not merged.",
+    "Pull request kubernetes/kubernetes#129719 is failing 1 check and has gone through 67 review rounds without merging.",
+    "The feature's odds are not validated, so its 0.7357 estimate should not be relied on."
+   ]
+  },
+  {
+   "id": "v1.37-freeze+1d-2570",
+   "attempts": 1,
+   "cost_usd": 0.001226,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 1.0,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Feature #2570 was removed from v1.37 at Code Freeze on 2026-07-23T12:20:51+00:00 and then re-added at 2026-07-23T12:37:42+00:00.",
+    "The main pull request kubernetes/kubernetes#137878 is not merged.",
+    "The pull request kubernetes/kubernetes#138439 has 1 failing check and has waited 98.2 days with no review rounds yet.",
+    "Feature #2570 has 14 of its 23 pull requests merged, with 2 still open."
+   ]
+  },
+  {
+   "id": "v1.37-freeze+1d-5855",
+   "attempts": 1,
+   "cost_usd": 0.000639,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 0.5,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "The feature was removed from v1.37 at Code Freeze on 2026-07-23T12:06:14+00:00.",
+    "The main pull request kubernetes/kubernetes#140013 merged after Code Freeze with an exception, and the feature was re-added to the release.",
+    "Pull request kubernetes/kubernetes#139414 has 1 failing check.",
+    "Pull request kubernetes/kubernetes#139413 has waited 52.9 days for review with 0 review rounds."
+   ]
+  },
+  {
+   "id": "v1.37-freeze+1d-5945",
+   "attempts": 1,
+   "cost_usd": 0.0,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 3,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 0.5,
+   "odds_honest": true,
+   "claims_total": 3,
+   "claims": [
+    "Feature #5945 was removed from the v1.37 release at code freeze and later re-added after the freeze.",
+    "The main pull request kubernetes/kubernetes#139933 was merged after code freeze, with an exception granted.",
+    "The main pull request kubernetes/kubernetes#139933 was merged on 2026-07-24 after 30 review rounds and 1 failing check."
+   ]
+  },
+  {
+   "id": "v1.38-freeze-7d-3157",
+   "attempts": 1,
+   "cost_usd": 0.004076,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "The feature has failing CI checks on kubernetes/kubernetes#138313, with 3 checks failing.",
+    "kubernetes/kubernetes#138313 has waited 151.9 days for review across 12 review rounds.",
+    "The main pull request kubernetes/kubernetes#143845 was opened 11.9 days before Code Freeze.",
+    "The estimated odds of making Code Freeze are 0.8882, and these odds are not validated."
+   ]
+  },
+  {
+   "id": "v1.38-freeze-7d-2570",
+   "attempts": 1,
+   "cost_usd": 0.001398,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 5,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 5,
+   "claims": [
+    "The feature's main pull request kubernetes/kubernetes#142854 is still open and unmerged with 0 review rounds.",
+    "Pull request kubernetes/kubernetes#138439 has 1 failing check, so the feature's CI is failing.",
+    "Pull request kubernetes/kubernetes#138439 has waited 207.2 days for review with no review rounds yet.",
+    "The feature was added to the release at 2026-09-08T19:30:49+00:00 and is currently in the release.",
+    "The odds of the feature making Code Freeze are not validated, so the estimate of 0.6053 should not be relied on."
+   ]
+  },
+  {
+   "id": "v1.38-freeze-7d-5554",
+   "attempts": 1,
+   "cost_usd": 0.001646,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": null,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "Pull request #136015 has 27 failing checks, which is blocking the feature's CI.",
+    "Late main pull request #143800 was opened 12.8 days before Code Freeze and is now closed unmerged.",
+    "Pull request #136015 has waited 83.8 days for review across 6 review rounds.",
+    "The estimated probability of making Code Freeze is 0.8882, but these odds are not validated."
+   ]
+  },
+  {
+   "id": "v1.38-freeze+1d-3157",
+   "attempts": 1,
+   "cost_usd": 0.004111,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 1.0,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "The main pull request #144285 is not merged yet.",
+    "Pull request #143839 merged after Code Freeze without an exception.",
+    "Pull request #138313 has 3 failing checks.",
+    "Pull request #138313 has waited 159.9 days for review across 12 review rounds."
+   ]
+  },
+  {
+   "id": "v1.38-freeze+1d-5554",
+   "attempts": 1,
+   "cost_usd": 0.001573,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 1.0,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "The main pull request kubernetes/kubernetes#143800 was closed without merging.",
+    "The main pull request kubernetes/kubernetes#143800 was opened 12.8 days before Code Freeze.",
+    "Pull request kubernetes/kubernetes#136015 has 27 failing checks.",
+    "Pull request kubernetes/kubernetes#136015 has waited 91.8 days for review over 6 review rounds."
+   ]
+  },
+  {
+   "id": "v1.38-freeze+1d-5710",
+   "attempts": 1,
+   "cost_usd": 0.00206,
+   "model": "claude-haiku-5-5",
+   "claims_shown": 4,
+   "removal_rate_first_attempt": 0.0,
+   "removal_rate_shown_attempt": 0.0,
+   "removed_by_reason": {},
+   "critical_coverage": 1.0,
+   "odds_honest": true,
+   "claims_total": 4,
+   "claims": [
+    "The main pull request #143516 is not merged, and it was closed without merging.",
+    "The main pull request #143516 was opened 19.8 days before Code Freeze, which is a late start.",
+    "Pull request #140836 has 1 failing check, so its CI is failing.",
+    "Pull request #140836 has waited 118 days for review through 4 review rounds."
+   ]
+  }
+ ],
+ "measured_at": "20261122T070520Z"
+}

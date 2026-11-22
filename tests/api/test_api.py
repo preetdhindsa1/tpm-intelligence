@@ -193,3 +193,33 @@ def test_validation_gate_requires_every_backtested_release(tmp_path: Path) -> No
     assert "v1.37 at 7 days" in v.reason
     assert "v1.38" not in v.reason
     assert len(v.leads) == 9
+
+
+def test_risk_note_endpoint_returns_only_verified_claims() -> None:
+    from agents.gateway import Gateway
+    from agents.ledger import MemoryLedger
+    from agents.notes import MemoryNoteStore
+    from agents.settings import AISettings
+    from api.ai import AIServices
+    from tests.agents.test_risk_analyst import BAD, Sequenced
+
+    client = Sequenced(BAD, BAD)
+    service = ReleaseService(
+        InMemoryEventSource(list(fixture_events())),
+        forecast=FAST,
+        now=lambda: utc(2026, 11, 10),
+        validation=lambda: Validation(False, "test: not validated"),
+    )
+    ai = AIServices(gateway=Gateway(AISettings(), MemoryLedger(), client), notes=MemoryNoteStore())
+    api = TestClient(create_app(service=service, ai=ai))
+    body = api.get("/releases/v1.38/features/6395/risk-note").json()
+    assert body["status"] == "fresh"
+    assert body["attempts"] == 2
+    assert [c["text"] for c in body["claims"]] == [BAD.claims[0 + 2].text]
+    assert body["claims_removed"] == 2
+    assert body["removed_by_reason"] == {"no_supporting_data": 1, "wrong_value": 1}
+    assert body["odds_validated"] is False
+    again = api.get("/releases/v1.38/features/6395/risk-note").json()
+    assert again["status"] == "reused"
+    assert len(client.calls) == 2
+    assert api.get("/releases/v1.38/features/9999/risk-note").status_code == 404
