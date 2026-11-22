@@ -27,6 +27,7 @@ from pipeline.events import (
     ChangeAction,
     CheckCompleted,
     CheckConclusion,
+    CommentPosted,
     NormalizedEvent,
     PullRequestObserved,
     ReleaseObserved,
@@ -365,6 +366,8 @@ def pull_request_events(node: Json, *, observed_at: datetime) -> list[Normalized
         )
     ]
     out.extend(review_events(node["reviews"]["nodes"], subject=subject, observed_at=observed_at))
+    comments = (node.get("comments") or {}).get("nodes") or []
+    out.extend(comment_events(comments, subject=subject, observed_at=observed_at))
     if commit and head_sha:
         out.extend(_check_events(commit, head_sha, subject, updated, observed_at))
     return out
@@ -393,6 +396,55 @@ def review_events(
                     submitted_at=submitted,
                 ),
                 identity=(r["databaseId"],),
+            )
+        )
+    return out
+
+
+# Prow commands at the start of a line: /lgtm, /lgtm cancel, /approve, /approve no-issue,
+# /approve cancel, /hold, /hold cancel, /unhold, /remove-lgtm, /remove-approve.
+_COMMAND = re.compile(
+    r"^\s*/(lgtm|approve|hold|unhold|remove-lgtm|remove-approve)\b[ \t]*(cancel)?",
+    re.I | re.M,
+)
+_CANCELS = {
+    "unhold": "hold_cancel",
+    "remove-lgtm": "lgtm_cancel",
+    "remove-approve": "approve_cancel",
+}
+
+
+def prow_commands(body: str) -> tuple[str, ...]:
+    """Prow review commands in a comment, in order (``lgtm``, ``approve_cancel``, ...)."""
+    out: list[str] = []
+    for name, cancel in _COMMAND.findall(body or ""):
+        name = name.lower()
+        out.append(_CANCELS.get(name) or (f"{name}_cancel" if cancel else name))
+    return tuple(out)
+
+
+def comment_events(
+    comments: Iterable[Json], *, subject: SubjectRef, observed_at: datetime
+) -> list[NormalizedEvent]:
+    """One event per comment: author, time and commands only; the text is not stored."""
+    out: list[NormalizedEvent] = []
+    for c in comments:
+        if not c.get("createdAt") or c.get("databaseId") is None:
+            continue
+        posted = parse_ts(c["createdAt"])
+        out.append(
+            new_event(
+                source=Source.GITHUB,
+                subject=subject,
+                occurred_at=posted,
+                observed_at=observed_at,
+                payload=CommentPosted(
+                    comment_id=str(c["databaseId"]),
+                    author=(c.get("author") or {}).get("login"),
+                    posted_at=posted,
+                    commands=prow_commands(c.get("body") or ""),
+                ),
+                identity=(c["databaseId"],),
             )
         )
     return out

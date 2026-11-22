@@ -4,7 +4,7 @@ Backtest rule (CLAUDE.md section 6): only data dated before the prediction point
 
 * **Time-varying facts** are rebuilt strictly from events with ``occurred_at < as_of``:
   release membership, labels, PR existence and state (open/merged/closed), merge and close
-  times, reviews and CI results.
+  times, reviews, conversation comments and CI results.
 * **Text fields** (issue description = tracking list, PR title/body, kep.yaml feature
   gates) come from the latest snapshot because GitHub keeps no history of them. This is an
   approximation: text edited after ``as_of`` can leak in. Its reach is limited because a PR
@@ -23,6 +23,7 @@ from linker.rules import LinkCandidate
 from pipeline.events import (
     ChangeAction,
     CheckCompleted,
+    CommentPosted,
     NormalizedEvent,
     PullRequestObserved,
     ReleaseObserved,
@@ -117,6 +118,16 @@ class Review:
 
 
 @dataclass(frozen=True)
+class Comment:
+    """One conversation comment: who, when and its Prow commands (no text)."""
+
+    id: str
+    author: str | None
+    at: datetime
+    commands: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
 class Check:
     """One CI result on the head commit."""
 
@@ -142,6 +153,7 @@ class PullRequest:
     closed_at: datetime | None
     reviews: tuple[Review, ...]
     checks: tuple[Check, ...]
+    comments: tuple[Comment, ...] = ()
 
     @property
     def is_open(self) -> bool:
@@ -195,6 +207,7 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
     label_hist: dict[str, list[LabelChange]] = defaultdict(list)
     pr_snap: dict[str, tuple[datetime, PullRequestObserved]] = {}
     reviews: dict[str, dict[str, Review]] = defaultdict(dict)
+    comments: dict[str, dict[str, Comment]] = defaultdict(dict)
     checks: dict[str, dict[str, Check]] = defaultdict(dict)
 
     for e in events:
@@ -226,6 +239,8 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
             reviews[key][p.review_id] = Review(
                 p.review_id, p.reviewer, p.state.value, p.submitted_at
             )
+        elif isinstance(p, CommentPosted):
+            comments[key][p.comment_id] = Comment(p.comment_id, p.author, p.posted_at, p.commands)
         elif isinstance(p, CheckCompleted):
             prev = checks[key].get(p.check_name)
             if prev is None or at >= prev.at:
@@ -237,7 +252,7 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
         if snap.created_at < as_of
     }
     prs = {
-        key: _pull_request(key, snap, reviews[key], checks[key], as_of)
+        key: _pull_request(key, snap, reviews[key], checks[key], as_of, comments[key])
         for key, (_, snap) in pr_snap.items()
         if snap.created_at < as_of
     }
@@ -285,6 +300,7 @@ def _pull_request(
     reviews: Mapping[str, Review],
     checks: Mapping[str, Check],
     as_of: datetime,
+    comments: Mapping[str, Comment] | None = None,
 ) -> PullRequest:
     merged = snap.merged_at if snap.merged_at and snap.merged_at < as_of else None
     closed = snap.closed_at if snap.closed_at and snap.closed_at < as_of else None
@@ -305,4 +321,5 @@ def _pull_request(
         closed_at=closed,
         reviews=tuple(sorted(reviews.values(), key=lambda r: (r.submitted_at, r.id))),
         checks=known_checks,
+        comments=tuple(sorted((comments or {}).values(), key=lambda c: (c.at, c.id))),
     )

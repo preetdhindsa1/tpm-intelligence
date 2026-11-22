@@ -35,6 +35,7 @@ from collectors.github_poller.calendar import Calendar, ReleaseDates
 from collectors.github_poller.client import GitHubClient
 from collectors.github_poller.queries import (
     ISSUE_TIMELINE,
+    MORE_COMMENTS,
     MORE_REVIEWS,
     SEARCH_PRS,
     prs_by_number_query,
@@ -79,7 +80,9 @@ class GitHubPoller:
     enhancements_repo: str = "kubernetes/enhancements"
     code_repo: str = "kubernetes/kubernetes"
     now: Callable[[], datetime] = lambda: datetime.now(UTC)
-    page_size: int = 50
+    # PRs per search page. Each PR brings up to 100 comments with their text (Prow bot
+    # comments are long); 50 per page made GitHub time out (HTTP 504) and truncate JSON.
+    page_size: int = 10
     cursor_overlap: timedelta = timedelta(minutes=10)
     stats: SyncStats = field(default_factory=SyncStats)
     _tracked_prs: set[tuple[str, int]] = field(default_factory=set)
@@ -266,7 +269,7 @@ class GitHubPoller:
         self.stats.tracked_prs_other_repos = sum(
             1 for r, _ in self._tracked_prs if r != self.code_repo
         )
-        for chunk in _chunks(missing, 20):
+        for chunk in _chunks(missing, 10):
             data = self.gh.graphql(prs_by_number_query(owner, name, chunk), allow_not_found=True)
             for n in chunk:
                 node = data["repository"].get(f"pr{n}")
@@ -279,6 +282,7 @@ class GitHubPoller:
         key = f"{node['repository']['nameWithOwner']}#{node['number']}"
         with self._item_span("github_poller.pull_request", **{"tpm.pull_request": key}):
             self._complete_reviews(node)
+            self._complete_comments(node)
             for event in normalize.pull_request_events(node, observed_at=observed):
                 self._publish(event)
         self.stats.prs_synced += 1
@@ -300,6 +304,27 @@ class GitHubPoller:
             reviews = data["repository"]["pullRequest"]["reviews"]
             node["reviews"]["nodes"].extend(reviews["nodes"])
             page = reviews["pageInfo"]
+
+    def _complete_comments(self, node: dict[str, Any]) -> None:
+        """Fetch remaining comment pages in place (PRs with 100+ comments)."""
+        comments = node.get("comments")
+        if not comments:
+            return
+        page = comments["pageInfo"]
+        owner, name = node["repository"]["nameWithOwner"].split("/")
+        while page.get("hasNextPage"):
+            data = self.gh.graphql(
+                MORE_COMMENTS,
+                {
+                    "owner": owner,
+                    "name": name,
+                    "number": node["number"],
+                    "after": page["endCursor"],
+                },
+            )
+            more = data["repository"]["pullRequest"]["comments"]
+            comments["nodes"].extend(more["nodes"])
+            page = more["pageInfo"]
 
     def _search(self, query: str) -> Iterator[dict[str, Any]]:
         after: str | None = None

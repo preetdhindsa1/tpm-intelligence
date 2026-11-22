@@ -5,8 +5,14 @@ one sitting. Counting records would make one careful reviewer look like many rou
 **round** is consecutive reviews by the same reviewer where each one follows the previous
 within ``window`` (default 60 minutes).
 
-Excluded: the PR author's own review records (replies to review threads create COMMENTED
-reviews by the author) and bot accounts (logins ending in ``[bot]`` or ``-bot``).
+Activity counted: GitHub review records **and conversation comments**. Kubernetes reviewers
+approve with Prow ``/lgtm`` and ``/approve`` comments, so a PR can merge with no GitHub review
+at all. A comment with ``/lgtm`` or ``/approve`` counts as ``approved``; any other comment as
+``commented`` (ADR-0006).
+
+Excluded: the PR author's own activity (replies to review threads, comments on their own
+PR) and bot accounts (logins ending in ``[bot]``, ``-bot`` or ``-robot``, e.g.
+``k8s-ci-robot``).
 """
 
 from __future__ import annotations
@@ -33,17 +39,32 @@ class ReviewRound:
     outcome: str  # last decisive state in the round, else "commented"
 
 
+_APPROVING_COMMANDS = frozenset({"lgtm", "approve"})
+
+
 def is_bot(login: str) -> bool:
     """Heuristic bot detection by login suffix."""
-    return login.endswith("[bot]") or login.endswith("-bot")
+    return login.endswith(("[bot]", "-bot", "-robot"))
+
+
+def activity(pr: PullRequest) -> list[Review]:
+    """Review records plus comments as review-like records, author and bots excluded."""
+    items = list(pr.reviews)
+    for c in pr.comments:
+        state = "approved" if _APPROVING_COMMANDS & set(c.commands) else "commented"
+        items.append(Review(f"comment:{c.id}", c.author, state, c.at))
+    return [
+        r
+        for r in items
+        if r.reviewer is not None and r.reviewer != pr.author and not is_bot(r.reviewer)
+    ]
 
 
 def review_rounds(pr: PullRequest, window: timedelta = DEFAULT_WINDOW) -> list[ReviewRound]:
     """Rounds on ``pr``, ordered by start time."""
     by_reviewer: dict[str, list[Review]] = defaultdict(list)
-    for r in pr.reviews:
-        if r.reviewer is None or r.reviewer == pr.author or is_bot(r.reviewer):
-            continue
+    for r in activity(pr):
+        assert r.reviewer is not None  # noqa: S101 - filtered in activity()
         by_reviewer[r.reviewer].append(r)
 
     rounds: list[ReviewRound] = []

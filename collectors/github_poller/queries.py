@@ -22,6 +22,10 @@ fragment PRFields on PullRequest {
     pageInfo { hasNextPage endCursor }
     nodes { databaseId author { login } state submittedAt }
   }
+  comments(first: 100) {
+    pageInfo { hasNextPage endCursor }
+    nodes { databaseId author { login } createdAt body }
+  }
   commits(last: 1) {
     nodes {
       commit {
@@ -62,6 +66,20 @@ query MoreReviews($owner: String!, $name: String!, $number: Int!, $after: String
       reviews(first: 100, after: $after) {
         pageInfo { hasNextPage endCursor }
         nodes { databaseId author { login } state submittedAt }
+      }
+    }
+  }
+}
+"""
+
+
+MORE_COMMENTS = """
+query MoreComments($owner: String!, $name: String!, $number: Int!, $after: String) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      comments(first: 100, after: $after) {
+        pageInfo { hasNextPage endCursor }
+        nodes { databaseId author { login } createdAt body }
       }
     }
   }

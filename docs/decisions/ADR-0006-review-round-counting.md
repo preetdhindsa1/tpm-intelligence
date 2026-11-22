@@ -44,8 +44,28 @@ On #143709 (as of 2026-11-21): **97 records → 10 rounds**. #6395's other PRs: 
   forecast to the window is TBD (not yet measured; M6 backtest).
 - Rounds are per reviewer and used only in aggregate (per PR, per feature, per SIG queue).
   The platform does not rank or report individual reviewers (CLAUDE.md §10).
-- Bot detection is a login-suffix heuristic. Prow acts through `k8s-ci-robot`, which does not
-  submit reviews, so this has not mattered so far.
+- Bot detection is a login-suffix heuristic (`[bot]`, `-bot`, `-robot`). Prow acts through
+  `k8s-ci-robot`, which posts many comments; the `-robot` suffix was added with comment
+  collection (2026-11-22).
+
+## Update 2026-11-22: conversation comments count (Phase 2 M5)
+
+Kubernetes reviewers approve through Prow comments (`/lgtm`, `/approve`), not GitHub
+reviews. In v1.33–v1.38, 20–30% of merged PRs had **no** GitHub review record, so rounds
+built from reviews alone missed much of the reviewers' work. This was found when the
+simulator failed validation (ADR-0012).
+
+- The poller now reads each PR's conversation comments (`comments` in `PRFields`, with
+  pagination). It stores a `pull_request.comment_posted` event with the comment's id,
+  author, time and the Prow commands found at the start of a line (`lgtm`, `approve`,
+  `hold`, and their cancels). **The comment text is not stored.**
+- Review rounds group review records **and** comments by the same person (same 60-minute
+  window). A comment with `/lgtm` or `/approve` counts as `approved`; any other comment by
+  someone other than the author counts as `commented`.
+- Comments by the PR author and by bots are excluded, as before.
+
+Consequence: rule flags and forecast calibration that use rounds now see comment-only
+reviews too. Their counts and waits change after the re-backfill.
 
 ## AI vs rules
 

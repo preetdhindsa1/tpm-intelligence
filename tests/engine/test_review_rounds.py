@@ -92,3 +92,38 @@ def test_review_waits() -> None:
     pr = pr_with([("rev-a", "commented", 0), ("rev-b", "approved", 24 * 60)])
     waits = review_waits(pr, review_rounds(pr))
     assert waits == [T0 - utc(2026, 11, 1), timedelta(days=1)]
+
+
+def test_lgtm_comments_count_as_approval_rounds() -> None:
+    """Kubernetes approves with /lgtm comments; a PR can merge with no GitHub review."""
+    from dataclasses import replace
+
+    from engine.projection import Comment
+
+    pr = replace(
+        pr_with([]),
+        comments=(
+            Comment("1", "author", T0, ()),  # author's own comment: ignored
+            Comment("2", "k8s-ci-robot", T0 + timedelta(minutes=1), ()),  # bot: ignored
+            Comment("3", "rev-a", T0 + timedelta(minutes=2), ("lgtm",)),
+            Comment("4", "rev-b", T0 + timedelta(hours=5), ()),
+        ),
+    )
+    rounds = review_rounds(pr)
+    assert [(r.reviewer, r.outcome) for r in rounds] == [
+        ("rev-a", "approved"),
+        ("rev-b", "commented"),
+    ]
+
+
+def test_review_and_lgtm_in_one_sitting_are_one_round() -> None:
+    from dataclasses import replace
+
+    from engine.projection import Comment
+
+    pr = replace(
+        pr_with([("rev-a", "commented", 0)]),
+        comments=(Comment("9", "rev-a", T0 + timedelta(minutes=20), ("lgtm",)),),
+    )
+    (rnd,) = review_rounds(pr)
+    assert (rnd.review_count, rnd.outcome) == (2, "approved")

@@ -393,3 +393,29 @@ def test_unknown_check_states_become_pending() -> None:
         if isinstance(e.payload, CheckCompleted)
     }
     assert checks == {"build": "pending", "pull-unit": "failure"}
+
+
+def test_prow_commands_are_parsed_and_text_is_not_kept() -> None:
+    from collectors.github_poller.normalize import comment_events, prow_commands, pull_request_ref
+
+    assert prow_commands("/lgtm\n/approve") == ("lgtm", "approve")
+    assert prow_commands("Looks good.\n  /lgtm cancel") == ("lgtm_cancel",)
+    assert prow_commands("/hold\nlater: /unhold") == ("hold",)  # commands start a line
+    assert prow_commands("/remove-lgtm") == ("lgtm_cancel",)
+    assert prow_commands("see /lgtm docs") == ()
+
+    (event,) = comment_events(
+        [
+            {
+                "databaseId": 42,
+                "author": {"login": "rev-a"},
+                "createdAt": "2026-11-03T09:00:00Z",
+                "body": "secret words\n/lgtm",
+            }
+        ],
+        subject=pull_request_ref("kubernetes/kubernetes", 1),
+        observed_at=datetime(2026, 11, 21, tzinfo=UTC),
+    )
+    assert event.event_type == "pull_request.comment_posted"
+    assert event.payload.commands == ("lgtm",)  # type: ignore[union-attr]
+    assert "secret" not in event.model_dump_json()

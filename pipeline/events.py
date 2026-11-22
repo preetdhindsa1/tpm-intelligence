@@ -198,6 +198,20 @@ class ReviewSubmitted(_Model):
     submitted_at: AwareDatetime
 
 
+class CommentPosted(_Model):
+    """A PR conversation comment, reduced to who, when and any Prow commands in it.
+
+    Kubernetes reviewers approve with ``/lgtm`` and ``/approve`` comments rather than GitHub
+    reviews (ADR-0006). The comment text is never stored, only the commands found in it.
+    """
+
+    type: Literal["pull_request.comment_posted"] = "pull_request.comment_posted"
+    comment_id: str
+    author: str | None
+    posted_at: AwareDatetime
+    commands: tuple[str, ...] = ()  # e.g. ("lgtm",), ("approve",), ("hold_cancel",)
+
+
 class CheckCompleted(_Model):
     """CI result for a PR head commit."""
 
@@ -230,6 +244,7 @@ EventPayload = Annotated[
     | ReferenceObserved
     | PullRequestObserved
     | ReviewSubmitted
+    | CommentPosted
     | CheckCompleted
     | ReleaseObserved,
     Field(discriminator="type"),
