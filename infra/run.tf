@@ -322,6 +322,11 @@ resource "google_cloud_run_v2_job" "poller" {
     # Cloud Run refuses a secret with no version; this one waits for Cloud SQL.
     google_secret_manager_secret_version.database_url,
   ]
+
+  # The deploy workflow rolls out new images; Terraform owns everything else.
+  lifecycle {
+    ignore_changes = [template[0].template[0].containers[0].image, client, client_version]
+  }
 }
 
 # Run before each deploy: gcloud run jobs execute tpm-migrate --wait
@@ -368,4 +373,9 @@ resource "google_cloud_run_v2_job" "migrate" {
     google_secret_manager_secret_iam_member.readers,
     google_secret_manager_secret_version.database_url,
   ]
+
+  # The deploy workflow rolls out new images; Terraform owns everything else.
+  lifecycle {
+    ignore_changes = [template[0].template[0].containers[0].image, client, client_version]
+  }
 }
