@@ -1,0 +1,561 @@
+{
+ "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+ "id": "13653997",
+ "key": "KAFKA-20682",
+ "fields": {
+  "summary": "Implement IQv2 for headers-aware state stores",
+  "issuetype": {
+   "id": "2",
+   "description": "A new feature of the product, which has yet to be developed.",
+   "name": "New Feature",
+   "subtask": false,
+   "avatarId": 21141
+  },
+  "components": [
+   {
+    "id": "12327571",
+    "name": "streams",
+    "description": "Streams library architecture and APIs"
+   }
+  ],
+  "subtasks": [
+   {
+    "id": "13654749",
+    "key": "KAFKA-20701",
+    "fields": {
+     "summary": "KIP drafting, publication, discussion, vote ",
+     "status": {
+      "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+      "name": "Resolved",
+      "id": "5",
+      "statusCategory": {
+       "id": 3,
+       "key": "done",
+       "colorName": "success",
+       "name": "Done"
+      }
+     },
+     "priority": {
+      "name": "Major",
+      "id": "3"
+     },
+     "issuetype": {
+      "id": "7",
+      "description": "The sub-task of the issue",
+      "name": "Sub-task",
+      "subtask": true,
+      "avatarId": 21146
+     }
+    }
+   },
+   {
+    "id": "13654750",
+    "key": "KAFKA-20702",
+    "fields": {
+     "summary": "PoC PR of query type 1 (TimestampedKeyQueryWithHeaders)",
+     "status": {
+      "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+      "name": "Resolved",
+      "id": "5",
+      "statusCategory": {
+       "id": 3,
+       "key": "done",
+       "colorName": "success",
+       "name": "Done"
+      }
+     },
+     "priority": {
+      "name": "Major",
+      "id": "3"
+     },
+     "issuetype": {
+      "id": "7",
+      "description": "The sub-task of the issue",
+      "name": "Sub-task",
+      "subtask": true,
+      "avatarId": 21146
+     }
+    }
+   },
+   {
+    "id": "13655684",
+    "key": "KAFKA-20741",
+    "fields": {
+     "summary": "Add ReadOnlyRecord Interface",
+     "status": {
+      "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+      "name": "Resolved",
+      "id": "5",
+      "statusCategory": {
+       "id": 3,
+       "key": "done",
+       "colorName": "success",
+       "name": "Done"
+      }
+     },
+     "priority": {
+      "name": "Major",
+      "id": "3"
+     },
+     "issuetype": {
+      "id": "7",
+      "description": "The sub-task of the issue",
+      "name": "Sub-task",
+      "subtask": true,
+      "avatarId": 21146
+     }
+    }
+   },
+   {
+    "id": "13654751",
+    "key": "KAFKA-20703",
+    "fields": {
+     "summary": "Implement query type 1 (TimestampedKeyWithHeadersQuery)",
+     "status": {
+      "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+      "name": "Resolved",
+      "id": "5",
+      "statusCategory": {
+       "id": 3,
+       "key": "done",
+       "colorName": "success",
+       "name": "Done"
+      }
+     },
+     "priority": {
+      "name": "Major",
+      "id": "3"
+     },
+     "issuetype": {
+      "id": "7",
+      "description": "The sub-task of the issue",
+      "name": "Sub-task",
+      "subtask": true,
+      "avatarId": 21146
+     }
+    }
+   },
+   {
+    "id": "13654752",
+    "key": "KAFKA-20704",
+    "fields": {
+     "summary": "Implement query type 2 (TimestampedRangeWithHeadersQuery)",
+     "status": {
+      "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+      "name": "Resolved",
+      "id": "5",
+      "statusCategory": {
+       "id": 3,
+       "key": "done",
+       "colorName": "success",
+       "name": "Done"
+      }
+     },
+     "priority": {
+      "name": "Major",
+      "id": "3"
+     },
+     "issuetype": {
+      "id": "7",
+      "description": "The sub-task of the issue",
+      "name": "Sub-task",
+      "subtask": true,
+      "avatarId": 21146
+     }
+    }
+   },
+   {
+    "id": "13654753",
+    "key": "KAFKA-20705",
+    "fields": {
+     "summary": "Implement query type 3 (TimestampedWindowKeyWithHeadersQuery)",
+     "status": {
+      "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+      "name": "Resolved",
+      "id": "5",
+      "statusCategory": {
+       "id": 3,
+       "key": "done",
+       "colorName": "success",
+       "name": "Done"
+      }
+     },
+     "priority": {
+      "name": "Major",
+      "id": "3"
+     },
+     "issuetype": {
+      "id": "7",
+      "description": "The sub-task of the issue",
+      "name": "Sub-task",
+      "subtask": true,
+      "avatarId": 21146
+     }
+    }
+   },
+   {
+    "id": "13654754",
+    "key": "KAFKA-20706",
+    "fields": {
+     "summary": "Implement query type 4 (TimestampedWindowRangeWithHeadersQuery)",
+     "status": {
+      "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+      "name": "Resolved",
+      "id": "5",
+      "statusCategory": {
+       "id": 3,
+       "key": "done",
+       "colorName": "success",
+       "name": "Done"
+      }
+     },
+     "priority": {
+      "name": "Major",
+      "id": "3"
+     },
+     "issuetype": {
+      "id": "7",
+      "description": "The sub-task of the issue",
+      "name": "Sub-task",
+      "subtask": true,
+      "avatarId": 21146
+     }
+    }
+   },
+   {
+    "id": "13659690",
+    "key": "KAFKA-20852",
+    "fields": {
+     "summary": "buffer + doc PR",
+     "status": {
+      "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+      "name": "Resolved",
+      "id": "5",
+      "statusCategory": {
+       "id": 3,
+       "key": "done",
+       "colorName": "success",
+       "name": "Done"
+      }
+     },
+     "priority": {
+      "name": "Minor",
+      "id": "4"
+     },
+     "issuetype": {
+      "id": "7",
+      "description": "The sub-task of the issue",
+      "name": "Sub-task",
+      "subtask": true,
+      "avatarId": 21146
+     }
+    }
+   }
+  ],
+  "created": "2026-06-09T18:58:54.833+0000",
+  "description": "KIP-1356: [https://cwiki.apache.org/confluence/spaces/KAFKA/pages/430408653/KIP-1356+Introduce+IQv2+for+headers-aware+state+stores]\u00a0",
+  "fixVersions": [
+   {
+    "id": "12356784",
+    "name": "4.4.0",
+    "archived": false,
+    "released": true,
+    "releaseDate": "2026-10-26"
+   }
+  ],
+  "resolution": {
+   "id": "1",
+   "description": "A fix for this issue is checked into the tree and tested.",
+   "name": "Fixed"
+  },
+  "labels": [
+   "kip"
+  ],
+  "resolutiondate": "2026-08-14T15:58:03.522+0000",
+  "issuelinks": [
+   {
+    "id": "12726046",
+    "outwardIssue": {
+     "id": "13661425",
+     "key": "KAFKA-20922",
+     "fields": {
+      "summary": "TimestampedRangeWithHeadersQuery iterator can NPE on a null-deserialized value (KV path missing the null guard the window path has)",
+      "status": {
+       "description": "A patch for this issue has been uploaded to JIRA by a contributor.",
+       "name": "Patch Available",
+       "id": "10002",
+       "statusCategory": {
+        "id": 4,
+        "key": "indeterminate",
+        "colorName": "inprogress",
+        "name": "In Progress"
+       }
+      },
+      "priority": {
+       "name": "Minor",
+       "id": "4"
+      },
+      "issuetype": {
+       "id": "4",
+       "description": "An improvement or enhancement to an existing feature or task.",
+       "name": "Improvement",
+       "subtask": false,
+       "avatarId": 21140
+      }
+     }
+    },
+    "type": {
+     "id": "12310560",
+     "name": "Problem/Incident",
+     "inward": "is caused by",
+     "outward": "causes"
+    }
+   }
+  ],
+  "updated": "2026-08-14T15:58:03.528+0000",
+  "status": {
+   "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+   "name": "Resolved",
+   "id": "5",
+   "statusCategory": {
+    "id": 3,
+    "key": "done",
+    "colorName": "success",
+    "name": "Done"
+   }
+  }
+ },
+ "renderedFields": null,
+ "changelog": {
+  "startAt": 0,
+  "maxResults": 20,
+  "total": 20,
+  "histories": [
+   {
+    "id": "23097574",
+    "created": "2026-06-09T18:59:12.252+0000",
+    "items": [
+     {
+      "field": "assignee",
+      "fromString": null,
+      "toString": "Jess Jin"
+     }
+    ]
+   },
+   {
+    "id": "23097604",
+    "created": "2026-06-09T19:15:10.142+0000",
+    "items": [
+     {
+      "field": "issuetype",
+      "fromString": "Bug",
+      "toString": "New Feature"
+     }
+    ]
+   },
+   {
+    "id": "23097606",
+    "created": "2026-06-09T19:15:21.278+0000",
+    "items": [
+     {
+      "field": "Component",
+      "fromString": null,
+      "toString": "streams"
+     }
+    ]
+   },
+   {
+    "id": "23097708",
+    "created": "2026-06-09T20:16:12.290+0000",
+    "items": [
+     {
+      "field": "status",
+      "fromString": "Open",
+      "toString": "In Progress"
+     }
+    ]
+   },
+   {
+    "id": "23097864",
+    "created": "2026-06-09T22:54:42.410+0000",
+    "items": [
+     {
+      "field": "labels",
+      "fromString": "",
+      "toString": "needs-kip"
+     }
+    ]
+   },
+   {
+    "id": "23163994",
+    "created": "2026-07-20T13:18:06.538+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": null,
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23176398",
+    "created": "2026-07-28T04:06:50.729+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23187906",
+    "created": "2026-08-04T10:21:48.689+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23190782",
+    "created": "2026-08-05T14:56:32.826+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23191824",
+    "created": "2026-08-06T06:08:54.519+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23193254",
+    "created": "2026-08-06T18:27:45.849+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23199275",
+    "created": "2026-08-11T10:29:14.574+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23209379",
+    "created": "2026-08-12T19:52:52.519+0000",
+    "items": [
+     {
+      "field": "labels",
+      "fromString": "needs-kip",
+      "toString": "kip"
+     }
+    ]
+   },
+   {
+    "id": "23209383",
+    "created": "2026-08-12T19:53:04.010+0000",
+    "items": [
+     {
+      "field": "description",
+      "fromString": null,
+      "toString": "KIP-1356: [https://cwiki.apache.org/confluence/spaces/KAFKA/pages/430408653/KIP-1356+Introduce+IQv2+for+headers-aware+state+stores]\u00a0"
+     }
+    ]
+   },
+   {
+    "id": "23209384",
+    "created": "2026-08-12T19:53:26.383+0000",
+    "items": [
+     {
+      "field": "Link",
+      "fromString": null,
+      "toString": "This issue causes KAFKA-20922"
+     }
+    ]
+   },
+   {
+    "id": "23211202",
+    "created": "2026-08-13T20:17:24.490+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23212508",
+    "created": "2026-08-14T15:52:41.214+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23212514",
+    "created": "2026-08-14T15:55:43.985+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22882 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23212515",
+    "created": "2026-08-14T15:56:09.503+0000",
+    "items": [
+     {
+      "field": "Fix Version",
+      "fromString": null,
+      "toString": "4.4.0"
+     }
+    ]
+   },
+   {
+    "id": "23212536",
+    "created": "2026-08-14T15:58:03.528+0000",
+    "items": [
+     {
+      "field": "resolution",
+      "fromString": null,
+      "toString": "Fixed"
+     },
+     {
+      "field": "status",
+      "fromString": "In Progress",
+      "toString": "Resolved"
+     }
+    ]
+   }
+  ]
+ }
+}

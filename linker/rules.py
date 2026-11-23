@@ -9,6 +9,7 @@ Method                   When                                       Status     C
 =======================  =========================================  =========  ====
 ``explicit_key``         strong KEP reference (see ``linker.refs``)  verified   0.95
 ``tracking_issue_link``  PR URL listed in the KEP issue description  verified   0.90
+``remote_link``          Jira issue links the PR (ADR-0018)          verified   0.85
 ``feature_gate``         gate of exactly one KEP named in the PR     verified   0.75
 ``explicit_key``         passing mention only (#143644)              suggested  0.50
 ``feature_gate``         gate shared by several KEPs                 suggested  0.40
@@ -33,6 +34,7 @@ from linker.refs import find_kep_refs, tracked_pull_requests
 CONFIDENCE: Mapping[tuple[LinkMethod, LinkStatus], Decimal] = {
     (LinkMethod.EXPLICIT_KEY, LinkStatus.VERIFIED): Decimal("0.95"),
     (LinkMethod.TRACKING_ISSUE_LINK, LinkStatus.VERIFIED): Decimal("0.90"),
+    (LinkMethod.REMOTE_LINK, LinkStatus.VERIFIED): Decimal("0.85"),
     (LinkMethod.FEATURE_GATE, LinkStatus.VERIFIED): Decimal("0.75"),
     (LinkMethod.EXPLICIT_KEY, LinkStatus.SUGGESTED): Decimal("0.50"),
     (LinkMethod.FEATURE_GATE, LinkStatus.SUGGESTED): Decimal("0.40"),

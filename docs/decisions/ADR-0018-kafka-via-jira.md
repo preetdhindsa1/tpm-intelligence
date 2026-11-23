@@ -1,6 +1,6 @@
 # ADR-0018: Apache Kafka via Jira (Phase 3 M3)
 
-- **Status:** proposed: collector built; the feature definition and calendar await the owner
+- **Status:** accepted (2026-11-22): feature rule and dates decided by the owner
 - **Date:** 2026-11-22
 
 ## Context
@@ -28,16 +28,19 @@ Measured on 2026-11-22 through the public REST API:
   issue is never read.
 - `python -m collectors.jira --team kafka --release 4.5.0`.
 
-## Open (owner)
+## Decided by the owner (2026-11-22)
 
-1. **What counts as a Kafka "feature"** for release health (the KEP analog)? Proposal:
-   an issue targeting the release that is a New Feature, **or** has sub-tasks (an
-   umbrella), **or** links a KIP page in its summary, description or remote links. Bugs and
-   loose improvements stay out of the feature list but still count as reviewer and CI load.
-2. **Freeze dates.** Jira versions carry release dates only. Proposal: enter KIP freeze,
-   feature freeze, code freeze and release day by hand from Kafka's public release-plan
-   page, with the link, in `connectors/teams/kafka-calendar.yaml`. The current file is a
-   placeholder and is not used.
+1. **A Kafka "feature"** (the KEP analog) is an issue that targets the release and is a
+   New Feature, **or** has sub-tasks (an umbrella), **or** names a KIP (`KIP-123` in its
+   summary or description, or a remote link to a KIP page). Bugs and loose improvements
+   stay off the feature list but still count as reviewer and CI load. A sub-task's PRs
+   roll up to its umbrella.
+2. **Dates: Jira release dates only, for now.** Each release gets `release_at` from its
+   Jira version and `cycle_start_at` from the release date of the previous x.y.0
+   version. No freeze dates, so forecasts that need Code Freeze show "no freeze date"
+   instead of a number. Hand-entered freeze dates from the Kafka release-plan page are
+   deferred (`connectors/teams/kafka-calendar.yaml` stays a placeholder, unused).
+   Measured 2026-11-22: 4.5.0 has **no release date** in Jira yet.
 
 ## Still to build after the decisions
 

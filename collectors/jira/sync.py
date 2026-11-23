@@ -95,6 +95,18 @@ class JiraCollector:
         observed = self.now()
         newest: datetime | None = since
         before = self.jira.full_changelogs
+        # Release dates from Jira versions (ADR-0018). Deterministic IDs, so re-runs
+        # publish duplicates the worker ignores; a changed date is a new event.
+        for event in normalize.release_events(
+            self.jira.versions(self.project_key),
+            self.releases,
+            project=self.project,
+            project_key=self.project_key,
+            base_url=self.base_url,
+            observed_at=observed,
+        ):
+            self.publisher.publish(event)
+            self.stats.events_published += 1
         for issue in self.jira.search(self.jql(since)):
             self.stats.issues += 1
             key = issue["key"]
@@ -105,9 +117,11 @@ class JiraCollector:
                 *normalize.issue_history(issue, project=self.project, observed_at=observed),
             ]
             self.stats.remote_link_calls += 1
-            events += normalize.remote_link_events(
-                key, self.jira.remote_links(key), observed_at=observed
-            )
+            links = self.jira.remote_links(key)
+            events += normalize.remote_link_events(key, links, observed_at=observed)
+            spec = normalize.issue_spec(issue, links, observed_at=observed)
+            if spec is not None:
+                events.append(spec)
             for event in events:
                 self.publisher.publish(event)
                 self.stats.events_published += 1

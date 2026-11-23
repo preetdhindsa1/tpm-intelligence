@@ -1,0 +1,327 @@
+{
+ "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+ "id": "13654751",
+ "key": "KAFKA-20703",
+ "fields": {
+  "summary": "Implement query type 1 (TimestampedKeyWithHeadersQuery)",
+  "issuetype": {
+   "id": "7",
+   "description": "The sub-task of the issue",
+   "name": "Sub-task",
+   "subtask": true,
+   "avatarId": 21146
+  },
+  "parent": {
+   "id": "13653997",
+   "key": "KAFKA-20682",
+   "fields": {
+    "summary": "Implement IQv2 for headers-aware state stores",
+    "status": {
+     "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+     "name": "Resolved",
+     "id": "5",
+     "statusCategory": {
+      "id": 3,
+      "key": "done",
+      "colorName": "success",
+      "name": "Done"
+     }
+    },
+    "priority": {
+     "name": "Major",
+     "id": "3"
+    },
+    "issuetype": {
+     "id": "2",
+     "description": "A new feature of the product, which has yet to be developed.",
+     "name": "New Feature",
+     "subtask": false,
+     "avatarId": 21141
+    }
+   }
+  },
+  "components": [
+   {
+    "id": "12327571",
+    "name": "streams",
+    "description": "Streams library architecture and APIs"
+   }
+  ],
+  "subtasks": [],
+  "created": "2026-06-16T14:42:33.852+0000",
+  "description": null,
+  "fixVersions": [
+   {
+    "id": "12356784",
+    "name": "4.4.0",
+    "archived": false,
+    "released": true,
+    "releaseDate": "2026-10-26"
+   }
+  ],
+  "resolution": {
+   "id": "1",
+   "description": "A fix for this issue is checked into the tree and tested.",
+   "name": "Fixed"
+  },
+  "labels": [],
+  "resolutiondate": "2026-07-08T12:56:12.322+0000",
+  "issuelinks": [],
+  "updated": "2026-08-14T15:57:52.797+0000",
+  "status": {
+   "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+   "name": "Resolved",
+   "id": "5",
+   "statusCategory": {
+    "id": 3,
+    "key": "done",
+    "colorName": "success",
+    "name": "Done"
+   }
+  }
+ },
+ "renderedFields": null,
+ "changelog": {
+  "startAt": 0,
+  "maxResults": 21,
+  "total": 21,
+  "histories": [
+   {
+    "id": "23106788",
+    "created": "2026-06-16T14:49:10.053+0000",
+    "items": [
+     {
+      "field": "assignee",
+      "fromString": null,
+      "toString": "Jess Jin"
+     }
+    ]
+   },
+   {
+    "id": "23106800",
+    "created": "2026-06-16T14:57:35.647+0000",
+    "items": [
+     {
+      "field": "Component",
+      "fromString": null,
+      "toString": "streams"
+     }
+    ]
+   },
+   {
+    "id": "23119384",
+    "created": "2026-06-24T20:21:11.450+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": null,
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23121087",
+    "created": "2026-06-25T15:28:09.559+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23121151",
+    "created": "2026-06-25T16:04:37.517+0000",
+    "items": [
+     {
+      "field": "status",
+      "fromString": "Open",
+      "toString": "In Progress"
+     }
+    ]
+   },
+   {
+    "id": "23121345",
+    "created": "2026-06-25T17:19:51.158+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23121351",
+    "created": "2026-06-25T17:20:26.721+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23121386",
+    "created": "2026-06-25T17:34:31.162+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23121557",
+    "created": "2026-06-25T19:49:04.816+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23125424",
+    "created": "2026-06-29T09:30:25.646+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23125874",
+    "created": "2026-06-29T14:35:48.748+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23125958",
+    "created": "2026-06-29T15:37:50.785+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23126078",
+    "created": "2026-06-29T17:09:47.593+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23126102",
+    "created": "2026-06-29T17:31:43.591+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23126129",
+    "created": "2026-06-29T18:09:12.391+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23129985",
+    "created": "2026-07-02T06:24:48.984+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23133973",
+    "created": "2026-07-06T15:01:52.625+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23137347",
+    "created": "2026-07-08T08:08:05.477+0000",
+    "items": [
+     {
+      "field": "RemoteIssueLink",
+      "fromString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\"",
+      "toString": "This issue links to \"GitHub Pull Request #22666 (Web Link)\""
+     }
+    ]
+   },
+   {
+    "id": "23137746",
+    "created": "2026-07-08T12:56:12.332+0000",
+    "items": [
+     {
+      "field": "resolution",
+      "fromString": null,
+      "toString": "Fixed"
+     },
+     {
+      "field": "status",
+      "fromString": "In Progress",
+      "toString": "Resolved"
+     }
+    ]
+   },
+   {
+    "id": "23140680",
+    "created": "2026-07-09T20:50:52.804+0000",
+    "items": [
+     {
+      "field": "summary",
+      "fromString": "Implement query type 1 (TimestampedKeyQueryWithHeaders)",
+      "toString": "Implement query type 1 (TimestampedKeyWithHeadersQuery)"
+     }
+    ]
+   },
+   {
+    "id": "23212531",
+    "created": "2026-08-14T15:57:52.798+0000",
+    "items": [
+     {
+      "field": "Fix Version",
+      "fromString": null,
+      "toString": "4.4.0"
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -12,6 +12,8 @@ the source:
 - ``work_item.label_changed`` and ``work_item.status_changed`` from the changelog.
 - ``reference.observed`` for each remote link to a GitHub pull request (raw evidence; the
   linker decides the method and confidence).
+- ``work_item.spec_observed`` when the issue names a KIP (its design doc), and
+  ``release.observed`` from Jira versions (release dates only, ADR-0018).
 
 Who made a change is never read (no per-person data, CLAUDE.md section 10).
 """
@@ -20,18 +22,20 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterable, Mapping
-from datetime import datetime
+from datetime import UTC, datetime, time
 from typing import Any, Literal
 
 from pipeline.events import (
     ChangeAction,
     NormalizedEvent,
     ReferenceObserved,
+    ReleaseObserved,
     SubjectKind,
     SubjectRef,
     WorkItemLabelChanged,
     WorkItemObserved,
     WorkItemReleaseChanged,
+    WorkItemSpecObserved,
     WorkItemStatusChanged,
     WorkItemType,
     new_event,
@@ -76,6 +80,8 @@ ITEM_TYPES: Mapping[str, WorkItemType] = {
     "Bug": WorkItemType.BUG,
 }
 
+_KIP = re.compile(r"\bKIP[-\s]?(\d{1,5})\b", re.IGNORECASE)
+_FEATURE_RELEASE = re.compile(r"^(\d+)\.(\d+)\.0$")
 _GITHUB_PR = re.compile(r"^https://github\.com/(?P<repo>[\w.-]+/[\w.-]+)/pull/(?P<n>\d+)/?$")
 
 
@@ -167,6 +173,7 @@ def issue_snapshot(
             sorted(release_key(project, v["name"]) for v in f.get("fixVersions", []))
         ),
         parent_key=(f.get("parent") or {}).get("key"),
+        child_keys=tuple(sorted(t["key"] for t in f.get("subtasks") or [])),
         description=f.get("description") or "",
         url=f"{base_url.rstrip('/')}/browse/{issue['key']}",
         created_at=parse_ts(f["created"]),
@@ -295,6 +302,105 @@ def remote_link_events(
                 observed_at=observed_at,
                 payload=ReferenceObserved(pull_request=pr, evidence="remote_link"),
                 identity=(link["id"], pr.external_key),
+            )
+        )
+    return out
+
+
+def kip(issue: Json, links: Iterable[Json] = ()) -> str | None:
+    """The KIP an issue names: summary first, then description, then remote links."""
+    f = issue["fields"]
+    texts = [f.get("summary") or "", f.get("description") or ""]
+    texts += [
+        f"{link.get('object', {}).get('url', '')} {link.get('object', {}).get('title', '')}"
+        for link in links
+    ]
+    for text in texts:
+        m = _KIP.search(text)
+        if m:
+            return f"KIP-{int(m.group(1))}"
+    return None
+
+
+def issue_spec(
+    issue: Json, links: Iterable[Json], *, observed_at: datetime
+) -> NormalizedEvent | None:
+    """``work_item.spec_observed`` naming the KIP, or None when the issue names none."""
+    name = kip(issue, links)
+    if name is None:
+        return None
+    updated = parse_ts(issue["fields"]["updated"])
+    return new_event(
+        source=EventSource.JIRA,
+        subject=work_item_ref(issue["key"]),
+        occurred_at=updated,
+        observed_at=observed_at,
+        payload=WorkItemSpecObserved(spec_path=name),
+        identity=(name, updated.isoformat()),
+    )
+
+
+def _day(value: str | None) -> datetime | None:
+    """Jira version dates are days (``2026-10-26``); taken as 00:00 UTC."""
+    if not value:
+        return None
+    return datetime.combine(datetime.strptime(value, "%Y-%m-%d").date(), time(), tzinfo=UTC)
+
+
+def _feature_release(name: str) -> tuple[int, int] | None:
+    m = _FEATURE_RELEASE.match(name)
+    return (int(m.group(1)), int(m.group(2))) if m else None
+
+
+def release_events(
+    versions: Iterable[Json],
+    names: Iterable[str],
+    *,
+    project: str,
+    project_key: str,
+    base_url: str,
+    observed_at: datetime,
+) -> list[NormalizedEvent]:
+    """``release.observed`` for each named version (ADR-0018: release dates only).
+
+    ``release_at`` is the Jira release date (None while unset). ``cycle_start_at`` is the
+    release date of the previous x.y.0 version; no freeze dates are known.
+    """
+    by_name = {v["name"]: v for v in versions}
+    feature_days = sorted(
+        (num, day)
+        for v in versions
+        if (num := _feature_release(v["name"])) and (day := _day(v.get("releaseDate")))
+    )
+    out: list[NormalizedEvent] = []
+    for name in sorted(names):
+        version = by_name.get(name)
+        if version is None:
+            continue
+        num = _feature_release(name)
+        start = _day(version.get("startDate"))
+        if start is None and num is not None:
+            earlier = [day for n, day in feature_days if n < num]
+            start = earlier[-1] if earlier else None
+        payload = ReleaseObserved(
+            project=project,
+            name=name,
+            cycle_start_at=start,
+            release_at=_day(version.get("releaseDate")),
+            source_url=f"{base_url.rstrip('/')}/projects/{project_key}/versions/{version['id']}",
+        )
+        out.append(
+            new_event(
+                source=EventSource.JIRA,
+                subject=SubjectRef(
+                    kind=SubjectKind.RELEASE,
+                    source=EventSource.JIRA,
+                    external_key=release_key(project, name),
+                ),
+                occurred_at=start or payload.release_at or observed_at,
+                observed_at=observed_at,
+                payload=payload,
+                identity=(payload.model_dump_json(),),
             )
         )
     return out

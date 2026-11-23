@@ -52,6 +52,8 @@ class FakeJira:
         if path.endswith("/remotelink"):
             key = path.split("/")[2]
             return httpx.Response(200, json=load(f"remotelinks_{key}.json"))
+        if path == "/project/KAFKA/versions":
+            return httpx.Response(200, json=load("versions_KAFKA.json"))
         if path.startswith("/issue/"):
             return httpx.Response(200, json=self.issues[path.split("/")[2]])
         return httpx.Response(404, json={})
@@ -115,7 +117,12 @@ def test_collector_publishes_history_and_references_and_advances_the_cursor() ->
     assert not stats.failed
     assert stats.issues == 1
     types = {e.payload.type for e in out.events}
-    assert {"work_item.observed", "work_item.release_changed", "reference.observed"} <= types
+    assert {
+        "work_item.observed",
+        "work_item.release_changed",
+        "reference.observed",
+        "release.observed",
+    } <= types
     # Issues that once had the version are searched too (removed items, CLAUDE.md s.6).
     assert 'fixVersion was in ("4.2.0")' in fake.jql[0]
     from collectors.jira.normalize import parse_ts
@@ -154,3 +161,13 @@ def test_failure_keeps_the_cursor_and_counts_it() -> None:
 def test_backfill_has_no_date_filter() -> None:
     c = collector(client(FakeJira([])), InMemoryCursorStore(), Captured())
     assert "updated >=" not in c.jql(None)
+
+
+def test_umbrella_with_a_kip_gets_a_spec_and_the_release_its_dates() -> None:
+    fake = FakeJira([load("issue_KAFKA-20682.json")])
+    out = Captured()
+    collector(client(fake), InMemoryCursorStore(), out).run()
+    specs = [e.payload for e in out.events if e.payload.type == "work_item.spec_observed"]
+    assert [getattr(s, "spec_path", None) for s in specs] == ["KIP-1356"]
+    releases = [e.payload for e in out.events if e.payload.type == "release.observed"]
+    assert [getattr(r, "name", None) for r in releases] == ["4.2.0"]

@@ -114,3 +114,65 @@ def test_no_person_fields_in_fixtures() -> None:
         text = path.read_text()
         assert "displayName" not in text
         assert "emailAddress" not in text
+
+
+# KAFKA-20682 (4.4.0): New Feature umbrella with 8 sub-tasks; KIP-1356 in its description.
+# KAFKA-20703: one of its sub-tasks, remote-linked to apache/kafka#22666.
+
+
+def test_umbrella_snapshot_lists_its_sub_tasks() -> None:
+    e = n.issue_snapshot(
+        load("issue_KAFKA-20682.json"), project="KAFKA", base_url=BASE, observed_at=OBSERVED
+    )
+    p = e.payload
+    assert p.item_type is WorkItemType.FEATURE
+    assert len(p.child_keys) == 8
+    assert "KAFKA-20703" in p.child_keys
+
+
+def test_sub_task_snapshot_points_at_its_umbrella() -> None:
+    issue = load("issue_KAFKA-20703.json")
+    p = n.issue_snapshot(issue, project="KAFKA", base_url=BASE, observed_at=OBSERVED).payload
+    assert p.item_type is WorkItemType.SUBTASK
+    assert p.parent_key == "KAFKA-20682"
+    refs = n.remote_link_events(
+        "KAFKA-20703", load("remotelinks_KAFKA-20703.json"), observed_at=OBSERVED
+    )
+    assert [r.payload.pull_request.external_key for r in refs] == ["apache/kafka#22666"]
+
+
+def test_kip_is_found_in_the_description_and_becomes_a_spec() -> None:
+    issue = load("issue_KAFKA-20682.json")
+    assert n.kip(issue) == "KIP-1356"
+    spec = n.issue_spec(issue, [], observed_at=OBSERVED)
+    assert spec is not None
+    assert spec.payload.spec_path == "KIP-1356"
+    # A bug that names no KIP gets no spec.
+    assert n.issue_spec(load("issue_KAFKA-19831.json"), [], observed_at=OBSERVED) is None
+
+
+def test_kip_in_a_remote_link_counts() -> None:
+    issue = load("issue_KAFKA-19831.json")
+    link = {"id": 1, "object": {"url": "https://cwiki.apache.org/confluence/display/KAFKA/KIP-932"}}
+    assert n.kip(issue, [link]) == "KIP-932"
+
+
+def test_release_dates_only_and_cycle_starts_at_the_previous_feature_release() -> None:
+    events = n.release_events(
+        load("versions_KAFKA.json"),
+        ["4.4.0", "4.5.0", "9.9.9"],
+        project="KAFKA",
+        project_key="KAFKA",
+        base_url=BASE,
+        observed_at=OBSERVED,
+    )
+    by_name = {e.payload.name: e.payload for e in events}
+    assert set(by_name) == {"4.4.0", "4.5.0"}  # unknown versions are skipped
+    r44, r45 = by_name["4.4.0"], by_name["4.5.0"]
+    assert r44.release_at == datetime(2026, 10, 26, tzinfo=UTC)
+    assert r44.cycle_start_at == datetime(2026, 5, 22, tzinfo=UTC)  # 4.3.0, not 4.3.1
+    assert r44.code_freeze_at is None
+    assert r44.enhancements_freeze_at is None
+    assert r45.release_at is None  # not set in Jira yet (measured 2026-11-22)
+    assert r45.cycle_start_at == datetime(2026, 10, 26, tzinfo=UTC)
+    assert events[0].subject.external_key == "KAFKA:4.4.0"

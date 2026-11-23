@@ -5,6 +5,10 @@ Backtest rule (CLAUDE.md section 6): only data dated before the prediction point
 * **Time-varying facts** are rebuilt strictly from events with ``occurred_at < as_of``:
   release membership, labels, PR existence and state (open/merged/closed), merge and close
   times, reviews, conversation comments and CI results.
+* **Release features** (``World.features_in``): planning items of type feature, or with
+  sub-tasks (an umbrella), or with a design doc (KEP ``kep.yaml``, Kafka KIP). Sub-tasks,
+  bugs and loose improvements are kept in ``World.features`` for linking (a sub-task's PRs
+  roll up to its umbrella) but are not release features (ADR-0018).
 * **Text fields** (issue description = tracking list, PR title/body, kep.yaml feature
   gates) come from the latest snapshot because GitHub keeps no history of them. This is an
   approximation: text edited after ``as_of`` can leak in. Its reach is limited because a PR
@@ -13,6 +17,7 @@ Backtest rule (CLAUDE.md section 6): only data dated before the prediction point
 
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -26,12 +31,14 @@ from pipeline.events import (
     CommentPosted,
     NormalizedEvent,
     PullRequestObserved,
+    ReferenceObserved,
     ReleaseObserved,
     ReviewSubmitted,
     WorkItemLabelChanged,
     WorkItemObserved,
     WorkItemReleaseChanged,
     WorkItemSpecObserved,
+    WorkItemType,
 )
 
 PRState = Literal["open", "merged", "closed"]
@@ -84,6 +91,24 @@ class Feature:
     stage: str | None = None
     owning_team: str | None = None
     participating_teams: tuple[str, ...] = ()
+    item_type: str = WorkItemType.FEATURE.value
+    parent_key: str | None = None
+    child_keys: tuple[str, ...] = ()
+    spec_path: str | None = None
+
+    @property
+    def is_release_feature(self) -> bool:
+        """Counts as a release feature (ADR-0018): a feature, an umbrella, or has a design doc.
+
+        Sub-tasks never do; their PRs roll up to the umbrella.
+        """
+        if self.item_type == WorkItemType.SUBTASK.value:
+            return False
+        return (
+            self.item_type == WorkItemType.FEATURE.value
+            or bool(self.child_keys)
+            or self.spec_path is not None
+        )
 
     @property
     def tracked(self) -> bool:
@@ -173,11 +198,30 @@ class World:
     # (ADR-0011). ``engine.links.link_release`` merges them; only a person's confirmation
     # makes one verified.
     extra_links: tuple[LinkCandidate, ...] = ()
+    # (work item key, PR key) recorded by the source, e.g. Jira remote links to GitHub PRs.
+    references: tuple[tuple[str, str], ...] = ()
 
     def features_in(self, release_key: str) -> list[Feature]:
         """Features currently in a release (removed ones excluded), sorted by key."""
         return sorted(
-            (f for f in self.features.values() if release_key in f.release_keys),
+            (
+                f
+                for f in self.features.values()
+                if f.is_release_feature and release_key in f.release_keys
+            ),
+            key=lambda f: f.key,
+        )
+
+    def sub_items(self, feature_key: str) -> list[Feature]:
+        """Work items whose parent is ``feature_key`` (Jira sub-tasks), sorted by key."""
+        feature = self.features.get(feature_key)
+        listed = set(feature.child_keys) if feature else set()
+        return sorted(
+            (
+                f
+                for f in self.features.values()
+                if f.key != feature_key and (f.parent_key == feature_key or f.key in listed)
+            ),
             key=lambda f: f.key,
         )
 
@@ -187,8 +231,11 @@ class World:
             (
                 f
                 for f in self.features.values()
-                if any(m.release_key == release_key for m in f.membership)
-                or release_key in f.release_keys
+                if f.is_release_feature
+                and (
+                    any(m.release_key == release_key for m in f.membership)
+                    or release_key in f.release_keys
+                )
             ),
             key=lambda f: f.key,
         )
@@ -209,6 +256,7 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
     reviews: dict[str, dict[str, Review]] = defaultdict(dict)
     comments: dict[str, dict[str, Comment]] = defaultdict(dict)
     checks: dict[str, dict[str, Check]] = defaultdict(dict)
+    references: set[tuple[str, str]] = set()
 
     for e in events:
         key, p, at = e.subject.external_key, e.payload, e.occurred_at
@@ -229,6 +277,8 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
             pr_snap[key] = _latest(pr_snap.get(key), at, p)
         elif at >= as_of:
             continue  # every remaining type is a time-varying fact
+        elif isinstance(p, ReferenceObserved):
+            references.add((key, p.pull_request.external_key))
         elif isinstance(p, WorkItemReleaseChanged):
             membership[key].append(
                 MembershipChange(at, p.release_key, p.action is ChangeAction.ADDED)
@@ -256,7 +306,13 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
         for key, (_, snap) in pr_snap.items()
         if snap.created_at < as_of
     }
-    return World(as_of=as_of, releases=releases, features=features, pull_requests=prs)
+    return World(
+        as_of=as_of,
+        releases=releases,
+        features=features,
+        pull_requests=prs,
+        references=tuple(sorted(references)),
+    )
 
 
 def _fold(changes: Iterable[tuple[datetime, str, bool]]) -> frozenset[str]:
@@ -264,6 +320,17 @@ def _fold(changes: Iterable[tuple[datetime, str, bool]]) -> frozenset[str]:
     for _, name, added in sorted(changes, key=lambda c: c[0]):
         (state.add if added else state.discard)(name)
     return frozenset(state)
+
+
+_NUMBER = re.compile(r"(\d+)$")
+
+
+def key_number(key: str) -> int:
+    """Number at the end of a work item key: ``org/repo#6395`` -> 6395, ``KAFKA-19831`` -> 19831."""
+    m = _NUMBER.search(key)
+    if m is None:
+        raise ValueError(f"work item key has no number: {key}")
+    return int(m.group(1))
 
 
 def _feature(
@@ -279,7 +346,7 @@ def _feature(
     s = spec[1] if spec else None
     return Feature(
         key=key,
-        number=int(key.rsplit("#", 1)[1]),
+        number=key_number(key),
         title=snap.title,
         url=snap.url,
         description=snap.description,
@@ -291,6 +358,10 @@ def _feature(
         stage=s.stage if s else None,
         owning_team=s.owning_team if s else None,
         participating_teams=s.participating_teams if s else (),
+        item_type=snap.item_type.value,
+        parent_key=snap.parent_key,
+        child_keys=snap.child_keys,
+        spec_path=s.spec_path if s else None,
     )
 
 

@@ -111,6 +111,7 @@ class WorkItemObserved(_Model):
     labels: tuple[str, ...] = ()
     release_keys: tuple[str, ...] = ()  # e.g. ("kubernetes:v1.38",); see release_key()
     parent_key: str | None = None
+    child_keys: tuple[str, ...] = ()  # Jira sub-tasks (an umbrella issue)
     description: str = ""  # ticket text; holds the KEP issue's PR tracking list
     url: str | None = None
     created_at: AwareDatetime

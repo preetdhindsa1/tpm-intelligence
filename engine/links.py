@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from engine.projection import Feature, World
 from linker.candidates import CandidateIndex, FeatureDoc
-from linker.methods import LinkStatus
+from linker.methods import LinkMethod, LinkStatus
 from linker.packs import get_pack
 from linker.rules import (
+    CONFIDENCE,
     LinkCandidate,
     LinkIndex,
     PullRequestInfo,
@@ -77,9 +78,22 @@ def link_release(world: World, release_key: str, *, link_pack: str | None = None
 
     ``link_pack`` selects the team linker (``kep``, ``jira_key``, …). When omitted, the
     pack is resolved from ``connectors/teams/`` by release project.
+
+    Sub-tasks roll up: a PR that names or is remote-linked from a sub-task links to the
+    sub-task's umbrella feature, with the sub-task in the evidence (ADR-0018).
     """
     pack = get_pack(_pack_name(release_key, link_pack))
-    index = LinkIndex.build(_info(f) for f in world.features_ever_in(release_key))
+    features = world.features_ever_in(release_key)
+    in_release = {f.key for f in features}
+    owner = {f.key: f.key for f in features}
+    for f in features:
+        for sub in world.sub_items(f.key):
+            owner.setdefault(sub.key, f.key)
+    index = LinkIndex.build(_info(world.features[k]) for k in sorted(owner))
+    remote: dict[str, list[str]] = defaultdict(list)
+    for item, pr_key in world.references:
+        if item in owner:
+            remote[pr_key].append(item)
     best: dict[tuple[str, str], LinkCandidate] = {}
     for pr in world.pull_requests.values():
         info = PullRequestInfo(
@@ -90,8 +104,9 @@ def link_release(world: World, release_key: str, *, link_pack: str | None = None
             body=pr.body,
             labels=pr.labels,
         )
-        best.update(best_links(list(pack.link(info, index))))
-    in_release = {f.key for f in world.features_ever_in(release_key)}
+        found = list(pack.link(info, index))
+        found += [_remote_link(pr.key, item) for item in remote.get(pr.key, ())]
+        best.update(best_links([_roll_up(c, owner) for c in found]))
     merge_extra_links(
         best,
         [
@@ -101,6 +116,28 @@ def link_release(world: World, release_key: str, *, link_pack: str | None = None
         ],
     )
     return ReleaseLinks(best=best)
+
+
+def _remote_link(pr_key: str, item_key: str) -> LinkCandidate:
+    method, status = LinkMethod.REMOTE_LINK, LinkStatus.VERIFIED
+    return LinkCandidate(
+        pull_request_key=pr_key,
+        work_item_key=item_key,
+        method=method,
+        status=status,
+        confidence=CONFIDENCE[(method, status)],
+        evidence={"remote_link_from": item_key},
+    )
+
+
+def _roll_up(c: LinkCandidate, owner: Mapping[str, str]) -> LinkCandidate:
+    """Re-point a link to a sub-task at its umbrella feature."""
+    target = owner.get(c.work_item_key, c.work_item_key)
+    if target == c.work_item_key:
+        return c
+    return replace(
+        c, work_item_key=target, evidence={**c.evidence, "via_sub_task": c.work_item_key}
+    )
 
 
 def merge_extra_links(
