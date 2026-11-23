@@ -31,8 +31,8 @@ Measured on 2026-11-22 through the public REST API:
 ## Decided by the owner (2026-11-22)
 
 1. **A Kafka "feature"** (the KEP analog) is an issue that targets the release and is a
-   New Feature, **or** has sub-tasks (an umbrella), **or** names a KIP (`KIP-123` in its
-   summary or description, or a remote link to a KIP page). Bugs and loose improvements
+   New Feature, **or** has sub-tasks (an umbrella), **or** names a KIP. (The KIP part
+   was tightened after measuring; see "Measured" below.) Bugs and loose improvements
    stay off the feature list but still count as reviewer and CI load. A sub-task's PRs
    roll up to its umbrella.
 2. **Dates: Jira release dates only, for now.** Each release gets `release_at` from its
@@ -84,7 +84,29 @@ Measured on 2026-11-22 through the public REST API:
 **Finding: the KIP part of the rule is too loose.** Of the 43 features in 4.4.0 that
 qualify only by naming a KIP, 22 are **bugs** and 34 name the KIP only in the
 description (e.g. KAFKA-20253 "High CPU loop on consumer after failed
-re-authentication" mentions KIP-848). Raised with the owner; not changed unilaterally.
+re-authentication" mentions KIP-848). Raised with the owner.
+
+**Revised rule (2026-11-23, option A, the recommendation; easy to change).** An issue is
+a Kafka feature if it is a New Feature, **or** an umbrella with sub-tasks, **or** a
+non-bug that names its KIP **in the title or through a remote link** to the KIP page. A
+KIP named only in the description no longer counts, and bugs never count through a KIP.
+The collector records where the KIP was found (`spec_source`); for events stored before
+that field existed, the engine checks the title itself.
+
+Re-measured with the revised rule (2026-11-23, after re-syncing Jira):
+
+| | 4.4.0 (shipped) | 4.5.0 (open) |
+|---|---|---|
+| Features ever in / in now | 26 / 19 | 17 / 16 |
+| ...by rule: New Feature / umbrella / KIP | 13 / 7 / 6 | 3 / 11 / 3 |
+| Features with a verified PR | 21 (81%) | 12 (71%) |
+| PRs with a verified link to a feature | 114 of 1,696 | 23 of 459 |
+| Verified links reached through a sub-task | 89 | 82 |
+
+All 6 KIP features in 4.4.0 are stories, not bugs. Two are borderline ("Create integration
+tests for KIP-1035 changes", "Revert public API changes from KIP-1238"). Removal history
+works: 6 of the 7 features dropped from 4.4.0 now sit in 4.5.0. Coverage counts whether
+a link exists, not whether it is right; precision is not labelled yet.
 
 ## Limitations
 

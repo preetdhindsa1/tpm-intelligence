@@ -123,6 +123,7 @@ make tf-plan                # offline plan: placeholder project, dummy token
 |---|---|
 | Forecast backtest, v1.35-v1.38 at 28/14/7 days before freeze, recalibrated | **Beats the base rate in 9 of 12 cases, not all**: skill −0.29 to +0.25 (v1.36 fails at 14 and 7 days, v1.37 at 7 days); improves on raw odds everywhere; AUC 0.51-0.76. Odds stay "not validated". Measured 2026-11-22; details in ADR-0005 |
 | Linking coverage: tracked v1.38 features with ≥1 verified PR | **68 / 69 (98.6%)**, measured 2026-11-21 21:36 UTC |
+| Linking coverage, Apache Kafka 4.4.0 (Jira plan, ADR-0018): features with ≥1 verified PR | **21 / 26 (81%)**, measured 2026-11-23; 89 links via sub-tasks; precision not labelled. `scripts/measure_kafka_linking.py` |
 | PRs in the v1.38 window with a verified link | **609 / 2,757 (22.1%)**; 24 suggested-only; 2,124 unlinked (count as load) |
 | Linking precision per method | TBD (not yet labelled): 70-row stratified v1.38 sample ready in `evals/cases/linking.csv` |
 | Fact checker vs labelled claims (`make evals`) | **43 / 43 agree** (22 verified, 21 removed across all 5 reasons). Labels are proposed by the developer, pending TPM review. Measured 2026-11-22 |

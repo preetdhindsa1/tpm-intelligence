@@ -307,36 +307,47 @@ def remote_link_events(
     return out
 
 
-def kip(issue: Json, links: Iterable[Json] = ()) -> str | None:
-    """The KIP an issue names: summary first, then description, then remote links."""
+def kip_and_source(issue: Json, links: Iterable[Json] = ()) -> tuple[str, str] | None:
+    """(KIP, where): the title first, then remote links, then the description."""
     f = issue["fields"]
-    texts = [f.get("summary") or "", f.get("description") or ""]
+    texts = [("title", f.get("summary") or "")]
     texts += [
-        f"{link.get('object', {}).get('url', '')} {link.get('object', {}).get('title', '')}"
+        (
+            "remote_link",
+            f"{link.get('object', {}).get('url', '')} {link.get('object', {}).get('title', '')}",
+        )
         for link in links
     ]
-    for text in texts:
+    texts.append(("description", f.get("description") or ""))
+    for source, text in texts:
         m = _KIP.search(text)
         if m:
-            return f"KIP-{int(m.group(1))}"
+            return f"KIP-{int(m.group(1))}", source
     return None
+
+
+def kip(issue: Json, links: Iterable[Json] = ()) -> str | None:
+    """The KIP an issue names anywhere (see :func:`kip_and_source`)."""
+    found = kip_and_source(issue, links)
+    return found[0] if found else None
 
 
 def issue_spec(
     issue: Json, links: Iterable[Json], *, observed_at: datetime
 ) -> NormalizedEvent | None:
-    """``work_item.spec_observed`` naming the KIP, or None when the issue names none."""
-    name = kip(issue, links)
-    if name is None:
+    """``work_item.spec_observed`` naming the KIP and where, or None when there is none."""
+    found = kip_and_source(issue, links)
+    if found is None:
         return None
+    name, source = found
     updated = parse_ts(issue["fields"]["updated"])
     return new_event(
         source=EventSource.JIRA,
         subject=work_item_ref(issue["key"]),
         occurred_at=updated,
         observed_at=observed_at,
-        payload=WorkItemSpecObserved(spec_path=name),
-        identity=(name, updated.isoformat()),
+        payload=WorkItemSpecObserved(spec_path=name, spec_source=source),
+        identity=(name, source, updated.isoformat()),
     )
 
 

@@ -95,20 +95,32 @@ class Feature:
     parent_key: str | None = None
     child_keys: tuple[str, ...] = ()
     spec_path: str | None = None
+    spec_source: str | None = None
 
     @property
     def is_release_feature(self) -> bool:
-        """Counts as a release feature (ADR-0018): a feature, an umbrella, or has a design doc.
+        """Counts as a release feature (ADR-0018): a feature, an umbrella, or a non-bug that
+        names its design doc in the title or links it.
 
-        Sub-tasks never do; their PRs roll up to the umbrella.
+        Sub-tasks never do; their PRs roll up to the umbrella. A design doc named only in
+        the description does not count: in Kafka 4.4.0 that admitted 22 bugs that merely
+        mention a KIP (measured 2026-11-23).
         """
         if self.item_type == WorkItemType.SUBTASK.value:
             return False
-        return (
-            self.item_type == WorkItemType.FEATURE.value
-            or bool(self.child_keys)
-            or self.spec_path is not None
-        )
+        if self.item_type == WorkItemType.FEATURE.value or self.child_keys:
+            return True
+        return self.item_type != WorkItemType.BUG.value and self.names_design_doc
+
+    @property
+    def names_design_doc(self) -> bool:
+        """The design doc is linked, or named in the title (``KIP-1265: ...``)."""
+        if self.spec_path is None:
+            return False
+        if self.spec_source == "remote_link":
+            return True
+        squash = re.compile(r"[\s\-_:]+")
+        return squash.sub("", self.spec_path).lower() in squash.sub("", self.title).lower()
 
     @property
     def tracked(self) -> bool:
@@ -362,6 +374,7 @@ def _feature(
         parent_key=snap.parent_key,
         child_keys=snap.child_keys,
         spec_path=s.spec_path if s else None,
+        spec_source=s.spec_source if s else None,
     )
 
 

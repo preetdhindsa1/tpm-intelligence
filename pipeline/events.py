@@ -129,6 +129,8 @@ class WorkItemSpecObserved(_Model):
     stage: str | None = None  # alpha / beta / stable
     target_release_key: str | None = None
     spec_status: str | None = None  # provisional / implementable / implemented
+    # Where a Jira issue names its design doc: "title", "remote_link" or "description".
+    spec_source: str | None = None
 
 
 class WorkItemReleaseChanged(_Model):

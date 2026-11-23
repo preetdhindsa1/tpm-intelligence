@@ -31,6 +31,14 @@ export const MEASURED: Measured[] = [
     measured: "2026-11-21",
   },
   {
+    id: "kafka-linking",
+    label: "Kafka 4.4.0 features with a verified PR (Jira plan)",
+    value: "21 / 26",
+    detail: "Same engine on Apache Kafka: Jira keys, remote links, sub-task PRs rolled up to umbrellas (89 links). Precision not labelled yet.",
+    verdict: "pass",
+    measured: "2026-11-23",
+  },
+  {
     id: "risk-analyst",
     label: "Risk analyst claims removed by the checker",
     value: "4.0%",

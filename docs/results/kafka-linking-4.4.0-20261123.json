@@ -1,31 +1,30 @@
 {
-  "measured_at": "2026-11-23T01:21:21+00:00",
-  "events": 57521,
+  "measured_at": "2026-11-23T01:51:10+00:00",
+  "events": 57611,
   "release": "KAFKA:4.4.0",
   "window": [
     "2026-05-22T00:00:00+00:00",
     "2026-10-26T00:00:00+00:00"
   ],
   "work_items_in_store": 643,
-  "features_ever_in_release": 63,
-  "features_in_release_now": 50,
+  "features_ever_in_release": 26,
+  "features_in_release_now": 19,
   "features_by_rule": {
     "umbrella": 7,
-    "kip": 43,
+    "kip": 6,
     "new_feature": 13
   },
-  "features_with_verified_pr": 51,
-  "feature_coverage": 0.81,
+  "features_with_verified_pr": 21,
+  "feature_coverage": 0.808,
   "prs_in_window": 1696,
-  "prs_with_verified_feature_link": 161,
-  "prs_with_only_suggested_link": 23,
+  "prs_with_verified_feature_link": 114,
+  "prs_with_only_suggested_link": 19,
   "prs_naming_any_kafka_key": 1178,
   "verified_links_by_method": {
-    "explicit_key": 167,
-    "remote_link": 1
+    "explicit_key": 119
   },
   "verified_links_via_sub_task": 89,
   "suggested_links_by_method": {
-    "explicit_key": 28
+    "explicit_key": 21
   }
 }

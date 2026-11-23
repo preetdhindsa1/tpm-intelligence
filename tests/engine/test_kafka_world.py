@@ -14,7 +14,7 @@ from typing import Any
 
 from collectors.jira import normalize as n
 from engine.links import link_release
-from engine.projection import key_number, project
+from engine.projection import Feature, key_number, project
 from linker.methods import LinkMethod, LinkStatus
 from pipeline.events import (
     NormalizedEvent,
@@ -130,3 +130,41 @@ def test_release_has_jira_dates_only() -> None:
     r = project(events(), LATER).releases[R44]
     assert r.release_at == datetime(2026, 10, 26, tzinfo=UTC)
     assert r.code_freeze_at is None
+
+
+def _item(item_type: str, title: str, spec: str | None, source: str | None) -> Feature:
+    return Feature(
+        key="KAFKA-1",
+        number=1,
+        title=title,
+        url=None,
+        description="",
+        labels=frozenset(),
+        release_keys=frozenset(),
+        membership=(),
+        label_history=(),
+        item_type=item_type,
+        spec_path=spec,
+        spec_source=source,
+    )
+
+
+def test_kip_counts_only_in_the_title_or_a_link_and_never_for_bugs() -> None:
+    """Shapes measured in 4.4.0 (2026-11-23); the description-only rule admitted 22 bugs."""
+    # KAFKA-20032 "KIP-1265 : Mechanism for automatic detection of internal API usage"
+    assert _item("story", "KIP-1265 : Mechanism", "KIP-1265", "title").is_release_feature
+    assert _item("story", "Implement KIP 1340: keys", "KIP-1340", None).is_release_feature
+    assert _item("story", "Rack-aware partitioning", "KIP-1123", "remote_link").is_release_feature
+    # KAFKA-19193: KIP only in the description.
+    assert not _item(
+        "story", "Rack-aware partitioning", "KIP-1123", "description"
+    ).is_release_feature
+    # KAFKA-20253: a bug that mentions KIP-848; KAFKA-20663: a bug with the KIP in its title.
+    assert not _item(
+        "bug", "High CPU loop on consumer", "KIP-848", "description"
+    ).is_release_feature
+    assert not _item(
+        "bug", "KIP-1035: stale changelog offset", "KIP-1035", "title"
+    ).is_release_feature
+    # New Features count with or without a KIP.
+    assert _item("feature", "Dead-letter queues for share groups", None, None).is_release_feature

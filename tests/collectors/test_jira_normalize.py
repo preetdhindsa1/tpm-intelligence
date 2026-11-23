@@ -147,6 +147,7 @@ def test_kip_is_found_in_the_description_and_becomes_a_spec() -> None:
     spec = n.issue_spec(issue, [], observed_at=OBSERVED)
     assert spec is not None
     assert spec.payload.spec_path == "KIP-1356"
+    assert spec.payload.spec_source == "description"
     # A bug that names no KIP gets no spec.
     assert n.issue_spec(load("issue_KAFKA-19831.json"), [], observed_at=OBSERVED) is None
 
@@ -155,6 +156,7 @@ def test_kip_in_a_remote_link_counts() -> None:
     issue = load("issue_KAFKA-19831.json")
     link = {"id": 1, "object": {"url": "https://cwiki.apache.org/confluence/display/KAFKA/KIP-932"}}
     assert n.kip(issue, [link]) == "KIP-932"
+    assert n.kip_and_source(issue, [link]) == ("KIP-932", "remote_link")
 
 
 def test_release_dates_only_and_cycle_starts_at_the_previous_feature_release() -> None:
