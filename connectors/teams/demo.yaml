@@ -8,9 +8,9 @@ project: demo
 link_pack: github_issue
 planning:
   source: github
-  repo: preetdhindsa1/tpm-demo-team
+  repo: preetdhindsa1/program-demo-team
 code:
   repos:
-    - preetdhindsa1/tpm-demo-team
+    - preetdhindsa1/program-demo-team
 calendar:
   path: connectors/teams/demo-calendar.yaml

@@ -8,7 +8,7 @@ from linker.packs import get_pack
 from linker.packs.github_issue import references
 from linker.rules import LinkIndex, PullRequestInfo, WorkItemInfo
 
-REPO = "preetdhindsa1/tpm-demo-team"
+REPO = "preetdhindsa1/program-demo-team"
 ISSUES = LinkIndex.build([WorkItemInfo(key=f"{REPO}#{n}", number=n) for n in (3, 12)])
 
 

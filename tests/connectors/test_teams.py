@@ -57,8 +57,8 @@ def test_demo_team_is_sample_data_planning_and_coding_in_one_repo() -> None:
     assert team.project == "demo"
     assert "sample data" in team.display_name
     assert team.link_pack == "github_issue"
-    assert team.planning_repo == team.primary_code_repo == "preetdhindsa1/tpm-demo-team"
-    assert team.owns("preetdhindsa1/tpm-demo-team#5")
+    assert team.planning_repo == team.primary_code_repo == "preetdhindsa1/program-demo-team"
+    assert team.owns("preetdhindsa1/program-demo-team#5")
     assert team.owns("demo:2026.12")
     assert not team.owns("kubernetes/kubernetes#5")
     calendar = load_calendar(team.calendar_path(relative_to=Path.cwd()))

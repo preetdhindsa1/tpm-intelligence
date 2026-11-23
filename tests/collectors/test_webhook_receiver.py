@@ -15,7 +15,7 @@ from tests.engine.synthetic import Stream
 
 SECRET = "test-secret"  # noqa: S105 - test fixture, not a credential
 NOW = datetime(2026, 11, 23, 12, tzinfo=UTC)
-REPO = "preetdhindsa1/tpm-demo-team"
+REPO = "preetdhindsa1/program-demo-team"
 
 
 def one_event() -> NormalizedEvent:
