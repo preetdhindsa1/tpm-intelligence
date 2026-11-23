@@ -77,7 +77,33 @@ def test_kafka_release_and_feature_through_the_api() -> None:
 
 
 def test_every_read_endpoint_copes_with_a_release_without_freeze_dates() -> None:
-    client = TestClient(create_app(service=service()), raise_server_exceptions=False)
+    # In-memory stores throughout: CI's unit-test job has no database (regression: this
+    # test passed locally against Postgres and failed in CI, 2026-11-23).
+    from agents.gateway import Gateway
+    from agents.ledger import MemoryLedger
+    from agents.link_store import MemoryLinkSuggestionStore
+    from agents.notes import MemoryNoteStore
+    from agents.settings import AISettings
+    from agents.updates import MemoryUpdateStore
+    from api.ai import AIServices
+    from api.live import InMemoryUpdates
+    from api.sim_store import MemorySimStore
+    from api.snapshots import MemorySnapshotStore
+
+    ai = AIServices(
+        gateway=Gateway(AISettings(), MemoryLedger(), None),
+        notes=MemoryNoteStore(),
+        updates=MemoryUpdateStore(),
+    )
+    app = create_app(
+        service=service(),
+        updates=InMemoryUpdates(),
+        ai=ai,
+        link_store=MemoryLinkSuggestionStore(),
+        sim_store=MemorySimStore(),
+        snapshot_store=MemorySnapshotStore(),
+    )
+    client = TestClient(app, raise_server_exceptions=False)
     paths = [
         "features",
         "features/20682",
