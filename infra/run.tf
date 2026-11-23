@@ -255,7 +255,12 @@ resource "google_cloud_run_v2_job" "poller" {
         args    = ["--release", var.poll_release]
 
         dynamic "env" {
-          for_each = merge(local.common_env, { OTEL_SERVICE_NAME = "tpm-github-poller" })
+          # No collector sidecar here (see below), so no OTLP export: structured JSON logs
+          # with trace IDs still reach Cloud Logging.
+          for_each = merge(local.common_env, {
+            OTEL_SERVICE_NAME           = "tpm-github-poller"
+            OTEL_EXPORTER_OTLP_ENDPOINT = ""
+          })
           content {
             name  = env.key
             value = env.value
@@ -286,30 +291,14 @@ resource "google_cloud_run_v2_job" "poller" {
         }
       }
 
-      containers {
-        name  = "otel-collector"
-        image = local.otel_image
-        args  = ["--config=/etc/otelcol/config.yaml"]
-        volume_mounts {
-          name       = "otel-config"
-          mount_path = "/etc/otelcol"
-        }
-      }
-
+      # One container only. With the collector as a second container, the job never got
+      # the Cloud SQL socket: every run since the first deploy failed with "No such file
+      # or directory" on /cloudsql/... (2026-11-23). The single-container migrate job
+      # connects fine, so the poller now runs the same way.
       volumes {
         name = "cloudsql"
         cloud_sql_instance {
           instances = [google_sql_database_instance.db.connection_name]
-        }
-      }
-      volumes {
-        name = "otel-config"
-        secret {
-          secret = google_secret_manager_secret.otel_config.secret_id
-          items {
-            version = "latest"
-            path    = "config.yaml"
-          }
         }
       }
     }
