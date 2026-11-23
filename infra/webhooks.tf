@@ -66,7 +66,9 @@ resource "google_cloud_run_v2_service" "webhooks" {
     timeout         = "30s" # GitHub gives up after 10 s
 
     scaling {
-      min_instance_count = 0 # nearly free at demo traffic; cold starts are measured
+      # One warm instance: a cold start took 12.1 s on GitHub's first ping (2026-11-23),
+      # past GitHub's 10 s limit. With cpu_idle it is billed at the idle rate between events.
+      min_instance_count = 1
       max_instance_count = 2
     }
 
@@ -134,6 +136,10 @@ resource "google_cloud_run_v2_service" "webhooks" {
           cpu    = "0.5"
           memory = "256Mi"
         }
+        # Match the receiver (Cloud Run sets these on every container; leaving them unset
+        # here showed as drift on every plan).
+        cpu_idle          = true
+        startup_cpu_boost = true
       }
       volume_mounts {
         name       = "otel-config"
