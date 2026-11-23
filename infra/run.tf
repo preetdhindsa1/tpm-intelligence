@@ -124,12 +124,7 @@ resource "google_cloud_run_v2_service" "api" {
       }
     }
 
-    volumes {
-      name = "cloudsql"
-      cloud_sql_instance {
-        instances = [google_sql_database_instance.db.connection_name]
-      }
-    }
+    # Same order as Cloud Run reports them; the other order showed as drift on every plan.
     volumes {
       name = "otel-config"
       secret {
@@ -138,6 +133,12 @@ resource "google_cloud_run_v2_service" "api" {
           version = "latest"
           path    = "config.yaml"
         }
+      }
+    }
+    volumes {
+      name = "cloudsql"
+      cloud_sql_instance {
+        instances = [google_sql_database_instance.db.connection_name]
       }
     }
   }

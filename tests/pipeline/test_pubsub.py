@@ -113,3 +113,14 @@ def test_round_trip_against_emulator() -> None:
         if consumer.poll_once(timeout_s=5.0):
             break
     assert [e.event_id for e in received] == [k8s_6395_tracked_no().event_id]
+
+
+def test_empty_subscription_deadline_is_no_messages_not_a_failure() -> None:
+    from google.api_core.exceptions import DeadlineExceeded
+
+    class TimingOut(FakeSubscriber):
+        def pull(self, request: dict[str, Any], timeout: float) -> Any:
+            raise DeadlineExceeded("Deadline Exceeded")
+
+    transport = PubSubTransport("demo-project", publisher=FakePublisher(), subscriber=TimingOut())
+    assert transport.pull("events", "worker", 10, 2.0) == []

@@ -19,11 +19,12 @@ from __future__ import annotations
 import json
 import logging
 from collections import OrderedDict
-from collections.abc import Callable, Collection, Sequence
+from collections.abc import Awaitable, Callable, Collection, Sequence
 from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import FastAPI, Request, Response
+from fastapi.concurrency import run_in_threadpool
 from opentelemetry import metrics
 
 from collectors.github_webhooks.signature import verify
@@ -69,9 +70,31 @@ def create_app(
     normalize: Normalizer,
     allowed_repos: Collection[str],
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
+    flush: Callable[[], object] | None = None,
 ) -> FastAPI:
-    """Build the receiver. ``secret`` must be non-empty: without it nothing is accepted."""
+    """Build the receiver. ``secret`` must be non-empty: without it nothing is accepted.
+
+    ``flush`` (telemetry export) runs after each delivery is handled and before the answer
+    goes out, while Cloud Run still gives the instance CPU. The request's own server span
+    ends after that, so it goes out with the next delivery's flush.
+    """
     app = FastAPI(title="TPM Intelligence webhook receiver", version="0.1.0")
+
+    if flush is not None:
+        flush_now = flush
+
+        @app.middleware("http")
+        async def flush_telemetry(
+            request: Request, call_next: Callable[[Request], Awaitable[Response]]
+        ) -> Response:
+            response = await call_next(request)
+            if request.url.path == "/github":
+                try:
+                    await run_in_threadpool(flush_now)
+                except Exception:  # telemetry must never fail a delivery
+                    logger.warning("telemetry flush failed", exc_info=True)
+            return response
+
     recent = RecentDeliveries()
     allowed = {r.lower() for r in allowed_repos}
 

@@ -52,6 +52,7 @@ def main() -> int:
             publish=publisher.publish,
             normalize=normalizer,
             allowed_repos=normalizer.repos,
+            flush=telemetry.force_flush,
         )
         FastAPIInstrumentor.instrument_app(app, excluded_urls="health")
         uvicorn.run(
