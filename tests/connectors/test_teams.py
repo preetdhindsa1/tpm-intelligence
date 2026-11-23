@@ -63,3 +63,15 @@ def test_this_project_tracks_itself_in_one_repo() -> None:
     calendar = load_calendar(team.calendar_path(relative_to=Path.cwd()))
     assert calendar.get("Phase 3").code_freeze.isoformat() == "2027-01-14T12:00:00+00:00"
     assert get_pack("github_issue").name == "github_issue"
+
+
+def test_front_page_card_uses_this_projects_display_name() -> None:
+    """The front page marks the card live by exact display name (web/lib/teams.ts)."""
+    from pathlib import Path
+
+    from connectors import load_team
+
+    name = load_team("tpm-intelligence").display_name
+    assert name == "Program Intelligence Platform (this project)"
+    teams_ts = Path(__file__).parents[2] / "web" / "lib" / "teams.ts"
+    assert f'SELF_PROJECT = "{name}"' in teams_ts.read_text()

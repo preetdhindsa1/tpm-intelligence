@@ -1,4 +1,4 @@
-# CLAUDE.md — TPM Intelligence Platform
+# CLAUDE.md — Program Intelligence Platform
 
 This file is the permanent source of project rules. Read it at the start of every session and follow it for every change.
 

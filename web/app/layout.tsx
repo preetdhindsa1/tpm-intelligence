@@ -4,7 +4,7 @@ import { AuthStatus } from "@/components/AuthStatus";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TPM Intelligence",
+  title: "Program Intelligence Platform",
   description:
     "Open-source portfolio dashboard: release health for public Kubernetes and Apache Kafka data. Forecasts which features may slip, with ranges. Read-only for visitors; no account needed.",
 };
@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="border-b bg-white">
           <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-3">
             <div className="flex items-center gap-6">
-              <Link href="/" className="font-semibold">TPM Intelligence</Link>
+              <Link href="/" className="font-semibold">Program Intelligence Platform</Link>
               <nav aria-label="Main" className="flex gap-4 text-sm text-slate-600">
                 <Link href="/" className="hover:text-slate-900">Overview</Link>
                 <Link href="/releases" className="hover:text-slate-900">Release health</Link>

@@ -1,4 +1,4 @@
-// Front page: what TPM Intelligence is, how it works, and what has been measured.
+// Front page: what Program Intelligence Platform is, how it works, and what has been measured.
 // The live card uses the API's computed facts; the scorecard comes from
 // lib/measured.ts (copied from the README, dated). No number here is written by AI.
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { OUTCOME_META, STATUS } from "@/lib/dashboard";
 import { formatUtc } from "@/lib/format";
 import { MEASURED, type Verdict } from "@/lib/measured";
 import { currentRelease, groupByProject, releasePath } from "@/lib/routes";
+import { SELF_PROJECT, teamState } from "@/lib/teams";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,7 @@ function Hero({ release, asOf, base }: { release?: Release; asOf: Date; base: st
             <span className="text-indigo-700">and why, before the release does.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-slate-600">
-            TPM Intelligence links the plan (KEPs, Jira issues) to the truth in the code (pull requests, reviews, CI). It computes the
+            Program Intelligence Platform links the plan (KEPs, Jira issues) to the truth in the code (pull requests, reviews, CI). It computes the
             facts, forecasts the odds as ranges, maps dependencies between teams, and drafts the executive update.
           </p>
           <p className="mt-3 max-w-2xl text-slate-600">
@@ -330,8 +331,8 @@ function Teams({ projects }: { projects: string[] }) {
     { name: "Kubernetes", how: "GitHub enhancement issues (KEPs) + kubernetes/kubernetes PRs" },
     { name: "Apache Kafka", how: "Jira fix versions (New Features, umbrellas, KIPs) + apache/kafka PRs; release dates only so far" },
     {
-      name: "TPM Intelligence (this project)",
-      how: "Tracks its own development: GitHub issues and the PRs that close them, delivered by GitHub App webhooks in seconds",
+      name: SELF_PROJECT,
+      how: "Tracks its own development: GitHub issues and the PRs that close them, delivered by GitHub webhooks in seconds",
     },
     { name: "Your team", how: "Copy a connector file: where the plan lives, where the code lives, the release calendar" },
   ];
@@ -344,13 +345,7 @@ function Teams({ projects }: { projects: string[] }) {
       />
       <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {rows.map((r) => {
-          const state = live.has(r.name)
-            ? "Live"
-            : r.name.startsWith("TPM Intelligence")
-              ? "Built · waiting for the first issues"
-              : r.name === "Apache Kafka"
-                ? "Connector configured · data not yet collected"
-                : "Plug in";
+          const state = teamState(r.name, live);
           return (
             <div key={r.name} className="rounded-xl border bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between gap-2">

@@ -1,4 +1,6 @@
-# TPM Intelligence Platform
+# Program Intelligence Platform
+
+_Formerly TPM Intelligence (renamed 2026-11-23, ADR-0021)._
 
 Predicts which features in a large multi-team software release will slip, explains why, and
 drafts the executive update for a human to approve.
@@ -18,7 +20,7 @@ drafts the executive update for a human to approve.
 > results), so the dashboard labels forecast odds "not validated".
 > Numbers not in the results table are **TBD (not yet measured)**.
 
-![Front page: what TPM Intelligence does, with a live pulse of Kubernetes v1.38](docs/images/front-page.png)
+![Front page: what Program Intelligence Platform does, with a live pulse of Kubernetes v1.38](docs/images/front-page.png)
 
 ![v1.38 dashboard: stat tiles, feature dependencies, Code Freeze outcomes, verified executive brief](docs/images/dashboard-v1.38.png)
 

@@ -3,7 +3,7 @@
 # them ("Fixes #12"). GitHub App webhooks deliver events in seconds; the poller can
 # reconcile. Its own project key, so it never mixes with Kubernetes or Kafka.
 id: tpm-intelligence
-display_name: TPM Intelligence (this project)
+display_name: Program Intelligence Platform (this project)
 project: tpm-intelligence
 link_pack: github_issue
 planning:

@@ -19,7 +19,7 @@ services:
     environment:
       <<: *local-env
       LANGFUSE_INIT_ORG_ID: tpm-intelligence
-      LANGFUSE_INIT_ORG_NAME: TPM Intelligence
+      LANGFUSE_INIT_ORG_NAME: Program Intelligence Platform
       LANGFUSE_INIT_PROJECT_ID: tpm-intelligence-local
       LANGFUSE_INIT_PROJECT_NAME: tpm-intelligence (local)
       LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:?set LANGFUSE_PUBLIC_KEY in .env}

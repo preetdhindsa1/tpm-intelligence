@@ -78,7 +78,7 @@ def create_app(
     goes out, while Cloud Run still gives the instance CPU. The request's own server span
     ends after that, so it goes out with the next delivery's flush.
     """
-    app = FastAPI(title="TPM Intelligence webhook receiver", version="0.1.0")
+    app = FastAPI(title="Program Intelligence Platform webhook receiver", version="0.1.0")
 
     if flush is not None:
         flush_now = flush
