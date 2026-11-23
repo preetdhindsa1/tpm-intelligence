@@ -219,6 +219,8 @@ resource "google_cloud_run_v2_service" "web" {
 
   lifecycle {
     ignore_changes = [template[0].containers[0].image, client, client_version]
+    # Renaming the service (it is the public URL) replaces it: start the new one first.
+    create_before_destroy = true
   }
 
   depends_on = [google_secret_manager_secret_iam_member.readers, google_secret_manager_secret_version.placeholder]

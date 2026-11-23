@@ -41,7 +41,7 @@ variable "poll_schedule" {
 variable "web_service_name" {
   description = "Cloud Run service for the web app; it is also the first part of the public URL (https://<name>-<project number>.<region>.run.app)."
   type        = string
-  default     = "tpm-intelligence"
+  default     = "program-intelligence-platform" # was tpm-intelligence until 2026-11-23 (ADR-0021)
 }
 
 variable "cors_origins" {
