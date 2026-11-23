@@ -1,4 +1,4 @@
-import { featureLabel } from "@/lib/vocab";
+import { featureLabel, vocab } from "@/lib/vocab";
 import { releaseFromParams } from "@/lib/release-page";
 import { releasePath } from "@/lib/routes";
 import Link from "next/link";
@@ -29,7 +29,8 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
             <a className="hover:underline" href={f.url ?? "#"}>{featureLabel(f)}</a> {f.title}
           </h1>
           <p className="text-sm text-slate-600">
-            {f.in_release ? "In the release" : "Removed from the release"} · {f.tracked ? "tracked" : "not tracked"} ·
+            {f.in_release ? "In the release" : "Removed from the release"}
+            {vocab(project).tracking ? (f.tracked ? " · tracked" : " · not tracked") : ""} ·
             stage {f.stage ?? "unknown"} · {f.teams.join(", ")}
           </p>
         </div>

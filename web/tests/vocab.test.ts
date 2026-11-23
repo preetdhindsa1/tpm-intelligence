@@ -11,5 +11,7 @@ describe("vocab", () => {
     expect(vocab("KAFKA").design).toBe("KIP");
     expect(vocab("other").team).toBe("team");
     expect(shortTeam("sig/node")).toBe("node");
+    expect(vocab("kubernetes").tracking).toBe(true);
+    expect(vocab("kafka").tracking).toBe(false);
   });
 });

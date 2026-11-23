@@ -161,7 +161,7 @@ function FeatureTable({ title, rows, project, release }: { title: string; rows: 
                     {featureLabel(f)}
                   </Link>{" "}
                   {f.title}
-                  {!f.tracked && f.in_release ? <span className="ml-1 text-xs text-slate-500">(not tracked)</span> : null}
+                  {vocab(project).tracking && !f.tracked && f.in_release ? <span className="ml-1 text-xs text-slate-500">(not tracked)</span> : null}
                 </td>
                 <td className="px-3 py-2 text-xs text-slate-600">{f.teams.map((t) => t.replace("sig/", "")).join(", ")}</td>
                 <td className="px-3 py-2 text-xs">{f.stage ?? "—"}</td>

@@ -30,7 +30,7 @@ export default async function FrontPage() {
         <Scorecard />
         <Teams projects={groups.map((g) => g.displayName)} />
         <p className="border-t pt-6 text-center text-xs text-slate-500">
-          Public data only (Kubernetes on GitHub; Apache Kafka next). Measures flow and bottlenecks per team, never individual
+          Public data only (Kubernetes on GitHub; Apache Kafka on Jira and GitHub). Measures flow and bottlenecks per team, never individual
           performance. Decision support, not guarantees.
         </p>
       </div>
@@ -56,7 +56,7 @@ function Hero({ release, asOf, base }: { release?: Release; asOf: Date; base: st
             <span className="text-indigo-700">and why, before the release does.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-slate-600">
-            TPM Intelligence links the plan (KEPs, Jira epics) to the truth in the code (pull requests, reviews, CI). It computes the
+            TPM Intelligence links the plan (KEPs, Jira issues) to the truth in the code (pull requests, reviews, CI). It computes the
             facts, forecasts the odds as ranges, maps dependencies between teams, and drafts the executive update.
           </p>
           <p className="mt-3 max-w-2xl text-slate-600">
@@ -264,7 +264,7 @@ function Rules() {
 function Modules({ base, release }: { base: string; release?: Release }) {
   const items = [
     { href: base, title: "Release health", body: "Tiles, what happened at Code Freeze, and every feature's flags, odds and linked PRs." },
-    { href: `${base}/dependencies`, title: "Dependency map", body: "Which features share code or wait on each other, across SIGs, and which PRs are stuck." },
+    { href: `${base}/dependencies`, title: "Dependency map", body: "Which features share code or wait on each other, across teams, and which PRs are stuck." },
     { href: `${base}/simulate`, title: "What-if simulator", body: "Change reviewer staffing and see review waits as ranges. Labelled not validated until it is." },
     { href: `${base}/update`, title: "Verified executive brief", body: "An AI draft where every line was fact-checked, ready for a TPM to edit and approve." },
     { href: `${base}/links`, title: "Link review", body: "Confirm or reject AI-suggested links; only confirmed links change the facts." },
@@ -328,7 +328,7 @@ function Teams({ projects }: { projects: string[] }) {
   const live = new Set(projects);
   const rows = [
     { name: "Kubernetes", how: "GitHub enhancement issues (KEPs) + kubernetes/kubernetes PRs" },
-    { name: "Apache Kafka", how: "Jira epics and fix versions + apache/kafka PRs" },
+    { name: "Apache Kafka", how: "Jira fix versions (New Features, umbrellas, KIPs) + apache/kafka PRs; release dates only so far" },
     { name: "Your team", how: "Copy a connector file: where the plan lives, where the code lives, the release calendar" },
   ];
   return (

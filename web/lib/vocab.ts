@@ -7,14 +7,15 @@ export function featureLabel(f: { key: string; number: number }): string {
   return f.key.includes("#") ? `#${f.number}` : f.key;
 }
 
-export type Vocab = { team: string; teams: string; design: string; designs: string };
+// `tracking`: the project's release team marks features tracked (Kubernetes "tracked/yes").
+export type Vocab = { team: string; teams: string; design: string; designs: string; tracking: boolean };
 
 const VOCAB: Record<string, Vocab> = {
-  kubernetes: { team: "SIG", teams: "SIGs", design: "KEP", designs: "KEPs" },
-  kafka: { team: "component", teams: "components", design: "KIP", designs: "KIPs" },
+  kubernetes: { team: "SIG", teams: "SIGs", design: "KEP", designs: "KEPs", tracking: true },
+  kafka: { team: "component", teams: "components", design: "KIP", designs: "KIPs", tracking: false },
 };
 
-const GENERIC: Vocab = { team: "team", teams: "teams", design: "design doc", designs: "design docs" };
+const GENERIC: Vocab = { team: "team", teams: "teams", design: "design doc", designs: "design docs", tracking: false };
 
 /** Vocabulary for a project slug or key ("kafka", "KAFKA"). */
 export function vocab(project: string): Vocab {

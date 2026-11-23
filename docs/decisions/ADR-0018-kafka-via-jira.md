@@ -68,6 +68,24 @@ Measured on 2026-11-22 through the public REST API:
   (`web/lib/vocab.ts`). Without a freeze date odds and merge dates say "No Code Freeze
   date" instead of a number.
 
+## Measured (2026-11-23, `scripts/measure_kafka_linking.py`)
+
+| | 4.4.0 (shipped) | 4.5.0 (open) |
+|---|---|---|
+| Jira issues collected (both releases) | 643 | |
+| Features ever in / in now | 63 / 50 | 38 / 35 |
+| ...by rule: New Feature / umbrella / KIP | 13 / 7 / 43 | 3 / 11 / 24 |
+| Features with a verified PR | 51 (81%) | 30 (79%) |
+| `apache/kafka` PRs in the window | 1,696 | 459 |
+| PRs naming any KAFKA key | 1,178 | 301 |
+| PRs with a verified link to a feature | 161 | 31 |
+| Verified links reached through a sub-task | 89 | 82 |
+
+**Finding: the KIP part of the rule is too loose.** Of the 43 features in 4.4.0 that
+qualify only by naming a KIP, 22 are **bugs** and 34 name the KIP only in the
+description (e.g. KAFKA-20253 "High CPU loop on consumer after failed
+re-authentication" mentions KIP-848). Raised with the owner; not changed unilaterally.
+
 ## Limitations
 
 - No freeze dates, so no odds or merge-date forecasts for Kafka yet; flags and links
