@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import threading
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -510,3 +511,19 @@ def test_in_memory_updates_accept_publishes_from_another_thread() -> None:
         return await asyncio.wait_for(first, timeout=2)
 
     assert asyncio.run(scenario()) is not None  # a trace context, not a heartbeat
+
+
+def test_sse_stream_ends_after_its_maximum_so_browsers_reconnect(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import api.main as main_mod
+
+    monkeypatch.setattr(main_mod, "STREAM_MAX_S", 0.2)
+    updates = InMemoryUpdates(heartbeat_s=0.05)
+    client = client_at(utc(2026, 11, 21, 3), updates, InMemoryEventSource(list(fixture_events())))
+    started = time.monotonic()
+    with client.stream("GET", "/releases/v1.38/stream") as response:
+        lines = list(response.iter_lines())  # returns only because the server ends it
+    assert time.monotonic() - started < 5
+    assert lines[0] == "event: ready"
+    assert "retry: 1000" in lines

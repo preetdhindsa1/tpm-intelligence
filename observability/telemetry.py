@@ -36,6 +36,16 @@ class Telemetry:
     tracer_provider: TracerProvider
     meter_provider: MeterProvider
 
+    def force_flush(self, timeout_millis: int = 2000) -> None:
+        """Export pending spans and metrics now.
+
+        On Cloud Run with request-based CPU (``cpu_idle``), CPU is throttled between
+        requests, so background exports to the collector time out. Services there flush
+        before answering each request instead.
+        """
+        self.tracer_provider.force_flush(timeout_millis)
+        self.meter_provider.force_flush(timeout_millis)
+
     def shutdown(self) -> None:
         """Flush and stop exporters."""
         self.tracer_provider.shutdown()

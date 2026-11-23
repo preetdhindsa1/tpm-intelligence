@@ -90,7 +90,16 @@ Cloud API (1 vCPU), real v1.38, 2 hours of normal polling (2026-11-23 20:02-22:0
   (up to 5 minutes) or a webhook's delivery: the full event -> dashboard p95 for
   webhooks is measured in P3-M5.
 - n counts pushes per open page: two pages were open (one held by the measurement, one a
-  visitor). Both maxima come from one slow recompute at 21:21:58 UTC (38.7 s), not near
-  a redeploy; its cause is not yet known. The next slowest (34.9 s) was the first
-  recompute after the 20:30 redeploy (cold calibration).
+  visitor). Both maxima come from one recompute at 21:21:58 UTC (38.7 s) that **rebuilt
+  the cached calibration** (the API's `calibrations_computed` went from 2 to 3): new data
+  touched something a finished release's calibration had read, as designed above. It was
+  the only rebuild in the window. The next slowest (34.9 s) was the first recompute after
+  the 20:30 redeploy (cold calibration).
+- **Two API revisions overlapped from 20:32 to 21:02.** The measurement's live connection
+  stayed on the old revision until the 60-minute request timeout, and Cloud Run keeps a
+  revision running while it has an open request. For those 30 minutes two in-process
+  workers shared the Pub/Sub subscription (ADR-0017 assumes one). No data was lost (both
+  write the same database), but a page on one revision was not pushed events the other
+  consumed. Follow-up: bound the live stream's length so pages reconnect to the newest
+  revision.
 - Small sample, one release, one 2-hour window.

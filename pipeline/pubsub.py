@@ -56,14 +56,24 @@ class PubSubTransport:
     def pull(
         self, topic: str, subscription: str, max_messages: int, timeout_s: float
     ) -> list[ReceivedMessage]:
-        """Synchronous pull; may return fewer messages than requested (or none)."""
-        response = self._subscriber.pull(
-            request={
-                "subscription": self._subscription_path(subscription),
-                "max_messages": max_messages,
-            },
-            timeout=timeout_s,
-        )
+        """Synchronous pull; may return fewer messages than requested (or none).
+
+        An empty subscription makes Pub/Sub's pull run out its deadline: that is "no
+        messages", not a failure (it used to be logged as a worker crash every few seconds,
+        each followed by a 5 s back-off, 2026-11-23).
+        """
+        from google.api_core.exceptions import DeadlineExceeded
+
+        try:
+            response = self._subscriber.pull(
+                request={
+                    "subscription": self._subscription_path(subscription),
+                    "max_messages": max_messages,
+                },
+                timeout=timeout_s,
+            )
+        except DeadlineExceeded:
+            return []
         return [
             ReceivedMessage(
                 message_id=received.message.message_id,

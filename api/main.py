@@ -61,6 +61,12 @@ from engine.assess import FeatureAssessment
 from engine.forecast import DEFAULT_FORECAST, model_version
 
 SERVICE_NAME = "tpm-api"
+# A live stream ends after this long and the browser reconnects (EventSource does so by
+# itself), landing on the newest revision. Without a bound, one open page kept an old
+# revision and its worker running for the 60-minute request timeout after a deploy
+# (2026-11-23, ADR-0019).
+STREAM_MAX_S = 600.0
+STREAM_RETRY_MS = 1000
 SIM_NOTE = (
     "Decision support, not a guarantee: if these assumptions hold, results are likely in "
     "these ranges."
@@ -675,7 +681,11 @@ def create_app(
 
         async def events() -> AsyncIterator[str]:
             yield _sse("ready", {"release": name, "version": svc().version})
+            yield f"retry: {STREAM_RETRY_MS}\n\n"
+            deadline = time.monotonic() + STREAM_MAX_S
             async for ctx in hub.subscribe(request.is_disconnected):
+                if time.monotonic() >= deadline:
+                    return  # the browser reconnects after STREAM_RETRY_MS
                 if ctx is None:
                     yield ": heartbeat\n\n"
                     continue

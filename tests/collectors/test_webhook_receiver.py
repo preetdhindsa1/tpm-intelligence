@@ -145,3 +145,35 @@ def test_recent_deliveries_forget_the_oldest() -> None:
     assert not recent.seen("c")  # "a" is forgotten
     assert not recent.seen("a")
     assert recent.seen("c")
+
+
+def _flushing_client(flush: Any) -> tuple[TestClient, list[NormalizedEvent]]:
+    published: list[NormalizedEvent] = []
+    app = create_app(
+        secret=SECRET,
+        publish=published.append,
+        normalize=lambda event, payload, at: [one_event()],
+        allowed_repos=[REPO],
+        now=lambda: NOW,
+        flush=flush,
+    )
+    return TestClient(app), published
+
+
+def test_telemetry_is_flushed_after_each_delivery_not_health_checks() -> None:
+    flushes: list[int] = []
+    c, published = _flushing_client(lambda: flushes.append(1))
+    assert post(c, "pull_request", PAYLOAD).status_code == 202
+    assert post(c, "pull_request", PAYLOAD, signature="sha256=bad").status_code == 401
+    assert c.get("/health").status_code == 200
+    assert len(flushes) == 2  # both deliveries, accepted or not; no health check
+    assert len(published) == 1
+
+
+def test_a_failing_flush_never_fails_the_delivery() -> None:
+    def broken() -> None:
+        raise RuntimeError("collector down")
+
+    c, published = _flushing_client(broken)
+    assert post(c, "pull_request", PAYLOAD).status_code == 202
+    assert len(published) == 1

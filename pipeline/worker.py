@@ -23,7 +23,7 @@ logger = logging.getLogger("pipeline.worker")
 
 
 def log_event(event: NormalizedEvent) -> None:
-    """Log one event (used when no database is configured, e.g. unit tests)."""
+    """Log one stored event (also the handler when no database is configured, e.g. tests)."""
     logger.info(
         "event stored",
         extra={
@@ -50,10 +50,12 @@ def store_events(
     def handle(event: NormalizedEvent) -> None:
         with session_scope(factory) as session:
             inserted = append_events(session, [event])
-        log_event(event)
         if not inserted:
-            logger.info("duplicate event skipped", extra={"event_id": event.event_id})
-        elif notify is not None:
+            # Not "stored": every poll re-reports facts already in the log (2026-11-23).
+            logger.debug("duplicate event skipped", extra={"event_id": event.event_id})
+            return
+        log_event(event)
+        if notify is not None:
             notify(notification(event.event_id, event.subject.external_key))
 
     return handle

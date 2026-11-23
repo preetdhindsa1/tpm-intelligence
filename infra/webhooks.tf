@@ -93,6 +93,9 @@ resource "google_cloud_run_v2_service" "webhooks" {
       dynamic "env" {
         for_each = merge(local.common_env, {
           OTEL_SERVICE_NAME = "tpm-webhooks"
+          # CPU is throttled between requests (cpu_idle), so background exports time out.
+          # Each delivery flushes telemetry before answering; this only catches stragglers.
+          OTEL_METRIC_EXPORT_INTERVAL = "3600000"
         })
         content {
           name  = env.key
