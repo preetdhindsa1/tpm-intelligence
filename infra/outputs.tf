@@ -27,3 +27,8 @@ output "deployer_service_account" {
   description = "GitHub repository variable GCP_DEPLOYER for the deploy workflow."
   value       = google_service_account.deployer.email
 }
+
+output "webhook_url" {
+  description = "GitHub App webhook URL (append /github)."
+  value       = "${local.webhook_url}/github"
+}
