@@ -67,6 +67,6 @@ jobs:
         run: |
           API="https://tpm-api-${{ vars.GCP_PROJECT_NUMBER }}.$REGION.run.app"
           WEB="https://tpm-web-${{ vars.GCP_PROJECT_NUMBER }}.$REGION.run.app"
-          curl -fsS --retry 10 --retry-delay 15 --retry-all-errors "$API/healthz"
+          curl -fsS --retry 10 --retry-delay 15 --retry-all-errors "$API/health"
           test "$(curl -fsS "$API/me" | python3 -c 'import json,sys; print(json.load(sys.stdin)["mode"])')" = required
           curl -fsS -o /dev/null --retry 5 --retry-delay 10 "$WEB/"

@@ -71,7 +71,10 @@ resource "google_monitoring_alert_policy" "poller_failures" {
 
 # AI spend at 80% of the daily cap (CLAUDE.md section 9). The gateway exports the
 # ai.budget.used_fraction gauge; the collector sends it to Managed Prometheus.
+# Google rejects a PromQL alert on a metric that has never been written, so this is off
+# until the API has made at least one AI call: then set enable_ai_budget_alert = true.
 resource "google_monitoring_alert_policy" "ai_budget" {
+  count        = var.enable_ai_budget_alert ? 1 : 0
   display_name = "TPM: AI spend at 80% of the daily cap"
   combiner     = "OR"
 

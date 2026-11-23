@@ -115,7 +115,7 @@ step "7/8 Migrations"
 gcloud run jobs execute tpm-migrate --region "$REGION" --project "$PROJECT" --wait
 
 step "8/8 Smoke test"
-curl -fsS --retry 20 --retry-delay 15 --retry-all-errors "$API_URL/healthz" && echo
+curl -fsS --retry 20 --retry-delay 15 --retry-all-errors "$API_URL/health" && echo
 curl -fsS "$API_URL/me" && echo
 curl -fsS -o /dev/null -w "web: HTTP %{http_code}\n" --retry 5 --retry-delay 10 "$WEB_URL/"
 

@@ -159,6 +159,10 @@ def create_app(
             mode=auth_config.mode,
         )
 
+    # Cloud Run reserves URL paths ending in "z" for itself (a public /healthz returns 404
+    # before reaching the app), so external checks use /health. Container probes still
+    # reach /healthz directly.
+    @app.get("/health")
     @app.get("/healthz")
     def healthz() -> dict[str, str]:
         """Liveness probe."""
@@ -698,7 +702,7 @@ def create_app(
             events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"}
         )
 
-    FastAPIInstrumentor.instrument_app(app, excluded_urls="healthz")
+    FastAPIInstrumentor.instrument_app(app, excluded_urls="healthz,health")
     return app
 
 

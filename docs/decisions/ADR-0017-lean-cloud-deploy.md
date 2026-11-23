@@ -36,7 +36,7 @@ lean option with a ceiling of about $150/month. Two measurements also matter:
   1. builds images tagged with the commit;
   2. runs migrations;
   3. rolls out the poller, API and web;
-  4. smoke-tests `/healthz`, `/me` (must say `required`) and the front page.
+  4. smoke-tests `/health`, `/me` (must say `required`) and the front page.
 
   Terraform ignores image changes on the services, so a later `apply` does not roll back
   a deploy.
@@ -63,3 +63,23 @@ lean option with a ceiling of about $150/month. Two measurements also matter:
 - **A crash in the worker thread is logged and retried in-process.** A crash of the API
   instance restarts both.
 - The cost figures are estimates. The measured bill replaces them after the first week.
+
+## First deploy (2026-11-23)
+
+Run by `infra/first-deploy.sh --yes --with-local-secrets --seed-local-data`. Live:
+web `https://tpm-web-109199755245.us-central1.run.app`, API
+`https://tpm-api-109199755245.us-central1.run.app`. Seeded from the local database:
+Kubernetes v1.33-v1.38 and Kafka 4.4.0/4.5.0 (counts match local: v1.38 70/106,
+Kafka 4.4.0 19/26). First requests after warm-up: v1.38 features 1.1 s, Kafka 4.4.0
+1.9 s (single requests, not a p95).
+
+The first attempt failed at the Terraform step, and both causes are fixed:
+- **Ordering:** Cloud Run jobs were created before the `database-url` secret had a
+  version (it waits for Cloud SQL). Services and jobs now depend on that version.
+- **AI-spend alert:** Cloud Monitoring rejects a PromQL alert on a metric that has never
+  been written. The alert is behind `enable_ai_budget_alert` (default false); turn it on
+  after the live API has made its first AI call.
+
+Also found: Cloud Run reserves public URL paths ending in `z`, so `/healthz` returns
+404 from Google's front end. External checks use `/health`; container probes still use
+`/healthz` (they reach the container directly).

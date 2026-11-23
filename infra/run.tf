@@ -151,6 +151,8 @@ resource "google_cloud_run_v2_service" "api" {
     google_secret_manager_secret_iam_member.readers,
     google_secret_manager_secret_version.otel_config,
     google_secret_manager_secret_version.placeholder,
+    # Cloud Run refuses a secret with no version; this one waits for Cloud SQL.
+    google_secret_manager_secret_version.database_url,
   ]
 }
 
@@ -317,6 +319,8 @@ resource "google_cloud_run_v2_job" "poller" {
     google_secret_manager_secret_iam_member.readers,
     google_secret_manager_secret_version.otel_config,
     google_secret_manager_secret_version.placeholder,
+    # Cloud Run refuses a secret with no version; this one waits for Cloud SQL.
+    google_secret_manager_secret_version.database_url,
   ]
 }
 
@@ -360,5 +364,8 @@ resource "google_cloud_run_v2_job" "migrate" {
     }
   }
 
-  depends_on = [google_secret_manager_secret_iam_member.readers]
+  depends_on = [
+    google_secret_manager_secret_iam_member.readers,
+    google_secret_manager_secret_version.database_url,
+  ]
 }

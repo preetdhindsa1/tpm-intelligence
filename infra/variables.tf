@@ -67,3 +67,9 @@ variable "github_repo" {
   type        = string
   default     = "preetdhindsa1/tpm-intelligence"
 }
+
+variable "enable_ai_budget_alert" {
+  description = "Create the AI-spend alert. Needs the ai_budget_used_fraction metric to exist (after the first AI call)."
+  type        = bool
+  default     = false
+}
