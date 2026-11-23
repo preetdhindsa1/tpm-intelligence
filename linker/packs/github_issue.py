@@ -1,6 +1,6 @@
 """Link PRs to planning issues on GitHub with GitHub's own closing keywords (ADR-0020).
 
-For team repos that plan in GitHub issues (the demo team). Pure, no I/O.
+For team repos that plan in GitHub issues (this project, ADR-0020). Pure, no I/O.
 
 * **Strong (verified, explicit_key):** a closing keyword followed by the issue
   (``Fixes #12``, ``closes owner/repo#12``, ``Resolves https://github.com/owner/repo/issues/12``)

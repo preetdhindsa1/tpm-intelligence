@@ -252,7 +252,11 @@ resource "google_cloud_run_v2_job" "poller" {
         name    = "poller"
         image   = local.app_image
         command = ["python", "-m", "collectors.github_poller"]
-        args    = ["--release", var.poll_release]
+        # One run polls every team in turn; a failing team does not stop the others.
+        args = flatten([
+          for team, release in merge({ kubernetes = var.poll_release }, var.extra_poll_teams) :
+          ["--poll", "${team}=${release}"]
+        ])
 
         # 512Mi is Cloud Run's minimum for a gen2 job with CPU always allocated. Before,
         # 256Mi poller + 256Mi collector met it; alone, 256Mi is rejected (2026-11-23).

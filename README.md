@@ -8,12 +8,15 @@ drafts the executive update for a human to approve.
 - The platform links them, computes facts and odds with deterministic code and statistics,
   and (in later phases) uses AI only to explain, with every AI claim checked against the data first.
 
-> **Status: phase 1, dashboard.** Collect → link → engine → API → web dashboard runs end to end on local
-> Docker. **Kubernetes is a live example team** (see `connectors/teams/`); the platform is meant for any
-> cross-functional release. The forecast is built and backtested. After recalibration it beats the
-> historical base rate in 9 of 12 backtest cases but not all (see results), so the dashboard labels
-> forecast odds "not validated".
-> Everything else below is **TBD (not yet measured)**.
+> **Status: phase 3, live in Google Cloud.** Live demo:
+> https://tpm-intelligence-109199755245.us-central1.run.app (deployed 2026-11-23, ADR-0017).
+> Collect → link → engine → API → web dashboard runs end to end, in the cloud and on local
+> Docker. Example teams (see `connectors/teams/`): **Kubernetes** (GitHub, polled every 5 minutes),
+> **Apache Kafka** (Jira plan, ADR-0018) and **this project itself** (ADR-0020); the platform is
+> meant for any cross-functional release. The forecast is built and backtested. After
+> recalibration it beats the historical base rate in 9 of 12 backtest cases but not all (see
+> results), so the dashboard labels forecast odds "not validated".
+> Numbers not in the results table are **TBD (not yet measured)**.
 
 ![Front page: what TPM Intelligence does, with a live pulse of Kubernetes v1.38](docs/images/front-page.png)
 
@@ -214,20 +217,27 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 - **Multi-project navigation** (ADR-0014): a "Release health" home page across projects,
   a project/release switcher, and release URLs that carry the project
   (`/projects/kubernetes/releases/v1.38`; old `/releases/v1.38` links redirect).
-  Kubernetes is the only project shown until Jira data for Apache Kafka is collected.
+  Apache Kafka (ADR-0018) and this project (ADR-0020) are shown alongside Kubernetes.
 
 ## Limitations
 
-- The cloud deployment (option B, ADR-0017: one API instance running the worker, no Redis,
-  shared-core Cloud SQL) is planned against the real project (91 resources, read-only plan)
-  but **not applied yet**, so no live URL exists.
+- **Lean cloud deployment** (option B, ADR-0017): one API instance running the worker, no
+  Redis, shared-core Cloud SQL. Live since 2026-11-23. The deploy workflow rolls out new
+  images only; Terraform changes are applied by hand. The cloud poller failed every run
+  from the first deploy until 2026-11-23 20:00 UTC (no Cloud SQL socket with a sidecar
+  container), so the site showed the loaded data without new events until then.
+- **Webhooks are wired but not receiving yet** (P3-M5). The receiver is live and rejects
+  unsigned deliveries; the GitHub App that sends them is not installed yet. Kubernetes and
+  Kafka stay polled, since webhooks need admin rights on the source repository.
+- **This project starts empty** (ADR-0020). Its `Phase 3` release begins on 2026-11-30, so
+  it shows no features until the milestone and its issues exist.
 - **Phase 3 M1: sign-in and permissions** (ADR-0016). Reading is public. Drafting or
   approving executive updates, deciding AI link suggestions, saving scenarios, and
   generating risk notes with paid AI need a GitHub sign-in on the approver allowlist.
   Approvals record the GitHub login. Actions are signed by the web server and checked by
   the API; a missing configuration fails closed. Real GitHub sign-in needs an OAuth app
   (see `.env.example`); local development uses `AUTH_MODE=local`.
-- Phase 2 so far: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, and the AI link suggester with a review queue, a what-if simulator (not validated), and the redesigned dashboard. Still to come: forecast improvements. Sign-in is done (Phase 3 M1); webhooks, Jira and cloud deploy are next in Phase 3.
+- Phase 2 is done: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, the AI link suggester with a review queue, a what-if simulator (not validated), the redesigned dashboard and forecast improvements. Phase 3 so far: sign-in (M1), Jira for Kafka, cloud deploy, faster recompute (M4, cloud numbers being measured). Still to come: webhooks end to end (M5) and operations (M6).
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue
   description (the release team's tracking list) and from KEP references in PR text.
