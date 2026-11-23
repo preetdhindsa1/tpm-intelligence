@@ -144,8 +144,9 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Odds with main-PR merge times (M7 step 4) vs all-PR merge times, v1.35-v1.38 × 3 lead times | Mean Brier **0.1885 vs 0.1897**, better in 9 of 12 (in-sample, adopted). Still beats the base rate in 9 of 12, so odds stay "not validated". Adding a per-stage non-code removal rate made Brier worse (0.1955) and was rejected. Measured 2026-11-22; ADR-0005 |
 | API: requests over 2 s while polling v1.38 every 5 s for 11 min (crosses 2 cache expiries) | Before **2** (one per expiry, worst 23 s). After stale-while-revalidate **0** from expiries; 1 cold start right after a redeploy (29.6 s). p50 ≤ 0.12 s both. Measured 2026-11-22; ADR-0002 |
 | Unseen test: v1.39 scored on forecasts recorded daily while it runs (model `forecast-m7.1+1a53f2d9`, frozen 2026-11-22) | TBD (not yet measured): v1.39 has not started. Rules and model fixed in ADR-0015; snapshots are append-only (a Postgres trigger refuses edits) |
-| Data freshness | TBD (not yet measured) |
-| Event → dashboard latency (p95) | TBD (not yet measured) |
+| Data freshness (polled Kubernetes, target < 10 min) | **Under 9 min worst case**: 24 of 24 polls succeeded every 5 min; longest gap between successful polls 6.2 min, poll run 74 s p50 / 124 s max. Measured 2026-11-23 20:02-22:03 UTC; `docs/results/poll-freshness-cloud-20261123.json` |
+| Stored event → live page in the cloud (p95), polled data | **15.9 s** (p50 12.7 s, n = 122 pushes, 2 open pages); v1.38 recompute p95 **9.2 s** (was about 56 s). Excludes the wait for the next poll. Measured 2026-11-23, 2-hour window, small sample; ADR-0019 |
+| Event → dashboard latency via webhooks (p95, target < 30 s) | TBD (not yet measured): needs the GitHub App installed (P3-M5) |
 
 Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 `DATABASE_URL=... uv run python scripts/measure_linking.py --release v1.38`.
@@ -237,7 +238,7 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   Approvals record the GitHub login. Actions are signed by the web server and checked by
   the API; a missing configuration fails closed. Real GitHub sign-in needs an OAuth app
   (see `.env.example`); local development uses `AUTH_MODE=local`.
-- Phase 2 is done: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, the AI link suggester with a review queue, a what-if simulator (not validated), the redesigned dashboard and forecast improvements. Phase 3 so far: sign-in (M1), Jira for Kafka, cloud deploy, faster recompute (M4, cloud numbers being measured). Still to come: webhooks end to end (M5) and operations (M6).
+- Phase 2 is done: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, the AI link suggester with a review queue, a what-if simulator (not validated), the redesigned dashboard and forecast improvements. Phase 3 so far: sign-in (M1), Jira for Kafka, cloud deploy, faster recompute (M4, measured in the cloud). Still to come: webhooks end to end (M5) and operations (M6).
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue
   description (the release team's tracking list) and from KEP references in PR text.
@@ -257,9 +258,9 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 - **Engine text fields are today's text.** Labels, release membership, PR state, reviews and
   CI are rebuilt strictly as of the prediction point. Issue descriptions, PR bodies and
   `kep.yaml` are not versioned by GitHub, so the latest text is used (ADR-0005).
-- **API recompute is not incremental.** Each change to the data re-projects every stored event
-  (about 9 s for 138k events on a laptop). The first request also fits the recalibration
-  (about 15 s). Fine for polled data within the 30 s target, but not for heavy webhook traffic.
+- **API recompute is not incremental.** Each change to the data re-projects every stored event.
+  With linking shared and the calibration cached (ADR-0019) a v1.38 recompute takes 9.2 s p95
+  in the cloud (2026-11-23). Fine for polled data; heavy webhook traffic is untested.
 - **CI flags cannot tell required checks from optional ones.** Prow does not mark them in the
   API data we read, so `ci_failing` counts any failing check on the latest commit.
 - Release dates come from a checked-in calendar
