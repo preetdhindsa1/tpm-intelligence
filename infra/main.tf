@@ -36,7 +36,7 @@ resource "google_artifact_registry_repository" "images" {
   repository_id = local.name
   location      = var.region
   format        = "DOCKER"
-  description   = "TPM Intelligence container images"
+  description   = "Program Intelligence Platform container images"
 
   cleanup_policies {
     id     = "keep-recent"

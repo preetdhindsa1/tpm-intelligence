@@ -1,4 +1,4 @@
-# TPM Intelligence release calendar (ADR-0020). The GitHub milestone must be named like
+# Program Intelligence Platform release calendar (ADR-0020). The GitHub milestone must be named like
 # the release ("Phase 3"). Dates set by the owner on 2026-11-23: the cycle avoids the
 # US Thanksgiving week and the holiday change moratorium (about Dec 18 - Jan 4), so
 # code freeze falls ten working days after people return. Times are UTC.

@@ -117,7 +117,7 @@ def create_app(
     async def approver(request: Request) -> Actor:
         return await require_approver(request, auth_config)
 
-    app = FastAPI(title="TPM Intelligence API", version="0.1.0")
+    app = FastAPI(title="Program Intelligence Platform API", version="0.1.0")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=cors_origins or ["http://localhost:3000"],
