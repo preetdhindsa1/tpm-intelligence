@@ -56,6 +56,7 @@ from api.views import (
     release_summary_out,
     summary_out,
 )
+from engine.assess import FeatureAssessment
 from engine.forecast import DEFAULT_FORECAST, model_version
 
 SERVICE_NAME = "tpm-api"
@@ -73,7 +74,14 @@ def sim_note(validated: bool) -> str:
     return SIM_NOTE if validated else SIM_NOTE + SIM_NOT_VALIDATED
 
 
-ENHANCEMENTS_REPO = "kubernetes/enhancements"
+def feature_by_number(view: ReleaseView, number: int) -> FeatureAssessment | None:
+    """The release's feature with this number: ``#6395`` (KEP) or ``KAFKA-20682``."""
+    for a in view.assessment.features:
+        feature = view.world.features.get(a.key)
+        if feature is not None and feature.number == number:
+            return a
+    return None
+
 
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -137,9 +145,7 @@ def create_app(
         """Compute the current release before the first visitor asks, then keep it fresh."""
         s = svc()
         s.start_warmer()
-        current = s.current_release_name()
-        if current:
-            s.warm([current])
+        s.warm(s.current_release_keys())
 
     app.state.warm_on_boot = warm_on_boot
 
@@ -179,7 +185,7 @@ def create_app(
     async def feature(name: str, number: int) -> FeatureDetailOut:
         """Feature page: PRs, critical path, timeline, odds and the inputs behind them."""
         v = await view(name)
-        a = v.feature(f"{ENHANCEMENTS_REPO}#{number}")
+        a = feature_by_number(v, number)
         if a is None:
             raise HTTPException(404, f"feature #{number} was never in {name}")
         return feature_detail(v, a)
@@ -193,7 +199,7 @@ def create_app(
         Anyone sees a stored note. Only an approver can make a new one (paid AI, ADR-0016).
         """
         v = await view(name)
-        a = v.feature(f"{ENHANCEMENTS_REPO}#{number}")
+        a = feature_by_number(v, number)
         if a is None:
             raise HTTPException(404, f"feature #{number} was never in {name}")
         result = await run_in_threadpool(lambda: ai_services.risk_note(v, a, generate=who.approver))

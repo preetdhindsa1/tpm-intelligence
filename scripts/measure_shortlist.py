@@ -64,7 +64,7 @@ def main() -> None:
     parser.add_argument("--size", type=int, default=SHORTLIST_SIZE)
     args = parser.parse_args()
     with Session(make_engine(instrument=False)) as session:
-        events = list(iter_events(session))
+        events = list(iter_events(session, project="kubernetes"))
     world = project(events, max(e.occurred_at for e in events) + timedelta(days=1))
     out = {
         "measured_at": datetime.now(UTC).isoformat(timespec="seconds"),

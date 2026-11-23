@@ -33,7 +33,7 @@ from connectors.load import display_name_for_project
 from engine.assess import FeatureAssessment
 from engine.forecast import Forecast
 from engine.merge_date import MergeDateForecast
-from engine.projection import ReleaseInfo
+from engine.projection import ReleaseInfo, key_number
 
 
 def _project(release: ReleaseInfo) -> str:
@@ -95,7 +95,12 @@ def odds_out(fc: Forecast | None, view: ReleaseView | None = None) -> OddsOut:
 
 
 def _number(key: str) -> int:
-    return int(key.rsplit("#", 1)[1])
+    return key_number(key)
+
+
+def _label(key: str) -> str:
+    """Short name: ``#6395`` for a GitHub issue, the key itself for Jira (``KAFKA-20682``)."""
+    return f"#{key_number(key)}" if "#" in key else key
 
 
 def _url(key: str) -> str:
@@ -279,7 +284,7 @@ def graph_out(view: ReleaseView) -> GraphOut:
         nodes[f.key] = GraphNodeOut(
             id=f.key,
             kind="feature",
-            label=f"#{_number(f.key)}",
+            label=_label(f.key),
             title=f.title,
             url=feature.url,
             sigs=list(f.teams),

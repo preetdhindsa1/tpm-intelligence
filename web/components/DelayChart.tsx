@@ -1,5 +1,6 @@
 "use client";
 
+import { featureLabel } from "@/lib/vocab";
 // Days-of-delay chart (M7, from the owner's mockup): how many features will have their
 // required code merged by each day, relative to Code Freeze. Two series, so a legend and
 // direct labels; the forecast band is the 10th-90th percentile of the simulated count.
@@ -32,7 +33,7 @@ function Tip({ active, payload, m }: { active?: boolean; payload?: { payload: De
           <ul>
             {on.slice(0, 6).map((f) => (
               <li key={f.key} className="truncate text-slate-700">
-                #{f.number} {f.title}
+                {featureLabel(f)} {f.title}
               </li>
             ))}
           </ul>
@@ -115,7 +116,7 @@ export function DelayChart({ m, recorded }: { m: MergeDates; recorded?: string }
             {late.slice(0, 10).map((f) => (
               <li key={f.key} className="flex justify-between gap-2">
                 <span className="truncate text-slate-700" title={f.title}>
-                  #{f.number} {f.title}
+                  {featureLabel(f)} {f.title}
                 </span>
                 <span className="shrink-0 font-medium text-slate-800">{Math.round((f.by_release ?? 0) * 100)}%</span>
               </li>

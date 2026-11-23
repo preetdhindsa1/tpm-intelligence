@@ -42,7 +42,7 @@ def main() -> None:
         factory = sessionmaker(engine)
         store = PostgresLinkSuggestionStore(factory)
         with Session(engine) as session:
-            events = list(iter_events(session))
+            events = list(iter_events(session, project="kubernetes"))
         world = project(events, datetime.now(UTC))
         world = replace(world, extra_links=tuple(engine_links(store.list(key))))
         gateway = Gateway(AISettings(), PostgresLedger(factory))

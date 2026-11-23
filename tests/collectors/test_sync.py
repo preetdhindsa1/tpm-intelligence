@@ -309,3 +309,25 @@ def test_tracked_pr_not_found_is_skipped(missing: int) -> None:
     stats = poller.run(backfill=True)
     assert stats.failed_streams == []
     assert stats.tracked_prs_fetched_by_number == 3
+
+
+def test_code_only_mode_syncs_prs_in_the_jira_window_and_nothing_else() -> None:
+    """Kafka (ADR-0018): Jira owns the plan and the release; GitHub gives PRs only."""
+    fake = FakeGitHub()
+    poller, transport, _ = make_poller(fake)
+    poller.calendar = None
+    poller.enhancements_repo = None
+    poller.window = (datetime(2026, 10, 26, tzinfo=UTC), None)  # 4.5.0: no release date yet
+    stats = poller.run(backfill=True)
+    types = {e.event_type for e in published(transport)}
+    assert stats.failed_streams == []
+    assert "release.observed" not in types
+    assert "work_item.observed" not in types
+    assert "pull_request.observed" in types
+    assert not any(r.url.path.startswith(ENH) for r in fake.requests)
+    queries = {q["variables"]["q"] for q in fake.graphql_queries if "q" in q["variables"]}
+    # Open-ended window runs to now.
+    assert (
+        "repo:kubernetes/kubernetes is:pr created:2026-10-26T00:00:00Z..2026-11-21T12:00:00Z"
+        in queries
+    )

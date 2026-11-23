@@ -1,3 +1,4 @@
+import { featureLabel, vocab } from "@/lib/vocab";
 import { releaseFromParams } from "@/lib/release-page";
 import { releasePath } from "@/lib/routes";
 import Link from "next/link";
@@ -145,7 +146,7 @@ function FeatureTable({ title, rows, project, release }: { title: string; rows: 
           <thead className="bg-slate-100 text-left text-xs uppercase text-slate-600">
             <tr>
               <th className="px-3 py-2">Feature</th>
-              <th className="px-3 py-2">SIGs</th>
+              <th className="px-3 py-2">{vocab(project).teams}</th>
               <th className="px-3 py-2">Stage</th>
               <th className="px-3 py-2">Odds by Code Freeze</th>
               <th className="px-3 py-2">Flags</th>
@@ -157,7 +158,7 @@ function FeatureTable({ title, rows, project, release }: { title: string; rows: 
               <tr key={f.key} className="align-top">
                 <td className="px-3 py-2">
                   <Link className="font-medium text-indigo-700 hover:underline" href={releasePath(project, release, `/features/${f.number}`)}>
-                    #{f.number}
+                    {featureLabel(f)}
                   </Link>{" "}
                   {f.title}
                   {!f.tracked && f.in_release ? <span className="ml-1 text-xs text-slate-500">(not tracked)</span> : null}

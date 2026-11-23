@@ -41,7 +41,7 @@ def main() -> None:
     releases = args.release or ["v1.37", "v1.38"]
 
     with Session(make_engine(instrument=False)) as session:
-        events = list(iter_events(session))
+        events = list(iter_events(session, project="kubernetes"))
     final = project(events, max(e.occurred_at for e in events) + timedelta(days=1))
 
     cases = []

@@ -20,6 +20,11 @@ describe("oddsDisplay", () => {
   it("never shows a number after freeze", () => {
     expect(oddsDisplay(odds({ status: "after_freeze", probability: null })).headline).toBe("Freeze passed");
   });
+  it("says why there are no odds when the release has no freeze date (Kafka, ADR-0018)", () => {
+    const d = oddsDisplay(odds({ status: "no_freeze_date", probability: null }));
+    expect(d.headline).toBe("—");
+    expect(d.detail).toBe("No Code Freeze date, so no odds");
+  });
 });
 
 it("sorts flags by severity", () => {

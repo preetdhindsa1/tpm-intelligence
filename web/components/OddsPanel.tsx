@@ -1,3 +1,4 @@
+import { featureLabel } from "@/lib/vocab";
 // Before Code Freeze: each feature's odds of landing as a range (10th-90th percentile),
 // lowest first, next to the base rate. One series in neutral ink; no colour-only meaning.
 import Link from "next/link";
@@ -25,7 +26,7 @@ export function OddsPanel({ project, release, rows, validated }: { project: stri
           return (
             <li key={f.key} className="grid grid-cols-[1fr_140px_44px] items-center gap-2">
               <Link href={releasePath(project, release, `/features/${f.number}`)} className="truncate text-slate-700 hover:underline" title={f.title}>
-                #{f.number} {f.title}
+                {featureLabel(f)} {f.title}
               </Link>
               <div className="relative h-3 rounded-full bg-slate-100" aria-hidden>
                 <div className="absolute top-1 h-1 rounded-full bg-slate-400" style={{ left: pct(low ?? 0), width: pct((high ?? 0) - (low ?? 0)) }} />

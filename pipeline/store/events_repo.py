@@ -87,8 +87,17 @@ def to_event(row: EventRecord) -> NormalizedEvent:
     )
 
 
-def iter_events(session: Session, *, batch_size: int = 5000) -> Iterator[NormalizedEvent]:
-    """Stream every stored event in ``occurred_at`` order."""
+def iter_events(
+    session: Session, *, batch_size: int = 5000, project: str | None = None
+) -> Iterator[NormalizedEvent]:
+    """Stream stored events in ``occurred_at`` order; only ``project``'s when given (ADR-0018)."""
+    team = None
+    if project is not None:
+        from connectors.load import team_for_project
+
+        team = team_for_project(project)
     stmt = select(EventRecord).order_by(EventRecord.occurred_at, EventRecord.id)
     for row in session.scalars(stmt.execution_options(yield_per=batch_size)):
-        yield to_event(row)
+        event = to_event(row)
+        if team is None or team.owns(event.subject.external_key):
+            yield event

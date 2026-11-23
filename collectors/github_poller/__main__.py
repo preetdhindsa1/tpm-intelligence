@@ -2,6 +2,11 @@
 
     python -m collectors.github_poller --team kubernetes --release v1.38
     python -m collectors.github_poller --team kubernetes --release v1.38 --backfill
+    python -m collectors.github_poller --team kafka --release 4.4.0 --backfill
+
+For a team that plans in Jira (Kafka, ADR-0018) only the code repo's PRs are synced,
+over the window the Jira version dates give (previous x.y.0 release to this release, or
+now while the release date is unset).
 
 Repos and calendar come from ``connectors/teams/<team>.yaml`` so another team can
 plug in without editing this module. Exit code 1 if any stream failed.
@@ -12,7 +17,9 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 SERVICE_NAME = "tpm-github-poller"
 
@@ -53,11 +60,25 @@ def main(argv: list[str] | None = None) -> int:
 
         team = load_team(args.team)
         if team.planning_repo is None:
-            logger.error(
-                "team %s uses non-GitHub planning; github_poller cannot sync it",
-                team.id,
+            window = _jira_window(team, args.release)
+            if window is None:
+                logger.error("release %s has no cycle start in Jira", args.release)
+                return 2
+            poller = GitHubPoller(
+                gh=GitHubClient.from_token(token),
+                publisher=EventPublisher(create_transport()),
+                cursors=PostgresCursorStore(sessionmaker(make_engine())),
+                calendar=None,
+                release_name=args.release,
+                enhancements_repo=None,
+                code_repo=team.primary_code_repo,
+                window=window,
             )
-            return 2
+            logger.info(
+                "code-only poll of %s for %s: %s", team.primary_code_repo, args.release, window
+            )
+            stats = poller.run(backfill=args.backfill)
+            return 1 if stats.failed_streams else 0
 
         calendar = load_calendar(team.calendar_path(relative_to=Path.cwd()))
         logger.info(
@@ -81,6 +102,35 @@ def main(argv: list[str] | None = None) -> int:
         return 1 if stats.failed_streams else 0
     finally:
         telemetry.shutdown()
+
+
+def _jira_window(team: Any, release: str) -> tuple[datetime, datetime | None] | None:
+    """(cycle start, release day) for a Jira-planned release, from its Jira versions."""
+    from collectors.jira import normalize
+    from collectors.jira.client import JiraClient
+    from connectors.schema import JiraPlanning
+
+    planning = team.planning
+    if not isinstance(planning, JiraPlanning):
+        return None
+    jira = JiraClient.from_base_url(planning.base_url)
+    try:
+        versions = jira.versions(planning.project_key)
+    finally:
+        jira.close()
+    events = normalize.release_events(
+        versions,
+        [release],
+        project=team.project,
+        project_key=planning.project_key,
+        base_url=planning.base_url,
+        observed_at=datetime.now(UTC),
+    )
+    if not events:
+        return None
+    payload = events[0].payload
+    start = getattr(payload, "cycle_start_at", None)
+    return (start, getattr(payload, "release_at", None)) if start else None
 
 
 if __name__ == "__main__":

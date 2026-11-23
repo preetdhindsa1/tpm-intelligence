@@ -55,7 +55,7 @@ def main() -> None:
     args = parser.parse_args()
     engine = make_engine(instrument=False)
     with Session(engine) as session:
-        events = list(iter_events(session))
+        events = list(iter_events(session, project="kubernetes"))
     world = project(events, max(e.occurred_at for e in events) + timedelta(seconds=1))
     key = f"kubernetes:{args.release}"
     sources = finished_releases(world, window(world, key).start, exclude=key)

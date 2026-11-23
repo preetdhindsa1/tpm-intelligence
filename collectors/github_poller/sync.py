@@ -12,6 +12,10 @@ Streams (each has its own cursor in ``sync_cursors``):
   and CI load (CLAUDE.md section 6). PRs named in an issue's tracking list but outside the
   window are fetched by number.
 
+Teams that plan in Jira (ADR-0018) run in **code-only** mode: ``enhancements_repo`` is
+None, no planning issues or release event are published (the Jira collector owns both),
+and the PR window is passed in from the Jira release dates.
+
 Tracing: one root span per synced item (issue or PR), linked to the run span, so each
 trace follows an item from the collector through the queue to the worker without one
 enormous trace per backfill.
@@ -75,9 +79,9 @@ class GitHubPoller:
     gh: GitHubClient
     publisher: EventPublisher
     cursors: CursorStore
-    calendar: Calendar
+    calendar: Calendar | None
     release_name: str
-    enhancements_repo: str = "kubernetes/enhancements"
+    enhancements_repo: str | None = "kubernetes/enhancements"
     code_repo: str = "kubernetes/kubernetes"
     now: Callable[[], datetime] = lambda: datetime.now(UTC)
     # PRs per search page. Each PR brings up to 100 comments with their text (Prow bot
@@ -87,11 +91,35 @@ class GitHubPoller:
     stats: SyncStats = field(default_factory=SyncStats)
     _tracked_prs: set[tuple[str, int]] = field(default_factory=set)
     _kep_paths: dict[int, str] | None = None
+    # Code-only mode: (cycle start, release day or None while unset).
+    window: tuple[datetime, datetime | None] | None = None
 
     @property
     def release(self) -> ReleaseDates:
         """Calendar entry for this release."""
+        if self.calendar is None:
+            raise ValueError("no calendar: code-only poller")
         return self.calendar.get(self.release_name)
+
+    @property
+    def _planning(self) -> str:
+        if self.enhancements_repo is None:
+            raise ValueError("code-only poller has no planning repo")
+        return self.enhancements_repo
+
+    @property
+    def release_project(self) -> str:
+        """Release-key prefix from the calendar."""
+        if self.calendar is None:
+            raise ValueError("no calendar: code-only poller")
+        return self.calendar.project
+
+    def _window(self) -> tuple[datetime, datetime]:
+        """PR window: cycle start to release day, capped at now."""
+        if self.window is not None:
+            start, end = self.window
+            return start, min(self.now(), end) if end else self.now()
+        return self.release.cycle_start, min(self.now(), self.release.release)
 
     @property
     def issues_stream(self) -> str:
@@ -111,8 +139,11 @@ class GitHubPoller:
             "github_poller.run",
             attributes={"tpm.release": self.release_name, "tpm.backfill": backfill},
         ):
-            self._publish(normalize.release_event(self.calendar.project, self.release, self.now()))
-            self._guarded(self.issues_stream, lambda: self.sync_enhancements(backfill=backfill))
+            if self.enhancements_repo is not None and self.calendar is not None:
+                self._publish(
+                    normalize.release_event(self.calendar.project, self.release, self.now())
+                )
+                self._guarded(self.issues_stream, lambda: self.sync_enhancements(backfill=backfill))
             self._guarded(self.prs_stream, lambda: self.sync_pull_requests(backfill=backfill))
         logger.info("poll finished", extra={"stats": self.stats.__dict__})
         return self.stats
@@ -158,7 +189,7 @@ class GitHubPoller:
         since = self._issues_since(backfill)
         observed = self.now()
         max_updated: str | None = self.cursors.get(self.issues_stream) if not backfill else None
-        repo = self.enhancements_repo
+        repo = self._planning
         issues = self.gh.paginate(
             f"/repos/{repo}/issues",
             {"state": "all", "since": since.isoformat(), "sort": "updated", "direction": "asc"},
@@ -178,7 +209,7 @@ class GitHubPoller:
         return max_updated
 
     def _sync_issue(self, issue: dict[str, Any], events: list[Any], observed: datetime) -> None:
-        repo, number, project = self.enhancements_repo, issue["number"], self.calendar.project
+        repo, number, project = self._planning, issue["number"], self.release_project
         self._publish(
             normalize.issue_snapshot(issue, repo=repo, project=project, observed_at=observed)
         )
@@ -213,7 +244,7 @@ class GitHubPoller:
 
     def issue_timeline(self, number: int) -> list[dict[str, Any]]:
         """Full milestone/label/close history via GraphQL (REST caps at ~300 events)."""
-        owner, name = self.enhancements_repo.split("/")
+        owner, name = self._planning.split("/")
         nodes: list[dict[str, Any]] = []
         after: str | None = None
         while True:
@@ -229,9 +260,7 @@ class GitHubPoller:
     def kep_paths(self) -> dict[int, str]:
         """KEP number -> kep.yaml path (one recursive tree call per run)."""
         if self._kep_paths is None:
-            tree = self.gh.get_json(
-                f"/repos/{self.enhancements_repo}/git/trees/master", {"recursive": "1"}
-            )
+            tree = self.gh.get_json(f"/repos/{self._planning}/git/trees/master", {"recursive": "1"})
             if tree.get("truncated"):
                 logger.warning("git tree listing truncated; some kep.yaml files may be missed")
             self._kep_paths = normalize.kep_paths(tree.get("tree", []))
@@ -249,7 +278,7 @@ class GitHubPoller:
             queries = [f"{base} updated:>={_q(since)}"]
             ranges: list[tuple[str, datetime, datetime]] = []
         else:
-            start, end = self.release.cycle_start, min(self.now(), self.release.release)
+            start, end = self._window()
             queries = []
             ranges = [(f"{base} created", start, end), (f"{base} merged", start, end)]
 
@@ -276,7 +305,7 @@ class GitHubPoller:
                 if node:
                     self.stats.tracked_prs_fetched_by_number += 1
                     self._sync_pr(node, observed)
-        return max_updated or _q(self.release.cycle_start)
+        return max_updated or _q(self._window()[0])
 
     def _sync_pr(self, node: dict[str, Any], observed: datetime) -> None:
         key = f"{node['repository']['nameWithOwner']}#{node['number']}"

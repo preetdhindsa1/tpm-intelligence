@@ -33,8 +33,15 @@ class Stream:
     observed: datetime
     events: list[NormalizedEvent] = field(default_factory=list)
 
-    def release(self, name: str, start: datetime, freeze: datetime, release: datetime) -> str:
-        key = f"kubernetes:{name}"
+    def release(
+        self,
+        name: str,
+        start: datetime,
+        freeze: datetime,
+        release: datetime,
+        project: str = "kubernetes",
+    ) -> str:
+        key = f"{project}:{name}"
         self.events.append(
             new_event(
                 source=Source.GITHUB,
@@ -43,7 +50,7 @@ class Stream:
                 observed_at=self.observed,
                 identity=(name,),
                 payload=ReleaseObserved(
-                    project="kubernetes",
+                    project=project,
                     name=name,
                     cycle_start_at=start,
                     enhancements_freeze_at=start,

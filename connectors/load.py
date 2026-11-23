@@ -2,12 +2,25 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from functools import lru_cache
 from pathlib import Path
+from typing import Protocol
 
 import yaml
 
 from connectors.schema import TeamConfig
+
+
+class _Key(Protocol):
+    @property
+    def external_key(self) -> str: ...
+
+
+class _Subject(Protocol):
+    @property
+    def subject(self) -> _Key: ...
+
 
 _TEAMS = Path(__file__).resolve().parent / "teams"
 
@@ -66,6 +79,23 @@ def link_pack_for_project(project: str) -> str:
         if team.project == project:
             return team.link_pack
     return "kep"
+
+
+def team_for_project(project: str) -> TeamConfig | None:
+    """The team whose release keys use ``project`` (None if no team file says so)."""
+    return next((t for t in load_teams().values() if t.project == project), None)
+
+
+def scope_events[E: _Subject](events: Iterable[E], project: str) -> list[E]:
+    """Only the events of one project's world (ADR-0018).
+
+    Each project gets its own world, so Kafka PRs never count as Kubernetes reviewer load
+    and one project's releases never calibrate another. Unknown projects keep every event.
+    """
+    team = team_for_project(project)
+    if team is None:
+        return list(events)
+    return [e for e in events if team.owns(e.subject.external_key)]
 
 
 def clear_team_cache() -> None:

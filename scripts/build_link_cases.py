@@ -44,7 +44,7 @@ def main() -> None:
     rng = random.Random(SEED)  # noqa: S311 - a reproducible sample, not security
 
     with Session(make_engine(instrument=False)) as session:
-        events = list(iter_events(session))
+        events = list(iter_events(session, project="kubernetes"))
     world = project(events, max(e.occurred_at for e in events) + timedelta(days=1))
 
     cases = []

@@ -40,7 +40,7 @@ def main() -> None:
     )
 
     with Session(make_engine(instrument=False)) as session:
-        events = list(iter_events(session))
+        events = list(iter_events(session, project="kubernetes"))
     started = time.perf_counter()
     results = [
         r

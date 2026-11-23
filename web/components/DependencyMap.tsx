@@ -1,5 +1,6 @@
 "use client";
 
+import { featureLabel } from "@/lib/vocab";
 // Feature dependency map (ADR-0013 addendum): only features, only those tied to another
 // feature, one group at a time. Grey line = the features share verified PRs (shared code, not proof of a
 // block); red arrow A -> B = a PR of B says it depends on a PR of A. Click a feature to
@@ -47,7 +48,7 @@ function FeatureNode({ data }: NodeProps<Node<FeatureData>>) {
     >
       <Handle type="target" position={Position.Left} style={CENTER} />
       <div className="flex items-center justify-between gap-1">
-        <span className="font-semibold text-slate-800">#{f.number}</span>
+        <span className="font-semibold text-slate-800">{featureLabel(f)}</span>
         {badge && (
           <span
             className={`truncate rounded px-1 text-[10px] font-medium ${
@@ -59,7 +60,7 @@ function FeatureNode({ data }: NodeProps<Node<FeatureData>>) {
         )}
       </div>
       <div className="truncate text-slate-700">{f.title}</div>
-      <div className="mt-0.5 truncate text-[11px] text-slate-500">{f.sigs.map(shortSig).join(" · ") || "no SIG"}</div>
+      <div className="mt-0.5 truncate text-[11px] text-slate-500">{f.sigs.map(shortSig).join(" · ") || "no team label"}</div>
       <Handle type="source" position={Position.Right} style={CENTER} />
     </div>
   );
@@ -339,10 +340,10 @@ function FeatureDetail({
     <div className="space-y-4">
       <div>
         <p className="font-semibold text-slate-900">
-          #{f.number} {f.title}
+          {featureLabel(f)} {f.title}
         </p>
         <p className="text-xs text-slate-500">
-          {OUTCOME_META[f.outcome].label} · {f.sigs.map(shortSig).join(", ") || "no SIG"}
+          {OUTCOME_META[f.outcome].label} · {f.sigs.map(shortSig).join(", ") || "no team label"}
         </p>
         <Link href={releasePath(project, release, `/features/${f.number}`)} className="text-xs font-medium text-indigo-700 hover:underline">
           Open feature page →

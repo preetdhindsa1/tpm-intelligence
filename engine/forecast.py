@@ -200,11 +200,17 @@ def calibrate(world: World, release_keys: Sequence[str]) -> Calibration:
 
 
 def finished_releases(world: World, before: datetime, exclude: str) -> list[str]:
-    """Releases released before ``before`` (calibration may only use these)."""
+    """Releases of ``exclude``'s project released before ``before`` (calibration may only
+    use these). Projects never calibrate each other: Kafka and Kubernetes differ in
+    process, cadence and review culture (ADR-0018)."""
+    project = exclude.split(":", 1)[0]
     return sorted(
         k
         for k, r in world.releases.items()
-        if k != exclude and r.release_at is not None and r.release_at <= before
+        if k != exclude
+        and k.split(":", 1)[0] == project
+        and r.release_at is not None
+        and r.release_at <= before
     )
 
 

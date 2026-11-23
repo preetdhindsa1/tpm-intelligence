@@ -122,5 +122,17 @@ services:
       redis: { condition: service_healthy }
       otel-collector: { condition: service_started }
 
+  jira:
+    build: .
+    profiles: ["tools"]
+    entrypoint: ["python", "-m", "collectors.jira"]
+    environment:
+      <<: *app-env
+      OTEL_SERVICE_NAME: tpm-jira-collector
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+      otel-collector: { condition: service_started }
+
 volumes:
   pgdata:

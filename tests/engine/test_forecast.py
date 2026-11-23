@@ -78,6 +78,14 @@ def test_finished_releases_only() -> None:
     assert finished_releases(world, utc(2026, 8, 1), exclude=r2) == []
 
 
+def test_projects_never_calibrate_each_other() -> None:
+    s, r1, r2 = two_releases()
+    kafka = s.release("4.4.0", utc(2026, 5, 22), utc(2026, 9, 1), utc(2026, 9, 26), "KAFKA")
+    world = project(s.events, utc(2026, 10, 1))
+    assert finished_releases(world, utc(2026, 10, 1), exclude=r2) == [r1]
+    assert finished_releases(world, utc(2026, 10, 1), exclude="KAFKA:4.5.0") == [kafka]
+
+
 def _forecast(s: Stream, r2: str, n: int, as_of: datetime, cal: Calibration) -> object:
     world = project(s.events, as_of)
     return forecast_feature(

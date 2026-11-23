@@ -26,6 +26,7 @@ from opentelemetry import trace
 from sqlalchemy.orm import Session, sessionmaker
 
 from api.validation import Validation, load_date_validation, load_validation
+from connectors.load import scope_events
 from engine.assess import FeatureAssessment, ReleaseAssessment, assess_release
 from engine.forecast import (
     DEFAULT_FORECAST,
@@ -43,7 +44,7 @@ from engine.odds import training_pairs
 from engine.projection import ReleaseInfo, World, project
 from engine.recalibrate import Recalibration, fit
 from linker.rules import LinkCandidate
-from pipeline.events import NormalizedEvent
+from pipeline.events import NormalizedEvent, ReleaseObserved
 
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -144,6 +145,8 @@ class ReleaseService:
         self._ttl = ttl.total_seconds()
         self._now = now
         self._events: list[NormalizedEvent] = []
+        # Release keys seen in the events, for resolving bare names ("4.4.0").
+        self._release_keys: set[str] = set()
         self._last_id = 0
         self._version = 0
         self._views: dict[str, ReleaseView] = {}
@@ -181,6 +184,9 @@ class ReleaseService:
             new, last = self._source.load_after(self._last_id)
             if new:
                 self._events.extend(new)
+                self._release_keys.update(
+                    e.subject.external_key for e in new if isinstance(e.payload, ReleaseObserved)
+                )
                 self._last_id = last
                 self._version += 1
             return len(new)
@@ -233,14 +239,43 @@ class ReleaseService:
             self._summaries = (version, time.monotonic(), summaries)
             return summaries
 
-    def current_release_name(self) -> str | None:
-        """The earliest release not yet released, else the newest one (None if none)."""
-        rows = self.releases()
+    def current_release_name(self, project: str | None = None) -> str | None:
+        """The project's earliest release not yet released, else its newest (None if none).
+
+        ``project`` defaults to the service's default project.
+        """
+        wanted = project or self._project
+        rows = [r for r in self.releases() if _project_of(r.release.key) == wanted]
         if not rows:
             return None
         now = self._now()
         open_ = [r for r in rows if r.release.release_at is None or r.release.release_at > now]
         return (open_[0] if open_ else rows[-1]).release.name
+
+    def current_release_keys(self) -> list[str]:
+        """The current release of every project (for warming on boot)."""
+        projects = sorted({_project_of(r.release.key) for r in self.releases()})
+        out = []
+        for project_ in projects:
+            name = self.current_release_name(project_)
+            if name:
+                out.append(f"{project_}:{name}")
+        return out
+
+    def resolve(self, release: str) -> str:
+        """Release key for ``kubernetes:v1.38``, or a bare name that is unique (``4.4.0``).
+
+        A bare name that several projects use resolves to the default project's release.
+        """
+        if ":" in release:
+            return release
+        self.refresh()
+        with self._lock:
+            matches = sorted(k for k in self._release_keys if k.split(":", 1)[1] == release)
+        default = f"{self._project}:{release}"
+        if len(matches) == 1:
+            return matches[0]
+        return default
 
     def view(self, release_name: str, *, wait: bool = False) -> ReleaseView:
         """Current view of a release.
@@ -250,7 +285,7 @@ class ReleaseService:
         ``invalidate``, or there is no view yet: then the caller waits (one computation
         per release at a time).
         """
-        key = f"{self._project}:{release_name}"
+        key = self.resolve(release_name)
         self.refresh()
         cached = self._views.get(key)
         if cached and self._is_fresh(cached):
@@ -263,7 +298,7 @@ class ReleaseService:
     def warm(self, release_names: Sequence[str] = ()) -> None:
         """Start background recomputes for stale views and for ``release_names``."""
         self.refresh()
-        keys = set(self._views) | {f"{self._project}:{n}" for n in release_names}
+        keys = set(self._views) | {self.resolve(n) for n in release_names}
         for key in keys:
             cached = self._views.get(key)
             if cached is None or not self._is_fresh(cached):
@@ -347,7 +382,8 @@ class ReleaseService:
 
     def _compute(self, key: str) -> ReleaseView:
         now = self._now()
-        events = self._snapshot_events()
+        # One world per project (ADR-0018): Kafka PRs are not Kubernetes load.
+        events = scope_events(self._snapshot_events(), _project_of(key))
         world = project(events, now)
         if key not in world.releases:
             raise KeyError(key)
@@ -421,3 +457,7 @@ class ReleaseService:
             recal = fit(pairs, base_rate=base, training_releases=used)
         self._recal[cache_key] = (time.monotonic(), recal)
         return recal
+
+
+def _project_of(release_key: str) -> str:
+    return release_key.split(":", 1)[0]

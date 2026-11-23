@@ -43,7 +43,7 @@ def main() -> None:
 
     engine = make_engine(instrument=False)
     with Session(engine) as session:
-        events = list(iter_events(session))
+        events = list(iter_events(session, project="kubernetes"))
     latest = max(e.occurred_at for e in events)
     final = project(events, latest + timedelta(days=1))
     release = final.releases[key]

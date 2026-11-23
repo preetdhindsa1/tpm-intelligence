@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links sim-validate sim-calibrate snapshot score-snapshots
+.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll jira-sync migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links sim-validate sim-calibrate snapshot score-snapshots
 
 UV ?= uv
 RELEASE ?=
@@ -36,13 +36,17 @@ web-test: ## Web: lint, typecheck, unit tests, build (runs in Node 20 via Docker
 evals: ## Eval suites (fact checker, linking); saves docs/results/evals-*.json
 	$(UV) run python -m evals.run_evals
 
-backfill: ## Load release data, e.g. make backfill TEAM=kubernetes RELEASE=v1.38
+backfill: ## Load release data, e.g. make backfill TEAM=kubernetes RELEASE=v1.38 (TEAM=kafka: PRs only)
 	@test -n "$(RELEASE)" || (echo "usage: make backfill TEAM=kubernetes RELEASE=v1.38" && exit 2)
 	docker compose run --rm poller --team $(TEAM) --release $(RELEASE) --backfill
 
 poll: ## Incremental poll, e.g. make poll TEAM=kubernetes RELEASE=v1.38
 	@test -n "$(RELEASE)" || (echo "usage: make poll TEAM=kubernetes RELEASE=v1.38" && exit 2)
 	docker compose run --rm poller --team $(TEAM) --release $(RELEASE)
+
+jira-sync: ## Jira plan for a Jira team (anonymous, slow on purpose), e.g. make jira-sync TEAM=kafka RELEASE=4.4.0
+	@test -n "$(RELEASE)" || (echo "usage: make jira-sync TEAM=kafka RELEASE=4.4.0" && exit 2)
+	docker compose run --rm jira --team $(TEAM) $(foreach r,$(RELEASE),--release $(r)) $(if $(BACKFILL),--backfill,)
 
 migrate: ## Apply DB migrations
 	$(UV) run alembic upgrade head

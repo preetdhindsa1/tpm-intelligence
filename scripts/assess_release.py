@@ -30,7 +30,7 @@ def main() -> None:
 
     t0 = time.perf_counter()
     with Session(make_engine(instrument=False)) as session:
-        events = list(iter_events(session))
+        events = list(iter_events(session, project="kubernetes"))
     t1 = time.perf_counter()
     world = project(events, as_of)
     t2 = time.perf_counter()

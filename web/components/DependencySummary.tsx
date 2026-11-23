@@ -1,3 +1,4 @@
+import { featureLabel } from "@/lib/vocab";
 // Dashboard panel: the groups of features tied to each other, stated cross-feature
 // dependencies, and PRs waiting on an unmerged PR. Text, not a shrunken graph, so it
 // stays readable in a third of the page; the map is on the Dependencies page.
@@ -56,7 +57,7 @@ export function DependencySummary({ project, release, data }: { project: string;
                     className="rounded border-2 bg-white px-1.5 text-xs text-slate-700 hover:bg-slate-50"
                     style={{ borderColor: BORDER[f.severity ?? ""] ?? "#d6d4cc" }}
                   >
-                    #{f.number}
+                    {featureLabel(f)}
                   </Link>
                 ))}
               </div>

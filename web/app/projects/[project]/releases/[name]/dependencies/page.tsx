@@ -1,3 +1,4 @@
+import { featureLabel, vocab } from "@/lib/vocab";
 import Link from "next/link";
 import { DependencyMap } from "@/components/DependencyMap";
 import { api, type DepFeature } from "@/lib/api";
@@ -21,6 +22,7 @@ export default async function DependenciesPage({
   const release = await releaseFromParams(params);
   const name = release.name;
   const project = release.project;
+  const v = vocab(project);
   const sp = await searchParams;
   const includeRemoved = sp.removed === "1";
   const data = await api.dependencies(name, includeRemoved);
@@ -41,7 +43,7 @@ export default async function DependenciesPage({
       note: s.waitingOnClosed ? `${s.waitingOnClosed} on a PR closed without merging` : "none on a closed PR",
       tone: s.waitingOnClosed ? STATUS.critical : undefined,
     },
-    { label: "Features spanning 2+ SIGs", value: `${s.multiSig}`, note: "need coordination between SIGs" },
+    { label: `Features spanning 2+ ${v.teams}`, value: `${s.multiSig}`, note: `need coordination between ${v.teams}` },
   ];
 
   return (
@@ -52,7 +54,7 @@ export default async function DependenciesPage({
             Dependencies · {release.display_name || release.project} {name}
           </h1>
           <p className="max-w-4xl text-sm text-slate-600">
-            How features depend on each other, from verified PR links and &quot;depends on&quot; statements in PR text. KEPs have no
+            How features depend on each other, from verified PR links and &quot;depends on&quot; statements in PR text. {v.designs} have no
             machine-readable dependency field, so this shows what the data says and nothing deeper. Data as of {formatUtc(data.as_of)}.
           </p>
         </div>
@@ -123,7 +125,7 @@ export default async function DependenciesPage({
                         const f = byKey.get(k);
                         return f ? (
                           <Link key={k} href={releasePath(project, name, `/features/${f.number}`)} className="block text-indigo-700 hover:underline">
-                            #{f.number} {f.title}
+                            {featureLabel(f)} {f.title}
                           </Link>
                         ) : null;
                       })}
@@ -138,9 +140,9 @@ export default async function DependenciesPage({
         </section>
 
         <section className="rounded-lg border bg-white p-4 shadow-sm">
-          <h2 className="font-semibold text-slate-800">SIGs that share features</h2>
+          <h2 className="font-semibold text-slate-800 first-letter:uppercase">{v.teams} that share features</h2>
           <p className="mb-3 text-xs text-slate-500">
-            Features labelled with both SIGs, so the SIGs must coordinate. Counted per SIG, never per person.
+            Features labelled with both {v.teams}, so the {v.teams} must coordinate. Counted per {v.team}, never per person.
           </p>
           <ul className="space-y-1.5 text-sm">
             {data.sig_pairs.slice(0, 10).map((p) => (
@@ -172,7 +174,7 @@ function StandaloneTable({ rows, project, release }: { rows: DepFeature[]; proje
           <thead className="text-left text-xs uppercase text-slate-500">
             <tr>
               <th className="py-1 pr-3">Feature</th>
-              <th className="py-1 pr-3">SIGs</th>
+              <th className="py-1 pr-3">{vocab(project).teams}</th>
               <th className="py-1 pr-3">PRs</th>
               <th className="py-1">Outcome</th>
             </tr>
@@ -186,7 +188,7 @@ function StandaloneTable({ rows, project, release }: { rows: DepFeature[]; proje
                 <tr key={f.key}>
                   <td className="py-1.5 pr-3">
                     <Link href={releasePath(project, release, `/features/${f.number}`)} className="font-medium text-indigo-700 hover:underline">
-                      #{f.number}
+                      {featureLabel(f)}
                     </Link>{" "}
                     {f.title}
                   </td>

@@ -77,6 +77,22 @@ class TeamConfig(BaseModel):
         """Main code repo used by the GitHub PR poller."""
         return self.code.repos[0]
 
+    def owns(self, subject_key: str) -> bool:
+        """Whether an event subject belongs to this team (ADR-0018: one world per project).
+
+        Release keys start with ``<project>:``; work items with the planning repo
+        (``kubernetes/enhancements#``) or Jira project key (``KAFKA-``); pull requests with
+        one of the code repos (``apache/kafka#``).
+        """
+        if subject_key.startswith(f"{self.project}:"):
+            return True
+        if isinstance(self.planning, GitHubPlanning):
+            prefixes = [f"{self.planning.repo}#"]
+        else:
+            prefixes = [f"{self.planning.project_key}-"]
+        prefixes += [f"{repo}#" for repo in self.code.repos]
+        return subject_key.startswith(tuple(prefixes))
+
     @property
     def planning_repo(self) -> str | None:
         """GitHub planning repo, if this team uses GitHub issues for the plan."""

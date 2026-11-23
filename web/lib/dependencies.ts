@@ -32,7 +32,7 @@ export function clusterName(members: DepFeature[], top = 2): string {
   const counts = new Map<string, number>();
   for (const f of members) for (const s of f.sigs) counts.set(s, (counts.get(s) ?? 0) + 1);
   const sigs = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, top);
-  return sigs.length ? sigs.map(([s]) => shortSig(s)).join(" · ") : "no SIG label";
+  return sigs.length ? sigs.map(([s]) => shortSig(s)).join(" · ") : "no team label";
 }
 
 /** Couplings of one feature, stated dependencies first, then by shared PRs. */

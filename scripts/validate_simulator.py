@@ -34,7 +34,7 @@ def main() -> None:
     parser.add_argument("--no-save", action="store_true")
     args = parser.parse_args()
     with Session(make_engine(instrument=False)) as session:
-        events = list(iter_events(session))
+        events = list(iter_events(session, project="kubernetes"))
     world = project(events, max(e.occurred_at for e in events) + timedelta(seconds=1))
     results = []
     for name in args.release or ["v1.37", "v1.38"]:
