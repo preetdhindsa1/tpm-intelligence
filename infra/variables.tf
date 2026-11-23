@@ -26,6 +26,12 @@ variable "poll_release" {
   default     = "v1.38"
 }
 
+variable "extra_poll_teams" {
+  description = "More teams the poller syncs in the same run, as team id => release (connectors/teams/<id>.yaml). Polled after Kubernetes, in key order."
+  type        = map(string)
+  default     = { "tpm-intelligence" = "Phase 3" }
+}
+
 variable "poll_schedule" {
   description = "Cron for the GitHub poller. Every 5 minutes keeps data freshness under the 10-minute SLO (CLAUDE.md section 9)."
   type        = string
