@@ -254,6 +254,15 @@ resource "google_cloud_run_v2_job" "poller" {
         command = ["python", "-m", "collectors.github_poller"]
         args    = ["--release", var.poll_release]
 
+        # 512Mi is Cloud Run's minimum for a gen2 job with CPU always allocated. Before,
+        # 256Mi poller + 256Mi collector met it; alone, 256Mi is rejected (2026-11-23).
+        resources {
+          limits = {
+            cpu    = "1000m"
+            memory = "512Mi"
+          }
+        }
+
         dynamic "env" {
           # No collector sidecar here (see below), so no OTLP export: structured JSON logs
           # with trace IDs still reach Cloud Logging.
