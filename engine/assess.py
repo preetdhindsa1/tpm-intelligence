@@ -114,11 +114,18 @@ def feature_timeline(
 
 
 def assess_release(
-    world: World, release_key: str, config: RuleConfig = DEFAULT_RULES
+    world: World,
+    release_key: str,
+    config: RuleConfig = DEFAULT_RULES,
+    links: ReleaseLinks | None = None,
 ) -> ReleaseAssessment:
-    """Assess every feature that is or was in the release."""
+    """Assess every feature that is or was in the release.
+
+    ``links`` is the release's linking if the caller already has it (P3-M4: link once
+    per recompute); it must be ``link_release(world, release_key)``.
+    """
     release = world.releases[release_key]
-    links = link_release(world, release_key)
+    links = links if links is not None else link_release(world, release_key)
     sig_load = unlinked_open_load(world, links)
     features = world.features_ever_in(release_key)
     graph = build_graph(release_key, features, world.pull_requests, links.by_feature())

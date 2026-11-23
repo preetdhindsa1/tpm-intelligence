@@ -437,9 +437,13 @@ def forecast_release(
     calibration: Calibration,
     config: ForecastConfig = DEFAULT_FORECAST,
     features: Iterable[Feature] | None = None,
+    links: ReleaseLinks | None = None,
 ) -> list[Forecast]:
-    """Forecast every feature currently in the release (or the given ones)."""
+    """Forecast every feature currently in the release (or the given ones).
+
+    ``links``: the release's linking if already computed (see ``assess_release``).
+    """
     release = world.releases[release_key]
-    links = link_release(world, release_key)
+    links = links if links is not None else link_release(world, release_key)
     chosen = list(features) if features is not None else world.features_in(release_key)
     return [forecast_feature(f, release, world, links, calibration, config) for f in chosen]

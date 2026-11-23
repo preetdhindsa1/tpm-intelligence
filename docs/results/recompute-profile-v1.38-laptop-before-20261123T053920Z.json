@@ -1,0 +1,20 @@
+{
+  "measured_at": "2026-11-23T05:39:20+00:00",
+  "tag": "laptop-before",
+  "release": "kubernetes:v1.38",
+  "events": 294328,
+  "note": "single runs, not percentiles",
+  "stages": {
+    "project": 1.12,
+    "link_release": 2.94,
+    "assess_release": 3.41,
+    "calibrate": 15.36,
+    "forecast_release": 2.89,
+    "merge_dates": 3.22
+  },
+  "service": {
+    "cold_view": 37.0,
+    "view_after_one_new_event": 26.76
+  },
+  "max_rss_mib": 1087
+}

@@ -39,6 +39,7 @@ from engine.forecast import (
     finished_releases,
     forecast_release,
 )
+from engine.links import link_release
 from engine.merge_date import MergeDateForecast, ReleaseCurve, forecast_release_dates, release_curve
 from engine.odds import training_pairs
 from engine.projection import ReleaseInfo, World, project
@@ -390,9 +391,11 @@ class ReleaseService:
         if self._extra_links is not None:
             world = replace(world, extra_links=tuple(self._extra_links(key)))
         started = time.perf_counter()
-        assessment = assess_release(world, key)
+        # Link once and share it (P3-M4): each stage used to link the release itself.
+        links = link_release(world, key)
+        assessment = assess_release(world, key, links=links)
         calibration = calibrate(world, finished_releases(world, now, exclude=key))
-        raw = forecast_release(world, key, calibration, self._forecast)
+        raw = forecast_release(world, key, calibration, self._forecast, links=links)
         recal = self._recalibration(events, world, key, calibration)
         forecasts = {
             f.feature_key: (
@@ -408,7 +411,7 @@ class ReleaseService:
             )
             for f in raw
         }
-        dates = forecast_release_dates(world, key, calibration, self._forecast)
+        dates = forecast_release_dates(world, key, calibration, self._forecast, links=links)
         curve = release_curve(world.releases[key], world.as_of, dates)
         logger.info(
             "release view computed",

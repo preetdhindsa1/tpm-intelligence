@@ -1,0 +1,12 @@
+{
+  "measured_at": "2026-11-23T05:42:36+00:00",
+  "tag": "laptop-step2",
+  "release": "kubernetes:v1.38",
+  "events": 294328,
+  "note": "single runs, not percentiles",
+  "service": {
+    "cold_view": 31.74,
+    "view_after_one_new_event": 21.81
+  },
+  "max_rss_mib": 1087
+}
