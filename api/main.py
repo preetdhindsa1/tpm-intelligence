@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import threading
+import time
 from collections.abc import AsyncIterator
 from typing import Any
 
@@ -17,7 +18,7 @@ from starlette.concurrency import run_in_threadpool
 
 from api.ai import AIServices
 from api.auth import Actor, AuthConfig, identify, require_approver
-from api.live import Updates
+from api.live import DEBOUNCE_S, Updates
 from api.schemas import (
     ClaimOutApi,
     DecisionIn,
@@ -682,6 +683,7 @@ def create_app(
                 with tracer.start_as_current_span(
                     "api.push_update", context=ctx, attributes={"tpm.release": name}
                 ):
+                    notified = time.monotonic()
                     before = svc().version
                     await run_in_threadpool(svc().refresh)
                     if svc().version == before:
@@ -695,6 +697,17 @@ def create_app(
                             "release": name,
                             "version": v.version,
                             "as_of": v.assessment.as_of.isoformat(),
+                        },
+                    )
+                    # Event -> dashboard latency (P3-M4, ADR-0019): from the worker's notice
+                    # (sent after the event is stored, batched for DEBOUNCE_S) to the push.
+                    logger.info(
+                        "live update pushed",
+                        extra={
+                            "release": name,
+                            "version": v.version,
+                            "seconds_since_notified": round(time.monotonic() - notified, 2),
+                            "debounce_s": DEBOUNCE_S,
                         },
                     )
 
