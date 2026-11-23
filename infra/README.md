@@ -8,7 +8,7 @@ Design: [ADR-0007](../docs/decisions/ADR-0007-cloud-run.md), sized by
 | `main.tf` | APIs, Artifact Registry |
 | `data.tf` | Cloud SQL Postgres 16 (`db-g1-small`) |
 | `pubsub.tf` | `normalized-events`, `worker` subscription, dead-letter topic (5 attempts) |
-| `run.tf` | Cloud Run: `tpm-api` (runs the event worker in-process) and `tpm-web` (services), `tpm-github-poller` and `tpm-migrate` (jobs); OTel Collector sidecars |
+| `run.tf` | Cloud Run: `tpm-api` (runs the event worker in-process) and the web app (`var.web_service_name`, default `tpm-intelligence`) (services), `tpm-github-poller` and `tpm-migrate` (jobs); OTel Collector sidecars |
 | `deploy.tf` | Workload Identity Federation for GitHub Actions (main branch only) and the deployer account |
 | `scheduler.tf` | Poller every 5 minutes |
 | `secrets.tf` | `database-url`, `github-token`, `anthropic-api-key`, sign-in secrets (generated and hand-added), collector config |

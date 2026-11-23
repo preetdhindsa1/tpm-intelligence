@@ -35,7 +35,9 @@ REGION=$(sed -n 's/^region *= *"\(.*\)"/\1/p' infra/terraform.tfvars)
 REGION=${REGION:-us-central1}
 REG="$REGION-docker.pkg.dev/$PROJECT/tpm"
 API_URL="https://tpm-api-$NUMBER.$REGION.run.app"
-WEB_URL="https://tpm-web-$NUMBER.$REGION.run.app"
+WEB_SERVICE=$(sed -n 's/^web_service_name *= *"\(.*\)"/\1/p' infra/terraform.tfvars)
+WEB_SERVICE=${WEB_SERVICE:-tpm-intelligence}  # default of var.web_service_name
+WEB_URL="https://$WEB_SERVICE-$NUMBER.$REGION.run.app"
 
 step() { printf '\n==> %s\n' "$*"; }
 tf() {

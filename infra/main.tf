@@ -23,7 +23,7 @@ locals {
   # Cloud Run's deterministic URLs, known before the services exist (web <-> API <-> GitHub
   # OAuth callback refer to each other).
   api_url = "https://${local.name}-api-${var.project_number}.${var.region}.run.app"
-  web_url = "https://${local.name}-web-${var.project_number}.${var.region}.run.app"
+  web_url = "https://${var.web_service_name}-${var.project_number}.${var.region}.run.app"
 }
 
 resource "google_project_service" "apis" {

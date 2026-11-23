@@ -159,7 +159,7 @@ resource "google_cloud_run_v2_service" "api" {
 # ---------------------------------------------------------------- Web (Next.js)
 
 resource "google_cloud_run_v2_service" "web" {
-  name                = "${local.name}-web"
+  name                = var.web_service_name
   location            = var.region
   ingress             = "INGRESS_TRAFFIC_ALL"
   deletion_protection = false

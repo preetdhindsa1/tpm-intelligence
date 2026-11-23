@@ -32,6 +32,12 @@ variable "poll_schedule" {
   default     = "*/5 * * * *"
 }
 
+variable "web_service_name" {
+  description = "Cloud Run service for the web app; it is also the first part of the public URL (https://<name>-<project number>.<region>.run.app)."
+  type        = string
+  default     = "tpm-intelligence"
+}
+
 variable "cors_origins" {
   description = "Extra browser origins allowed to call the API (e.g. a custom domain). The Cloud Run web URL is always allowed."
   type        = list(string)

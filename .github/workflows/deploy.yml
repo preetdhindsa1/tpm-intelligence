@@ -28,6 +28,8 @@ jobs:
     env:
       PROJECT: ${{ vars.GCP_PROJECT_ID }}
       REGION: ${{ vars.GCP_REGION }}
+      # Must match var.web_service_name in infra/variables.tf.
+      WEB_SERVICE: tpm-intelligence
       SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
@@ -62,12 +64,12 @@ jobs:
           # --region before --container: flags after --container apply to that container.
           gcloud run jobs update tpm-github-poller --region "$REGION" --container poller --image "$REG/app:$SHA"
           gcloud run services update tpm-api --region "$REGION" --container api --image "$REG/app:$SHA"
-          gcloud run services update tpm-web --image "$REG/web:$SHA" --region "$REGION"
+          gcloud run services update "$WEB_SERVICE" --image "$REG/web:$SHA" --region "$REGION"
 
       - name: Smoke test
         run: |
           API="https://tpm-api-${{ vars.GCP_PROJECT_NUMBER }}.$REGION.run.app"
-          WEB="https://tpm-web-${{ vars.GCP_PROJECT_NUMBER }}.$REGION.run.app"
+          WEB="https://$WEB_SERVICE-${{ vars.GCP_PROJECT_NUMBER }}.$REGION.run.app"
           curl -fsS --retry 10 --retry-delay 15 --retry-all-errors "$API/health"
           test "$(curl -fsS "$API/me" | python3 -c 'import json,sys; print(json.load(sys.stdin)["mode"])')" = required
           curl -fsS -o /dev/null --retry 5 --retry-delay 10 "$WEB/"
