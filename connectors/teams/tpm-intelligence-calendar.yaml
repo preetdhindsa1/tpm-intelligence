@@ -1,10 +1,12 @@
 # TPM Intelligence release calendar (ADR-0020). The GitHub milestone must be named like
-# the release ("Phase 3"). Dates proposed 2026-11-23 for the owner to confirm. UTC.
+# the release ("Phase 3"). Dates set by the owner on 2026-11-23: the cycle avoids the
+# US Thanksgiving week and the holiday change moratorium (about Dec 18 - Jan 4), so
+# code freeze falls ten working days after people return. Times are UTC.
 project: tpm-intelligence
 releases:
   - name: "Phase 3"
-    cycle_start: 2026-11-22T00:00:00Z        # P3-M1 started
-    enhancements_freeze: 2026-11-30T12:00:00Z # remaining Phase 3 issues planned by then
-    code_freeze: 2026-12-14T12:00:00Z
-    release: 2026-12-21T00:00:00Z
+    cycle_start: 2026-11-30T00:00:00Z
+    enhancements_freeze: 2026-12-14T12:00:00Z # planning freeze: Phase 3 issues set
+    code_freeze: 2027-01-14T12:00:00Z
+    release: 2027-01-20T00:00:00Z
     source_url: https://github.com/preetdhindsa1/tpm-intelligence/milestones

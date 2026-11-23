@@ -61,5 +61,5 @@ def test_this_project_tracks_itself_in_one_repo() -> None:
     assert team.owns("tpm-intelligence:Phase 3")
     assert not team.owns("kubernetes/kubernetes#5")
     calendar = load_calendar(team.calendar_path(relative_to=Path.cwd()))
-    assert calendar.get("Phase 3").code_freeze.isoformat() == "2026-12-14T12:00:00+00:00"
+    assert calendar.get("Phase 3").code_freeze.isoformat() == "2027-01-14T12:00:00+00:00"
     assert get_pack("github_issue").name == "github_issue"
