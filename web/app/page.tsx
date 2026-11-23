@@ -330,8 +330,8 @@ function Teams({ projects }: { projects: string[] }) {
     { name: "Kubernetes", how: "GitHub enhancement issues (KEPs) + kubernetes/kubernetes PRs" },
     { name: "Apache Kafka", how: "Jira fix versions (New Features, umbrellas, KIPs) + apache/kafka PRs; release dates only so far" },
     {
-      name: "Demo team (sample data)",
-      how: "A repository the owner controls: GitHub App webhooks deliver events in seconds. Scripted sample activity, not a real project",
+      name: "TPM Intelligence (this project)",
+      how: "Tracks its own development: GitHub issues and the PRs that close them, delivered by GitHub App webhooks in seconds",
     },
     { name: "Your team", how: "Copy a connector file: where the plan lives, where the code lives, the release calendar" },
   ];
@@ -346,8 +346,8 @@ function Teams({ projects }: { projects: string[] }) {
         {rows.map((r) => {
           const state = live.has(r.name)
             ? "Live"
-            : r.name.startsWith("Demo team")
-              ? "Built · waiting for the demo repository"
+            : r.name.startsWith("TPM Intelligence")
+              ? "Built · waiting for the first issues"
               : r.name === "Apache Kafka"
                 ? "Connector configured · data not yet collected"
                 : "Plug in";

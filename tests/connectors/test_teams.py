@@ -49,18 +49,17 @@ def test_kep_and_jira_packs_are_registered() -> None:
     assert get_pack("jira_key").name == "jira_key"
 
 
-def test_demo_team_is_sample_data_planning_and_coding_in_one_repo() -> None:
-    """ADR-0020: a separate project, so its numbers never mix with real projects."""
+def test_this_project_tracks_itself_in_one_repo() -> None:
+    """ADR-0020: real data from this repository, under its own project key."""
     from collectors.github_poller.calendar import load_calendar
 
-    team = load_team("demo")
-    assert team.project == "demo"
-    assert "sample data" in team.display_name
+    team = load_team("tpm-intelligence")
+    assert team.project == "tpm-intelligence"
     assert team.link_pack == "github_issue"
-    assert team.planning_repo == team.primary_code_repo == "preetdhindsa1/program-demo-team"
-    assert team.owns("preetdhindsa1/program-demo-team#5")
-    assert team.owns("demo:2026.12")
+    assert team.planning_repo == team.primary_code_repo == "preetdhindsa1/tpm-intelligence"
+    assert team.owns("preetdhindsa1/tpm-intelligence#5")
+    assert team.owns("tpm-intelligence:Phase 3")
     assert not team.owns("kubernetes/kubernetes#5")
     calendar = load_calendar(team.calendar_path(relative_to=Path.cwd()))
-    assert calendar.get("2026.12").code_freeze.isoformat() == "2026-12-09T12:00:00+00:00"
+    assert calendar.get("Phase 3").code_freeze.isoformat() == "2026-12-14T12:00:00+00:00"
     assert get_pack("github_issue").name == "github_issue"

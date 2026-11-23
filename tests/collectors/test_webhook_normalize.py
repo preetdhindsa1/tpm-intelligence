@@ -169,12 +169,12 @@ def test_planning_issue_uses_the_timeline_for_history_ids() -> None:
 
 
 def test_planning_and_code_in_the_same_repository() -> None:
-    """The demo team plans in issues and codes in PRs of one repository."""
-    n = hook.WebhookNormalizer([load_team("demo")], timeline=lambda repo, number: [])
-    repo = {"full_name": "preetdhindsa1/program-demo-team"}
+    """This project plans in issues and codes in PRs of one repository."""
+    n = hook.WebhookNormalizer([load_team("tpm-intelligence")], timeline=lambda repo, number: [])
+    repo = {"full_name": "preetdhindsa1/tpm-intelligence"}
     issue = {**load_json("issue_6395.json"), "number": 3}
     got = n("issues", {"action": "opened", "repository": repo, "issue": issue}, OBS)
-    assert [e.subject.external_key for e in got] == ["preetdhindsa1/program-demo-team#3"]
+    assert [e.subject.external_key for e in got] == ["preetdhindsa1/tpm-intelligence#3"]
     assert got[0].event_type == "work_item.observed"
     pr = {**load_json("webhook_pull_request_143709.json")["pull_request"], "number": 4}
     got = n("pull_request", {"action": "opened", "repository": repo, "pull_request": pr}, OBS)

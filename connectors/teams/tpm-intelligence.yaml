@@ -1,0 +1,16 @@
+# This project tracks its own development (P3-M5, ADR-0020): real data, not a sample.
+# Plans are GitHub issues in a milestone named after the release; code is PRs that close
+# them ("Fixes #12"). GitHub App webhooks deliver events in seconds; the poller can
+# reconcile. Its own project key, so it never mixes with Kubernetes or Kafka.
+id: tpm-intelligence
+display_name: TPM Intelligence (this project)
+project: tpm-intelligence
+link_pack: github_issue
+planning:
+  source: github
+  repo: preetdhindsa1/tpm-intelligence
+code:
+  repos:
+    - preetdhindsa1/tpm-intelligence
+calendar:
+  path: connectors/teams/tpm-intelligence-calendar.yaml

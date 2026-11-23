@@ -8,20 +8,18 @@ export function featureLabel(f: { key: string; number: number }): string {
 }
 
 // `tracking`: the project's release team marks features tracked (Kubernetes "tracked/yes").
-// `sample`: invented demo data (ADR-0020); every page says so.
 export type Vocab = {
   team: string;
   teams: string;
   design: string;
   designs: string;
   tracking: boolean;
-  sample?: boolean;
 };
 
 const VOCAB: Record<string, Vocab> = {
   kubernetes: { team: "SIG", teams: "SIGs", design: "KEP", designs: "KEPs", tracking: true },
   kafka: { team: "component", teams: "components", design: "KIP", designs: "KIPs", tracking: false },
-  demo: { team: "team", teams: "teams", design: "issue", designs: "issues", tracking: false, sample: true },
+  "tpm-intelligence": { team: "area", teams: "areas", design: "issue", designs: "issues", tracking: false },
 };
 
 const GENERIC: Vocab = { team: "team", teams: "teams", design: "design doc", designs: "design docs", tracking: false };
