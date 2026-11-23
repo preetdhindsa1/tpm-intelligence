@@ -1,0 +1,101 @@
+{
+ "action": "closed",
+ "repository": {
+  "full_name": "kubernetes/kubernetes"
+ },
+ "pull_request": {
+  "number": 143709,
+  "title": "Dynamic node-local ephemeral volumes: alpha implementation",
+  "body": "#### What type of PR is this?\r\n\r\n/kind feature\r\n/kind api-change\r\n\r\n#### What this PR does / why we need it:\r\n\r\nImplements Alpha support for **KEP-6395: Dynamic Node-Local Ephemeral Volumes** behind the `DynamicNodeLocalEphemeralVolumes` feature gate.\r\n\r\nThis PR has the following dependencies:\r\n- [x] https://github.com/kubernetes/kubernetes/pull/143474\r\n- [x] https://github.com/kubernetes/kubernetes/pull/141807\r\n- [x] https://github.com/kubernetes/kubernetes/pull/143715\r\n\r\n#### Which issue(s) this PR is related to:\r\n\r\nKEP: https://github.com/kubernetes/enhancements/issues/6395\r\n\r\n#### Special notes for your reviewer:\r\n\r\nNote that we decided to remove the mutable mounts portion of this PR, deferring that to the next cycle.\r\n\r\n#### Does this PR introduce a user-facing change?\r\n\r\n```release-note\r\nAdded alpha support for dynamically adding and removing node-local ephemeral volumes.\r\n* The following volume types are supported: `emptyDir`, `configMap`, `secret`, `projected`, `image`.\r\n* You may add and remove these volume types under the `/dynamic`subresource behind the `DynamicNodeLocalEphemeralVolumes` feature gate.\r\n* To use newly added volumes, you must use the `DynamicContainers` feature to add a container referencing the new volume. In this first alpha, dynamically adjusting `volumeMounts` of a preexisting container is not yet allowed.\r\n```\r\n\r\n#### AI usage disclosure:\r\n\r\nYES \u2014 An AI coding assistant was used to help draft implementation code, unit/integration/node E2E tests, and structure the commit series. All changes were reviewed and verified by the author.",
+  "state": "closed",
+  "merged": true,
+  "merged_at": "2026-11-20T23:28:24Z",
+  "closed_at": "2026-11-20T23:28:24Z",
+  "created_at": "2026-11-02T16:44:28Z",
+  "updated_at": "2026-11-20T23:32:00Z",
+  "html_url": "https://github.com/kubernetes/kubernetes/pull/143709",
+  "labels": [
+   {
+    "name": "area/test"
+   },
+   {
+    "name": "area/kubelet"
+   },
+   {
+    "name": "sig/scheduling"
+   },
+   {
+    "name": "area/apiserver"
+   },
+   {
+    "name": "lgtm"
+   },
+   {
+    "name": "sig/storage"
+   },
+   {
+    "name": "sig/node"
+   },
+   {
+    "name": "sig/api-machinery"
+   },
+   {
+    "name": "release-note"
+   },
+   {
+    "name": "sig/autoscaling"
+   },
+   {
+    "name": "size/XXL"
+   },
+   {
+    "name": "kind/api-change"
+   },
+   {
+    "name": "kind/feature"
+   },
+   {
+    "name": "sig/auth"
+   },
+   {
+    "name": "sig/apps"
+   },
+   {
+    "name": "approved"
+   },
+   {
+    "name": "cncf-cla: yes"
+   },
+   {
+    "name": "sig/testing"
+   },
+   {
+    "name": "sig/architecture"
+   },
+   {
+    "name": "area/conformance"
+   },
+   {
+    "name": "area/code-generation"
+   },
+   {
+    "name": "needs-priority"
+   },
+   {
+    "name": "api-review"
+   },
+   {
+    "name": "needs-triage"
+   }
+  ],
+  "base": {
+   "ref": "master"
+  },
+  "head": {
+   "sha": "826dcfc0ca9e04898547817c1b5f47b8ea313b6c"
+  },
+  "user": {
+   "login": "user-1"
+  }
+ }
+}

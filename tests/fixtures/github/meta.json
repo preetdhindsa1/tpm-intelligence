@@ -10,5 +10,6 @@
   143644,
   143709
  ],
- "rest_event_count_2570": 307
+ "rest_event_count_2570": 307,
+ "webhook_fixtures": "webhook_*_143709.json: REST shapes (as in webhook payloads) for kubernetes/kubernetes#143709, fetched 2026-11-23; logins replaced by placeholders; comment text reduced to Prow review commands."
 }

@@ -147,6 +147,11 @@ def release_event(project: str, dates: ReleaseDates, observed_at: datetime) -> N
 # ---------------------------------------------------------------- issues
 
 
+# Shared with the webhook normalizer (ADR-0020); REST sends the same values lowercase.
+REVIEW_STATES = _REVIEW_STATES
+CHECK_RUN_CONCLUSIONS = _CHECK_RUN_CONCLUSIONS
+
+
 def is_pull_request(issue: Json) -> bool:
     """The REST issues list also returns PRs; they carry a ``pull_request`` key."""
     return "pull_request" in issue

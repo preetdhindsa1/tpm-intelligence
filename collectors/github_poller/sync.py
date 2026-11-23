@@ -244,18 +244,7 @@ class GitHubPoller:
 
     def issue_timeline(self, number: int) -> list[dict[str, Any]]:
         """Full milestone/label/close history via GraphQL (REST caps at ~300 events)."""
-        owner, name = self._planning.split("/")
-        nodes: list[dict[str, Any]] = []
-        after: str | None = None
-        while True:
-            data = self.gh.graphql(
-                ISSUE_TIMELINE, {"owner": owner, "name": name, "number": number, "after": after}
-            )
-            items = data["repository"]["issue"]["timelineItems"]
-            nodes.extend(items["nodes"])
-            if not items["pageInfo"]["hasNextPage"]:
-                return normalize.timeline_to_events(nodes)
-            after = items["pageInfo"]["endCursor"]
+        return fetch_issue_timeline(self.gh, self._planning, number)
 
     def kep_paths(self) -> dict[int, str]:
         """KEP number -> kep.yaml path (one recursive tree call per run)."""
@@ -382,6 +371,26 @@ class GitHubPoller:
         if count > SEARCH_RESULT_CAP:
             logger.warning("search still over cap at minimum range", extra={"query": query})
         yield from self._search(query)
+
+
+def fetch_issue_timeline(gh: GitHubClient, repo: str, number: int) -> list[dict[str, Any]]:
+    """An issue's full milestone/label/close history via GraphQL, in issue-event shape.
+
+    Shared with the webhook receiver (ADR-0020) so both produce the same event IDs: the
+    IDs come from GraphQL timeline node IDs, which webhook payloads do not carry.
+    """
+    owner, name = repo.split("/")
+    nodes: list[dict[str, Any]] = []
+    after: str | None = None
+    while True:
+        data = gh.graphql(
+            ISSUE_TIMELINE, {"owner": owner, "name": name, "number": number, "after": after}
+        )
+        items = data["repository"]["issue"]["timelineItems"]
+        nodes.extend(items["nodes"])
+        if not items["pageInfo"]["hasNextPage"]:
+            return normalize.timeline_to_events(nodes)
+        after = items["pageInfo"]["endCursor"]
 
 
 def _q(ts: datetime) -> str:
