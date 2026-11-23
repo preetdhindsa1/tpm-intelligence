@@ -35,7 +35,7 @@ from engine.forecast import (
     ForecastConfig,
     Rate,
     bucket,
-    calibrate,
+    calibrate_tracked,
     finished_releases,
     forecast_release,
 )
@@ -45,7 +45,7 @@ from engine.odds import training_pairs
 from engine.projection import ReleaseInfo, World, project
 from engine.recalibrate import Recalibration, fit
 from linker.rules import LinkCandidate
-from pipeline.events import NormalizedEvent, ReleaseObserved
+from pipeline.events import NormalizedEvent, PullRequestObserved, ReleaseObserved
 
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -101,6 +101,20 @@ class ReleaseSummary:
 
 
 @dataclass(frozen=True)
+class _CalibrationEntry:
+    """A cached calibration and what it depends on (P3-M4, ADR-0019 option A)."""
+
+    sources: tuple[str, ...]
+    calibration: Calibration
+    read: frozenset[str]  # subjects calibrate_tracked read
+    # PR fields calibration uses, per PR it read: a re-observed snapshot that leaves
+    # these alone (e.g. after a review) cannot change it.
+    pr_fields: dict[str, tuple[object, ...]]
+    events_seen: int  # length of the service's event list when it was computed
+    computed_at: float  # monotonic
+
+
+@dataclass(frozen=True)
 class ReleaseView:
     """One computed release state."""
 
@@ -134,6 +148,7 @@ class ReleaseService:
         forecast: ForecastConfig = DEFAULT_FORECAST,
         ttl: timedelta = timedelta(minutes=5),
         recalibration_ttl: timedelta = timedelta(hours=6),
+        calibration_ttl: timedelta = timedelta(hours=6),
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
         validation: Callable[[], Validation] = load_validation,
         date_validation: Callable[[], Validation] = load_date_validation,
@@ -153,6 +168,9 @@ class ReleaseService:
         self._views: dict[str, ReleaseView] = {}
         self._recal: dict[tuple[str, int], tuple[float, Recalibration]] = {}
         self._recal_ttl = recalibration_ttl.total_seconds()
+        self._calibrations: dict[str, _CalibrationEntry] = {}
+        self._calibration_ttl = calibration_ttl.total_seconds()
+        self.calibrations_computed = 0  # for tests and the profile script
         self._validation = validation
         self._date_validation = date_validation
         # Called after each new view (e.g. to store the day's forecast snapshot).
@@ -197,6 +215,8 @@ class ReleaseService:
         with self._lock:
             self._version += 1
             self._required_version = self._version
+            # A person's decision may change links anywhere: no cached calibration survives.
+            self._calibrations.clear()
 
     def release_keys(self) -> list[str]:
         """Known release keys, oldest first."""
@@ -381,10 +401,45 @@ class ReleaseService:
         with self._lock:
             return list(self._events)
 
+    def _calibration(
+        self, world: World, key: str, now: datetime, snapshot: Sequence[NormalizedEvent]
+    ) -> Calibration:
+        """Calibration for ``key``, reused while nothing it read has changed (option A).
+
+        Rebuilt when the finished releases change, when a new event's subject is one the
+        calibration read (a finished release's feature or linked PR, or the release
+        itself), after ``calibration_ttl`` (covers a brand-new PR linking to an old
+        feature), or after ``invalidate``.
+        """
+        sources = tuple(finished_releases(world, now, exclude=key))
+        # Count events in the snapshot ``world`` was built from, so an event that arrives
+        # meanwhile is checked on the next recompute rather than marked as seen.
+        with self._lock:
+            entry = self._calibrations.get(key)
+        total = len(snapshot)
+        new = snapshot[entry.events_seen :] if entry else []
+        if (
+            entry is not None
+            and entry.sources == sources
+            and time.monotonic() - entry.computed_at < self._calibration_ttl
+            and not any(_changes_calibration(e, entry) for e in new)
+        ):
+            return entry.calibration
+        with tracer.start_as_current_span("api.calibrate", attributes={"tpm.release": key}):
+            calibration, read = calibrate_tracked(world, sources)
+        self.calibrations_computed += 1
+        pr_fields = {k: _pr_fields_of(pr) for k, pr in world.pull_requests.items() if k in read}
+        with self._lock:
+            self._calibrations[key] = _CalibrationEntry(
+                sources, calibration, read, pr_fields, total, time.monotonic()
+            )
+        return calibration
+
     def _compute(self, key: str) -> ReleaseView:
         now = self._now()
         # One world per project (ADR-0018): Kafka PRs are not Kubernetes load.
-        events = scope_events(self._snapshot_events(), _project_of(key))
+        snapshot = self._snapshot_events()
+        events = scope_events(snapshot, _project_of(key))
         world = project(events, now)
         if key not in world.releases:
             raise KeyError(key)
@@ -394,7 +449,7 @@ class ReleaseService:
         # Link once and share it (P3-M4): each stage used to link the release itself.
         links = link_release(world, key)
         assessment = assess_release(world, key, links=links)
-        calibration = calibrate(world, finished_releases(world, now, exclude=key))
+        calibration = self._calibration(world, key, now, snapshot)
         raw = forecast_release(world, key, calibration, self._forecast, links=links)
         recal = self._recalibration(events, world, key, calibration)
         forecasts = {
@@ -420,6 +475,8 @@ class ReleaseService:
                 "events": len(events),
                 "features": len(assessment.features),
                 "seconds": round(time.perf_counter() - started, 2),
+                # Grows only when the calibration was rebuilt (P3-M4).
+                "calibrations_computed": self.calibrations_computed,
             },
         )
         return ReleaseView(
@@ -464,3 +521,33 @@ class ReleaseService:
 
 def _project_of(release_key: str) -> str:
     return release_key.split(":", 1)[0]
+
+
+# Calibration reads PR snapshots, work items, references and releases; never reviews,
+# comments or CI results, which are most of the event volume (ADR-0019).
+_NOT_READ_BY_CALIBRATION = frozenset(
+    {
+        "pull_request.review_submitted",
+        "pull_request.comment_posted",
+        "pull_request.check_completed",
+    }
+)
+
+
+def _pr_fields_of(pr: object) -> tuple[object, ...]:
+    """The PR fields calibration uses: dates for durations, text for links."""
+    return tuple(
+        getattr(pr, name) for name in ("created_at", "merged_at", "closed_at", "title", "body")
+    )
+
+
+def _changes_calibration(event: NormalizedEvent, entry: _CalibrationEntry) -> bool:
+    """Whether a new event could change a cached calibration (errs towards yes)."""
+    if event.payload.type in _NOT_READ_BY_CALIBRATION:
+        return False
+    key = event.subject.external_key
+    if key not in entry.read:
+        return False
+    if isinstance(event.payload, PullRequestObserved) and key in entry.pr_fields:
+        return _pr_fields_of(event.payload) != entry.pr_fields[key]
+    return True

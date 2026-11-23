@@ -62,6 +62,8 @@ def service(events: list[Any], name: str, now: datetime) -> dict[str, float]:
     _lap(t, "cold_view", lambda: svc.view(name, wait=True))
     source.events.append(events[-1])  # one new event, as the worker would deliver it
     _lap(t, "view_after_one_new_event", lambda: svc.view(name, wait=True))
+    t["calibrations_computed"] = svc.calibrations_computed
+    t["new_event_subject"] = events[-1].subject.external_key  # type: ignore[assignment]
     return t
 
 

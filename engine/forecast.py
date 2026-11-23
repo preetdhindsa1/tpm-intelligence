@@ -129,6 +129,20 @@ class Calibration:
 
 def calibrate(world: World, release_keys: Sequence[str]) -> Calibration:
     """Measure durations, new-PR rates and landing rates on finished releases."""
+    return calibrate_tracked(world, release_keys)[0]
+
+
+def calibrate_tracked(
+    world: World, release_keys: Sequence[str]
+) -> tuple[Calibration, frozenset[str]]:
+    """:func:`calibrate`, plus the subjects it read (P3-M4 calibration cache).
+
+    The subjects are the release keys, every feature that was ever in them and every PR
+    with a verified link to one of those features. A new event on any of them can change
+    the calibration; an event elsewhere cannot, except a brand-new PR that links to an
+    old feature (ADR-0019 covers that with a time limit).
+    """
+    read: set[str] = set(release_keys)
     durations: list[float] = []
     main_durations: list[float] = []
     new_pr: dict[tuple[int, bool], list[int]] = {}
@@ -141,6 +155,8 @@ def calibrate(world: World, release_keys: Sequence[str]) -> Calibration:
             continue
         links = link_release(world, key)
         features = world.features_ever_in(key)
+        read.update(f.key for f in features)
+        read.update(links.linked_pr_keys())
         seen_prs: set[str] = set()
         seen_main: set[str] = set()
         for f in features:
@@ -188,7 +204,7 @@ def calibrate(world: World, release_keys: Sequence[str]) -> Calibration:
                 landing.setdefault(b, [0, 0])
                 landing[b][0] += int(outcome)
                 landing[b][1] += 1
-    return Calibration(
+    calibration = Calibration(
         source_releases=tuple(release_keys),
         as_of=world.as_of,
         durations_days=tuple(sorted(durations)),
@@ -197,6 +213,7 @@ def calibrate(world: World, release_keys: Sequence[str]) -> Calibration:
         main_durations_days=tuple(sorted(main_durations)),
         removed_despite_code={k: Rate(*v) for k, v in removed.items()},
     )
+    return calibration, frozenset(read)
 
 
 def finished_releases(world: World, before: datetime, exclude: str) -> list[str]:
