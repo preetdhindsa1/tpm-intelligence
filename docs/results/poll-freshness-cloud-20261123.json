@@ -1,0 +1,10 @@
+{
+  "measured_at": "2026-11-23T22:10:00+00:00",
+  "window": ["2026-11-23T20:02:17Z", "2026-11-23T22:03:20Z"],
+  "source": "gcloud run jobs executions list --job tpm-github-poller (schedule */5)",
+  "polls_in_window": 24,
+  "polls_succeeded": 24,
+  "gap_between_successful_completions_minutes": {"median": 4.6, "max": 6.2},
+  "poll_duration_seconds": {"p50": 74.4, "max": 124.2},
+  "note": "Worst-case data age on the dashboard is bounded by max gap + max poll duration + push p95 (about 6.2 min + 2.1 min + 16 s, under 9 min)."
+}

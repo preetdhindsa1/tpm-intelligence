@@ -75,4 +75,22 @@ Laptop, real v1.38, recompute after one new event (a PR comment), single runs:
 | After one new event | 26.8 s | 21.8 s | **4.6 s** |
 | Cold start | 37.0 s | 31.7 s | 23.5 s |
 
-Cloud and event -> dashboard p95: **TBD (being measured)**.
+Cloud API (1 vCPU), real v1.38, 2 hours of normal polling (2026-11-23 20:02-22:03 UTC;
+`scripts/measure_freshness.py`, `docs/results/freshness-cloud-20261123T220325Z.json`):
+
+| | n | p50 | p95 | max |
+|---|---|---|---|---|
+| Recompute of the v1.38 view | 80 | 6.3 s | **9.2 s** | 38.7 s |
+| Stored event -> live page push | 122 | 12.7 s | **15.9 s** | 39.6 s |
+
+- The recompute was about 56 s in the cloud before this change.
+- **What the push time covers:** from the worker's notice that new events are stored to
+  the browser being told to reload, including the recompute and the 1 s batching delay
+  (counted in full, so it errs high). It does **not** include the wait for the next poll
+  (up to 5 minutes) or a webhook's delivery: the full event -> dashboard p95 for
+  webhooks is measured in P3-M5.
+- n counts pushes per open page: two pages were open (one held by the measurement, one a
+  visitor). Both maxima come from one slow recompute at 21:21:58 UTC (38.7 s), not near
+  a redeploy; its cause is not yet known. The next slowest (34.9 s) was the first
+  recompute after the 20:30 redeploy (cold calibration).
+- Small sample, one release, one 2-hour window.

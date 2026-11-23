@@ -1,0 +1,17 @@
+{
+  "measured_at": "2026-11-23T22:03:25+00:00",
+  "window_hours": 2,
+  "event_to_dashboard_seconds": {
+    "n": 122,
+    "p50": 12.71,
+    "p95": 15.92,
+    "max": 39.62
+  },
+  "note": "seconds_since_notified + debounce_s (upper bound); pushes need an open live page",
+  "recompute_seconds_kubernetes:v1.38": {
+    "n": 80,
+    "p50": 6.33,
+    "p95": 9.24,
+    "max": 38.68
+  }
+}

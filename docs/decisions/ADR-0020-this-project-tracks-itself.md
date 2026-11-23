@@ -66,8 +66,8 @@ freeze. The owner set the cycle start and planning freeze.
   milestone and its issues exist, the project shows no features.
 - **Slower way of working.** Changes go through PRs that close issues, rather than direct
   pushes to `main`.
-- **A longer poll run.** Kubernetes takes about 3 minutes per run; this project adds
-  seconds. Both must finish inside the 5-minute schedule.
+- **A longer poll run.** A Kubernetes poll took 74 s (p50) and at most 124 s over 24 runs
+  (2026-11-23); this project adds seconds. Both must finish inside the 5-minute schedule.
 - **Linking is rules only.** The deterministic `github_issue` pack verifies a closing
   keyword (`Fixes #12`) or a `Feature: #12` line; a bare `#12` elsewhere stays
   `suggested` until a person confirms it. No AI is involved in this decision.
