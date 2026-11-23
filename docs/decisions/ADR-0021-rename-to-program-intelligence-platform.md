@@ -25,7 +25,8 @@ The owner chose layers 1 and 3 and kept layer 2:
   Platform". The front page's "this project" card now matches the live project through
   one constant (`web/lib/teams.ts`), and a test checks it equals the team file's
   `display_name`. The card used to look for the old name by prefix.
-- **Layer 3 (next change):** the web service becomes `program-intelligence-platform`.
+- **Layer 3:** the web service becomes `program-intelligence-platform`, so the site is
+  https://program-intelligence-platform-109199755245.us-central1.run.app.
   The old URL is removed, not redirected (owner's choice). The switch is ordered so the
   deploy workflow never runs against a missing service name: `gcloud run services
   update` would create an unmanaged one.

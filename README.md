@@ -11,7 +11,8 @@ drafts the executive update for a human to approve.
   and (in later phases) uses AI only to explain, with every AI claim checked against the data first.
 
 > **Status: phase 3, live in Google Cloud.** Live demo:
-> https://tpm-intelligence-109199755245.us-central1.run.app (deployed 2026-11-23, ADR-0017).
+> https://program-intelligence-platform-109199755245.us-central1.run.app (deployed 2026-11-23, ADR-0017; URL renamed
+> 2026-11-23, ADR-0021).
 > Collect → link → engine → API → web dashboard runs end to end, in the cloud and on local
 > Docker. Example teams (see `connectors/teams/`): **Kubernetes** (GitHub, polled every 5 minutes),
 > **Apache Kafka** (Jira plan, ADR-0018) and **this project itself** (ADR-0020); the platform is

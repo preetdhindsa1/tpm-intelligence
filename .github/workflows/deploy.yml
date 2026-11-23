@@ -28,8 +28,9 @@ jobs:
     env:
       PROJECT: ${{ vars.GCP_PROJECT_ID }}
       REGION: ${{ vars.GCP_REGION }}
-      # Must match var.web_service_name in infra/variables.tf.
-      WEB_SERVICE: tpm-intelligence
+      # Must match var.web_service_name in infra/variables.tf. `gcloud run services update`
+      # creates a service that does not exist, so a mismatch makes an unmanaged one.
+      WEB_SERVICE: program-intelligence-platform
       SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
