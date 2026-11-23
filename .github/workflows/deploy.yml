@@ -59,7 +59,7 @@ jobs:
 
       - name: Roll out
         run: |
-          gcloud run jobs update tpm-github-poller --image "$REG/app:$SHA" --region "$REGION"
+          gcloud run jobs update tpm-github-poller --container poller --image "$REG/app:$SHA" --region "$REGION"
           gcloud run services update tpm-api --container api --image "$REG/app:$SHA" --region "$REGION"
           gcloud run services update tpm-web --image "$REG/web:$SHA" --region "$REGION"
 
