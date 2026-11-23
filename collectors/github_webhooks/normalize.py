@@ -164,10 +164,11 @@ class WebhookNormalizer:
         """Events for one delivery; empty for anything not handled."""
         repo_name = str((payload.get("repository") or {}).get("full_name", ""))
         repo = repo_name.lower()
+        # Planning first: a team may plan and code in the same repository (the demo team).
+        if event == "issues" and repo in self._planning:
+            return self._planning_issue(repo_name, payload, observed_at)
         if repo in self._code:
             return self._code_event(event, repo_name, payload, observed_at)
-        if repo in self._planning and event == "issues":
-            return self._planning_issue(repo_name, payload, observed_at)
         return []
 
     def _code_event(

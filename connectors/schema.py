@@ -55,7 +55,7 @@ class TeamConfig(BaseModel):
     id: str = Field(description="Stable id, e.g. kubernetes or kafka")
     display_name: str
     project: str = Field(description="Prefix used in release keys, e.g. kubernetes:v1.38")
-    link_pack: Literal["kep", "jira_key"] = "kep"
+    link_pack: Literal["kep", "jira_key", "github_issue"] = "kep"
     planning: GitHubPlanning | JiraPlanning = Field(discriminator="source")
     code: CodeRepos
     calendar: CalendarRef

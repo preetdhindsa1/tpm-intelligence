@@ -329,6 +329,10 @@ function Teams({ projects }: { projects: string[] }) {
   const rows = [
     { name: "Kubernetes", how: "GitHub enhancement issues (KEPs) + kubernetes/kubernetes PRs" },
     { name: "Apache Kafka", how: "Jira fix versions (New Features, umbrellas, KIPs) + apache/kafka PRs; release dates only so far" },
+    {
+      name: "Demo team (sample data)",
+      how: "A repository the owner controls: GitHub App webhooks deliver events in seconds. Scripted sample activity, not a real project",
+    },
     { name: "Your team", how: "Copy a connector file: where the plan lives, where the code lives, the release calendar" },
   ];
   return (
@@ -338,9 +342,15 @@ function Teams({ projects }: { projects: string[] }) {
         title="One model for plans in GitHub or Jira"
         sub="Collectors turn every source into the same events, so the facts, forecast and AI work the same way for every team."
       />
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
+      <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {rows.map((r) => {
-          const state = live.has(r.name) ? "Live" : r.name === "Apache Kafka" ? "Connector configured · data not yet collected" : "Plug in";
+          const state = live.has(r.name)
+            ? "Live"
+            : r.name.startsWith("Demo team")
+              ? "Built · waiting for the demo repository"
+              : r.name === "Apache Kafka"
+                ? "Connector configured · data not yet collected"
+                : "Plug in";
           return (
             <div key={r.name} className="rounded-xl border bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between gap-2">

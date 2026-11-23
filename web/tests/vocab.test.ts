@@ -13,5 +13,7 @@ describe("vocab", () => {
     expect(shortTeam("sig/node")).toBe("node");
     expect(vocab("kubernetes").tracking).toBe(true);
     expect(vocab("kafka").tracking).toBe(false);
+    expect(vocab("demo").sample).toBe(true);
+    expect(vocab("kubernetes").sample).toBeFalsy();
   });
 });

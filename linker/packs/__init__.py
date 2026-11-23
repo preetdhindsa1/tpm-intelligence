@@ -5,14 +5,16 @@ from __future__ import annotations
 from typing import Literal
 
 from linker.packs.base import LinkPack
+from linker.packs.github_issue import GitHubIssuePack
 from linker.packs.jira_key import JiraKeyPack
 from linker.packs.kep import KepPack
 
-PackName = Literal["kep", "jira_key"]
+PackName = Literal["kep", "jira_key", "github_issue"]
 
 _PACKS: dict[str, LinkPack] = {
     "kep": KepPack(),
     "jira_key": JiraKeyPack(),
+    "github_issue": GitHubIssuePack(),
 }
 
 

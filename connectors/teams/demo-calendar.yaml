@@ -1,0 +1,10 @@
+# Demo team calendar: SAMPLE DATA (ADR-0020). Invented dates for a short demo cycle;
+# no real project ships on them. Times are UTC.
+project: demo
+releases:
+  - name: "2026.12"
+    cycle_start: 2026-11-23T00:00:00Z
+    enhancements_freeze: 2026-11-30T12:00:00Z
+    code_freeze: 2026-12-09T12:00:00Z
+    release: 2026-12-16T00:00:00Z
+    source_url: https://github.com/preetdhindsa1/tpm-demo-team/milestones

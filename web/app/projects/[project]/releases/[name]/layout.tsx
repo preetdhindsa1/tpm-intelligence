@@ -1,7 +1,9 @@
 import { ReleaseSwitcher } from "@/components/ReleaseSwitcher";
+import { SampleDataBanner } from "@/components/SampleDataBanner";
 import { Sidebar } from "@/components/Sidebar";
 import { releaseFromParams, releaseList } from "@/lib/release-page";
 import { groupByProject } from "@/lib/routes";
+import { vocab } from "@/lib/vocab";
 
 export default async function ReleaseLayout({
   children,
@@ -19,6 +21,7 @@ export default async function ReleaseLayout({
   return (
     <div className="space-y-4">
       <ReleaseSwitcher groups={groups} project={release.project.toLowerCase()} release={release.name} />
+      {vocab(release.project).sample && <SampleDataBanner />}
       <div className="flex gap-6">
         <aside className="hidden w-44 shrink-0 md:block">
           <Sidebar project={release.project} release={release.name} />
