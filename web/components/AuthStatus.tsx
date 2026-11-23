@@ -1,21 +1,18 @@
 // Header sign-in state (server component; ADR-0016). Whether someone may act is decided
 // by the API, so this only shows who is signed in.
+//
+// Signed-out visitors see no sign-in button here: reading needs no account, and the pages
+// where an approver acts (Update, Links) offer sign-in themselves. A login button on every
+// page of a new run.app address got the site flagged by Chrome's phishing check
+// (2026-11-23), so the front page should read as a dashboard, not a login page.
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions, devLoginEnabled, githubEnabled, type TpmSession } from "@/lib/auth";
 
 export async function AuthStatus() {
-  if (!githubEnabled() && !devLoginEnabled()) {
-    return <span className="text-xs text-slate-400">Read-only (sign-in not configured)</span>;
-  }
+  if (!githubEnabled() && !devLoginEnabled()) return null;
   const session = (await getServerSession(authOptions())) as TpmSession;
-  if (!session?.login) {
-    return (
-      <Link href="/api/auth/signin" prefetch={false} className="rounded-md border px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50">
-        Sign in with GitHub
-      </Link>
-    );
-  }
+  if (!session?.login) return null;
   return (
     <span className="flex items-center gap-3 text-sm text-slate-600">
       <span>

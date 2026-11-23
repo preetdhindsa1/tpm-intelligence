@@ -6,7 +6,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "TPM Intelligence",
   description:
-    "Predict which release features will slip. Plug in any cross-functional team — Kubernetes is a live example.",
+    "Open-source portfolio dashboard: release health for public Kubernetes and Apache Kafka data. Forecasts which features may slip, with ranges. Read-only for visitors; no account needed.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
