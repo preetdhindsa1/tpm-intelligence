@@ -21,6 +21,7 @@ import numpy.typing as npt
 
 from engine.forecast import (
     DEFAULT_FORECAST,
+    INSUFFICIENT_HISTORY,
     Calibration,
     ForecastConfig,
     simulate_completion,
@@ -42,7 +43,7 @@ class MergeDateForecast:
 
     feature_key: str
     as_of: datetime
-    status: str  # "done" | "forecast" | "no_freeze_date"
+    status: str  # "done" | "forecast" | "no_freeze_date" | "insufficient_history"
     done_day: float | None = None  # status "done": when it actually merged
     # Quantiles of the merge day; None = later than the horizon (or never).
     p10: float | None = None
@@ -121,6 +122,8 @@ def forecast_merge_date(
     _, done = required_done_at(feature, world, links)
     if done is not None:
         return MergeDateForecast(feature.key, t, "done", done_day=round(_rel_days(done, freeze), 2))
+    if not calibration.source_releases:  # nothing measured to draw from (issue #9)
+        return MergeDateForecast(feature.key, t, INSUFFICIENT_HISTORY)
     now = _rel_days(t, freeze)
     window_end = freeze if t < freeze else (release.release_at or freeze)
     draws = simulate_completion(

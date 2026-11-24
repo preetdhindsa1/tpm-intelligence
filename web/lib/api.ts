@@ -3,7 +3,7 @@
 export type Flag = { code: string; severity: "info" | "warning" | "critical"; message: string; facts: Record<string, unknown> };
 
 export type Odds = {
-  status: "forecast" | "after_freeze" | "no_freeze_date" | "not_in_release";
+  status: "forecast" | "after_freeze" | "no_freeze_date" | "insufficient_history" | "not_in_release";
   validated: boolean;
   base_rate: number | null;
   raw_probability: number | null;
@@ -357,7 +357,7 @@ export type Dependencies = {
 // relative to Code Freeze.
 export type MergeDate = {
   feature_key: string;
-  status: "done" | "forecast" | "no_freeze_date";
+  status: "done" | "forecast" | "no_freeze_date" | "insufficient_history";
   done_day: number | null;
   p10: number | null;
   p50: number | null;

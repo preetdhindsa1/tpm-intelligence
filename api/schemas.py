@@ -40,7 +40,7 @@ class FlagOut(_Out):
 class OddsOut(_Out):
     """Monte Carlo odds of landing by Code Freeze. Decision support, not a guarantee."""
 
-    status: str  # forecast | after_freeze | no_freeze_date | not_in_release
+    status: str  # forecast | after_freeze | no_freeze_date | insufficient_history | not_in_release
     validated: bool = False  # newest backtest beat the base rate (api/validation.py)
     base_rate: float | None = None  # earlier releases' landing rate at this lead time
     raw_probability: float | None = None  # before recalibration
@@ -100,7 +100,7 @@ class MergeDateOut(_Out):
     """When a feature's required code merges, in days relative to Code Freeze (ADR-0005)."""
 
     feature_key: str
-    status: str  # done | forecast | no_freeze_date
+    status: str  # done | forecast | no_freeze_date | insufficient_history
     done_day: float | None = None
     p10: float | None = None
     p50: float | None = None

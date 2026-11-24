@@ -267,13 +267,16 @@ def model_version(config: ForecastConfig = DEFAULT_FORECAST) -> str:
     return f"{MODEL_NAME}+{hashlib.sha256(settings.encode()).hexdigest()[:8]}"
 
 
+INSUFFICIENT_HISTORY = "insufficient_history"  # no earlier release to calibrate on
+
+
 @dataclass(frozen=True)
 class Forecast:
     """Odds for one feature with its range and the inputs used."""
 
     feature_key: str
     as_of: datetime
-    status: str  # "forecast" | "after_freeze" | "no_freeze_date"
+    status: str  # "forecast" | "after_freeze" | "no_freeze_date" | "insufficient_history"
     probability: float | None
     low: float | None
     high: float | None
@@ -417,6 +420,10 @@ def forecast_feature(
         return Forecast(feature.key, t, "no_freeze_date", None, None, None)
     if t >= freeze:
         return Forecast(feature.key, t, "after_freeze", None, None, None)
+    if not calibration.source_releases:
+        # Nothing measured to draw from: an uninformed prior would print "50%" that looks
+        # like an estimate (issue #9). Say so instead.
+        return Forecast(feature.key, t, INSUFFICIENT_HISTORY, None, None, None)
     horizon = _days(freeze - t)
     draws = simulate_completion(feature, world, links, calibration, horizon, horizon, config)
     probs = [float((when <= horizon).mean()) for when in draws.total]

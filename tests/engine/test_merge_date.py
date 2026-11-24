@@ -26,7 +26,7 @@ def world_at(when: datetime) -> World:
 
 
 def calibration(durations: tuple[float, ...]) -> Calibration:
-    return Calibration((), utc(2026, 11, 1), durations, {}, {})
+    return Calibration(("kubernetes:v1.37",), utc(2026, 11, 1), durations, {}, {})
 
 
 def test_done_feature_reports_when_its_main_pr_merged() -> None:
@@ -159,3 +159,28 @@ def test_truth_ignores_prs_opened_after_release_day() -> None:
     # Cut-off before the main PR #143709 opened (Nov 2): it no longer counts.
     _, early = required_done_at(w.features[K6395], w, links, utc(2026, 11, 1))
     assert early != done
+
+
+def test_no_earlier_release_means_no_merge_date_forecast() -> None:
+    """Issue #9: an empty calibration gives no distribution, but a merged fact still shows."""
+    no_history = Calibration((), utc(2026, 11, 1), (), {}, {})
+    before = world_at(utc(2026, 11, 10))
+    fc = forecast_merge_date(
+        before.features[K6395],
+        before.releases[V138],
+        before,
+        link_release(before, V138),
+        no_history,
+        FAST,
+    )
+    assert fc.status == "insufficient_history"
+    after = world_at(utc(2026, 11, 21, 12))
+    done = forecast_merge_date(
+        after.features[K6395],
+        after.releases[V138],
+        after,
+        link_release(after, V138),
+        no_history,
+        FAST,
+    )
+    assert done.status == "done"  # facts come first

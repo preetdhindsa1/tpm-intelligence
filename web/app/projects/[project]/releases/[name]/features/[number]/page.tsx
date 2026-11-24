@@ -111,6 +111,8 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
 function MergeDateText({ f, freeze }: { f: Awaited<ReturnType<typeof api.feature>>; freeze: string | null }) {
   const m = f.merge_date;
   if (!m || m.status === "no_freeze_date") return <p className="text-sm text-slate-500">No Code Freeze date, so no merge-date forecast.</p>;
+  if (m.status === "insufficient_history")
+    return <p className="text-sm text-slate-500">Not enough history to forecast a merge date: no earlier release to measure.</p>;
   if (m.status === "done")
     return (
       <p className="text-sm text-slate-700">
