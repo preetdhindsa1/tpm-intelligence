@@ -180,7 +180,40 @@ def test_ci_failure_is_a_count_of_pull_requests() -> None:
     assert report.ci_failures == 1
 
 
-def _report(prs: list[PullRequest], *, as_of: datetime | None = None) -> LabReport:
+def test_no_lower_bound_keeps_a_pull_request_opened_before_the_cycle() -> None:
+    early = _pr(key="repo#9", number=9, created_at=utc(2026, 11, 1))
+    start = utc(2026, 11, 30)
+    assert _report([early], since=None).n_pull_requests == 1
+    assert _report([early], since=start).n_pull_requests == 0
+
+
+def test_dependabot_is_not_the_cursor_lane() -> None:
+    bot = _pr(head_ref="dependabot/npm_and_yarn/left-pad", author="dependabot[bot]")
+    report = _report([bot])
+    assert report.buckets == (report.buckets[0],)
+    assert report.buckets[0].lane == "dependabot"
+    assert report.arrivals[0].lane == "dependabot"
+
+
+def test_approval_rate_counts_an_approving_round_and_not_the_merge() -> None:
+    approved = _pr(
+        key="repo#1",
+        number=1,
+        state="merged",
+        merged_at=T0 + timedelta(hours=5),
+        reviews=(Review("1", "preetdhindsa1", "approved", T0 + timedelta(hours=1)),),
+    )
+    bare = _pr(key="repo#2", number=2, state="merged", merged_at=T0 + timedelta(hours=6))
+    report = _report([approved, bare])
+    assert report.approved_merged == 1
+    assert report.approval_rate == 0.5
+    assert report.median_hours_to_merge == 5.5
+    assert _report([_pr()]).approval_rate is None
+
+
+def _report(
+    prs: list[PullRequest], *, as_of: datetime | None = None, since: datetime | None = None
+) -> LabReport:
     when = as_of or (T0 + timedelta(days=2))
     world = World(
         as_of=when,
@@ -197,4 +230,4 @@ def _report(prs: list[PullRequest], *, as_of: datetime | None = None) -> LabRepo
         features={},
         pull_requests={pr.key: pr for pr in prs},
     )
-    return lab_report(world, "tpm-intelligence:Phase 3", RULES, ("preetdhindsa1",))
+    return lab_report(world, "tpm-intelligence:Phase 3", RULES, ("preetdhindsa1",), since=since)
