@@ -176,7 +176,7 @@ _DECISION_LABEL = {
 
 def waiting(p: ProgramFacts) -> list[dict[str, Any]]:
     """Approvals this program waits on, in ADR-0025 rule 5 order."""
-    items = []
+    items: list[tuple[str, str, int, dict[str, int] | None]] = []
     if p.draft_update_id is not None:
         label = f"{p.display_name} {p.release} exec update · draft"
         items.append(("approve_exec_update", label, 1, {"update_id": p.draft_update_id}))

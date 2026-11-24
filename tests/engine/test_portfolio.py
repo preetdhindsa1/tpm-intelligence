@@ -8,8 +8,8 @@ from typing import Any
 from engine.portfolio import LabFacts, ProgramFacts, portfolio, program, stage
 
 
-def utc(*args: int) -> datetime:
-    return datetime(*args, tzinfo=UTC)
+def utc(year: int, month: int, day: int, hour: int = 0, minute: int = 0, sec: int = 0) -> datetime:
+    return datetime(year, month, day, hour, minute, sec, tzinfo=UTC)
 
 
 def cal(start: datetime, ef: datetime, cf: datetime, rel: datetime) -> dict[str, Any]:
