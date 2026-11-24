@@ -1,10 +1,6 @@
 # Cost alert (roadmap hardening; owner chose $150/month on 2026-11-24). The estimate was
 # about $95-125 a month, plus the always-warm webhook instance (#36's PR notes). Emails go to
 # the same channel as the other alerts (#14).
-data "google_project" "this" {
-  project_id = var.project_id
-}
-
 resource "google_billing_budget" "monthly" {
   provider        = google.billing
   count           = var.billing_account == "" ? 0 : 1
@@ -12,7 +8,7 @@ resource "google_billing_budget" "monthly" {
   display_name    = "TPM: monthly cost (${var.monthly_budget_usd} USD)"
 
   budget_filter {
-    projects = ["projects/${data.google_project.this.number}"]
+    projects = ["projects/${var.project_number}"] # a variable, so CI's offline plan needs no API call
   }
 
   amount {
