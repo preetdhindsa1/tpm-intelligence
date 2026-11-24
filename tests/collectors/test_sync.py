@@ -116,7 +116,7 @@ def _data(data: dict[str, Any]) -> httpx.Response:
 
 
 def make_poller(
-    fake: FakeGitHub, cursors: InMemoryCursorStore | None = None
+    fake: FakeGitHub, cursors: InMemoryCursorStore | None = None, *, read_kep_specs: bool = True
 ) -> tuple[GitHubPoller, InMemoryTransport, InMemoryCursorStore]:
     http = HttpClient(
         "https://api.github.com",
@@ -133,6 +133,7 @@ def make_poller(
         calendar=load_calendar(),
         release_name="v1.38",
         now=lambda: NOW,
+        read_kep_specs=read_kep_specs,
     )
     return poller, transport, store
 
@@ -331,3 +332,14 @@ def test_code_only_mode_syncs_prs_in_the_jira_window_and_nothing_else() -> None:
         "repo:kubernetes/kubernetes is:pr created:2026-10-26T00:00:00Z..2026-11-21T12:00:00Z"
         in queries
     )
+
+
+def test_planning_repo_without_kep_specs_never_asks_for_them() -> None:
+    """Issue #11: this project's issues made the poller ask for kep.yaml on 'master' (404)."""
+    fake = FakeGitHub()
+    poller, transport, _ = make_poller(fake, read_kep_specs=False)
+    stats = poller.run(backfill=True)
+    assert stats.failed_streams == []
+    assert stats.issues_in_release == 1
+    assert not any("/git/trees/" in r.url.path for r in fake.requests)
+    assert not any(e.event_type == "work_item.spec_observed" for e in published(transport))
