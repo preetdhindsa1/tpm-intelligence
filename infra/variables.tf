@@ -29,7 +29,19 @@ variable "poll_release" {
 variable "extra_poll_teams" {
   description = "More teams the poller syncs in the same run, as team id => release (connectors/teams/<id>.yaml). Polled after Kubernetes, in key order."
   type        = map(string)
-  default     = { "tpm-intelligence" = "Phase 3" }
+  default     = { "tpm-intelligence" = "Phase 3", "kafka" = "4.5.0" }
+}
+
+variable "jira_releases" {
+  description = "Kafka fix versions the hourly Jira collector syncs (#47)."
+  type        = list(string)
+  default     = ["4.5.0"]
+}
+
+variable "jira_schedule" {
+  description = "Cron for the Jira collector. Hourly: Apache rate-limits automated tools (CLAUDE.md section 7)."
+  type        = string
+  default     = "17 * * * *"
 }
 
 variable "poll_schedule" {

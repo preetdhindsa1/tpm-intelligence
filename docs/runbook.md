@@ -13,6 +13,7 @@ that project.
 | Alerts and incidents | https://console.cloud.google.com/monitoring/alerting?project=tpm-intelligence |
 | Services (web, API, webhooks) | https://console.cloud.google.com/run?project=tpm-intelligence |
 | Poller runs (every 5 min) | https://console.cloud.google.com/run/jobs/details/us-central1/tpm-github-poller/executions?project=tpm-intelligence |
+| Jira collector runs (hourly, Kafka plan) | https://console.cloud.google.com/run/jobs/details/us-central1/tpm-jira-collector/executions?project=tpm-intelligence |
 | Errors | https://console.cloud.google.com/logs/query;query=severity%3E%3DERROR?project=tpm-intelligence |
 | Traces | https://console.cloud.google.com/traces/list?project=tpm-intelligence |
 | CI and deploys | https://github.com/preetdhindsa1/tpm-intelligence/actions |
@@ -24,7 +25,7 @@ Alerts email the owner (notification channel from `alert_email` in the gitignore
 ## How changes ship
 
 - **Code:** merge to `main` → CI → the Deploy workflow builds images and rolls them out
-  to the API, web, webhook receiver and poller job.
+  to the API, web, webhook receiver, poller job and Jira collector job.
 - **Infrastructure:** the Deploy workflow does **not** apply Terraform. Apply by hand,
   then record the change in a PR:
   ```

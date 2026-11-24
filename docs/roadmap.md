@@ -1,7 +1,7 @@
 # Roadmap
 
 What each phase set out to do, what is done, and what is left. Updated as milestones close.
-Last updated 2026-11-24. Measured numbers live in the README's "Measured results" table;
+Last updated 2026-11-24 (hardening progress). Measured numbers live in the README's "Measured results" table;
 this page only says where things stand.
 
 **Legend:** ✅ done · 🟡 in progress or partly done · ⬜ not started · ❌ measured and failing
@@ -36,7 +36,7 @@ Calendar (ADR-0020): cycle start 2026-11-30, planning freeze 2026-12-14, code fr
 |---|---|---|---|
 | P3-M1 | Sign-in and permissions | ✅ | ADR-0016 |
 | P3-M2 | Cloud deploy (live demo) | ✅ | ADR-0017; renamed URL in ADR-0021 |
-| P3-M3 | Apache Kafka via Jira | 🟡 | ADR-0018. Collector, linking (81% of 4.4.0 features) and UI done. **Left:** Jira and `apache/kafka` sync is not scheduled in the cloud, so Kafka data is a one-time load from 2026-11-23; no freeze dates, so no Kafka odds (#8); components not mapped to teams |
+| P3-M3 | Apache Kafka via Jira | 🟡 | ADR-0018. Collector, linking (81% of 4.4.0 features) and UI done. Jira plan synced hourly and `apache/kafka` PRs every 5 minutes in the cloud since 2026-11-24 (#47). **Left:** no freeze dates, so no Kafka odds (#8); components not mapped to teams |
 | P3-M4 | Faster recompute | ✅ | ADR-0019 (link once, cache the calibration; incremental projection dropped after profiling). Cloud recompute p95 9.2 s |
 | P3-M5 | Webhooks end to end | 🟡 | ADR-0020 (this repo tracks itself; repository webhook). Receiver live. **Left:** end-to-end timing and the measured event-to-dashboard p95 (#6) |
 | P3-M6 | Operations | 🟡 | Alert emails done and tested (#14). **Left:** see "Hardening" below (#7) |
@@ -49,14 +49,14 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 | Item | Status |
 |---|---|
 | Alerts reach a person | ✅ email channel, tested 2026-11-24 |
-| Uptime check and availability alert (SLO 99.5%) | ⬜ |
+| Uptime check and availability alert (SLO 99.5%) | ✅ (#36) |
 | Billing budget alert | ⬜ |
-| Fact-checker removal-rate and AI-spend-at-80% alerts (CLAUDE.md section 9) | ⬜ |
-| SLO dashboard (freshness, event to dashboard, simulator p95, availability, AI spend) | ⬜ |
+| Fact-checker removal-rate and AI-spend-at-80% alerts (CLAUDE.md section 9) | ✅ (#45) |
+| SLO dashboard (freshness, event to dashboard, simulator p95, availability, AI spend) | 🟡 live (#40); simulator p95 and AI spend not drawn yet |
 | Runbook (deploy, Terraform apply, rollback, each alert) | ✅ `docs/runbook.md` (#38) |
 | Cloud SQL backups | 🟡 configured; restore never tested |
-| Scheduled Jira and Kafka PR sync in the cloud | ⬜ (P3-M3 follow-up) |
-| Dependency and secret scanning in CI | ⬜ |
+| Scheduled Jira and Kafka PR sync in the cloud | ✅ hourly Jira job, Kafka PRs in the 5-minute poll (#47) |
+| Dependency and secret scanning in CI | ✅ pip-audit, npm audit, gitleaks, Dependabot (#18, #34) |
 | Security review of the public endpoints (sign-in, webhooks, API) | ⬜ |
 | Load test of the API and live stream | ⬜ |
 
