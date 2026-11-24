@@ -12,3 +12,6 @@ github_repo    = "owner/tpm-intelligence"
 
 # Turn on once the API has made one AI call (Google rejects PromQL alerts on unwritten metrics).
 # enable_ai_budget_alert = true
+
+# Cloud Billing account for the cost alert (budget.tf); keep it here, not in code.
+# billing_account = "012345-6789AB-CDEF01"
