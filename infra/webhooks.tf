@@ -217,5 +217,5 @@ resource "google_monitoring_alert_policy" "webhook_bad_signature" {
     }
   }
 
-  notification_channels = var.alert_notification_channels
+  notification_channels = local.alert_channels
 }
