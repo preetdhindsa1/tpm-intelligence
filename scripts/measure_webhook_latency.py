@@ -18,11 +18,18 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from observability.latency import webhook_latency
+from observability.latency import per_event_latency, webhook_latency
 
 
 def _read(project: str, hours: int, service: str, message: str) -> list[dict[str, Any]]:
     """Payloads of one log line from one Cloud Run service, oldest first."""
+    return [payload for _, payload in _read_timed(project, hours, service, message)]
+
+
+def _read_timed(
+    project: str, hours: int, service: str, message: str
+) -> list[tuple[datetime, dict[str, Any]]]:
+    """(log time, payload) of one log line from one Cloud Run service, oldest first."""
     gcloud = shutil.which("gcloud")
     if gcloud is None:
         raise SystemExit("gcloud not found on PATH")
@@ -46,7 +53,13 @@ def _read(project: str, hours: int, service: str, message: str) -> list[dict[str
         capture_output=True,
         text=True,
     ).stdout
-    return [dict(row.get("jsonPayload") or {}) for row in json.loads(out or "[]")]
+    return [
+        (
+            datetime.fromisoformat(str(row["timestamp"]).replace("Z", "+00:00")),
+            dict(row.get("jsonPayload") or {}),
+        )
+        for row in json.loads(out or "[]")
+    ]
 
 
 def main() -> None:
@@ -56,18 +69,20 @@ def main() -> None:
     parser.add_argument("--hours", type=int, default=24)
     parser.add_argument("--out", default="docs/results")
     args = parser.parse_args()
-    receipts = _read(args.project, args.hours, "tpm-webhooks", "webhook received")
-    pushes = _read(args.project, args.hours, "tpm-api", "live update pushed")
+    receipts = _read_timed(args.project, args.hours, "tpm-webhooks", "webhook received")
+    stored = _read_timed(args.project, args.hours, "tpm-api", "event stored")
+    pushes = _read_timed(args.project, args.hours, "tpm-api", "live update pushed")
     now = datetime.now(UTC)
     result = {
         "measured_at": now.isoformat(timespec="seconds"),
         "window_hours": args.hours,
         "webhook_deliveries": len(receipts),
-        **webhook_latency(receipts, pushes),
+        "per_event": per_event_latency(receipts, stored, [at for at, _ in pushes]),
+        "per_push": webhook_latency([r for _, r in receipts], [p for _, p in pushes]),
         "note": (
-            "total = push time - GitHub's occurred_at (GitHub clock, whole seconds: about "
-            "+-1 s); percentiles over unique events (first push of each); pushes need an "
-            "open live page"
+            "per_event (primary): every new webhook event, timed to the first push after it "
+            "was stored. per_push: one event per push. total = push - GitHub's occurred_at "
+            "(GitHub clock, whole seconds: about +-1 s). Pushes need an open live page."
         ),
     }
     text = json.dumps(result, indent=2)
