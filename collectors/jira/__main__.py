@@ -33,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
         from collectors.jira.client import JiraClient
         from collectors.jira.sync import JiraCollector
         from connectors import load_team
+        from connectors.load import release_plan
         from connectors.schema import JiraPlanning
         from pipeline.factory import create_transport
         from pipeline.queue import EventPublisher
@@ -53,6 +54,7 @@ def main(argv: list[str] | None = None) -> int:
                 project_key=team.planning.project_key,
                 base_url=team.planning.base_url,
                 releases=args.release,
+                plan=release_plan(team),
             ).run(backfill=args.backfill)
         finally:
             jira.close()

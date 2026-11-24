@@ -154,6 +154,7 @@ def _jira_window(team: Any, release: str) -> tuple[datetime, datetime | None] | 
     """(cycle start, release day) for a Jira-planned release, from its Jira versions."""
     from collectors.jira import normalize
     from collectors.jira.client import JiraClient
+    from connectors.load import release_plan
     from connectors.schema import JiraPlanning
 
     planning = team.planning
@@ -171,6 +172,7 @@ def _jira_window(team: Any, release: str) -> tuple[datetime, datetime | None] | 
         project_key=planning.project_key,
         base_url=planning.base_url,
         observed_at=datetime.now(UTC),
+        plan=release_plan(team),
     )
     if not events:
         return None

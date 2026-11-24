@@ -1,9 +1,24 @@
-# Minimal placeholder so TeamConfig for kafka validates. Replace with measured dates.
+# Apache Kafka release calendar (#8, ADR-0018 follow-up). Freeze dates are hand-entered
+# from each release's plan on the Apache wiki; Jira stays the source of the cycle start
+# (previous x.y.0 release) and of the actual release date. Times are UTC.
+#
+# Mapping to the engine's dates (ADR-0018 addendum):
+#   enhancements_freeze = Kafka's "KIP Freeze"   (planning set)
+#   code_freeze         = Kafka's "Feature Freeze" (features merged; after it only fixes go
+#                         in, which is what the engine's Code Freeze means)
+#   Kafka's later "Code Freeze" (blockers only) has no field here; it is noted per release.
+# The plans give dates without a time zone; each date is taken as the end of that day, UTC.
 project: KAFKA
 releases:
-  - name: "4.3.0"
-    cycle_start: 2025-01-01T00:00:00Z
-    enhancements_freeze: 2025-06-01T00:00:00Z
-    code_freeze: 2025-09-01T00:00:00Z
-    release: 2025-10-01T00:00:00Z
-    source_url: https://issues.apache.org/jira/projects/KAFKA
+  - name: "4.4.0"
+    cycle_start: 2026-05-22T00:00:00Z # Jira: 4.3.0 released
+    enhancements_freeze: 2026-07-09T00:00:00Z # "KIP Freeze: (8th July 2026)"
+    code_freeze: 2026-07-30T00:00:00Z # "Feature Freeze: (29th July 2026)"; Code Freeze 12 Aug 2026
+    release: 2026-10-26T00:00:00Z # Jira release date (plan: "no earlier than September 9 2026")
+    source_url: https://cwiki.apache.org/confluence/display/KAFKA/Release+Plan+4.4.0
+  - name: "4.5.0"
+    cycle_start: 2026-10-26T00:00:00Z # Jira: 4.4.0 released
+    enhancements_freeze: 2027-01-14T00:00:00Z # "KIP Freeze: (January 13, 2027)"
+    code_freeze: 2027-02-04T00:00:00Z # "Feature Freeze: (February 3, 2027)"; Code Freeze 17 Feb 2027
+    release: 2027-03-17T00:00:00Z # planned: "no earlier than March 17, 2027" (no Jira date yet)
+    source_url: https://cwiki.apache.org/confluence/display/KAFKA/Release+Plan+4.5.0
