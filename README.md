@@ -249,7 +249,7 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   Approvals record the GitHub login. Actions are signed by the web server and checked by
   the API; a missing configuration fails closed. Real GitHub sign-in needs an OAuth app
   (see `.env.example`); local development uses `AUTH_MODE=local`.
-- Phase 2 is done: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, the AI link suggester with a review queue, a what-if simulator (not validated), the redesigned dashboard and forecast improvements. Phase 3 so far: sign-in (M1), Jira for Kafka, cloud deploy, faster recompute (M4, measured in the cloud). Phase 3 M5 (webhooks end to end, measured) is done; operations (M6) is in progress.
+- Phase 2 is done: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, the AI link suggester with a review queue, a what-if simulator (not validated), the redesigned dashboard and forecast improvements. Phase 3 so far: sign-in (M1), Jira for Kafka, cloud deploy, faster recompute (M4, measured in the cloud). Phase 3 M5 (webhooks end to end, measured) and M6 (operations) are done; follow-ups are tracked in `docs/roadmap.md`.
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue
   description (the release team's tracking list) and from KEP references in PR text.
