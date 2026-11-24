@@ -78,3 +78,25 @@ def test_duplicate_is_not_logged_as_stored_nor_announced(monkeypatch: Any) -> No
     messages, notices = _store_with(monkeypatch, inserted=0)
     assert messages == ["duplicate event skipped"]
     assert notices == []
+
+
+def test_stopping_hands_back_the_rest_of_a_batch_at_once() -> None:
+    """P3-M5: after a deploy, the old revision's unprocessed messages waited 60 s."""
+    from pipeline.queue import EventConsumer
+
+    transport = InMemoryTransport()
+    publisher = EventPublisher(transport)
+    for _ in range(3):
+        publisher.publish(k8s_6395_tracked_no())
+    stop = threading.Event()
+    seen: list[str] = []
+
+    def handler(event: Any) -> None:
+        seen.append(event.event_id)
+        stop.set()  # shutdown begins while the first message is being handled
+
+    consumer = EventConsumer(transport=transport, subscription=SUBSCRIPTION, handler=handler)
+    assert consumer.poll_once(max_messages=10, stop=stop) == 1
+    assert len(seen) == 1
+    # The other two are back in the queue now, not stuck until an ack deadline.
+    assert len(transport.pull(EVENTS_TOPIC, SUBSCRIPTION, 10, 0)) == 2

@@ -17,6 +17,7 @@ redelivered and, after ``max_delivery_attempts``, moved to the dead-letter topic
 from __future__ import annotations
 
 import logging
+import threading
 import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
@@ -125,10 +126,28 @@ class EventConsumer:
     max_delivery_attempts: int = DEFAULT_MAX_DELIVERY_ATTEMPTS
     _stats: dict[str, int] = field(default_factory=lambda: {"ok": 0, "failed": 0, "dead": 0})
 
-    def poll_once(self, max_messages: int = 10, timeout_s: float = 1.0) -> int:
-        """Pull one batch and process it; return how many messages were handled OK."""
+    def poll_once(
+        self,
+        max_messages: int = 10,
+        timeout_s: float = 1.0,
+        stop: threading.Event | None = None,
+    ) -> int:
+        """Pull one batch and process it; return how many messages were handled OK.
+
+        If ``stop`` is set part-way (the process is shutting down), the rest of the batch
+        is handed back at once (nack) instead of waiting out the ack deadline: after a
+        deploy, the old revision's unacked messages were redelivered only after 60 s
+        (2026-11-24, P3-M5).
+        """
         messages = self.transport.pull(self.topic, self.subscription, max_messages, timeout_s)
-        return sum(self._process(message) for message in messages)
+        handled = 0
+        for i, message in enumerate(messages):
+            if stop is not None and stop.is_set():
+                for rest in messages[i:]:
+                    self.transport.nack(self.topic, self.subscription, rest)
+                break
+            handled += self._process(message)
+        return handled
 
     def _process(self, message: ReceivedMessage) -> bool:
         labels = {"topic": self.topic, "event_type": message.attributes.get("event_type", "")}

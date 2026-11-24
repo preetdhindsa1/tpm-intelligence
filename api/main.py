@@ -66,7 +66,7 @@ SERVICE_NAME = "tpm-api"
 # itself), landing on the newest revision. Without a bound, one open page kept an old
 # revision and its worker running for the 60-minute request timeout after a deploy
 # (2026-11-23, ADR-0019).
-STREAM_MAX_S = 600.0
+STREAM_MAX_S = 120.0  # 600 s still let an old revision run 5+ min after a deploy (P3-M5)
 STREAM_RETRY_MS = 1000
 SIM_NOTE = (
     "Decision support, not a guarantee: if these assumptions hold, results are likely in "
@@ -791,6 +791,7 @@ def main() -> None:
     telemetry = init_telemetry(SERVICE_NAME)
     origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
     updates: Updates | None = None
+    worker_stop: threading.Event | None = None
     if os.getenv("WORKER_IN_PROCESS", "").lower() == "true":
         # Cloud, option B (ADR-0017): the worker runs in this process and announces new
         # events directly, so no worker service and no Redis are needed.
@@ -798,7 +799,7 @@ def main() -> None:
         from pipeline.worker import start_in_background
 
         local = InMemoryUpdates(debounce_s=DEBOUNCE_S)
-        start_in_background(local.publish)
+        worker_stop = start_in_background(local.publish)
         updates = local
     app = create_app(cors_origins=origins, updates=updates)
     # Warm in the background so the server starts accepting requests at once.
@@ -811,6 +812,13 @@ def main() -> None:
             log_config=None,
         )
     finally:
+        if worker_stop is not None:
+            # Stop pulling and hand back what was pulled but not processed, so the next
+            # revision gets it at once (P3-M5).
+            worker_stop.set()
+            for t in threading.enumerate():
+                if t.name == "worker":
+                    t.join(timeout=10)
         telemetry.shutdown()
 
 

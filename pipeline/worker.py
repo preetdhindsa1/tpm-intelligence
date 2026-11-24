@@ -79,7 +79,7 @@ def run(
     consumer = EventConsumer(transport=transport, subscription=SUBSCRIPTION, handler=handler)
     handled = 0
     while not stop.is_set():
-        handled += consumer.poll_once(timeout_s=poll_timeout_s)
+        handled += consumer.poll_once(timeout_s=poll_timeout_s, stop=stop)
     return handled
 
 
