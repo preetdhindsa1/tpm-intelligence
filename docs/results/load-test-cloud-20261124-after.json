@@ -1,0 +1,11 @@
+{
+  "measured_at": "2026-11-24T06:41:19Z",
+  "tool": "k6 0.54.0, same script as docs/results/load-test-cloud-20261124.json (10 then 20 users, 5 read pages per iteration, 1 s pause)",
+  "runs": {
+    "1_before": {"api": "tpm-api-00033 / 00036", "requests": 1580, "rps": 12.4, "errors": 0, "client_p50_s": 0.73, "client_p95_s": 2.27, "v1_38_recomputes_during_test": 2},
+    "2_after_73_per_project_staleness": {"api": "tpm-api-00040", "requests": 1650, "rps": 13.0, "errors": 0, "client_p50_s": 0.69, "client_p95_s": 2.14, "server_health_p50_s": 0.58, "v1_38_recomputes_during_test": 1},
+    "3_after_74_dependencies_cached_off_event_loop": {"api": "tpm-api-00041", "requests": 3935, "rps": 30.8, "errors": 0, "client_p50_s": 0.19, "client_p95_s": 0.65, "server_p50_s": 0.10, "server_p95_s": 0.53, "v1_38_recomputes_during_test": 0}
+  },
+  "cause": "The dependencies page (about 115 ms and 258 KiB per request for v1.38, 15x the others) was rebuilt on every request on the event loop, so every request queued behind it.",
+  "caveat": "Run 3 had no background recompute during the test, runs 1 and 2 had one or two; recomputes in the same process can still slow requests for their duration."
+}
