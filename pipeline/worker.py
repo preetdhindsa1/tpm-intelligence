@@ -56,7 +56,14 @@ def store_events(
             return
         log_event(event)
         if notify is not None:
-            notify(notification(event.event_id, event.subject.external_key))
+            notify(
+                notification(
+                    event.event_id,
+                    event.subject.external_key,
+                    occurred_at=event.occurred_at,
+                    observed_at=event.observed_at,
+                )
+            )
 
     return handle
 

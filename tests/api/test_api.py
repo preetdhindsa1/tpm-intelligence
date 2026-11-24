@@ -541,7 +541,9 @@ def test_in_memory_updates_accept_publishes_from_another_thread() -> None:
         threading.Thread(target=updates.publish, args=(notification("e1", "x"),)).start()
         return await asyncio.wait_for(first, timeout=2)
 
-    assert asyncio.run(scenario()) is not None  # a trace context, not a heartbeat
+    notice = asyncio.run(scenario())
+    assert notice is not None  # an update, not a heartbeat
+    assert notice.event_id == "e1"  # type: ignore[attr-defined]
 
 
 def test_sse_stream_ends_after_its_maximum_so_browsers_reconnect(
@@ -568,3 +570,27 @@ def test_no_earlier_release_means_no_odds_not_a_fake_fifty_percent() -> None:
     assert row["odds"]["probability"] is None
     assert row["odds"]["low"] is None
     assert row["odds"]["high"] is None
+
+
+def test_push_timing_measures_from_the_source_and_the_collector() -> None:
+    """P3-M5: the push log times the first event from GitHub's clock and from receipt."""
+    from opentelemetry.context import Context
+
+    from api.live import push_timing
+    from pipeline.notify import Notice, notice_of
+
+    msg = notification(
+        "e1", "x", occurred_at=utc(2026, 11, 24, 2, 0, 0), observed_at=utc(2026, 11, 24, 2, 0, 1)
+    )
+    notice = notice_of(msg, batched=3)
+    assert notice.event_id == "e1"
+    timing = push_timing(notice, utc(2026, 11, 24, 2, 0, 9))
+    assert timing == {
+        "event_id": "e1",
+        "batched": 3,
+        "seconds_since_occurred": 9.0,
+        "seconds_since_observed": 8.0,
+    }
+    # Old-format notifications (no times) still work, with nothing to time.
+    assert push_timing(Notice(Context()), utc(2026, 11, 24)) == {"event_id": None, "batched": 1}
+    assert notice_of(b"not json").event_id is None
