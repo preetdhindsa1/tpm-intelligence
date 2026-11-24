@@ -104,6 +104,15 @@ class Calibration:
     main_durations_days: tuple[float, ...] = ()
     removed_despite_code: Mapping[str, Rate] = field(default_factory=dict)
 
+    @property
+    def has_history(self) -> bool:
+        """True if earlier releases gave at least one measured PR duration to draw from.
+
+        A source release alone is not enough: Kafka 4.5.0 calibrates on 4.4.0 but had no
+        linked PR durations (2026-11-23).
+        """
+        return bool(self.source_releases) and bool(self.durations_days)
+
     def describe(self) -> dict[str, object]:
         """Summary for display and logs."""
         finite = [d for d in self.durations_days if d != float("inf")]
@@ -420,7 +429,7 @@ def forecast_feature(
         return Forecast(feature.key, t, "no_freeze_date", None, None, None)
     if t >= freeze:
         return Forecast(feature.key, t, "after_freeze", None, None, None)
-    if not calibration.source_releases:
+    if not calibration.has_history:
         # Nothing measured to draw from: an uninformed prior would print "50%" that looks
         # like an estimate (issue #9). Say so instead.
         return Forecast(feature.key, t, INSUFFICIENT_HISTORY, None, None, None)

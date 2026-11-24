@@ -184,3 +184,9 @@ def test_no_earlier_release_means_no_merge_date_forecast() -> None:
         FAST,
     )
     assert done.status == "done"  # facts come first
+
+
+def test_a_source_release_without_pr_durations_is_not_history() -> None:
+    """Kafka 4.5.0 calibrates on 4.4.0 but had no linked PR durations (2026-11-23)."""
+    assert not Calibration(("KAFKA:4.4.0",), utc(2026, 11, 1), (), {}, {}).has_history
+    assert Calibration(("KAFKA:4.4.0",), utc(2026, 11, 1), (3.0,), {}, {}).has_history

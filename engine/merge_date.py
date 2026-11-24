@@ -122,7 +122,7 @@ def forecast_merge_date(
     _, done = required_done_at(feature, world, links)
     if done is not None:
         return MergeDateForecast(feature.key, t, "done", done_day=round(_rel_days(done, freeze), 2))
-    if not calibration.source_releases:  # nothing measured to draw from (issue #9)
+    if not calibration.has_history:  # nothing measured to draw from (issue #9)
         return MergeDateForecast(feature.key, t, INSUFFICIENT_HISTORY)
     now = _rel_days(t, freeze)
     window_end = freeze if t < freeze else (release.release_at or freeze)
