@@ -151,7 +151,7 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Unseen test: v1.39 scored on forecasts recorded daily while it runs (model `forecast-m7.1+1a53f2d9`, frozen 2026-11-22) | TBD (not yet measured): v1.39 has not started. Rules and model fixed in ADR-0015; snapshots are append-only (a Postgres trigger refuses edits) |
 | Data freshness (polled Kubernetes, target < 10 min) | **Under 9 min worst case**: 24 of 24 polls succeeded every 5 min; longest gap between successful polls 6.2 min, poll run 74 s p50 / 124 s max. Measured 2026-11-23 20:02-22:03 UTC; `docs/results/poll-freshness-cloud-20261123.json` |
 | Stored event → live page in the cloud (p95), polled data | **15.9 s** (p50 12.7 s, n = 122 pushes, 2 open pages); v1.38 recompute p95 **9.2 s** (was about 56 s). Excludes the wait for the next poll. Measured 2026-11-23, 2-hour window, small sample; ADR-0019 |
-| Event → dashboard latency via webhooks (p95, target < 30 s) | TBD (not yet measured): needs the GitHub App installed (P3-M5) |
+| Event → dashboard latency via webhooks (p95, target < 30 s) | **9.7 s: passes** (p50 5.7 s, max 12.2 s; n = 27 webhook events, each timed from GitHub's event time to the first push to an open page). GitHub's delivery p50 2.2 s, receipt → page p50 3.6 s. Measured 2026-11-24 04:29–04:45 UTC with Kubernetes, Kafka and webhooks flowing, after the P3-M5 fixes; before them some events took 60 s to 14 min (ADR-0022). Small sample, one repository. `docs/results/webhook-latency-cloud-20261124T044532Z.json` |
 
 Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 `DATABASE_URL=... uv run python scripts/measure_linking.py --release v1.38`.
@@ -232,18 +232,20 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   images only; Terraform changes are applied by hand. The cloud poller failed every run
   from the first deploy until 2026-11-23 20:00 UTC (no Cloud SQL socket with a sidecar
   container), so the site showed the loaded data without new events until then.
-- **Webhooks are wired but not receiving yet** (P3-M5). The receiver is live and rejects
-  unsigned deliveries; the GitHub App that sends them is not installed yet. Kubernetes and
-  Kafka stay polled, since webhooks need admin rights on the source repository.
-- **This project starts empty** (ADR-0020). Its `Phase 3` release begins on 2026-11-30, so
-  it shows no features until the milestone and its issues exist.
+- **Webhooks cover this repository only** (P3-M5, ADR-0020). A repository webhook delivers
+  its events in seconds (p95 9.7 s, small sample). Kubernetes and Kafka stay polled every
+  5 minutes (the Kafka plan hourly), since webhooks need admin rights on the source
+  repository.
+- **This project has no history yet** (ADR-0020). Its `Phase 3` release begins on
+  2026-11-30 and has no earlier release to learn from, so its forecasts say "not enough
+  history" instead of a number (#9).
 - **Phase 3 M1: sign-in and permissions** (ADR-0016). Reading is public. Drafting or
   approving executive updates, deciding AI link suggestions, saving scenarios, and
   generating risk notes with paid AI need a GitHub sign-in on the approver allowlist.
   Approvals record the GitHub login. Actions are signed by the web server and checked by
   the API; a missing configuration fails closed. Real GitHub sign-in needs an OAuth app
   (see `.env.example`); local development uses `AUTH_MODE=local`.
-- Phase 2 is done: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, the AI link suggester with a review queue, a what-if simulator (not validated), the redesigned dashboard and forecast improvements. Phase 3 so far: sign-in (M1), Jira for Kafka, cloud deploy, faster recompute (M4, measured in the cloud). Still to come: webhooks end to end (M5) and operations (M6).
+- Phase 2 is done: fact checker, AI gateway, risk analyst, VP summarizer with TPM approval, the AI link suggester with a review queue, a what-if simulator (not validated), the redesigned dashboard and forecast improvements. Phase 3 so far: sign-in (M1), Jira for Kafka, cloud deploy, faster recompute (M4, measured in the cloud). Phase 3 M5 (webhooks end to end, measured) is done; operations (M6) is in progress.
 - **PR discovery.** Kubernetes enhancement issues have no timeline cross-reference events
   for their PRs (checked on #6395, 2026-11-21). PRs are found from the PR list in the issue
   description (the release team's tracking list) and from KEP references in PR text.
