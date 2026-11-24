@@ -19,7 +19,7 @@ from __future__ import annotations
 import logging
 import threading
 import time
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Protocol
 
@@ -111,6 +111,18 @@ class EventPublisher:
 Handler = Callable[[NormalizedEvent], None]
 
 
+class BatchStore(Protocol):
+    """Stores a pulled batch at once (the worker's fast path)."""
+
+    def store(self, events: Sequence[NormalizedEvent]) -> set[str]:
+        """Store all events in one transaction; return the IDs that were new."""
+        ...
+
+    def announce(self, event: NormalizedEvent) -> None:
+        """Called for each new event, inside that event's consumer span."""
+        ...
+
+
 @dataclass
 class EventConsumer:
     """Pulls events and runs ``handler`` for each inside a CONSUMER span.
@@ -124,6 +136,12 @@ class EventConsumer:
     handler: Handler
     topic: str = EVENTS_TOPIC
     max_delivery_attempts: int = DEFAULT_MAX_DELIVERY_ATTEMPTS
+    # Fast path: store a whole pulled batch in one transaction and ack it in one call. One
+    # event at a time kept up with about 500 events a minute; a poll of Kubernetes and Kafka
+    # plus the hourly Jira sync built a 5,000-message backlog that delayed webhooks by up to
+    # 14 minutes (2026-11-24). Any batch failure falls back to one message at a time, which
+    # keeps retries and dead-lettering exactly as before.
+    batch: BatchStore | None = None
     _stats: dict[str, int] = field(default_factory=lambda: {"ok": 0, "failed": 0, "dead": 0})
 
     def poll_once(
@@ -140,6 +158,14 @@ class EventConsumer:
         (2026-11-24, P3-M5).
         """
         messages = self.transport.pull(self.topic, self.subscription, max_messages, timeout_s)
+        if self.batch is not None and messages:
+            if stop is not None and stop.is_set():
+                for message in messages:
+                    self.transport.nack(self.topic, self.subscription, message)
+                return 0
+            stored = self._store_batch(self.batch, messages)
+            if stored is not None:
+                return stored
         handled = 0
         for i, message in enumerate(messages):
             if stop is not None and stop.is_set():
@@ -148,6 +174,40 @@ class EventConsumer:
                 break
             handled += self._process(message)
         return handled
+
+    def _store_batch(self, batch: BatchStore, messages: Sequence[ReceivedMessage]) -> int | None:
+        """Store and ack a batch at once; None means "fall back to one at a time"."""
+        start = time.perf_counter()
+        try:
+            events = [NormalizedEvent.from_bytes(m.data) for m in messages]
+            new_ids = batch.store(events)
+        except Exception:
+            logger.warning(
+                "batch store failed; processing one message at a time",
+                extra={"messages": len(messages)},
+                exc_info=True,
+            )
+            return None
+        elapsed = (time.perf_counter() - start) / len(messages)
+        for message, event in zip(messages, events, strict=True):
+            labels = {"topic": self.topic, "event_type": message.attributes.get("event_type", "")}
+            # The consumer span per message keeps one trace from the collector to the page.
+            with consume_span(self.transport.system, self.topic, self.subscription, message):
+                if event.event_id in new_ids:
+                    try:
+                        batch.announce(event)
+                    except Exception:  # stored already; a failed notice must not lose acks
+                        logger.warning("announce failed", exc_info=True)
+            _processed.add(1, labels)
+            _duration.record(elapsed, labels)
+        ack_many = getattr(self.transport, "ack_many", None)
+        if ack_many is not None:
+            ack_many(self.topic, self.subscription, list(messages))
+        else:
+            for message in messages:
+                self.transport.ack(self.topic, self.subscription, message)
+        self._stats["ok"] += len(messages)
+        return len(messages)
 
     def _process(self, message: ReceivedMessage) -> bool:
         labels = {"topic": self.topic, "event_type": message.attributes.get("event_type", "")}

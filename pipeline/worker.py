@@ -9,12 +9,13 @@ from __future__ import annotations
 import logging
 import signal
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 
 from sqlalchemy.orm import Session, sessionmaker
 
 from pipeline.events import NormalizedEvent
-from pipeline.queue import EventConsumer, Handler, Transport
+from pipeline.queue import BatchStore, EventConsumer, Handler, Transport
 
 SERVICE_NAME = "tpm-worker"
 SUBSCRIPTION = "worker"
@@ -68,18 +69,62 @@ def store_events(
     return handle
 
 
+@dataclass
+class BatchEvents:
+    """Stores a pulled batch in one transaction and announces the new events (fast path)."""
+
+    factory: sessionmaker[Session]
+    notify: Callable[[str], None] | None = None
+
+    def store(self, events: Sequence[NormalizedEvent]) -> set[str]:
+        """Insert all events at once; return the IDs that were new."""
+        from pipeline.store.events_repo import append_new_events
+        from pipeline.store.session import session_scope
+
+        with session_scope(self.factory) as session:
+            new = append_new_events(session, events)
+        if len(new) < len(events):
+            logger.debug("duplicate events skipped", extra={"duplicates": len(events) - len(new)})
+        return new
+
+    def announce(self, event: NormalizedEvent) -> None:
+        """Log and notify one new event (inside its consumer span, for the trace)."""
+        from pipeline.notify import notification
+
+        log_event(event)
+        if self.notify is not None:
+            self.notify(
+                notification(
+                    event.event_id,
+                    event.subject.external_key,
+                    occurred_at=event.occurred_at,
+                    observed_at=event.observed_at,
+                )
+            )
+
+
 def run(
     stop: threading.Event,
     transport: Transport,
     *,
     handler: Callable[[NormalizedEvent], None] = log_event,
+    batch: BatchStore | None = None,
     poll_timeout_s: float = 2.0,
+    max_messages: int = 100,
 ) -> int:
-    """Consume until ``stop`` is set; return the number of events handled OK."""
-    consumer = EventConsumer(transport=transport, subscription=SUBSCRIPTION, handler=handler)
+    """Consume until ``stop`` is set; return the number of events handled OK.
+
+    With ``batch``, each pulled batch is stored in one transaction; ``handler`` is the
+    one-at-a-time fallback when a batch fails.
+    """
+    consumer = EventConsumer(
+        transport=transport, subscription=SUBSCRIPTION, handler=handler, batch=batch
+    )
     handled = 0
     while not stop.is_set():
-        handled += consumer.poll_once(timeout_s=poll_timeout_s, stop=stop)
+        handled += consumer.poll_once(
+            max_messages=max_messages, timeout_s=poll_timeout_s, stop=stop
+        )
     return handled
 
 
@@ -94,14 +139,16 @@ def start_in_background(
     from pipeline.store.session import make_engine
 
     stop = threading.Event()
-    handler = store_events(sessionmaker(make_engine()), notify=notify)
+    factory = sessionmaker(make_engine())
+    handler = store_events(factory, notify=notify)
+    batch = BatchEvents(factory, notify=notify)
     queue = transport or create_transport()
 
     def loop() -> None:
         logger.info("in-process worker started", extra={"subscription": SUBSCRIPTION})
         while not stop.is_set():
             try:
-                run(stop, queue, handler=handler)
+                run(stop, queue, handler=handler, batch=batch)
             except Exception:  # keep consuming; a bad batch must not stop the API's worker
                 logger.exception("in-process worker failed; retrying in 5 s")
                 stop.wait(5)
@@ -132,8 +179,9 @@ def main() -> None:
         def notify(message: str) -> None:
             client.publish(CHANNEL, message)
 
-        handler = store_events(sessionmaker(make_engine()), notify=notify)
-        run(stop, create_transport(), handler=handler)
+        factory = sessionmaker(make_engine())
+        handler = store_events(factory, notify=notify)
+        run(stop, create_transport(), handler=handler, batch=BatchEvents(factory, notify=notify))
     finally:
         telemetry.shutdown()
 

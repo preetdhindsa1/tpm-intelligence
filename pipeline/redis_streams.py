@@ -149,6 +149,11 @@ class RedisStreamsTransport:
         """``XACK`` the message."""
         self._r.xack(stream_key(topic), subscription, message.ack_id)
 
+    def ack_many(self, topic: str, subscription: str, messages: list[ReceivedMessage]) -> None:
+        """``XACK`` a batch in one call."""
+        if messages:
+            self._r.xack(stream_key(topic), subscription, *[m.ack_id for m in messages])
+
     def nack(self, topic: str, subscription: str, message: ReceivedMessage) -> None:
         """Make the message immediately eligible for reclaim by any consumer."""
         self._r.xclaim(

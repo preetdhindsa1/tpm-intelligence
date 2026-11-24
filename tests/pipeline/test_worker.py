@@ -100,3 +100,111 @@ def test_stopping_hands_back_the_rest_of_a_batch_at_once() -> None:
     assert len(seen) == 1
     # The other two are back in the queue now, not stuck until an ack deadline.
     assert len(transport.pull(EVENTS_TOPIC, SUBSCRIPTION, 10, 0)) == 2
+
+
+class _FakeBatch:
+    """Records what the consumer's fast path does; ``new`` decides which IDs were new."""
+
+    def __init__(self, new: set[str] | None = None, fail: bool = False) -> None:
+        self.new, self.fail = new, fail
+        self.stored: list[list[str]] = []
+        self.announced: list[str] = []
+        self.traces: list[int] = []
+
+    def store(self, events: Any) -> set[str]:
+        if self.fail:
+            raise RuntimeError("database down")
+        ids = [e.event_id for e in events]
+        self.stored.append(ids)
+        return set(ids) if self.new is None else self.new
+
+    def announce(self, event: Any) -> None:
+        from opentelemetry import trace
+
+        self.announced.append(event.event_id)
+        self.traces.append(trace.get_current_span().get_span_context().trace_id)
+
+
+def _three_events(transport: InMemoryTransport) -> list[str]:
+    from pipeline.events import NormalizedEvent
+
+    publisher = EventPublisher(transport)
+    ids = []
+    for i in range(3):
+        event = k8s_6395_tracked_no()
+        event = NormalizedEvent.model_validate(
+            {**event.model_dump(), "event_id": f"00000000-0000-0000-0000-00000000000{i}"}
+        )
+        publisher.publish(event)
+        ids.append(event.event_id)
+    return ids
+
+
+def test_batch_path_stores_once_announces_only_new_events_and_acks_all() -> None:
+    from pipeline.queue import EventConsumer
+
+    transport = InMemoryTransport()
+    ids = _three_events(transport)
+    batch = _FakeBatch(new={ids[0], ids[2]})  # the middle one was already stored
+    handled: list[str] = []
+    consumer = EventConsumer(
+        transport=transport,
+        subscription=SUBSCRIPTION,
+        handler=lambda e: handled.append(e),
+        batch=batch,
+    )
+    assert consumer.poll_once(max_messages=100) == 3
+    assert batch.stored == [ids]  # one store for the whole batch
+    assert batch.announced == [ids[0], ids[2]]
+    assert handled == []  # the one-at-a-time path was not needed
+    assert transport.pull(EVENTS_TOPIC, SUBSCRIPTION, 10, 0) == []  # all acked
+
+
+def test_a_failed_batch_falls_back_to_one_message_at_a_time() -> None:
+    from pipeline.queue import EventConsumer
+
+    transport = InMemoryTransport()
+    ids = _three_events(transport)
+    handled: list[str] = []
+    consumer = EventConsumer(
+        transport=transport,
+        subscription=SUBSCRIPTION,
+        handler=lambda e: handled.append(e.event_id),
+        batch=_FakeBatch(fail=True),
+    )
+    assert consumer.poll_once(max_messages=100) == 3
+    assert handled == ids  # retries and dead-lettering stay on the proven path
+
+
+def test_each_new_event_is_announced_inside_its_own_trace() -> None:
+    """One trace from the collector to the page (CLAUDE.md section 9), batch or not."""
+    from opentelemetry import trace
+
+    from pipeline.queue import EventConsumer
+
+    transport = InMemoryTransport()
+    with trace.get_tracer("test").start_as_current_span("collector") as span:
+        _three_events(transport)
+        producer_trace = span.get_span_context().trace_id
+    batch = _FakeBatch()
+    EventConsumer(
+        transport=transport, subscription=SUBSCRIPTION, handler=lambda e: None, batch=batch
+    ).poll_once(max_messages=100)
+    if producer_trace:  # 0 when no tracer provider is installed in this test run
+        assert batch.traces == [producer_trace] * 3
+
+
+def test_stopping_hands_back_a_whole_batch() -> None:
+    from pipeline.queue import EventConsumer
+
+    transport = InMemoryTransport()
+    _three_events(transport)
+    stop = threading.Event()
+    stop.set()
+    batch = _FakeBatch()
+    consumer = EventConsumer(
+        transport=transport, subscription=SUBSCRIPTION, handler=lambda e: None, batch=batch
+    )
+    assert consumer.poll_once(max_messages=100, stop=stop) == 0
+    assert batch.stored == []
+    assert len(transport.pull(EVENTS_TOPIC, SUBSCRIPTION, 10, 0)) == 3
