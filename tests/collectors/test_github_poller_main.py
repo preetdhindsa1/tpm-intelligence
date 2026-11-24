@@ -71,3 +71,11 @@ def test_missing_token_stops_before_polling(
     monkeypatch.delenv("GITHUB_TOKEN")
     assert entry.main(["--poll", "ok=r1"]) == 2
     assert polled == []
+
+
+def test_only_the_kep_link_pack_reads_kep_specs() -> None:
+    """Issue #11: Kubernetes plans with kep.yaml; this project and others do not."""
+    from connectors import load_team
+
+    assert load_team("kubernetes").link_pack == "kep"
+    assert load_team("tpm-intelligence").link_pack != "kep"

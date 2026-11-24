@@ -91,6 +91,9 @@ class GitHubPoller:
     stats: SyncStats = field(default_factory=SyncStats)
     _tracked_prs: set[tuple[str, int]] = field(default_factory=set)
     _kep_paths: dict[int, str] | None = None
+    # Kubernetes keeps a kep.yaml per enhancement; other planning repos have no such specs
+    # (asking for one failed every run for this project, issue #11).
+    read_kep_specs: bool = True
     # Code-only mode: (cycle start, release day or None while unset).
     window: tuple[datetime, datetime | None] | None = None
 
@@ -217,7 +220,7 @@ class GitHubPoller:
             events, repo=repo, number=number, project=project, observed_at=observed
         ):
             self._publish(event)
-        path = self.kep_paths().get(number)
+        path = self.kep_paths().get(number) if self.read_kep_specs else None
         if path:
             text = self.gh.get_text(f"/repos/{repo}/contents/{path}")
             try:

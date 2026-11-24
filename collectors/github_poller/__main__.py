@@ -142,6 +142,7 @@ def _poll_team(team_id: str, release: str, *, token: str, backfill: bool) -> int
         release_name=release,
         enhancements_repo=team.planning_repo,
         code_repo=team.primary_code_repo,
+        read_kep_specs=team.link_pack == "kep",  # only Kubernetes plans with kep.yaml
     )
     stats = poller.run(backfill=backfill)
     return 1 if stats.failed_streams else 0
