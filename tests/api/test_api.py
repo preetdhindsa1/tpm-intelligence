@@ -606,6 +606,8 @@ def test_a_burst_is_timed_by_its_newest_event_not_its_first() -> None:
     notice = newest_notice([history, action, no_time])
     assert notice.event_id == "new"
     assert notice.batched == 3
+    with pytest.raises(ValueError, match="messages must not be empty"):
+        newest_notice([])
 
 
 def test_a_page_still_gets_the_update_when_something_else_refreshed_first(
