@@ -9,3 +9,6 @@ github_repo    = "owner/tpm-intelligence"
 
 # Alerts go here (issue #14). Keep it in this gitignored file, never in code.
 # alert_email = "you@example.com"
+
+# Turn on once the API has made one AI call (Google rejects PromQL alerts on unwritten metrics).
+# enable_ai_budget_alert = true

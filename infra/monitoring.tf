@@ -91,7 +91,8 @@ resource "google_monitoring_alert_policy" "poller_failures" {
 # AI spend at 80% of the daily cap (CLAUDE.md section 9). The gateway exports the
 # ai.budget.used_fraction gauge; the collector sends it to Managed Prometheus.
 # Google rejects a PromQL alert on a metric that has never been written, so this is off
-# until the API has made at least one AI call: then set enable_ai_budget_alert = true.
+# until the API has made at least one AI call: then set enable_ai_budget_alert = true
+# (done 2026-11-24 in terraform.tfvars, #45: the metric exists in the live project).
 resource "google_monitoring_alert_policy" "ai_budget" {
   count        = var.enable_ai_budget_alert ? 1 : 0
   display_name = "TPM: AI spend at 80% of the daily cap"
@@ -105,6 +106,47 @@ resource "google_monitoring_alert_policy" "ai_budget" {
     }
   }
 
+  notification_channels = local.alert_channels
+  depends_on            = [google_project_service.apis]
+}
+
+# Unusual fact-checker removal rate (CLAUDE.md section 9; #45): mean share of claims
+# removed per checked output, over an hour, above 30% (the redraft threshold).
+resource "google_logging_metric" "claims_removal_rate" {
+  name   = "tpm/claims_removal_rate"
+  filter = "resource.type=\"cloud_run_revision\" AND jsonPayload.logger=\"agents.gateway\" AND jsonPayload.message=\"claims checked\" AND jsonPayload.claims>0"
+  metric_descriptor {
+    metric_kind = "DELTA"
+    value_type  = "DISTRIBUTION"
+    unit        = "1"
+  }
+  value_extractor = "EXTRACT(jsonPayload.removal_rate)"
+  bucket_options {
+    linear_buckets {
+      num_finite_buckets = 10
+      width              = 0.1
+      offset             = 0
+    }
+  }
+}
+
+resource "google_monitoring_alert_policy" "claims_removal_rate" {
+  display_name = "TPM: fact checker removing an unusual share of claims"
+  combiner     = "OR"
+  conditions {
+    display_name = "Mean removal rate over an hour above 30%"
+    condition_threshold {
+      filter          = "resource.type = \"cloud_run_revision\" AND metric.type = \"logging.googleapis.com/user/${google_logging_metric.claims_removal_rate.name}\""
+      comparison      = "COMPARISON_GT"
+      threshold_value = 0.3
+      duration        = "0s"
+      aggregations {
+        alignment_period     = "3600s"
+        per_series_aligner   = "ALIGN_DELTA"
+        cross_series_reducer = "REDUCE_MEAN"
+      }
+    }
+  }
   notification_channels = local.alert_channels
   depends_on            = [google_project_service.apis]
 }

@@ -302,6 +302,15 @@ def verify_output(response: AIResponse[Any], facts: Any, ledger: Ledger) -> Any:
     claims = [c.to_claim() for c in response.output.claims]
     report = check_claims(claims, facts)
     ledger.set_check_counts(response.fingerprint, report.counts)
+    # One line per checked output feeds the removal-rate alert (CLAUDE.md section 9, #45).
+    logger.info(
+        "claims checked",
+        extra={
+            "counts": report.counts,
+            "claims": len(report.checked),
+            "removal_rate": report.removal_rate,
+        },
+    )
     return report
 
 

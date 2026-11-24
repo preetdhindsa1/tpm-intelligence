@@ -187,3 +187,17 @@ def test_verify_output_keeps_only_verified_claims_and_stores_counts() -> None:
     assert [c.text for c in report.verified] == ["Code Freeze was Nov 17."]
     assert ledger.results[response.fingerprint].check_counts == report.counts
     assert report.counts["removed.no_supporting_data"] == 1
+
+
+def test_verify_output_logs_one_line_for_the_removal_rate_alert(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """#45: CLAUDE.md section 9 alerts on an unusual fact-checker removal rate."""
+    ledger = MemoryLedger()
+    response = gateway(FakeClient(), ledger).run(SIMPLE, PROMPT, FACTS.as_prompt_rows(), ClaimsOut)
+    with caplog.at_level("INFO", logger="agents.gateway"):
+        report = verify_output(response, FACTS, ledger)
+    [line] = [r for r in caplog.records if r.getMessage() == "claims checked"]
+    assert line.removal_rate == report.removal_rate  # type: ignore[attr-defined]
+    assert line.counts == report.counts  # type: ignore[attr-defined]
+    assert line.claims == len(report.checked)  # type: ignore[attr-defined]
