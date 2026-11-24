@@ -14,6 +14,10 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: [version-update:semver-major]
+      # SQLAlchemy 2.1 is outside OpenTelemetry's instrumentation range (0.66b2 supports
+      # < 2.1); merging it lost database spans (2026-11-24). Lift once that changes.
+      - dependency-name: sqlalchemy
+        versions: [">=2.1"]
 
   - package-ecosystem: npm
     directory: /web

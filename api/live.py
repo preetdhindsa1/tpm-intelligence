@@ -29,7 +29,11 @@ def newest_notice(messages: list[str]) -> Notice:
     A webhook delivery can carry an issue's older history (for example "opened" minutes
     earlier) before the action that triggered it; timing the first message measured that
     history, not the action (P3-M5).
+
+    An empty burst has no newest event, so callers must pass at least one message.
     """
+    if not messages:
+        raise ValueError("messages must not be empty")
     notices = [notice_of(m) for m in messages]
     earliest = datetime.min.replace(tzinfo=UTC)
     newest = max(notices, key=lambda n: n.occurred_at or earliest)
