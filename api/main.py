@@ -63,7 +63,7 @@ from api.views import (
     release_summary_out,
     summary_out,
 )
-from connectors.load import team_for_project
+from connectors.load import load_teams
 from engine.assess import FeatureAssessment
 from engine.forecast import DEFAULT_FORECAST, model_version
 from engine.lab import lab_report
@@ -239,9 +239,12 @@ def create_app(
         Other projects use the selected release's cycle. Teams without agent lanes
         still return opened, merged, and approval counts.
         """
-        team = team_for_project(project)
+        # The web app sends the URL slug ("kafka"); release keys use "KAFKA".
+        wanted = project.lower()
+        team = next((t for t in load_teams().values() if t.project.lower() == wanted), None)
         if team is None:
             raise HTTPException(404, f"unknown project {project}")
+        project = team.project
         own_history = team.project == "tpm-intelligence"
         if not own_history and not release:
             raise HTTPException(404, "release is required")

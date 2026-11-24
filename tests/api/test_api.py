@@ -757,6 +757,15 @@ def test_dependencies_are_built_once_per_view_and_rebuilt_when_data_changes(
     assert len(builds) >= 2  # rebuilt for the new view
 
 
+def test_lab_accepts_the_lowercase_project_slug_the_web_app_sends(
+    after_readd: TestClient,
+) -> None:
+    # /lab?project=kafka returned 404 because release keys use "KAFKA" (#84).
+    upper = after_readd.get("/lab?project=KUBERNETES&release=v1.38")
+    assert upper.status_code == 200
+    assert upper.json()["project"] == "kubernetes"
+
+
 def test_kubernetes_lab_has_no_agent_lanes(after_readd: TestClient) -> None:
     body = after_readd.get("/lab?project=kubernetes&release=v1.38")
     assert body.status_code == 200

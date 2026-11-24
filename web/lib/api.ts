@@ -148,8 +148,8 @@ export const api = {
   dependencies: (release: string, includeRemoved = false) =>
     get<Dependencies>(`/releases/${release}/dependencies${includeRemoved ? "?include_removed=true" : ""}`),
   updates: (release: string) => get<ExecUpdate[]>(`/releases/${release}/updates`),
-  lab: (project: string, release?: string) => {
-    const query = new URLSearchParams({ project });
+  lab: (project: string, release?: string, cap = 2, lines = 400) => {
+    const query = new URLSearchParams({ project, cap: String(cap), lines: String(lines) });
     if (release) query.set("release", release);
     return get<LabReport>(`/lab?${query}`);
   },
