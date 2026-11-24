@@ -25,12 +25,15 @@ resource "google_monitoring_alert_policy" "queue_backlog" {
   combiner     = "OR"
 
   conditions {
-    display_name = "Oldest unacked event older than 10 minutes"
+    # 3 min held for 2 min. The old 10 min held for 5 min opened 18 minutes after a real
+    # backlog began (2026-11-24, 03:23 -> 03:41), far too late for a 30 s target. Batched
+    # storing clears even the hourly Jira burst in well under a minute.
+    display_name = "Oldest unacked event older than 3 minutes"
     condition_threshold {
       filter          = "resource.type = \"pubsub_subscription\" AND resource.labels.subscription_id = \"${google_pubsub_subscription.worker.name}\" AND metric.type = \"pubsub.googleapis.com/subscription/oldest_unacked_message_age\""
       comparison      = "COMPARISON_GT"
-      threshold_value = 600
-      duration        = "300s"
+      threshold_value = 180
+      duration        = "120s"
       aggregations {
         alignment_period   = "60s"
         per_series_aligner = "ALIGN_MAX"
