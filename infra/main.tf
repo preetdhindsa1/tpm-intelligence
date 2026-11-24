@@ -12,6 +12,7 @@ locals {
     "logging.googleapis.com",
     "iamcredentials.googleapis.com", # keyless deploys from GitHub Actions
     "sts.googleapis.com",
+    "billingbudgets.googleapis.com", # cost alert (budget.tf)
   ]
 
   registry  = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.images.repository_id}"

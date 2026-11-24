@@ -50,7 +50,7 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 |---|---|
 | Alerts reach a person | ✅ email channel, tested 2026-11-24 |
 | Uptime check and availability alert (SLO 99.5%) | ✅ (#36) |
-| Billing budget alert | ⬜ |
+| Billing budget alert | ✅ $150/month: 50%, 90%, 100% actual and 100% forecast (#68) |
 | Fact-checker removal-rate and AI-spend-at-80% alerts (CLAUDE.md section 9) | ✅ (#45) |
 | SLO dashboard (freshness, event to dashboard, simulator p95, availability, AI spend) | 🟡 live (#40); simulator p95 and AI spend not drawn yet |
 | Runbook (deploy, Terraform apply, rollback, each alert) | ✅ `docs/runbook.md` (#38) |

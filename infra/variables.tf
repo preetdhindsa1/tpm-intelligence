@@ -104,3 +104,15 @@ variable "enable_ai_budget_alert" {
   type        = bool
   default     = false
 }
+
+variable "billing_account" {
+  description = "Cloud Billing account ID for the budget alert (budget.tf), e.g. 012345-6789AB-CDEF01. Set it in terraform.tfvars; empty means no budget."
+  type        = string
+  default     = ""
+}
+
+variable "monthly_budget_usd" {
+  description = "Monthly cost budget in USD; alerts at 50%, 90% and 100% of actual spend and 100% of forecast (owner's choice, 2026-11-24)."
+  type        = number
+  default     = 150
+}

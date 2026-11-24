@@ -24,3 +24,12 @@ provider "google" {
   project = var.project_id
   region  = var.region
 }
+
+# The Budget API needs a quota project on every call; only budget.tf uses this provider.
+provider "google" {
+  alias                 = "billing"
+  project               = var.project_id
+  region                = var.region
+  user_project_override = true
+  billing_project       = var.project_id
+}
