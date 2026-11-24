@@ -59,7 +59,7 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 | Cloud SQL backups | 🟡 configured; restore never tested |
 | Scheduled Jira and Kafka PR sync in the cloud | ✅ hourly Jira job, Kafka PRs in the 5-minute poll (#47) |
 | Dependency and secret scanning in CI | ✅ pip-audit, npm audit, gitleaks, Dependabot (#18, #34) |
-| Security review of the public endpoints (sign-in, webhooks, API) | ⬜ |
+| Security review of the public endpoints (sign-in, webhooks, API) | ✅ `docs/security-review.md` (#64); follow-ups #65, #66 |
 | Load test of the API and live stream | ⬜ |
 
 ## Proof (results still to measure or pass)
