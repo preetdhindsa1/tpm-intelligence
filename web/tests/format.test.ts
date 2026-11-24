@@ -39,3 +39,11 @@ it("labels timeline kinds and formats UTC", () => {
   expect(timelineLabel("removed_from_release")).toBe("Removed from release");
   expect(formatUtc("2026-11-17T12:05:57Z")).toBe("2026-11-17 12:05 UTC");
 });
+
+describe("odds without history", () => {
+  it("says there is not enough history instead of showing a number", () => {
+    const d = oddsDisplay(odds({ status: "insufficient_history", probability: null }));
+    expect(d.headline).toBe("—");
+    expect(d.detail).toContain("Not enough history");
+  });
+});

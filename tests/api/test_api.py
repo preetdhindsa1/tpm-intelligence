@@ -18,6 +18,7 @@ from api.main import create_app
 from api.service import InMemoryEventSource, ReleaseService
 from api.validation import Validation, load_validation
 from engine.forecast import ForecastConfig
+from pipeline.events import NormalizedEvent
 from pipeline.notify import notification
 from tests.engine.conftest import fixture_events, utc
 
@@ -26,10 +27,38 @@ OLD = ForecastConfig(durations="all")
 FAST = ForecastConfig(replications=5, sims=100)
 
 
+def history_events() -> list[NormalizedEvent]:
+    """A finished v1.37 (10 features: 6 land, 4 slip) so odds have history to draw from.
+
+    Without an earlier release the forecast says ``insufficient_history`` (issue #9).
+    """
+    from datetime import timedelta
+
+    from tests.engine.synthetic import Stream
+
+    day = timedelta(days=1)
+    s = Stream(utc(2026, 9, 1))  # observed after v1.37 shipped, before the test dates
+    r1 = s.release("v1.37", utc(2026, 5, 18), utc(2026, 7, 23, 12), utc(2026, 8, 26))
+    for i in range(10):
+        lands = i < 6
+        changes = [(utc(2026, 5, 20), True)]
+        if not lands:
+            changes.append((utc(2026, 7, 23, 13), False))
+        s.feature(100 + i, r1, changes)
+        created = utc(2026, 6, 1) + i * day
+        s.pr(5000 + i, 100 + i, created, merged=created + 10 * day if lands else None)
+    return s.events
+
+
 def client_at(
-    now: datetime, updates: InMemoryUpdates | None = None, source: InMemoryEventSource | None = None
+    now: datetime,
+    updates: InMemoryUpdates | None = None,
+    source: InMemoryEventSource | None = None,
+    *,
+    history: bool = False,
 ) -> TestClient:
-    source = source or InMemoryEventSource(list(fixture_events()))
+    events = [*fixture_events(), *(history_events() if history else [])]
+    source = source or InMemoryEventSource(events)
     service = ReleaseService(
         source,
         forecast=FAST,
@@ -87,7 +116,9 @@ def test_removed_feature_can_be_hidden(after_readd: TestClient) -> None:
 def test_odds_before_freeze_have_a_range() -> None:
     row = next(
         f
-        for f in client_at(utc(2026, 11, 10)).get("/releases/v1.38/features").json()["features"]
+        for f in client_at(utc(2026, 11, 10), history=True)
+        .get("/releases/v1.38/features")
+        .json()["features"]
         if f["number"] == 6395
     )
     odds = row["odds"]
@@ -140,7 +171,7 @@ def test_sse_pushes_update_inside_the_workers_trace(spans: InMemorySpanExporter)
 
 
 def test_odds_are_labelled_not_validated() -> None:
-    body = client_at(utc(2026, 11, 10)).get("/releases/v1.38/features").json()
+    body = client_at(utc(2026, 11, 10), history=True).get("/releases/v1.38/features").json()
     assert body["validation"]["validated"] is False
     row = next(f for f in body["features"] if f["number"] == 6395)
     assert row["odds"]["validated"] is False
@@ -208,7 +239,7 @@ def test_risk_note_endpoint_returns_only_verified_claims() -> None:
 
     client = Sequenced(BAD, BAD)
     service = ReleaseService(
-        InMemoryEventSource(list(fixture_events())),
+        InMemoryEventSource([*fixture_events(), *history_events()]),
         forecast=FAST,
         now=lambda: utc(2026, 11, 10),
         validation=lambda: Validation(False, "test: not validated"),
@@ -527,3 +558,13 @@ def test_sse_stream_ends_after_its_maximum_so_browsers_reconnect(
     assert time.monotonic() - started < 5
     assert lines[0] == "event: ready"
     assert "retry: 1000" in lines
+
+
+def test_no_earlier_release_means_no_odds_not_a_fake_fifty_percent() -> None:
+    """Issue #9: with nothing to calibrate on, the API must not print an estimate."""
+    body = client_at(utc(2026, 11, 10)).get("/releases/v1.38/features").json()
+    row = next(f for f in body["features"] if f["number"] == 6395)
+    assert row["odds"]["status"] == "insufficient_history"
+    assert row["odds"]["probability"] is None
+    assert row["odds"]["low"] is None
+    assert row["odds"]["high"] is None

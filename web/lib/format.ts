@@ -10,6 +10,8 @@ export function oddsDisplay(odds: Odds): OddsDisplay {
   if (odds.status === "not_in_release") return { headline: "—", detail: "Not in the release", tone: "none", validated: odds.validated };
   if (odds.status === "no_freeze_date")
     return { headline: "—", detail: "No Code Freeze date, so no odds", tone: "none", validated: odds.validated };
+  if (odds.status === "insufficient_history")
+    return { headline: "—", detail: "Not enough history to forecast: no earlier release to measure", tone: "none", validated: odds.validated };
   if (odds.status !== "forecast" || odds.probability === null || odds.low === null || odds.high === null) {
     return { headline: "—", detail: "No forecast", tone: "none", validated: odds.validated };
   }
