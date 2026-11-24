@@ -4,9 +4,9 @@ Pure. No I/O. Every number is a count or a duration from pull requests already
 observed. A what-if replays those pull requests. It does not forecast a release
 and it does not call the review simulator.
 
-Lane match order is label, then branch prefix, then trailer. The contributor
-login is not an input: Dependabot is not a lane, and a ``claude`` commit
-attribution is not a lane by itself.
+Lane match order is label, then branch prefix, then trailer. A contributor
+login is not a lane. ``dependabot[bot]`` and a ``dependabot/`` branch are their
+own bucket, never ``cursor``.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from math import ceil
 from statistics import median
 from typing import Literal
 
-from engine.projection import PullRequest, ReleaseInfo, World
+from engine.projection import PullRequest, World
 from engine.review_rounds import ReviewRound, review_rounds
 
 SMALL_SAMPLE_BELOW = 20
@@ -91,14 +91,29 @@ class SizeCap:
 
 
 @dataclass(frozen=True)
+class BucketCount:
+    """Opened, merged, and still open in one lane, Dependabot, or unassigned."""
+
+    lane: str
+    opened: int
+    merged: int
+    still_open: int
+
+
+@dataclass(frozen=True)
 class LabReport:
-    """Counts for one release window. ``small_sample`` is a label, not a filled-in forecast."""
+    """Counts for one window. ``small_sample`` is a label, not a filled-in forecast."""
 
     release_key: str
     as_of: datetime
     n_pull_requests: int
     n_merged: int
+    n_open: int
     small_sample: bool
+    buckets: tuple[BucketCount, ...]
+    approval_rate: float | None
+    approved_merged: int
+    median_hours_to_merge: float | None
     arrivals: tuple[WeekCount, ...]
     queue: tuple[DayCount, ...]
     time_to_first_review_hours: tuple[float, ...]
@@ -111,6 +126,23 @@ class LabReport:
     cap: CapReplay
     first_pass: FirstPass
     size: SizeCap
+
+
+def bucket_of(
+    labels: tuple[str, ...] | list[str],
+    head_ref: str | None,
+    texts: tuple[str, ...] | list[str],
+    rules: tuple[LaneSpec, ...] | list[LaneSpec],
+    author: str | None = None,
+) -> str:
+    """Lane, else Dependabot, else unassigned. Dependabot is never ``cursor``."""
+    lane = classify_lane(labels, head_ref, texts, rules)
+    if lane is not None:
+        return lane
+    ref = head_ref or ""
+    if ref.startswith("dependabot/") or author == "dependabot[bot]":
+        return "dependabot"
+    return "unassigned"
 
 
 def classify_lane(
@@ -175,26 +207,41 @@ def lab_report(
     *,
     cap_n: int = 2,
     max_lines: int = 400,
+    since: datetime | None = None,
 ) -> LabReport:
-    """Counts for pull requests opened in the release window."""
-    release = world.releases[release_key]
-    window = _in_window(world, release)
-    lanes = {pr.key: _lane_of(pr, rules) for pr in window}
+    """Counts for pull requests opened in the window.
+
+    ``since`` is the lower bound. ``None`` counts every pull request opened by
+    ``as_of`` (the history of this repository). A release passes its cycle start.
+    """
+    window = _in_window(world, since)
+    lanes = {pr.key: _bucket(pr, rules) for pr in window}
     pool = set(reviewer_pool)
     rounds = {pr.key: tuple(review_rounds(pr)) for pr in window}
     merged = [pr for pr in window if pr.merged_at is not None]
+    approved = [pr for pr in merged if _approved(rounds[pr.key])]
     small = len(merged) < SMALL_SAMPLE_BELOW
     waits = _first_review_hours(window, rounds)
     waiting = sum(1 for pr in window if not rounds[pr.key])
     round_counts = tuple(len(rounds[pr.key]) for pr in window)
+    merge_hours = [
+        (pr.merged_at - pr.created_at).total_seconds() / 3600
+        for pr in merged
+        if pr.merged_at is not None
+    ]
     return LabReport(
         release_key=release_key,
         as_of=world.as_of,
         n_pull_requests=len(window),
         n_merged=len(merged),
+        n_open=sum(1 for pr in window if pr.state == "open"),
         small_sample=small,
+        buckets=tuple(_buckets(window, lanes)),
+        approval_rate=(len(approved) / len(merged)) if merged else None,
+        approved_merged=len(approved),
+        median_hours_to_merge=float(median(merge_hours)) if merge_hours else None,
         arrivals=tuple(_arrivals(window, lanes)),
-        queue=tuple(_queue(window, rounds, pool, release, world.as_of)),
+        queue=tuple(_queue(window, rounds, pool, since, world.as_of)),
         time_to_first_review_hours=tuple(waits),
         still_waiting=waiting,
         review_round_counts=round_counts,
@@ -210,7 +257,7 @@ def lab_report(
 
 def cap_open_agent_prs(
     prs: list[PullRequest],
-    lanes: dict[str, str | None],
+    lanes: dict[str, str],
     n: int,
     *,
     n_merged: int,
@@ -281,16 +328,34 @@ def extra_for_sizes(sizes: list[int], max_lines: int) -> int:
     return extra
 
 
-def _lane_of(pr: PullRequest, rules: tuple[LaneSpec, ...] | list[LaneSpec]) -> str | None:
+def _bucket(pr: PullRequest, rules: tuple[LaneSpec, ...] | list[LaneSpec]) -> str:
     texts = [pr.body, *(note.message for note in pr.commits)]
-    return classify_lane(pr.labels, pr.head_ref, texts, rules)
+    return bucket_of(pr.labels, pr.head_ref, texts, rules, pr.author)
 
 
-def _in_window(world: World, release: ReleaseInfo) -> list[PullRequest]:
-    start = release.cycle_start_at
+def _approved(rounds: tuple[ReviewRound, ...]) -> bool:
+    """An approving review round. Merging without one does not count."""
+    return any(rnd.outcome == "approved" for rnd in rounds)
+
+
+def _buckets(prs: list[PullRequest], lanes: dict[str, str]) -> list[BucketCount]:
+    opened: dict[str, int] = defaultdict(int)
+    merged: dict[str, int] = defaultdict(int)
+    still: dict[str, int] = defaultdict(int)
+    for pr in prs:
+        lane = lanes[pr.key]
+        opened[lane] += 1
+        if pr.merged_at is not None:
+            merged[lane] += 1
+        if pr.state == "open":
+            still[lane] += 1
+    return [BucketCount(lane, opened[lane], merged[lane], still[lane]) for lane in sorted(opened)]
+
+
+def _in_window(world: World, since: datetime | None) -> list[PullRequest]:
     out = []
     for pr in world.pull_requests.values():
-        if start is not None and pr.created_at < start:
+        if since is not None and pr.created_at < since:
             continue
         if pr.created_at > world.as_of:
             continue
@@ -299,11 +364,11 @@ def _in_window(world: World, release: ReleaseInfo) -> list[PullRequest]:
     return out
 
 
-def _arrivals(prs: list[PullRequest], lanes: dict[str, str | None]) -> list[WeekCount]:
+def _arrivals(prs: list[PullRequest], lanes: dict[str, str]) -> list[WeekCount]:
     counts: dict[tuple[str, str], int] = defaultdict(int)
     for pr in prs:
         year, week, _ = pr.created_at.isocalendar()
-        counts[(f"{year}-W{week:02d}", lanes[pr.key] or "unassigned")] += 1
+        counts[(f"{year}-W{week:02d}", lanes[pr.key])] += 1
     return [WeekCount(week, lane, n) for (week, lane), n in sorted(counts.items())]
 
 
@@ -311,12 +376,13 @@ def _queue(
     prs: list[PullRequest],
     rounds: dict[str, tuple[ReviewRound, ...]],
     pool: set[str],
-    release: ReleaseInfo,
+    since: datetime | None,
     as_of: datetime,
 ) -> list[DayCount]:
-    if release.cycle_start_at is None or release.cycle_start_at > as_of:
+    start = since if since is not None else (min(pr.created_at for pr in prs) if prs else None)
+    if start is None or start > as_of:
         return []
-    day = release.cycle_start_at.date()
+    day = start.date()
     last = as_of.date()
     points: list[DayCount] = []
     while day <= last:
@@ -358,9 +424,7 @@ def _rework(pr: PullRequest, rounds: tuple[ReviewRound, ...]) -> bool:
     return any(note.committed_at > first for note in pr.commits)
 
 
-def _replay_cap(
-    prs: list[PullRequest], lanes: dict[str, str | None], n: int
-) -> tuple[int, int, int]:
+def _replay_cap(prs: list[PullRequest], lanes: dict[str, str], n: int) -> tuple[int, int, int]:
     """Return observed max open, how many were held, and the capped max."""
     events: list[tuple[datetime, int, str, PullRequest]] = []
     for pr in prs:

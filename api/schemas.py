@@ -620,14 +620,28 @@ class LabSizeOut(_Out):
     assumption: str
 
 
+class LabBucketOut(_Out):
+    lane: str
+    opened: int
+    merged: int
+    still_open: int
+
+
 class LabOut(_Out):
-    """Development-lab counts. A case study of this repository, not a forecast."""
+    """Development-lab counts. A case study, not a forecast."""
 
     release: str
+    project: str
+    lanes_configured: bool
     as_of: datetime
     n_pull_requests: int
     n_merged: int
+    n_open: int
     small_sample: bool
+    buckets: list[LabBucketOut]
+    approval_rate: float | None
+    approved_merged: int
+    median_hours_to_merge: float | None
     arrivals: list[LabWeekOut]
     queue: list[LabDayOut]
     time_to_first_review_hours: list[float]

@@ -17,6 +17,7 @@ from api.schemas import (
     GraphEdgeOut,
     GraphNodeOut,
     GraphOut,
+    LabBucketOut,
     LabCapOut,
     LabCollisionOut,
     LabDayOut,
@@ -476,15 +477,25 @@ def merge_dates_out(view: ReleaseView) -> MergeDatesOut:
     )
 
 
-def lab_out(report: LabReport) -> LabOut:
+def lab_out(report: LabReport, *, project: str, lanes_configured: bool) -> LabOut:
     """Lab counts. Scenario numbers stay null while the sample is small."""
     cap = report.cap
     return LabOut(
         release=report.release_key,
+        project=project,
+        lanes_configured=lanes_configured,
         as_of=report.as_of,
         n_pull_requests=report.n_pull_requests,
         n_merged=report.n_merged,
+        n_open=report.n_open,
         small_sample=report.small_sample,
+        buckets=[
+            LabBucketOut(lane=b.lane, opened=b.opened, merged=b.merged, still_open=b.still_open)
+            for b in report.buckets
+        ],
+        approval_rate=report.approval_rate,
+        approved_merged=report.approved_merged,
+        median_hours_to_merge=report.median_hours_to_merge,
         arrivals=[LabWeekOut(week=a.week, lane=a.lane, count=a.count) for a in report.arrivals],
         queue=[LabDayOut(day=d.day, count=d.count) for d in report.queue],
         time_to_first_review_hours=list(report.time_to_first_review_hours),

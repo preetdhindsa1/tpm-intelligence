@@ -757,8 +757,10 @@ def test_dependencies_are_built_once_per_view_and_rebuilt_when_data_changes(
     assert len(builds) >= 2  # rebuilt for the new view
 
 
-def test_kubernetes_has_no_lab(after_readd: TestClient) -> None:
-    assert after_readd.get("/releases/v1.38/lab").status_code == 404
+def test_kubernetes_lab_has_no_agent_lanes(after_readd: TestClient) -> None:
+    body = after_readd.get("/lab?project=kubernetes&release=v1.38")
+    assert body.status_code == 200
+    assert body.json()["lanes_configured"] is False
     assert after_readd.get("/releases").json()[0]["has_lab"] is False
 
 
@@ -816,11 +818,29 @@ def test_lab_reports_a_shared_file_collision() -> None:
                 ),
             )
         )
+    events.append(
+        new_event(
+            source=Source.GITHUB,
+            subject=ref(SubjectKind.PULL_REQUEST, f"{repo}#3"),
+            occurred_at=utc(2026, 11, 1),
+            observed_at=observed,
+            identity=(3,),
+            payload=PullRequestObserved(
+                repo=repo,
+                number=3,
+                title="before the cycle",
+                state="merged",
+                created_at=utc(2026, 11, 1),
+                merged_at=utc(2026, 11, 2),
+                updated_at=observed,
+            ),
+        )
+    )
     client = client_at(observed, source=InMemoryEventSource(events))
-    body = client.get("/releases/Phase%203/lab").json()
-    assert body["n_pull_requests"] == 2
+    body = client.get("/lab?project=tpm-intelligence").json()
+    assert body["n_pull_requests"] == 3
     assert body["small_sample"] is True
-    assert body["arrivals"][0]["lane"] == "claude"
+    assert any(row["lane"] == "claude" and row["count"] == 2 for row in body["arrivals"])
     assert body["collisions"][0]["kind"] == "shared_files"
     assert body["collisions"][0]["paths"] == ["engine/lab.py"]
     assert body["cap"]["scenario_max_open"] is None

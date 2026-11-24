@@ -32,10 +32,17 @@ export type Release = {
 
 export type LabReport = {
   release: string;
+  project: string;
+  lanes_configured: boolean;
   as_of: string;
   n_pull_requests: number;
   n_merged: number;
+  n_open: number;
   small_sample: boolean;
+  buckets: { lane: string; opened: number; merged: number; still_open: number }[];
+  approval_rate: number | null;
+  approved_merged: number;
+  median_hours_to_merge: number | null;
   arrivals: { week: string; lane: string; count: number }[];
   queue: { day: string; count: number }[];
   time_to_first_review_hours: number[];
@@ -141,8 +148,11 @@ export const api = {
   dependencies: (release: string, includeRemoved = false) =>
     get<Dependencies>(`/releases/${release}/dependencies${includeRemoved ? "?include_removed=true" : ""}`),
   updates: (release: string) => get<ExecUpdate[]>(`/releases/${release}/updates`),
-  lab: (release: string, cap = 2, lines = 400) =>
-    get<LabReport>(`/releases/${encodeURIComponent(release)}/lab?cap=${cap}&lines=${lines}`),
+  lab: (project: string, release?: string) => {
+    const query = new URLSearchParams({ project });
+    if (release) query.set("release", release);
+    return get<LabReport>(`/lab?${query}`);
+  },
 };
 
 export type VerifiedClaim = { text: string; type: string; refs: string[]; value: unknown };

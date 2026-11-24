@@ -227,22 +227,36 @@ def create_app(
             validation=v.validation.as_dict(),
         )
 
-    @app.get("/releases/{name}/lab", response_model=LabOut)
+    @app.get("/lab", response_model=LabOut)
     async def lab(
-        name: str,
+        project: str = "tpm-intelligence",
+        release: str | None = None,
         cap: int = Query(default=2, ge=1, le=20),
         lines: int = Query(default=400, ge=1, le=5000),
     ) -> LabOut:
-        """Development-lab counts for a team that configured author lanes.
+        """Development-lab counts. This repository uses its whole history.
 
-        Numbers are counts of pull requests already observed. Teams without lanes
-        have no lab.
+        Other projects use the selected release's cycle. Teams without agent lanes
+        still return opened, merged, and approval counts.
         """
-        v = await view(name)
-        project = v.assessment.release.key.split(":", 1)[0]
         team = team_for_project(project)
-        if team is None or not team.author_lanes:
-            raise HTTPException(404, "no lab for this project")
+        if team is None:
+            raise HTTPException(404, f"unknown project {project}")
+        own_history = team.project == "tpm-intelligence"
+        if not own_history and not release:
+            raise HTTPException(404, "release is required")
+
+        def _newest_name() -> str | None:
+            rows = [r for r in svc().releases() if r.release.key.split(":", 1)[0] == project]
+            return rows[-1].release.name if rows else None
+
+        name = release or await run_in_threadpool(_newest_name)
+        if name is None:
+            raise HTTPException(404, f"no release for {project}")
+        v = await view(name)
+        if v.assessment.release.key.split(":", 1)[0] != project:
+            raise HTTPException(404, f"unknown project {project}")
+        since = None if own_history else v.assessment.release.cycle_start_at
         report = lab_report(
             v.world,
             v.assessment.release.key,
@@ -250,8 +264,9 @@ def create_app(
             team.reviewer_pool,
             cap_n=cap,
             max_lines=lines,
+            since=since,
         )
-        return lab_out(report)
+        return lab_out(report, project=project, lanes_configured=bool(team.author_lanes))
 
     @app.get("/releases/{name}/features/{number}", response_model=FeatureDetailOut)
     async def feature(name: str, number: int) -> FeatureDetailOut:
