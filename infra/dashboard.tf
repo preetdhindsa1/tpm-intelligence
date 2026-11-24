@@ -71,13 +71,14 @@ resource "google_monitoring_dashboard" "slo" {
   dashboard_json = jsonencode({
     displayName = "TPM: SLOs (CLAUDE.md section 9)"
     gridLayout = {
-      columns = 2
+      columns = "2" # Google stores it as a string; a number showed as drift
       widgets = [
         for t in local.dashboard_tiles : {
           title = t.title
           xyChart = {
             dataSets = [{
-              plotType = "LINE"
+              plotType   = "LINE"
+              targetAxis = "Y1" # Google's default; leaving it out showed as drift
               timeSeriesQuery = {
                 timeSeriesFilter = {
                   filter = t.filter
