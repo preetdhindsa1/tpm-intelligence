@@ -62,6 +62,13 @@ variable "db_tier" {
   default     = "db-g1-small" # shared core, option B (ADR-0017); about 300k events fit easily
 }
 
+variable "alert_email" {
+  description = "Email address that receives alerts. Set it in terraform.tfvars (gitignored), never in code; empty means no email channel."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 variable "alert_notification_channels" {
   description = "Cloud Monitoring notification channel IDs for alerts (empty: alerts fire with no notification)."
   type        = list(string)

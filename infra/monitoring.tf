@@ -1,6 +1,25 @@
 # Alerts from CLAUDE.md section 9 that apply in phase 1. Fact-checker removal rate and
 # AI spend arrive with the phase-2 agents.
 
+# Where alerts go. Until 2026-11-24 there was no channel at all, so alerts fired and
+# notified nobody (issue #14). The address lives in terraform.tfvars, which is gitignored.
+resource "google_monitoring_notification_channel" "email" {
+  count        = var.alert_email == "" ? 0 : 1
+  display_name = "TPM alerts by email"
+  type         = "email"
+  labels = {
+    email_address = var.alert_email
+  }
+  depends_on = [google_project_service.apis]
+}
+
+locals {
+  alert_channels = concat(
+    var.alert_notification_channels,
+    google_monitoring_notification_channel.email[*].id,
+  )
+}
+
 resource "google_monitoring_alert_policy" "queue_backlog" {
   display_name = "TPM: event queue backlog growing"
   combiner     = "OR"
@@ -19,7 +38,7 @@ resource "google_monitoring_alert_policy" "queue_backlog" {
     }
   }
 
-  notification_channels = var.alert_notification_channels
+  notification_channels = local.alert_channels
   depends_on            = [google_project_service.apis]
 }
 
@@ -41,7 +60,7 @@ resource "google_monitoring_alert_policy" "dead_letters" {
     }
   }
 
-  notification_channels = var.alert_notification_channels
+  notification_channels = local.alert_channels
   depends_on            = [google_project_service.apis]
 }
 
@@ -65,7 +84,7 @@ resource "google_monitoring_alert_policy" "poller_failures" {
     }
   }
 
-  notification_channels = var.alert_notification_channels
+  notification_channels = local.alert_channels
   depends_on            = [google_project_service.apis]
 }
 
@@ -86,6 +105,6 @@ resource "google_monitoring_alert_policy" "ai_budget" {
     }
   }
 
-  notification_channels = var.alert_notification_channels
+  notification_channels = local.alert_channels
   depends_on            = [google_project_service.apis]
 }
