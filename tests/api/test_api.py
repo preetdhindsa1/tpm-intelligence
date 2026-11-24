@@ -594,3 +594,15 @@ def test_push_timing_measures_from_the_source_and_the_collector() -> None:
     # Old-format notifications (no times) still work, with nothing to time.
     assert push_timing(Notice(Context()), utc(2026, 11, 24)) == {"event_id": None, "batched": 1}
     assert notice_of(b"not json").event_id is None
+
+
+def test_a_burst_is_timed_by_its_newest_event_not_its_first() -> None:
+    """P3-M5: a delivery can carry older history before the action that triggered it."""
+    from api.live import newest_notice
+
+    history = notification("old", "x", occurred_at=utc(2026, 11, 24, 1, 45))
+    action = notification("new", "x", occurred_at=utc(2026, 11, 24, 1, 51))
+    no_time = notification("none", "x")
+    notice = newest_notice([history, action, no_time])
+    assert notice.event_id == "new"
+    assert notice.batched == 3

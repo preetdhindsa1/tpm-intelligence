@@ -13,14 +13,27 @@ from __future__ import annotations
 import asyncio
 import threading
 from collections.abc import AsyncIterator, Awaitable, Callable
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass, field, replace
+from datetime import UTC, datetime
 from typing import Protocol
 
 from pipeline.notify import CHANNEL, Notice, notice_of
 
 HEARTBEAT_S = 15.0
 DEBOUNCE_S = 1.0
+
+
+def newest_notice(messages: list[str]) -> Notice:
+    """The notice of the burst's newest event at the source.
+
+    A webhook delivery can carry an issue's older history (for example "opened" minutes
+    earlier) before the action that triggered it; timing the first message measured that
+    history, not the action (P3-M5).
+    """
+    notices = [notice_of(m) for m in messages]
+    earliest = datetime.min.replace(tzinfo=UTC)
+    newest = max(notices, key=lambda n: n.occurred_at or earliest)
+    return replace(newest, batched=len(messages))
 
 
 def push_timing(notice: Notice, pushed_at: datetime) -> dict[str, object]:
@@ -64,11 +77,10 @@ async def _debounced(
             yield None
             continue
         await asyncio.sleep(debounce_s)
-        batched = 1
+        burst = [first]
         while not queue.empty():  # coalesce the burst
-            queue.get_nowait()
-            batched += 1
-        yield notice_of(first, batched)
+            burst.append(queue.get_nowait())
+        yield newest_notice(burst)
 
 
 @dataclass
