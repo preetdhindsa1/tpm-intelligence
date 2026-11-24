@@ -10,10 +10,10 @@ UX v1 replaces the old menu with five screens and a lifecycle stage. Release URL
 ## Decision
 
 - Tailwind tokens: ink `#0B1020`, canvas `#F6F7F9`, action `#4F46E5`, healthy `#166534` / `#DCFCE7`, warning `#B45309` / `#FEF3C7`, critical `#B91C1C` / `#FEE2E2`. Space Grotesk for headings, Inter for body, both self-hosted.
-- `/` shows Sign in only when GitHub or local dev login is configured, plus **Open the live demo**. Other screens show Search, Live, and the signed-in person. No sign-in button on app screens.
+- `/` shows Sign in only when GitHub or local dev login is configured, plus **Open the live demo**. Other screens show Search and the signed-in avatar (initials, with the login in the accessible name, plus Sign out). No sign-in button on app screens. The Live label is the release page's stream state, not a dot on every screen.
 - Live Cockpit and Decision Studio use the program in the URL, then `localStorage` key `pi.lastProgram`, then `/releases`.
 - AI-native PDLC links to `/lab` until `/pdlc` exists. ⌘K lists the five screens and the open release's sections. No search API.
-- Stage uses the release dates against that release's `as_of`, in UTC. No dates → "Dates not known". Before the first freeze → Plan. Enhancements freeze until Code Freeze → Build. Code Freeze until release → Freeze. The UTC day of `release_at` → Launch. After that day → Learn.
+- Stage uses the same UTC boundaries as ADR-0025, compared to the release's `as_of`. Missing cycle start, Code Freeze, or release → "Dates not known". Before cycle start → Plan. Cycle start until Code Freeze → Build. Code Freeze until release → Freeze. Release until seven days later → Launch. After that → Learn.
 
 ## Alternatives considered
 
@@ -21,7 +21,7 @@ A sign-in button on every screen (phishing flag). Hard-coding Kubernetes v1.38 a
 
 ## Trade-offs and consequences
 
-Launch is one UTC day because the API stores a timestamp, not a launch window. Revisit when readiness defines Launch. The PDLC link moves to `/pdlc` when that page ships.
+Launch is seven days, matching ADR-0025, because the API stores a release timestamp and not a separate launch window. The PDLC link moves to `/pdlc` when that page ships. Portfolio and Connect stay in the menu; their pages are the following issues.
 
 ## AI vs rules
 

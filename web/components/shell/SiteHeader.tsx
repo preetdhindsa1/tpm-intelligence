@@ -13,16 +13,22 @@ export function SiteHeader({ login, signIn }: { login: string | null; signIn: bo
   const front = path === "/";
   const last = useSyncExternalStore(subscribeLast, readLastSnapshot, noLast);
   const [open, setOpen] = useState(false);
+  const searchBtn = useRef<HTMLButtonElement>(null);
+  const closeSearch = () => { setOpen(false); searchBtn.current?.focus(); };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      const el = document.activeElement;
+      const typing = el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || (el instanceof HTMLElement && el.isContentEditable);
+      const chord = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k";
+      if (chord && (open || !typing)) {
         e.preventDefault();
-        setOpen((v) => !v);
-      }
+        if (open) closeSearch();
+        else setOpen(true);
+      } else if (e.key === "Escape" && open) closeSearch();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [open]);
   const dest = destinations(path, last);
   const here = currentId(path);
   const cockpit = dest.find((d) => d.id === "cockpit")?.href ?? "/releases";
@@ -40,18 +46,16 @@ export function SiteHeader({ login, signIn }: { login: string | null; signIn: bo
         <div className="ml-auto flex flex-wrap items-center gap-3">
           {front && !login && signIn && <Link href="/api/auth/signin" prefetch={false} className="inline-flex min-h-11 items-center text-sm text-slate-200">Sign in</Link>}
           {front && <Link href={cockpit} className="inline-flex min-h-11 items-center rounded-md bg-action px-3 text-sm font-medium text-white">Open the live demo</Link>}
-          {!front && <button type="button" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/20 px-3 text-sm" onClick={() => setOpen(true)}>Search <kbd className="text-xs text-slate-300">⌘K</kbd></button>}
-          {!front && <span className="inline-flex min-h-11 items-center gap-1.5 text-sm"><span aria-hidden className="h-2 w-2 rounded-full bg-healthy-bg" />Live</span>}
+          {!front && <button ref={searchBtn} type="button" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/20 px-3 text-sm" onClick={() => setOpen(true)}>Search <kbd className="text-xs text-slate-300">⌘K</kbd></button>}
           {login && (
             <span className="inline-flex min-h-11 items-center gap-2 text-sm">
-              <span aria-hidden className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/15">{login.slice(0, 1).toUpperCase()}</span>
-              {login}
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/15" aria-label={`Signed in as ${login}`}>{login.slice(0, 1).toUpperCase()}</span>
               <Link href="/api/auth/signout" prefetch={false} className="text-slate-200 hover:underline">Sign out</Link>
             </span>
           )}
         </div>
       </div>
-      {open && <CommandPalette path={path} last={last} onClose={() => setOpen(false)} />}
+      {open && <CommandPalette path={path} last={last} onClose={closeSearch} />}
     </header>
   );
 }
@@ -59,6 +63,7 @@ export function SiteHeader({ login, signIn }: { login: string | null; signIn: bo
 function CommandPalette({ path, last, onClose }: { path: string; last: LastProgram | null; onClose: () => void }) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
+  const dialog = useRef<HTMLDivElement>(null);
   const [q, setQ] = useState("");
   const [i, setI] = useState(0);
   const items = useMemo(() => {
@@ -71,11 +76,18 @@ function CommandPalette({ path, last, onClose }: { path: string; last: LastProgr
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-24">
       <button type="button" aria-label="Close search" className="absolute inset-0 bg-ink/70" onClick={onClose} />
-      <div role="dialog" aria-modal="true" aria-label="Search" className="relative w-full max-w-lg rounded-lg bg-white text-slate-900 shadow-xl">
+      <div ref={dialog} role="dialog" aria-modal="true" aria-label="Search" className="relative w-full max-w-lg rounded-lg bg-white text-slate-900 shadow-xl"
+        onKeyDown={(e) => {
+          if (e.key !== "Tab" || !dialog.current) return;
+          const nodes = [...dialog.current.querySelectorAll<HTMLElement>("a, button, input")];
+          const first = nodes[0];
+          const lastNode = nodes[nodes.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); lastNode?.focus(); }
+          else if (!e.shiftKey && document.activeElement === lastNode) { e.preventDefault(); first?.focus(); }
+        }}>
         <input ref={input} value={q} aria-label="Search pages" placeholder="Search pages" className="w-full border-b px-4 py-3 text-sm"
           onChange={(e) => { setQ(e.target.value); setI(0); }}
           onKeyDown={(e) => {
-            if (e.key === "Escape") onClose();
             if (e.key === "ArrowDown") { e.preventDefault(); setI((n) => Math.min(n + 1, Math.max(items.length - 1, 0))); }
             if (e.key === "ArrowUp") { e.preventDefault(); setI((n) => Math.max(n - 1, 0)); }
             if (e.key === "Enter" && items[i]) go(items[i].href);

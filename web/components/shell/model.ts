@@ -40,23 +40,20 @@ export function subscribeLast(onChange: () => void): () => void {
   };
 }
 
-export type ReleaseDates = { enhancements_freeze_at: string | null; code_freeze_at: string | null; release_at: string | null };
+export type ReleaseDates = { cycle_start_at: string | null; code_freeze_at: string | null; release_at: string | null };
 
-/** Compared to the release as_of, in UTC. "Dates not known" when nothing is dated. */
+const STAGES = ["Plan", "Build", "Freeze", "Launch", "Learn"] as const;
+const LAUNCH_MS = 7 * 86_400_000;
+
+/** Same boundaries as ADR-0025: cycle start, Code Freeze, release, release + 7 days. */
 export function stageOf(r: ReleaseDates, asOf: Date): string {
-  const t = asOf.getTime();
-  const at = (s: string | null) => (s ? new Date(s).getTime() : null);
-  const rel = at(r.release_at);
-  const cf = at(r.code_freeze_at);
-  const ef = at(r.enhancements_freeze_at);
-  if (rel !== null && t >= rel) {
-    const day = (n: number) => new Date(n).toISOString().slice(0, 10);
-    return day(t) === day(rel) ? "Launch" : "Learn";
-  }
-  if (cf !== null && t >= cf) return "Freeze";
-  if (ef !== null && t >= ef) return "Build";
-  if (rel !== null || cf !== null || ef !== null) return "Plan";
-  return "Dates not known";
+  const at = (s: string | null) => (s ? new Date(s).getTime() : Number.NaN);
+  const start = at(r.cycle_start_at);
+  const freeze = at(r.code_freeze_at);
+  const release = at(r.release_at);
+  if (Number.isNaN(start) || Number.isNaN(freeze) || Number.isNaN(release)) return "Dates not known";
+  const passed = [start, freeze, release, release + LAUNCH_MS].filter((b) => b <= asOf.getTime()).length;
+  return STAGES[passed] ?? "Learn";
 }
 
 export type Dest = { id: string; href: string; label: string };

@@ -2,19 +2,19 @@ import { describe, expect, it } from "vitest";
 import { commandItems, currentId, destinations, readLast, stageOf, writeLast, type ReleaseDates } from "./model";
 
 const V138: ReleaseDates = {
-  enhancements_freeze_at: "2026-09-30T12:00:00Z",
+  cycle_start_at: "2026-08-31T00:00:00Z",
   code_freeze_at: "2026-11-17T12:00:00Z",
   release_at: "2026-12-16T00:00:00Z",
 };
 
 describe("shell", () => {
-  it("names the stage from the release dates in UTC", () => {
-    expect(stageOf(V138, new Date("2026-09-01T00:00:00Z"))).toBe("Plan");
-    expect(stageOf(V138, new Date("2026-10-01T00:00:00Z"))).toBe("Build");
-    expect(stageOf(V138, new Date("2026-11-21T00:00:00Z"))).toBe("Freeze");
-    expect(stageOf(V138, new Date("2026-12-16T18:00:00Z"))).toBe("Launch");
-    expect(stageOf(V138, new Date("2026-12-17T00:00:00Z"))).toBe("Learn");
-    expect(stageOf({ enhancements_freeze_at: null, code_freeze_at: null, release_at: null }, new Date(0))).toBe("Dates not known");
+  it("uses the portfolio stage boundaries", () => {
+    expect(stageOf(V138, new Date("2026-08-01T00:00:00Z"))).toBe("Plan");
+    expect(stageOf(V138, new Date("2026-11-17T11:59:59Z"))).toBe("Build");
+    expect(stageOf(V138, new Date("2026-11-17T12:00:00Z"))).toBe("Freeze");
+    expect(stageOf(V138, new Date("2026-12-22T23:00:00Z"))).toBe("Launch");
+    expect(stageOf(V138, new Date("2026-12-23T00:00:00Z"))).toBe("Learn");
+    expect(stageOf({ ...V138, cycle_start_at: null }, new Date("2026-11-21T00:00:00Z"))).toBe("Dates not known");
   });
 
   it("links the five screens to the last program, or the release index", () => {
