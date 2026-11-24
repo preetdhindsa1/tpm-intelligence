@@ -33,9 +33,9 @@ variable "extra_poll_teams" {
 }
 
 variable "jira_releases" {
-  description = "Kafka fix versions the hourly Jira collector syncs (#47)."
+  description = "Kafka fix versions the hourly Jira collector syncs (#47): the current release and the finished one it calibrates on. Without the finished one, its freeze dates never reach the engine and the current release has no history to forecast from."
   type        = list(string)
-  default     = ["4.5.0"]
+  default     = ["4.4.0", "4.5.0"]
 }
 
 variable "jira_schedule" {
