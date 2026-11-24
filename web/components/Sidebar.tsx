@@ -11,6 +11,7 @@ const ICONS: Record<string, React.ReactNode> = {
   Simulations: <path d="M2 14V2M2 14h12M4.5 11l3-4 2.5 2 4-5" />,
   Reports: <path d="M4 1.5h6l3 3v10H4zM10 1.5v3h3M6 8h5M6 10.5h5" />,
   "Link review": <path d="M6.5 9.5l3-3M5 8l-1.5 1.5a2 2 0 0 0 3 3L8 11M11 8l1.5-1.5a2 2 0 0 0-3-3L8 5" />,
+  Lab: <path d="M3 13V3M3 13h10M5 10l2.2-3 2 1.6L12 4" />,
 };
 
 const ITEMS = [
@@ -21,14 +22,23 @@ const ITEMS = [
   { href: "/links", label: "Link review" },
 ];
 
-export function Sidebar({ project, release }: { project: string; release: string }) {
+export function Sidebar({
+  project,
+  release,
+  showLab = false,
+}: {
+  project: string;
+  release: string;
+  showLab?: boolean;
+}) {
   const path = usePathname();
   const base = releasePath(project, release);
+  const items = showLab ? [...ITEMS, { href: "/lab", label: "Lab" }] : ITEMS;
   const active = (href: string) =>
     href === "" ? path === base || path.startsWith(`${base}/features`) : path.startsWith(base + href);
   return (
     <nav aria-label="Release sections" className="sticky top-4 flex flex-col gap-1 text-sm">
-      {ITEMS.map((i) => (
+      {items.map((i) => (
         <Link
           key={i.label}
           href={base + i.href}

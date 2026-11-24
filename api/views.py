@@ -17,6 +17,13 @@ from api.schemas import (
     GraphEdgeOut,
     GraphNodeOut,
     GraphOut,
+    LabCapOut,
+    LabCollisionOut,
+    LabDayOut,
+    LabFirstPassOut,
+    LabOut,
+    LabSizeOut,
+    LabWeekOut,
     MergeDateOut,
     MergeDatesOut,
     OddsOut,
@@ -29,9 +36,10 @@ from api.schemas import (
     WaitingPROut,
 )
 from api.service import ReleaseSummary, ReleaseView
-from connectors.load import display_name_for_project
+from connectors.load import display_name_for_project, team_for_project
 from engine.assess import FeatureAssessment
 from engine.forecast import Forecast
+from engine.lab import LabReport, LaneSpec
 from engine.merge_date import MergeDateForecast
 from engine.projection import ReleaseInfo, key_number
 
@@ -42,6 +50,7 @@ def _project(release: ReleaseInfo) -> str:
 
 def _release_fields(release: ReleaseInfo) -> dict[str, Any]:
     project = _project(release)
+    team = team_for_project(project)
     return {
         "key": release.key,
         "name": release.name,
@@ -51,6 +60,7 @@ def _release_fields(release: ReleaseInfo) -> dict[str, Any]:
         "enhancements_freeze_at": release.enhancements_freeze_at,
         "code_freeze_at": release.code_freeze_at,
         "release_at": release.release_at,
+        "has_lab": bool(team and team.author_lanes),
     }
 
 
@@ -463,4 +473,61 @@ def merge_dates_out(view: ReleaseView) -> MergeDatesOut:
         items=items,
         validation=view.date_validation.as_dict(),
         note=MERGE_DATE_NOTE,
+    )
+
+
+def lab_out(report: LabReport) -> LabOut:
+    """Lab counts. Scenario numbers stay null while the sample is small."""
+    cap = report.cap
+    return LabOut(
+        release=report.release_key,
+        as_of=report.as_of,
+        n_pull_requests=report.n_pull_requests,
+        n_merged=report.n_merged,
+        small_sample=report.small_sample,
+        arrivals=[LabWeekOut(week=a.week, lane=a.lane, count=a.count) for a in report.arrivals],
+        queue=[LabDayOut(day=d.day, count=d.count) for d in report.queue],
+        time_to_first_review_hours=list(report.time_to_first_review_hours),
+        still_waiting=report.still_waiting,
+        review_round_counts=list(report.review_round_counts),
+        review_rounds_median=report.review_rounds_median,
+        rework=report.rework,
+        ci_failures=report.ci_failures,
+        collisions=[
+            LabCollisionOut(
+                kind=c.kind,
+                pull_requests=list(c.pull_requests),
+                paths=list(c.paths),
+                truncated=c.truncated,
+            )
+            for c in report.collisions
+        ],
+        cap=LabCapOut(
+            observed_max_open=cap.observed_max_open,
+            held=cap.held if cap.comparable else None,
+            scenario_max_open=cap.scenario_max_open,
+            comparable=cap.comparable,
+            assumption=cap.assumption,
+        ),
+        first_pass=LabFirstPassOut(
+            observed_median_hours=report.first_pass.observed_median_hours,
+            n=report.first_pass.n,
+            waiting=report.first_pass.waiting,
+            comparable=report.first_pass.comparable,
+            assumption=report.first_pass.assumption,
+        ),
+        size=LabSizeOut(
+            over_cap=report.size.over_cap,
+            extra_pull_requests=report.size.extra_pull_requests,
+            comparable=report.size.comparable,
+            assumption=report.size.assumption,
+        ),
+    )
+
+
+def lane_specs(team_lanes: dict[str, Any]) -> tuple[LaneSpec, ...]:
+    """Team-file lanes in file order."""
+    return tuple(
+        LaneSpec(name, rule.labels, rule.branch_prefixes, rule.trailers)
+        for name, rule in team_lanes.items()
     )

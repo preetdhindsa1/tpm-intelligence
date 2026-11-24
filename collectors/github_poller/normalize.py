@@ -28,6 +28,8 @@ from pipeline.events import (
     CheckCompleted,
     CheckConclusion,
     CommentPosted,
+    CommitNote,
+    MergeabilityObserved,
     NormalizedEvent,
     PullRequestObserved,
     ReleaseObserved,
@@ -343,6 +345,7 @@ def pull_request_events(node: Json, *, observed_at: datetime) -> list[Normalized
     commit = _latest_commit(node)
     head_sha = commit.get("oid") if commit else None
     updated = parse_ts(node["updatedAt"])
+    lane = _lane_snapshot(node)
 
     pr = PullRequestObserved(
         repo=repo,
@@ -359,6 +362,7 @@ def pull_request_events(node: Json, *, observed_at: datetime) -> list[Normalized
         merged_at=parse_ts(node["mergedAt"]) if node.get("mergedAt") else None,
         closed_at=parse_ts(node["closedAt"]) if node.get("closedAt") else None,
         url=node.get("url"),
+        **lane,
     )
     out = [
         new_event(
@@ -370,6 +374,21 @@ def pull_request_events(node: Json, *, observed_at: datetime) -> list[Normalized
             identity=(node["updatedAt"],),
         )
     ]
+    raw_mergeable = node.get("mergeable")
+    if head_sha and raw_mergeable in ("MERGEABLE", "CONFLICTING"):
+        state: Literal["mergeable", "conflicting"] = (
+            "mergeable" if raw_mergeable == "MERGEABLE" else "conflicting"
+        )
+        out.append(
+            new_event(
+                source=Source.GITHUB,
+                subject=subject,
+                occurred_at=updated,
+                observed_at=observed_at,
+                payload=MergeabilityObserved(head_sha=head_sha, mergeable=state),
+                identity=(head_sha, state),
+            )
+        )
     out.extend(review_events(node["reviews"]["nodes"], subject=subject, observed_at=observed_at))
     comments = (node.get("comments") or {}).get("nodes") or []
     out.extend(comment_events(comments, subject=subject, observed_at=observed_at))
@@ -452,6 +471,48 @@ def comment_events(
                 identity=(c["databaseId"],),
             )
         )
+    return out
+
+
+def _lane_snapshot(node: Json) -> dict[str, Any]:
+    """Branch, paths, size and commit messages when the lane query asked for them.
+
+    Missing keys stay at the snapshot defaults, so a Kubernetes node still normalizes.
+    Paths and messages only: never a patch.
+    """
+    files = node.get("files") or {}
+    paths = tuple(
+        n["path"] for n in (files.get("nodes") or []) if isinstance(n, dict) and n.get("path")
+    )
+    history = node.get("history") or {}
+    notes: list[CommitNote] = []
+    for n in (history.get("nodes") or [])[:30]:
+        commit = (n or {}).get("commit") or {}
+        when = commit.get("committedDate")
+        if not when:
+            continue
+        message = "\n".join(
+            part for part in (commit.get("messageHeadline"), commit.get("messageBody")) if part
+        )
+        notes.append(CommitNote(committed_at=parse_ts(when), message=message))
+    mergeable = {"MERGEABLE": "mergeable", "CONFLICTING": "conflicting"}.get(
+        node.get("mergeable") or "", "unknown"
+    )
+    out: dict[str, Any] = {}
+    if "headRefName" in node:
+        out["head_ref"] = node.get("headRefName")
+    if "additions" in node:
+        out["additions"] = int(node.get("additions") or 0)
+    if "deletions" in node:
+        out["deletions"] = int(node.get("deletions") or 0)
+    if files:
+        out["changed_files"] = paths
+        out["files_truncated"] = bool((files.get("pageInfo") or {}).get("hasNextPage"))
+    if history:
+        out["commits"] = tuple(notes)
+        out["commits_truncated"] = bool((history.get("pageInfo") or {}).get("hasNextPage"))
+    if "mergeable" in node:
+        out["mergeable"] = mergeable
     return out
 
 

@@ -87,15 +87,54 @@ query MoreComments($owner: String!, $name: String!, $number: Int!, $after: Strin
 """
 
 
-def prs_by_number_query(owner: str, name: str, numbers: list[int]) -> str:
+def search_prs_query(*, lane: bool) -> str:
+    """PR search document. Lane teams also ask for paths, size and commit messages."""
+    if not lane:
+        return SEARCH_PRS
+    return (
+        PR_FIELDS
+        + LANE_FIELDS
+        + """
+query SearchPRs($q: String!, $first: Int!, $after: String) {
+  rateLimit { cost remaining resetAt }
+  search(query: $q, type: ISSUE, first: $first, after: $after) {
+    issueCount
+    pageInfo { hasNextPage endCursor }
+    nodes { ...PRFields ...LaneFields }
+  }
+}
+"""
+    )
+
+
+LANE_FIELDS = """
+fragment LaneFields on PullRequest {
+  headRefName
+  additions
+  deletions
+  mergeable
+  files(first: 100) {
+    pageInfo { hasNextPage }
+    nodes { path }
+  }
+  history: commits(last: 30) {
+    pageInfo { hasNextPage }
+    nodes { commit { committedDate messageHeadline messageBody } }
+  }
+}
+"""
+
+
+def prs_by_number_query(owner: str, name: str, numbers: list[int], *, lane: bool = False) -> str:
     """One query fetching several PRs by number via aliases (``pr143709: pullRequest(...)``)."""
     if not numbers:
         raise ValueError("numbers must not be empty")
-    fields = "\n".join(
-        f"    pr{n}: pullRequest(number: {int(n)}) {{ ...PRFields }}" for n in numbers
-    )
+    spread = "...PRFields ...LaneFields" if lane else "...PRFields"
+    fields = "\n".join(f"    pr{n}: pullRequest(number: {int(n)}) {{ {spread} }}" for n in numbers)
+    extra = LANE_FIELDS if lane else ""
     return (
         PR_FIELDS
+        + extra
         + f"""
 query PRsByNumber {{
   rateLimit {{ cost remaining resetAt }}

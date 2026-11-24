@@ -12,7 +12,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from opentelemetry import trace
@@ -30,6 +30,7 @@ from api.schemas import (
     FeatureDetailOut,
     FeaturesOut,
     GraphOut,
+    LabOut,
     LinkDecisionIn,
     LinkSuggestionOut,
     LinkSuggestionsOut,
@@ -55,13 +56,17 @@ from api.views import (
     feature_detail,
     feature_row,
     graph_out,
+    lab_out,
+    lane_specs,
     merge_dates_out,
     release_out,
     release_summary_out,
     summary_out,
 )
+from connectors.load import team_for_project
 from engine.assess import FeatureAssessment
 from engine.forecast import DEFAULT_FORECAST, model_version
+from engine.lab import lab_report
 
 SERVICE_NAME = "tpm-api"
 # A live stream ends after this long and the browser reconnects (EventSource does so by
@@ -221,6 +226,32 @@ def create_app(
             calibration=v.calibration.describe(),
             validation=v.validation.as_dict(),
         )
+
+    @app.get("/releases/{name}/lab", response_model=LabOut)
+    async def lab(
+        name: str,
+        cap: int = Query(default=2, ge=1, le=20),
+        lines: int = Query(default=400, ge=1, le=5000),
+    ) -> LabOut:
+        """Development-lab counts for a team that configured author lanes.
+
+        Numbers are counts of pull requests already observed. Teams without lanes
+        have no lab.
+        """
+        v = await view(name)
+        project = v.assessment.release.key.split(":", 1)[0]
+        team = team_for_project(project)
+        if team is None or not team.author_lanes:
+            raise HTTPException(404, "no lab for this project")
+        report = lab_report(
+            v.world,
+            v.assessment.release.key,
+            lane_specs(team.author_lanes),
+            team.reviewer_pool,
+            cap_n=cap,
+            max_lines=lines,
+        )
+        return lab_out(report)
 
     @app.get("/releases/{name}/features/{number}", response_model=FeatureDetailOut)
     async def feature(name: str, number: int) -> FeatureDetailOut:

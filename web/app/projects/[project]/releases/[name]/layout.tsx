@@ -21,7 +21,7 @@ export default async function ReleaseLayout({
       <ReleaseSwitcher groups={groups} project={release.project.toLowerCase()} release={release.name} />
       <div className="flex gap-6">
         <aside className="hidden w-44 shrink-0 md:block">
-          <Sidebar project={release.project} release={release.name} />
+          <Sidebar project={release.project} release={release.name} showLab={Boolean(release.has_lab)} />
         </aside>
         <div className="min-w-0 flex-1">{children}</div>
       </div>

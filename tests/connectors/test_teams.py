@@ -63,6 +63,17 @@ def test_this_project_tracks_itself_in_one_repo() -> None:
     calendar = load_calendar(team.calendar_path(relative_to=Path.cwd()))
     assert calendar.get("Phase 3").code_freeze.isoformat() == "2027-01-14T12:00:00+00:00"
     assert get_pack("github_issue").name == "github_issue"
+    assert tuple(team.author_lanes) == ("claude", "cursor", "human")
+    assert team.author_lanes["cursor"].labels == ("cursor-agent",)
+    assert team.author_lanes["claude"].branch_prefixes == ("claude/",)
+    assert team.author_lanes["human"].labels == ("harpreet",)
+    assert team.reviewer_pool == ("preetdhindsa1",)
+
+
+def test_kubernetes_has_no_lanes() -> None:
+    """Kubernetes is not this repository's development lab."""
+    assert load_team("kubernetes").author_lanes == {}
+    assert load_team("kubernetes").reviewer_pool == ()
 
 
 def test_front_page_card_uses_this_projects_display_name() -> None:

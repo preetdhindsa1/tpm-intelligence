@@ -27,6 +27,44 @@ export type Release = {
   features_in_release: number;
   features_ever_in_release: number;
   as_of: string;
+  has_lab?: boolean;
+};
+
+export type LabReport = {
+  release: string;
+  as_of: string;
+  n_pull_requests: number;
+  n_merged: number;
+  small_sample: boolean;
+  arrivals: { week: string; lane: string; count: number }[];
+  queue: { day: string; count: number }[];
+  time_to_first_review_hours: number[];
+  still_waiting: number;
+  review_round_counts: number[];
+  review_rounds_median: number | null;
+  rework: number;
+  ci_failures: number;
+  collisions: { kind: string; pull_requests: string[]; paths: string[]; truncated: boolean }[];
+  cap: {
+    observed_max_open: number;
+    held: number | null;
+    scenario_max_open: number | null;
+    comparable: boolean;
+    assumption: string;
+  };
+  first_pass: {
+    observed_median_hours: number | null;
+    n: number;
+    waiting: number;
+    comparable: boolean;
+    assumption: string;
+  };
+  size: {
+    over_cap: number;
+    extra_pull_requests: number | null;
+    comparable: boolean;
+    assumption: string;
+  };
 };
 
 export type FeatureRow = {
@@ -103,6 +141,8 @@ export const api = {
   dependencies: (release: string, includeRemoved = false) =>
     get<Dependencies>(`/releases/${release}/dependencies${includeRemoved ? "?include_removed=true" : ""}`),
   updates: (release: string) => get<ExecUpdate[]>(`/releases/${release}/updates`),
+  lab: (release: string, cap = 2, lines = 400) =>
+    get<LabReport>(`/releases/${encodeURIComponent(release)}/lab?cap=${cap}&lines=${lines}`),
 };
 
 export type VerifiedClaim = { text: string; type: string; refs: string[]; value: unknown };

@@ -171,6 +171,13 @@ class ReferenceObserved(_Model):
     evidence: Literal["remote_link"]
 
 
+class CommitNote(_Model):
+    """When a commit landed and its message. No diff (CLAUDE.md section 10)."""
+
+    committed_at: AwareDatetime
+    message: str = ""
+
+
 class PullRequestObserved(_Model):
     """Current snapshot of a pull request (text fields only; never code)."""
 
@@ -184,11 +191,27 @@ class PullRequestObserved(_Model):
     labels: tuple[str, ...] = ()
     base_ref: str | None = None
     head_sha: str | None = None
+    head_ref: str | None = None
+    changed_files: tuple[str, ...] = ()  # paths only
+    files_truncated: bool = False  # GitHub had more than the 100 paths stored
+    additions: int = 0
+    deletions: int = 0
+    commits: tuple[CommitNote, ...] = ()  # cap 30; messages for lane trailers
+    commits_truncated: bool = False
+    mergeable: Literal["mergeable", "conflicting", "unknown"] = "unknown"
     created_at: AwareDatetime
     updated_at: AwareDatetime
     merged_at: AwareDatetime | None = None
     closed_at: AwareDatetime | None = None
     url: str | None = None
+
+
+class MergeabilityObserved(_Model):
+    """Whether GitHub can merge the PR into its base. Can change without ``updated_at``."""
+
+    type: Literal["pull_request.mergeability_observed"] = "pull_request.mergeability_observed"
+    head_sha: str
+    mergeable: Literal["mergeable", "conflicting"]
 
 
 class ReviewSubmitted(_Model):
@@ -246,6 +269,7 @@ EventPayload = Annotated[
     | WorkItemStatusChanged
     | ReferenceObserved
     | PullRequestObserved
+    | MergeabilityObserved
     | ReviewSubmitted
     | CommentPosted
     | CheckCompleted

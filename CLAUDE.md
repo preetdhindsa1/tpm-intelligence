@@ -126,6 +126,8 @@ tpm-intelligence/
 
 ## 12. How to work in this repo
 
+Branch and pull-request rules for every coding agent and the owner live in `AGENTS.md`. Follow that file. Do not push to `main`.
+
 1. **Plan before coding.** For any task bigger than a small fix, write a short plan (files, steps, tests, risks) and wait for approval.
 2. Work in **small, reviewable steps.** After each step: run `ruff`, `mypy`, `pytest`, and relevant evals; fix failures before moving on.
 3. **Record design decisions** as ADRs in `docs/decisions/` (context, decision, alternatives, trade-offs). Explain every AI-vs-rules choice there.

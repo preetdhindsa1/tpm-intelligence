@@ -41,8 +41,8 @@ from collectors.github_poller.queries import (
     ISSUE_TIMELINE,
     MORE_COMMENTS,
     MORE_REVIEWS,
-    SEARCH_PRS,
     prs_by_number_query,
+    search_prs_query,
 )
 from pipeline.events import NormalizedEvent
 from pipeline.queue import EventPublisher
@@ -96,6 +96,8 @@ class GitHubPoller:
     read_kep_specs: bool = True
     # Code-only mode: (cycle start, release day or None while unset).
     window: tuple[datetime, datetime | None] | None = None
+    # Ask GitHub for file paths, line counts and commit messages (development lab only).
+    lane_fields: bool = False
 
     @property
     def release(self) -> ReleaseDates:
@@ -291,7 +293,10 @@ class GitHubPoller:
             1 for r, _ in self._tracked_prs if r != self.code_repo
         )
         for chunk in _chunks(missing, 10):
-            data = self.gh.graphql(prs_by_number_query(owner, name, chunk), allow_not_found=True)
+            data = self.gh.graphql(
+                prs_by_number_query(owner, name, chunk, lane=self.lane_fields),
+                allow_not_found=True,
+            )
             for n in chunk:
                 node = data["repository"].get(f"pr{n}")
                 if node:
@@ -351,7 +356,8 @@ class GitHubPoller:
         after: str | None = None
         while True:
             data = self.gh.graphql(
-                SEARCH_PRS, {"q": query, "first": self.page_size, "after": after}
+                search_prs_query(lane=self.lane_fields),
+                {"q": query, "first": self.page_size, "after": after},
             )
             result = data["search"]
             yield from (n for n in result["nodes"] if n and "number" in n)
@@ -364,7 +370,9 @@ class GitHubPoller:
     ) -> Iterator[dict[str, Any]]:
         """Search ``prefix:start..end``, halving the range while it exceeds the 1000 cap."""
         query = f"{prefix}:{_q(start)}..{_q(end)}"
-        probe = self.gh.graphql(SEARCH_PRS, {"q": query, "first": 1, "after": None})
+        probe = self.gh.graphql(
+            search_prs_query(lane=self.lane_fields), {"q": query, "first": 1, "after": None}
+        )
         count = int(probe["search"]["issueCount"])
         if count > SEARCH_RESULT_CAP and end - start > timedelta(minutes=1):
             mid = start + (end - start) / 2

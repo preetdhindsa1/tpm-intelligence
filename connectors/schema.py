@@ -35,6 +35,16 @@ class CodeRepos(BaseModel):
     repos: tuple[str, ...] = Field(min_length=1)
 
 
+class LaneRule(BaseModel):
+    """One author lane. First match wins: label, then branch, then trailer."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    labels: tuple[str, ...] = ()
+    branch_prefixes: tuple[str, ...] = ()
+    trailers: tuple[str, ...] = ()
+
+
 class CalendarRef(BaseModel):
     """Path to a release calendar YAML (github_poller/release_calendar.yaml shape)."""
 
@@ -59,6 +69,10 @@ class TeamConfig(BaseModel):
     planning: GitHubPlanning | JiraPlanning = Field(discriminator="source")
     code: CodeRepos
     calendar: CalendarRef
+    # Empty means this team has no development lab. Match order is label, then branch
+    # prefix, then trailer (engine/lab.py). Dict order is the lane order.
+    author_lanes: dict[str, LaneRule] = Field(default_factory=dict)
+    reviewer_pool: tuple[str, ...] = ()
 
     def calendar_path(self, *, relative_to: Path) -> Path:
         """Resolve the calendar file (paths are repo-root relative unless absolute)."""
