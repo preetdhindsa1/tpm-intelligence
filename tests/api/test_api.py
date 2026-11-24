@@ -688,3 +688,40 @@ def test_live_streams_are_capped_and_a_finished_one_frees_its_slot(
     for _ in range(2):  # the second only works if the first gave its slot back
         with client.stream("GET", "/releases/v1.38/stream") as stream:
             assert next(stream.iter_lines()) == "event: ready"
+
+
+def _kafka_event() -> NormalizedEvent:
+    """A real-shaped event from another project's world (Kafka's Jira plan)."""
+    from pipeline.sample import k8s_6395_tracked_no
+
+    base = k8s_6395_tracked_no().model_dump()
+    base["event_id"] = "00000000-0000-0000-0000-00000000kafk".replace("kafk", "0001")
+    base["subject"] = {**base["subject"], "external_key": "KAFKA-19831"}
+    return NormalizedEvent.model_validate(base)
+
+
+def test_another_projects_events_do_not_make_this_release_stale() -> None:
+    """#70: a Kafka poll used to force a 5-30 s Kubernetes recompute, starving requests."""
+    events = list(fixture_events())
+    source = InMemoryEventSource(events[:-1])
+    service = ReleaseService(source, forecast=FAST, now=lambda: utc(2026, 11, 21, 3))
+    first = service.view("v1.38", wait=True)
+    source.events.append(_kafka_event())
+    assert service.view("v1.38", wait=True) is first  # no recompute for Kafka's event
+    source.events.append(events[-1])  # a Kubernetes event
+    assert service.view("v1.38", wait=True) is not first
+
+
+def test_unowned_events_still_make_every_view_stale() -> None:
+    """Safety: an event no team owns (e.g. a PR in an unlisted repo) refreshes everything."""
+    from pipeline.sample import k8s_6395_tracked_no
+
+    events = list(fixture_events())
+    source = InMemoryEventSource(events)
+    service = ReleaseService(source, forecast=FAST, now=lambda: utc(2026, 11, 21, 3))
+    first = service.view("v1.38", wait=True)
+    base = k8s_6395_tracked_no().model_dump()
+    base["event_id"] = "00000000-0000-0000-0000-000000000099"
+    base["subject"] = {**base["subject"], "external_key": "someone/elsewhere#1"}
+    source.events.append(NormalizedEvent.model_validate(base))
+    assert service.view("v1.38", wait=True) is not first

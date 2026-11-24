@@ -86,6 +86,11 @@ def team_for_project(project: str) -> TeamConfig | None:
     return next((t for t in load_teams().values() if t.project == project), None)
 
 
+def projects_owning(subject_key: str) -> set[str]:
+    """Projects whose world an event subject belongs to (empty if no team owns it)."""
+    return {t.project for t in load_teams().values() if t.owns(subject_key)}
+
+
 def scope_events[E: _Subject](events: Iterable[E], project: str) -> list[E]:
     """Only the events of one project's world (ADR-0018).
 
