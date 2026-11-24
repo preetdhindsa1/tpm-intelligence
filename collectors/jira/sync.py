@@ -17,6 +17,7 @@ from datetime import UTC, datetime, timedelta
 from opentelemetry import trace
 
 from collectors.github_poller.calendar import ReleaseDates
+from collectors.http import HttpError
 from collectors.jira import normalize
 from collectors.jira.client import JiraClient
 from pipeline.events import NormalizedEvent
@@ -36,6 +37,7 @@ class JiraStats:
     issues: int = 0
     full_changelogs_fetched: int = 0
     remote_link_calls: int = 0
+    remote_link_failures: int = 0
     events_published: int = 0
     failed: bool = False
 
@@ -123,11 +125,23 @@ class JiraCollector:
                 *normalize.issue_history(issue, project=self.project, observed_at=observed),
             ]
             self.stats.remote_link_calls += 1
-            links = self.jira.remote_links(key)
-            events += normalize.remote_link_events(key, links, observed_at=observed)
-            spec = normalize.issue_spec(issue, links, observed_at=observed)
-            if spec is not None:
-                events.append(spec)
+            try:
+                links = self.jira.remote_links(key)
+            except HttpError as exc:
+                # Remote links are enrichment: one ticket whose endpoint keeps failing
+                # (KAFKA-19693 returned 503 on every call, #89) must not abort the run.
+                # The ticket and its history still go out; its link-based events wait
+                # for a later run that sees it updated.
+                self.stats.remote_link_failures += 1
+                logger.warning(
+                    "remote links failed; skipped for this issue",
+                    extra={"issue": key, "status": exc.status, "error": str(exc)},
+                )
+            else:
+                events += normalize.remote_link_events(key, links, observed_at=observed)
+                spec = normalize.issue_spec(issue, links, observed_at=observed)
+                if spec is not None:
+                    events.append(spec)
             for event in events:
                 self.publisher.publish(event)
                 self.stats.events_published += 1
