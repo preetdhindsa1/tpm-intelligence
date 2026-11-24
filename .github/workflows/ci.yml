@@ -68,7 +68,7 @@ jobs:
         working-directory: web
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
           cache: npm
@@ -116,7 +116,7 @@ jobs:
         run: |
           uv export --frozen --no-dev --no-hashes --format requirements-txt -q > requirements.txt
           uvx pip-audit -r requirements.txt --disable-pip --no-deps
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
       - name: Web dependencies (npm audit, production, high and above)
