@@ -39,7 +39,7 @@ Calendar (ADR-0020): cycle start 2026-11-30, planning freeze 2026-12-14, code fr
 | P3-M3 | Apache Kafka via Jira | 🟡 | ADR-0018. Collector, linking (81% of 4.4.0 features) and UI done. Jira plan synced hourly and `apache/kafka` PRs every 5 minutes in the cloud since 2026-11-24 (#47). **Left:** no freeze dates, so no Kafka odds (#8); components not mapped to teams |
 | P3-M4 | Faster recompute | ✅ | ADR-0019 (link once, cache the calibration; incremental projection dropped after profiling). Cloud recompute p95 9.2 s |
 | P3-M5 | Webhooks end to end | ✅ | ADR-0020 (this repo tracks itself; repository webhook), ADR-0022 (pipeline under real load). End-to-end timing live; five causes of slow events found and fixed (deploy overlap, short Pub/Sub pulls, one-event-at-a-time storing, skipped pushes, timing the wrong event). Measured p95 **9.7 s** (n = 27), passes the 30 s target. ✅ |
-| P3-M6 | Operations | ✅ | Alerts email the owner and fire on time (#14, #45, #54); uptime checks and a $150/month budget; SLO dashboard with every section 9 target; runbook; restore tested (9 min); CI scanning; security review; load test; Kafka sync; batched event storing (ADR-0022). Follow-ups: #65, #66, #70 |
+| P3-M6 | Operations | ✅ | Alerts email the owner and fire on time (#14, #45, #54); uptime checks and a $150/month budget; SLO dashboard with every section 9 target; runbook; restore tested (9 min); CI scanning; security review; load test; Kafka sync; batched event storing (ADR-0022). Follow-ups: #65 |
 
 Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); forecasts say
 "not enough history" instead of a fake 50% (#9); poller fixes (#11).
@@ -60,7 +60,7 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 | Scheduled Jira and Kafka PR sync in the cloud | ✅ hourly Jira job, Kafka PRs in the 5-minute poll (#47) |
 | Dependency and secret scanning in CI | ✅ pip-audit, npm audit, gitleaks, Dependabot (#18, #34) |
 | Security review of the public endpoints (sign-in, webhooks, API) | ✅ `docs/security-review.md` (#64); follow-ups #65, #66 |
-| Load test of the API and live stream | ✅ 20 users, 0 errors; read p95 about 2 s (#70) |
+| Load test of the API and live stream | ✅ 20 users, 0 errors; read p95 0.53 s at 31 requests/s after #73, #74 (was about 2 s at 12) |
 
 ## Proof (results still to measure or pass)
 
