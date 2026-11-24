@@ -48,3 +48,11 @@ resource "google_cloud_run_v2_job_iam_member" "scheduler_runs_poller" {
   role     = "roles/run.invoker"
   member   = google_service_account.sa["scheduler"].member
 }
+
+# ...and the Jira collector job (#47).
+resource "google_cloud_run_v2_job_iam_member" "scheduler_runs_jira" {
+  name     = google_cloud_run_v2_job.jira.name
+  location = var.region
+  role     = "roles/run.invoker"
+  member   = google_service_account.sa["scheduler"].member
+}

@@ -21,3 +21,26 @@ resource "google_cloud_scheduler_job" "poll" {
 
   depends_on = [google_project_service.apis]
 }
+
+# Kafka's Jira plan, hourly (#47).
+resource "google_cloud_scheduler_job" "jira" {
+  name      = "${local.name}-sync-jira"
+  region    = var.region
+  schedule  = var.jira_schedule
+  time_zone = "Etc/UTC"
+
+  retry_config {
+    retry_count = 0
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://run.googleapis.com/v2/projects/${var.project_id}/locations/${var.region}/jobs/${google_cloud_run_v2_job.jira.name}:run"
+
+    oauth_token {
+      service_account_email = google_service_account.sa["scheduler"].email
+    }
+  }
+
+  depends_on = [google_project_service.apis]
+}

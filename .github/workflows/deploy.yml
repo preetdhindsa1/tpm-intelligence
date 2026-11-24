@@ -64,6 +64,7 @@ jobs:
         run: |
           # --region before --container: flags after --container apply to that container.
           gcloud run jobs update tpm-github-poller --region "$REGION" --container poller --image "$REG/app:$SHA"
+          gcloud run jobs update tpm-jira-collector --region "$REGION" --container jira --image "$REG/app:$SHA"
           gcloud run services update tpm-api --region "$REGION" --container api --image "$REG/app:$SHA"
           gcloud run services update "$WEB_SERVICE" --image "$REG/web:$SHA" --region "$REGION"
           # Webhook receiver (ADR-0020), once Terraform has created it.

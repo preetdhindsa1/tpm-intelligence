@@ -1,5 +1,6 @@
 # Second example shape: Jira plan + GitHub code (most companies).
-# Collector for Jira is not wired yet; this file defines the plug-in contract.
+# The Jira collector syncs the plan hourly in the cloud; the GitHub poller syncs apache/kafka
+# PRs every 5 minutes (#47).
 id: kafka
 display_name: Apache Kafka
 project: KAFKA

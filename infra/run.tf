@@ -384,3 +384,77 @@ resource "google_cloud_run_v2_job" "migrate" {
     ignore_changes = [template[0].template[0].containers[0].image, client, client_version]
   }
 }
+
+# Kafka's Jira plan (P3-M3 follow-up, #47). Hourly, not every 5 minutes: Apache
+# rate-limits automated tools with HTTP 429 (CLAUDE.md section 7). Reuses the poller's
+# service account (database and Pub/Sub; it needs no GitHub token).
+resource "google_cloud_run_v2_job" "jira" {
+  name                = "${local.name}-jira-collector"
+  location            = var.region
+  deletion_protection = false
+
+  template {
+    task_count = 1
+    template {
+      service_account = google_service_account.sa["poller"].email
+      timeout         = "1800s" # a 429 back-off is about 2 minutes; leave room for several
+      max_retries     = 0       # the next hourly run is the retry
+
+      containers {
+        name    = "jira"
+        image   = local.app_image
+        command = ["python", "-m", "collectors.jira"]
+        args    = concat(["--team", "kafka"], flatten([for r in var.jira_releases : ["--release", r]]))
+
+        resources {
+          limits = {
+            cpu    = "1000m"
+            memory = "512Mi" # Cloud Run's gen2 minimum (see the poller)
+          }
+        }
+
+        dynamic "env" {
+          for_each = merge(local.common_env, {
+            OTEL_SERVICE_NAME           = "tpm-jira-collector"
+            OTEL_EXPORTER_OTLP_ENDPOINT = ""
+          })
+          content {
+            name  = env.key
+            value = env.value
+          }
+        }
+        env {
+          name = "DATABASE_URL"
+          value_source {
+            secret_key_ref {
+              secret  = google_secret_manager_secret.database_url.secret_id
+              version = "latest"
+            }
+          }
+        }
+
+        volume_mounts {
+          name       = "cloudsql"
+          mount_path = "/cloudsql"
+        }
+      }
+
+      volumes {
+        name = "cloudsql"
+        cloud_sql_instance {
+          instances = [google_sql_database_instance.db.connection_name]
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    google_secret_manager_secret_iam_member.readers,
+    google_secret_manager_secret_version.database_url,
+  ]
+
+  # The deploy workflow rolls out new images; Terraform owns everything else.
+  lifecycle {
+    ignore_changes = [template[0].template[0].containers[0].image, client, client_version]
+  }
+}
