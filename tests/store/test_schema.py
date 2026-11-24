@@ -22,7 +22,7 @@ from pipeline.events import (
     WorkItemReleaseChanged,
     new_event,
 )
-from pipeline.store.events_repo import append_events, events_for_subject
+from pipeline.store.events_repo import append_events, append_new_events, events_for_subject
 from pipeline.store.models import (
     Base,
     EventRecord,
@@ -140,6 +140,15 @@ def test_append_events_is_idempotent(session: Session) -> None:
     assert append_events(session, history) == 0  # redelivery / re-poll
     assert append_events(session, []) == 0
     assert len(events_for_subject(session, K8S_6395)) == 3
+
+
+def test_append_new_events_returns_only_the_ids_that_were_new(session: Session) -> None:
+    """The worker's batch path announces only these (2026-11-24)."""
+    history = _k8s_6395_history()
+    first = append_new_events(session, history[:2])
+    assert first == {e.event_id for e in history[:2]}
+    assert append_new_events(session, history) == {history[2].event_id}  # two were stored
+    assert append_new_events(session, []) == set()
 
 
 def test_as_of_only_returns_events_that_occurred_before(session: Session) -> None:

@@ -102,6 +102,17 @@ class PubSubTransport:
             }
         )
 
+    def ack_many(self, topic: str, subscription: str, messages: list[ReceivedMessage]) -> None:
+        """Acknowledge a batch in as few calls as possible (1,000 IDs per request)."""
+        ids = [m.ack_id for m in messages]
+        for i in range(0, len(ids), 1000):
+            self._subscriber.acknowledge(
+                request={
+                    "subscription": self._subscription_path(subscription),
+                    "ack_ids": ids[i : i + 1000],
+                }
+            )
+
     def nack(self, topic: str, subscription: str, message: ReceivedMessage) -> None:
         """Set the ack deadline to 0 so Pub/Sub redelivers now."""
         self._subscriber.modify_ack_deadline(

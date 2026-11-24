@@ -34,16 +34,25 @@ def append_events(session: Session, events: Iterable[NormalizedEvent]) -> int:
 
     Idempotent, so at-least-once queue delivery and re-polls are safe.
     """
+    return len(append_new_events(session, events))
+
+
+def append_new_events(session: Session, events: Iterable[NormalizedEvent]) -> set[str]:
+    """Insert events in one statement, skipping stored ``event_id`` s; return the new IDs.
+
+    The worker stores a whole pulled batch this way (one transaction instead of one per
+    event) and announces only the new ones.
+    """
     rows = [_row(e) for e in events]
     if not rows:
-        return 0
+        return set()
     stmt = (
         insert(EventRecord)
         .values(rows)
         .on_conflict_do_nothing(index_elements=["event_id"])
-        .returning(EventRecord.id)
+        .returning(EventRecord.event_id)
     )
-    return len(session.execute(stmt).all())
+    return {str(row[0]) for row in session.execute(stmt).all()}
 
 
 def events_for_subject(
