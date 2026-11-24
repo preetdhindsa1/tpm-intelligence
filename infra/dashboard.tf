@@ -1,6 +1,6 @@
 # SLO dashboard (CLAUDE.md section 9; issue #40). One page for the live targets:
-# availability, event -> dashboard, freshness (poller runs), queue age, API and web health.
-# AI spend has no metric yet and is not drawn (roadmap gap).
+# availability, event -> dashboard, freshness (poller runs), queue age, API and web health,
+# simulator p95 and AI spend (#62).
 
 # Seconds from an event at the source (GitHub's clock) to the push to an open page, per
 # push, from the API's "live update pushed" log line (P3-M5).
@@ -16,6 +16,24 @@ resource "google_logging_metric" "event_to_dashboard" {
   bucket_options {
     explicit_buckets {
       bounds = [1, 2, 5, 10, 20, 30, 60, 120, 300, 600]
+    }
+  }
+}
+
+# Seconds a what-if scenario takes (CLAUDE.md section 14: p95 under 2 s), per request, from
+# Cloud Run's request log for POST /releases/{name}/simulate (#62).
+resource "google_logging_metric" "simulate_latency" {
+  name   = "tpm/simulate_seconds"
+  filter = "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"${google_cloud_run_v2_service.api.name}\" AND httpRequest.requestMethod=\"POST\" AND httpRequest.requestUrl=~\"/releases/[^/]+/simulate$\""
+  metric_descriptor {
+    metric_kind = "DELTA"
+    value_type  = "DISTRIBUTION"
+    unit        = "s"
+  }
+  value_extractor = "EXTRACT(httpRequest.latency)"
+  bucket_options {
+    explicit_buckets {
+      bounds = [0.25, 0.5, 1, 1.5, 2, 3, 5, 10, 30]
     }
   }
 }
@@ -58,6 +76,13 @@ locals {
       group   = ["resource.label.service_name", "metric.label.response_code_class"]
     },
     {
+      title   = "Simulator: what-if scenario p95 seconds (target < 2 s)"
+      filter  = "metric.type=\"logging.googleapis.com/user/${google_logging_metric.simulate_latency.name}\" resource.type=\"cloud_run_revision\""
+      aligner = "ALIGN_PERCENTILE_95"
+      reducer = "REDUCE_MAX"
+      group   = []
+    },
+    {
       title   = "Request latency p95 by service (ms)"
       filter  = "metric.type=\"run.googleapis.com/request_latencies\" resource.type=\"cloud_run_revision\""
       aligner = "ALIGN_PERCENTILE_95"
@@ -72,7 +97,7 @@ resource "google_monitoring_dashboard" "slo" {
     displayName = "TPM: SLOs (CLAUDE.md section 9)"
     gridLayout = {
       columns = "2" # Google stores it as a string; a number showed as drift
-      widgets = [
+      widgets = concat([
         for t in local.dashboard_tiles : {
           title = t.title
           xyChart = {
@@ -95,7 +120,21 @@ resource "google_monitoring_dashboard" "slo" {
             }]
           }
         }
-      ]
+        ], [
+        {
+          # The gateway's own counter (agents/gateway.py), exported to Managed Prometheus.
+          title = "AI spend per day, USD (daily cap in config; alert at 80%)"
+          xyChart = {
+            dataSets = [{
+              plotType   = "LINE"
+              targetAxis = "Y1"
+              timeSeriesQuery = {
+                prometheusQuery = "sum(increase(ai_cost_USD_total[1d]))"
+              }
+            }]
+          }
+        }
+      ])
     }
   })
   depends_on = [google_project_service.apis]

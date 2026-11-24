@@ -52,7 +52,7 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 | Uptime check and availability alert (SLO 99.5%) | ✅ (#36) |
 | Billing budget alert | ⬜ |
 | Fact-checker removal-rate and AI-spend-at-80% alerts (CLAUDE.md section 9) | ✅ (#45) |
-| SLO dashboard (freshness, event to dashboard, simulator p95, availability, AI spend) | 🟡 live (#40); simulator p95 and AI spend not drawn yet |
+| SLO dashboard (freshness, event to dashboard, simulator p95, availability, AI spend) | ✅ all tiles (#40, #62) |
 | Runbook (deploy, Terraform apply, rollback, each alert) | ✅ `docs/runbook.md` (#38) |
 | Event pipeline keeps up with polls and syncs (batched storing) | ✅ ADR-0022 (#50) |
 | Backlog alert fires in minutes, not 18 | ✅ 3 min held for 2 (#54) |
