@@ -52,6 +52,22 @@ Alerts email the owner (notification channel from `alert_email` in the gitignore
   `gcloud run jobs update tpm-github-poller --region us-central1 --image <previous image>`.
 - **Infrastructure:** revert the Terraform change in a PR and apply it.
 
+## Restore the database (tested 2026-11-24)
+
+Cloud SQL keeps daily backups (7) and point-in-time recovery. Restore into a **new**
+instance, check it, then switch or copy what is needed; never restore over production
+without a reason and a fresh backup.
+
+```
+gcloud sql instances clone tpm-postgres tpm-postgres-restore --point-in-time 2026-11-24T05:11:51.000Z
+```
+
+Tested 2026-11-24: the clone took 9 minutes; schema version, tables and every row count up
+to the restore point matched production exactly (355,529 events), and the temporary
+instance was deleted afterwards (`docs/results/restore-test-20261124.json`). To check a
+clone, connect through the Cloud SQL proxy with the `database-url` secret's user and
+password.
+
 ## Alerts
 
 ### TPM: GitHub poller failing (2+ failed runs in 15 minutes)
