@@ -1,4 +1,5 @@
 // Typed client for the FastAPI service. Shapes mirror api/schemas.py.
+import type { Portfolio } from "@/lib/portfolio";
 
 export type Flag = { code: string; severity: "info" | "warning" | "critical"; message: string; facts: Record<string, unknown> };
 
@@ -148,6 +149,7 @@ export const api = {
   dependencies: (release: string, includeRemoved = false) =>
     get<Dependencies>(`/releases/${release}/dependencies${includeRemoved ? "?include_removed=true" : ""}`),
   updates: (release: string) => get<ExecUpdate[]>(`/releases/${release}/updates`),
+  portfolio: () => get<Portfolio>("/portfolio"),
   lab: (project: string, release?: string, cap = 2, lines = 400) => {
     const query = new URLSearchParams({ project, cap: String(cap), lines: String(lines) });
     if (release) query.set("release", release);
