@@ -7,6 +7,7 @@ import threading
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -725,3 +726,32 @@ def test_unowned_events_still_make_every_view_stale() -> None:
     base["subject"] = {**base["subject"], "external_key": "someone/elsewhere#1"}
     source.events.append(NormalizedEvent.model_validate(base))
     assert service.view("v1.38", wait=True) is not first
+
+
+def test_dependencies_are_built_once_per_view_and_rebuilt_when_data_changes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """#70: the costliest read ran on every request (and on the event loop)."""
+    import api.main as main_mod
+
+    builds: list[int] = []
+    real = main_mod.dependencies_out
+
+    def counting(view: Any, include_removed: bool = False) -> Any:
+        builds.append(1)
+        return real(view, include_removed)
+
+    monkeypatch.setattr(main_mod, "dependencies_out", counting)
+    events = list(fixture_events())
+    source = InMemoryEventSource(events[:-1])
+    client = client_at(utc(2026, 11, 21, 3), source=source)
+    first = client.get("/releases/v1.38/dependencies")
+    again = client.get("/releases/v1.38/dependencies")
+    assert first.status_code == again.status_code == 200
+    assert first.json() == again.json()
+    assert len(builds) == 1  # served from the stored JSON the second time
+    source.events.append(events[-1])  # new Kubernetes data
+    client.get("/releases/v1.38/dependencies?include_removed=false")
+    client.get("/releases/v1.38/features")  # let the view recompute if it went stale
+    assert client.get("/releases/v1.38/dependencies").status_code == 200
+    assert len(builds) >= 2  # rebuilt for the new view
