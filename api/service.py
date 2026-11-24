@@ -187,6 +187,12 @@ class ReleaseService:
         # Views older than this version must be recomputed before they are served
         # (raised by ``invalidate``: the user's own action must show).
         self._required_version = 0
+        # The data version at which each project's events last changed (#70). A Kafka poll
+        # or a webhook on this repository used to make every view stale, so Kubernetes v1.38
+        # (5-30 s of CPU) was recomputed for events it never reads, and those recomputes
+        # starved request threads: read p95 about 2 s under load (2026-11-24).
+        self._project_changed: dict[str, int] = {}
+        self._all_changed = 0  # events no team owns, and invalidate(): every view is stale
         self._refreshing: set[str] = set()
         self._refreshing_guard = threading.Lock()
         self._warmer: threading.Thread | None = None
@@ -208,13 +214,27 @@ class ReleaseService:
                 )
                 self._last_id = last
                 self._version += 1
+                self._mark_changed(new)
             return len(new)
+
+    def _mark_changed(self, new: Sequence[NormalizedEvent]) -> None:
+        """Record which projects the new events belong to (caller holds the lock)."""
+        from connectors.load import projects_owning
+
+        for subject in {e.subject.external_key for e in new}:
+            projects = projects_owning(subject)
+            if not projects:  # unknown owner: stay safe and treat every view as stale
+                self._all_changed = self._version
+                return
+            for owner in projects:
+                self._project_changed[owner] = self._version
 
     def invalidate(self) -> None:
         """Recompute views before their next use (e.g. after a person confirms a link)."""
         with self._lock:
             self._version += 1
             self._required_version = self._version
+            self._all_changed = self._version
             # A person's decision may change links anywhere: no cached calibration survives.
             self._calibrations.clear()
 
@@ -391,7 +411,12 @@ class ReleaseService:
             return view
 
     def _is_fresh(self, cached: ReleaseView) -> bool:
-        return cached.version == self._version and time.monotonic() - cached.computed_at < self._ttl
+        """Fresh unless its own project's events (or unowned ones) changed since it was made."""
+        changed = max(
+            self._project_changed.get(_project_of(cached.assessment.release.key), 0),
+            self._all_changed,
+        )
+        return cached.version >= changed and time.monotonic() - cached.computed_at < self._ttl
 
     def _key_lock(self, key: str) -> threading.Lock:
         with self._key_locks_guard:

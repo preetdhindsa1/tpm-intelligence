@@ -752,6 +752,8 @@ def create_app(
                     # Wait for the recomputed view here, in the stream, so the browser
                     # reloads only once the new data is ready (pages never wait for it).
                     v = await view(name, wait=True)
+                    if v.version <= last_sent:
+                        continue  # another project's events: this release did not change (#70)
                     last_sent = v.version
                     yield _sse(
                         "update",
