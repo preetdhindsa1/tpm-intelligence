@@ -4,7 +4,8 @@ The worker publishes one small message per stored event, with the W3C trace cont
 the event it just stored: on a Redis channel when it runs as its own service (local
 Docker), or in-process when the API runs it (cloud, ADR-0017). The API debounces bursts
 (a backfill stores thousands of events) and hands the first message's trace context to
-the SSE handler, so the API's recompute joins the trace that started in the collector.
+the SSE handler, so the API's recompute joins the trace that started in the collector,
+with the first event's source times so the push can be timed end to end (P3-M5).
 """
 
 from __future__ import annotations
@@ -13,22 +14,39 @@ import asyncio
 import threading
 from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Protocol
 
-from opentelemetry.context import Context
-
-from pipeline.notify import CHANNEL, context_of
+from pipeline.notify import CHANNEL, Notice, notice_of
 
 HEARTBEAT_S = 15.0
 DEBOUNCE_S = 1.0
 
 
+def push_timing(notice: Notice, pushed_at: datetime) -> dict[str, object]:
+    """Seconds from the first event's source time and collector time to the push (P3-M5).
+
+    ``occurred_at`` is the source's clock (GitHub, whole seconds), so the first figure is
+    accurate to about a second and assumes the clocks agree.
+    """
+    timing: dict[str, object] = {"event_id": notice.event_id, "batched": notice.batched}
+    if notice.occurred_at is not None:
+        timing["seconds_since_occurred"] = round(
+            (pushed_at - notice.occurred_at).total_seconds(), 2
+        )
+    if notice.observed_at is not None:
+        timing["seconds_since_observed"] = round(
+            (pushed_at - notice.observed_at).total_seconds(), 2
+        )
+    return timing
+
+
 class Updates(Protocol):
-    """Yields a trace context per (debounced) update, or None as a heartbeat."""
+    """Yields a :class:`Notice` per (debounced) update, or None as a heartbeat."""
 
     def subscribe(
         self, is_disconnected: Callable[[], Awaitable[bool]]
-    ) -> AsyncIterator[Context | None]:
+    ) -> AsyncIterator[Notice | None]:
         """Iterate until the client disconnects."""
         ...
 
@@ -38,7 +56,7 @@ async def _debounced(
     is_disconnected: Callable[[], Awaitable[bool]],
     heartbeat_s: float,
     debounce_s: float,
-) -> AsyncIterator[Context | None]:
+) -> AsyncIterator[Notice | None]:
     while not await is_disconnected():
         try:
             first = await asyncio.wait_for(queue.get(), timeout=heartbeat_s)
@@ -46,9 +64,11 @@ async def _debounced(
             yield None
             continue
         await asyncio.sleep(debounce_s)
+        batched = 1
         while not queue.empty():  # coalesce the burst
             queue.get_nowait()
-        yield context_of(first)
+            batched += 1
+        yield notice_of(first, batched)
 
 
 @dataclass
@@ -76,7 +96,7 @@ class InMemoryUpdates:
 
     async def subscribe(
         self, is_disconnected: Callable[[], Awaitable[bool]]
-    ) -> AsyncIterator[Context | None]:
+    ) -> AsyncIterator[Notice | None]:
         """Iterate debounced updates."""
         queue: asyncio.Queue[str] = asyncio.Queue()
         entry = (asyncio.get_running_loop(), queue)
@@ -102,7 +122,7 @@ class RedisUpdates:
 
     async def subscribe(
         self, is_disconnected: Callable[[], Awaitable[bool]]
-    ) -> AsyncIterator[Context | None]:
+    ) -> AsyncIterator[Notice | None]:
         """Iterate debounced updates from the Redis channel."""
         import redis.asyncio as aioredis
 

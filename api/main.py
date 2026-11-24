@@ -7,6 +7,7 @@ import logging
 import threading
 import time
 from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -18,7 +19,7 @@ from starlette.concurrency import run_in_threadpool
 
 from api.ai import AIServices
 from api.auth import Actor, AuthConfig, identify, require_approver
-from api.live import DEBOUNCE_S, Updates
+from api.live import DEBOUNCE_S, Updates, push_timing
 from api.schemas import (
     ClaimOutApi,
     DecisionIn,
@@ -683,15 +684,15 @@ def create_app(
             yield _sse("ready", {"release": name, "version": svc().version})
             yield f"retry: {STREAM_RETRY_MS}\n\n"
             deadline = time.monotonic() + STREAM_MAX_S
-            async for ctx in hub.subscribe(request.is_disconnected):
+            async for notice in hub.subscribe(request.is_disconnected):
                 if time.monotonic() >= deadline:
                     return  # the browser reconnects after STREAM_RETRY_MS
-                if ctx is None:
+                if notice is None:
                     yield ": heartbeat\n\n"
                     continue
                 # Continue the trace started by the collector (via queue and worker).
                 with tracer.start_as_current_span(
-                    "api.push_update", context=ctx, attributes={"tpm.release": name}
+                    "api.push_update", context=notice.context, attributes={"tpm.release": name}
                 ):
                     notified = time.monotonic()
                     before = svc().version
@@ -709,8 +710,9 @@ def create_app(
                             "as_of": v.assessment.as_of.isoformat(),
                         },
                     )
-                    # Event -> dashboard latency (P3-M4, ADR-0019): from the worker's notice
+                    # Event -> dashboard latency. P3-M4 (ADR-0019): from the worker's notice
                     # (sent after the event is stored, batched for DEBOUNCE_S) to the push.
+                    # P3-M5: also from the first event's source and collector times.
                     logger.info(
                         "live update pushed",
                         extra={
@@ -718,6 +720,7 @@ def create_app(
                             "version": v.version,
                             "seconds_since_notified": round(time.monotonic() - notified, 2),
                             "debounce_s": DEBOUNCE_S,
+                            **push_timing(notice, datetime.now(UTC)),
                         },
                     )
 

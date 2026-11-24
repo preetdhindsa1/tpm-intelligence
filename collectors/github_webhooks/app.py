@@ -133,7 +133,13 @@ def create_app(
             publish(e)
         logger.info(
             "webhook received",
-            extra={"github_event": event, "repo": repo, "events_published": len(events)},
+            extra={
+                "github_event": event,
+                "repo": repo,
+                "events_published": len(events),
+                # Lets the P3-M5 measurement tell webhook events from polled ones.
+                "event_ids": [e.event_id for e in events],
+            },
         )
         return _outcome(
             Response(content=json.dumps({"events": len(events)}), status_code=202),

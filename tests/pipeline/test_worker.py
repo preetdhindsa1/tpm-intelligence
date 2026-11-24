@@ -62,9 +62,16 @@ def _store_with(monkeypatch: Any, inserted: int) -> tuple[list[str], list[str]]:
 
 
 def test_new_event_is_logged_as_stored_and_announced(monkeypatch: Any) -> None:
+    from pipeline.notify import notice_of
+    from pipeline.sample import k8s_6395_tracked_no
+
     messages, notices = _store_with(monkeypatch, inserted=1)
     assert messages == ["event stored"]
     assert len(notices) == 1
+    event, notice = k8s_6395_tracked_no(), notice_of(notices[0])
+    assert notice.event_id == event.event_id
+    assert notice.occurred_at == event.occurred_at  # P3-M5: timed from the source
+    assert notice.observed_at is not None  # the sample stamps a fresh observed time
 
 
 def test_duplicate_is_not_logged_as_stored_nor_announced(monkeypatch: Any) -> None:
