@@ -43,3 +43,28 @@ def test_a_slow_p95_misses_the_target() -> None:
         for i in range(20)
     ]
     assert webhook_latency(receipts, pushes)["meets_target"] is False
+
+
+def test_every_webhook_event_is_timed_to_the_first_push_after_it_was_stored() -> None:
+    from datetime import UTC, datetime, timedelta
+
+    from observability.latency import per_event_latency
+
+    t0 = datetime(2026, 11, 24, 3, 0, tzinfo=UTC)
+    s = timedelta(seconds=1)
+    receipts = [(t0 + 2 * s, {"event_ids": ["a", "b"]}), (t0 + 30 * s, {"event_ids": ["c"]})]
+    stored = [
+        (t0 + 3 * s, {"event_id": "a", "occurred_at": t0.isoformat()}),
+        (t0 + 3 * s, {"event_id": "b", "occurred_at": t0.isoformat()}),  # same batch as a
+        (t0 + 4 * s, {"event_id": "polled", "occurred_at": t0.isoformat()}),  # not a webhook
+        (t0 + 31 * s, {"event_id": "c", "occurred_at": (t0 + 29 * s).isoformat()}),
+        (t0 + 99 * s, {"event_id": "never pushed", "occurred_at": t0.isoformat()}),
+    ]
+    receipts.append((t0 + 98 * s, {"event_ids": ["never pushed"]}))
+    pushes = [t0 + 6 * s, t0 + 35 * s]
+    out = per_event_latency(receipts, stored, pushes)
+    assert out["events"] == 3  # a and b (one push), c; not the polled one or the unpushed one
+    assert out["total_seconds"]["max"] == 6.0  # a, b: 0 -> push at 6 s; c: 29 -> 35 s
+    assert out["github_to_receiver_seconds"]["max"] == 2.0
+    assert out["receiver_to_push_seconds"]["max"] == 5.0  # c: received 30, pushed 35
+    assert out["meets_target"] is True

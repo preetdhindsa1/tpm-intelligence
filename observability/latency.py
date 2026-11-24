@@ -21,7 +21,9 @@ waits for.
 
 from __future__ import annotations
 
+from bisect import bisect_left
 from collections.abc import Iterable, Mapping
+from datetime import datetime
 from typing import Any
 
 import numpy as np
@@ -76,6 +78,53 @@ def webhook_latency(
     return {
         "pushes": all_pushes,
         "unique_events": len(first),
+        "total_seconds": summary(total),
+        "github_to_receiver_seconds": summary(delivery),
+        "receiver_to_push_seconds": summary(after_receipt),
+        "target_p95_seconds": TARGET_P95_S,
+        "meets_target": None if p95 is None else bool(p95 < TARGET_P95_S),
+    }
+
+
+def per_event_latency(
+    receipts: Iterable[tuple[datetime, Mapping[str, Any]]],
+    stored: Iterable[tuple[datetime, Mapping[str, Any]]],
+    push_times: Iterable[datetime],
+) -> dict[str, Any]:
+    """Time every webhook event, not one event per push (P3-M5).
+
+    A push is timed by one event of its batch; when polled events share the batch, webhook
+    events that reached the page go unmeasured. Here each webhook event is timed to the
+    first push after it was stored:
+
+    * ``receipts``: (log time, ``webhook received`` payload): the receipt time per event.
+    * ``stored``: (log time, ``event stored`` payload): store time and ``occurred_at``.
+      Only new events are logged as stored, so repeats of known facts are skipped.
+    * ``push_times``: log times of ``live update pushed`` (any open page).
+    """
+    received: dict[str, datetime] = {}
+    for at, r in receipts:
+        for e in r.get("event_ids") or []:
+            received.setdefault(str(e), at)
+    pushes = sorted(push_times)
+    total: list[float] = []
+    delivery: list[float] = []
+    after_receipt: list[float] = []
+    for at, s in stored:
+        event_id = str(s.get("event_id") or "")
+        if event_id not in received or not s.get("occurred_at"):
+            continue
+        i = bisect_left(pushes, at)
+        if i == len(pushes):
+            continue  # no open page pushed after it
+        occurred = datetime.fromisoformat(str(s["occurred_at"]))
+        push = pushes[i]
+        total.append((push - occurred).total_seconds())
+        delivery.append((received[event_id] - occurred).total_seconds())
+        after_receipt.append((push - received[event_id]).total_seconds())
+    p95 = summary(total)["p95"]
+    return {
+        "events": len(total),
         "total_seconds": summary(total),
         "github_to_receiver_seconds": summary(delivery),
         "receiver_to_push_seconds": summary(after_receipt),
