@@ -166,7 +166,7 @@ class ReleaseService:
         self._last_id = 0
         self._version = 0
         self._views: dict[str, ReleaseView] = {}
-        self._recal: dict[tuple[str, int], tuple[float, Recalibration]] = {}
+        self._recal: dict[tuple[str, int], tuple[float, Recalibration, Calibration]] = {}
         self._recal_ttl = recalibration_ttl.total_seconds()
         self._calibrations: dict[str, _CalibrationEntry] = {}
         self._calibration_ttl = calibration_ttl.total_seconds()
@@ -533,14 +533,17 @@ class ReleaseService:
             return Recalibration.identity_to_base(base)
         cache_key = (key, int(lead))
         hit = self._recal.get(cache_key)
-        if hit and time.monotonic() - hit[0] < self._recal_ttl:
+        # Only if fit on this same calibration: one fit on an earlier, empty calibration
+        # (base 0.5, no training pairs) kept every Kafka 4.5.0 probability at 0.5 after
+        # the calibration had been rebuilt with 58 samples (#81).
+        if hit and hit[2] is calibration and time.monotonic() - hit[0] < self._recal_ttl:
             return hit[1]
         with tracer.start_as_current_span(
             "api.fit_recalibration", attributes={"tpm.lead_days": int(lead)}
         ):
             pairs, used = training_pairs(events, key, world.as_of, lead, self._forecast)
             recal = fit(pairs, base_rate=base, training_releases=used)
-        self._recal[cache_key] = (time.monotonic(), recal)
+        self._recal[cache_key] = (time.monotonic(), recal, calibration)
         return recal
 
 

@@ -144,3 +144,26 @@ def test_reviews_comments_and_unchanged_snapshots_do_not_rebuild() -> None:
     source.events += more(lambda s: s.pr(5002, 102, utc(2026, 6, 3), merged=utc(2026, 6, 13)))
     svc.view("v1.38", wait=True)
     assert svc.calibrations_computed == 1
+
+
+def test_recalibration_is_not_reused_across_a_rebuilt_calibration() -> None:
+    """#81: a fit on an empty calibration (base 0.5) kept every Kafka 4.5.0 odds at 0.5
+    after the calibration was rebuilt with 58 samples."""
+    from types import SimpleNamespace
+
+    from engine.forecast import Calibration, Rate
+
+    service = ReleaseService(InMemoryEventSource([]), now=lambda: utc(2026, 11, 24))
+    key = "KAFKA:4.5.0"
+    world = SimpleNamespace(
+        as_of=utc(2026, 11, 24),
+        releases={key: SimpleNamespace(code_freeze_at=utc(2027, 2, 4))},  # 72 days ahead
+    )
+    empty = Calibration(("KAFKA:4.4.0",), utc(2026, 11, 24), (), {}, {})
+    rebuilt = Calibration(("KAFKA:4.4.0",), utc(2026, 11, 24), (5.6,), {}, {4: Rate(13, 14)})
+    first = service._recalibration([], world, key, empty)  # type: ignore[arg-type]
+    again = service._recalibration([], world, key, empty)  # type: ignore[arg-type]
+    after = service._recalibration([], world, key, rebuilt)  # type: ignore[arg-type]
+    assert again is first  # same calibration: the cache still works
+    assert first.base_rate == 0.5  # empty: an uninformed prior
+    assert after.base_rate == round(Rate(13, 14).mean, 4)  # rebuilt: refit, not reused
