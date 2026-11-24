@@ -639,3 +639,48 @@ def test_a_page_still_gets_the_update_when_something_else_refreshed_first(
             if line == "event: update":
                 break
     assert "event: update" in received
+
+
+def test_responses_carry_security_headers() -> None:
+    """Security review (#64): no framing, no content sniffing, no referrer leaks."""
+    response = client_at(utc(2026, 11, 21, 3)).get("/health")
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert response.headers["Referrer-Policy"] == "no-referrer"
+
+
+def test_simulator_answers_busy_instead_of_queueing_unbounded_work(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Security review (#64): the public simulator is CPU-heavy on a single instance."""
+    import api.main as main_mod
+
+    monkeypatch.setattr(main_mod, "MAX_PARALLEL_SIMULATIONS", 0)  # always busy
+    response = client_at(utc(2026, 11, 3)).post("/releases/v1.38/simulate", json={})
+    assert response.status_code == 429
+    assert response.headers["Retry-After"] == "5"
+
+
+def test_live_streams_are_capped_and_a_finished_one_frees_its_slot(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Security review (#64): open live pages must not fill the instance's 160 slots.
+
+    The test client runs a stream to its end before returning, so two cannot overlap here:
+    a cap of 0 shows the refusal, a cap of 1 with streams one after another shows a finished
+    stream gives its slot back.
+    """
+    import api.main as main_mod
+
+    monkeypatch.setattr(main_mod, "STREAM_MAX_S", 0.2)
+    monkeypatch.setattr(main_mod, "MAX_OPEN_STREAMS", 0)
+    full = client_at(utc(2026, 11, 21, 3), InMemoryUpdates(heartbeat_s=0.05))
+    refused = full.get("/releases/v1.38/stream")
+    assert refused.status_code == 503
+    assert refused.headers["Retry-After"] == "30"
+
+    monkeypatch.setattr(main_mod, "MAX_OPEN_STREAMS", 1)
+    client = client_at(utc(2026, 11, 21, 3), InMemoryUpdates(heartbeat_s=0.05))
+    for _ in range(2):  # the second only works if the first gave its slot back
+        with client.stream("GET", "/releases/v1.38/stream") as stream:
+            assert next(stream.iter_lines()) == "event: ready"

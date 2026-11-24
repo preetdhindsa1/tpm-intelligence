@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import threading
 import time
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from opentelemetry import trace
@@ -68,6 +69,16 @@ SERVICE_NAME = "tpm-api"
 # (2026-11-23, ADR-0019).
 STREAM_MAX_S = 120.0  # 600 s still let an old revision run 5+ min after a deploy (P3-M5)
 STREAM_RETRY_MS = 1000
+# Security review (docs/security-review.md, #64): one API instance takes 160 concurrent
+# requests; open live pages each hold one, so cap them below that and keep room for pages
+# and actions. The public simulator is CPU-heavy: at most a couple of runs at once.
+MAX_OPEN_STREAMS = 100
+MAX_PARALLEL_SIMULATIONS = 2
+_SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "no-referrer",
+}
 SIM_NOTE = (
     "Decision support, not a guarantee: if these assumptions hold, results are likely in "
     "these ranges."
@@ -127,6 +138,18 @@ def create_app(
         # from the browser directly; CORS covers reads and the live-update stream.
         allow_headers=["*"],
     )
+
+    @app.middleware("http")
+    async def security_headers(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        response = await call_next(request)
+        for key, value in _SECURITY_HEADERS.items():
+            response.headers.setdefault(key, value)
+        return response
+
+    simulations = asyncio.Semaphore(MAX_PARALLEL_SIMULATIONS)
+    open_streams = {"n": 0}
     state: dict[str, Any] = {
         "service": service,
         "updates": updates,
@@ -563,8 +586,16 @@ def create_app(
 
     @app.post("/releases/{name}/simulate", response_model=SimulationOut)
     async def simulate(name: str, body: ScenarioIn) -> SimulationOut:
-        """Run a scenario next to the baseline. Nothing is saved."""
-        return await simulate_out(name, body)
+        """Run a scenario next to the baseline. Nothing is saved.
+
+        At most ``MAX_PARALLEL_SIMULATIONS`` run at once; more get 429 (security review).
+        """
+        if simulations.locked():
+            raise HTTPException(
+                429, "The simulator is busy; try again in a few seconds.", {"Retry-After": "5"}
+            )
+        async with simulations:
+            return await simulate_out(name, body)
 
     def saved_out(row: Any) -> SavedScenarioOut:
         return SavedScenarioOut(
@@ -677,10 +708,21 @@ def create_app(
     async def stream(name: str, request: Request) -> StreamingResponse:
         """Server-Sent Events: an ``update`` event whenever new data changes the release."""
         await view(name)  # 404 early for unknown releases
+        if open_streams["n"] >= MAX_OPEN_STREAMS:
+            # Browsers' EventSource retries by itself; Retry-After spreads the retries.
+            raise HTTPException(503, "Too many live pages open; retrying.", {"Retry-After": "30"})
         hub = state["updates"] or _default_updates()
         state["updates"] = hub
 
         async def events() -> AsyncIterator[str]:
+            open_streams["n"] += 1
+            try:
+                async for chunk in _events():
+                    yield chunk
+            finally:
+                open_streams["n"] -= 1
+
+        async def _events() -> AsyncIterator[str]:
             # Push when the data is newer than what this page last got, whoever refreshed
             # it: comparing against the version before this stream's own refresh missed
             # updates for up to 11 minutes when another page or request refreshed first
