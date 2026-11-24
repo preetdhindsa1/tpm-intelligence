@@ -20,7 +20,7 @@
 | API security headers | Live response headers | ❌ No `nosniff` or framing protection |
 | Capacity abuse: live streams | Cloud Run settings | ❌ One API instance (ADR-0017) takes 160 concurrent requests; each open live page holds one, so about 160 open pages would block the site |
 | Capacity abuse: simulator | Code | ❌ Public and CPU-heavy, no limit on parallel runs. Inputs and replications are bounded, so one request cannot be made expensive; many at once could tie up the instance |
-| Content-Security-Policy | Live response headers | ⚠️ None |
+| Content-Security-Policy | Live response headers | ✅ Since #65: per-request nonce, `strict-dynamic`, no `unsafe-inline` for scripts |
 
 ## Fixed in this change (#64)
 
@@ -35,8 +35,11 @@
 
 ## Follow-ups
 
-- **#65** Content-Security-Policy for the web app (needs nonces or hashes for Next.js inline
-  scripts; start in report-only mode).
+- **#65** Content-Security-Policy (done): `web/proxy.ts` sets a fresh nonce per request, so
+  only Next.js's own scripts run. Checked locally in headless Chrome with the policy
+  enforced: 10 pages, 0 violations, live updates connected; an injected `onerror` handler
+  and inline script were blocked (the same page without the policy ran them).
+  `CSP_MODE=report-only` relaxes it without a code change if a page breaks.
 - **#66** The risk-note page took 12.5 s for a stored note (performance, found during the
   review).
 - No per-IP rate limiting beyond the limits above. Reads are public by design; Cloud Run's
