@@ -67,7 +67,7 @@ lean option with a ceiling of about $150/month. Two measurements also matter:
 ## First deploy (2026-11-23)
 
 Run by `infra/first-deploy.sh --yes --with-local-secrets --seed-local-data`. Live:
-web `https://tpm-intelligence-109199755245.us-central1.run.app` (renamed from `tpm-web` on 2026-11-23 at the owner's request), API
+web `https://tpm-intelligence-109199755245.us-central1.run.app` (renamed from `tpm-web` on 2026-11-23 at the owner's request) (renamed again later that day to `https://program-intelligence-platform-109199755245.us-central1.run.app`, ADR-0021), API
 `https://tpm-api-109199755245.us-central1.run.app`. Seeded from the local database:
 Kubernetes v1.33-v1.38 and Kafka 4.4.0/4.5.0 (counts match local: v1.38 70/106,
 Kafka 4.4.0 19/26). First requests after warm-up: v1.38 features 1.1 s, Kafka 4.4.0
