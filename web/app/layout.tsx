@@ -1,37 +1,31 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { AuthStatus } from "@/components/AuthStatus";
+import { Inter, Space_Grotesk } from "next/font/google";
+import { getServerSession } from "next-auth";
+import { SiteHeader } from "@/components/shell/SiteHeader";
+import { authOptions, devLoginEnabled, githubEnabled, type TpmSession } from "@/lib/auth";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const grotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk" });
 
 export const metadata: Metadata = {
   title: "Program Intelligence Platform",
   description:
-    "Open-source portfolio dashboard: release health for public Kubernetes and Apache Kafka data. Forecasts which features may slip, with ranges. Read-only for visitors; no account needed.",
+    "AI-native program management. Every fact verified. Read-only for visitors; no account needed.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = (await getServerSession(authOptions())) as TpmSession;
   return (
     <html lang="en">
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
-        <header className="border-b bg-white">
-          <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-3">
-            <div className="flex items-center gap-6">
-              <Link href="/" className="font-semibold">Program Intelligence Platform</Link>
-              <nav aria-label="Main" className="flex gap-4 text-sm text-slate-600">
-                <Link href="/" className="hover:text-slate-900">Overview</Link>
-                <Link href="/releases" className="hover:text-slate-900">Release health</Link>
-                <Link href="/lab" className="hover:text-slate-900">Multi-Agent Development and PR Lab</Link>
-              </nav>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="hidden text-xs text-slate-500 lg:inline">
-                AI-native program health · decision support, not guarantees
-              </span>
-              <AuthStatus />
-            </div>
-          </div>
-        </header>
-        <main className="mx-auto max-w-[1600px] px-6 py-6">{children}</main>
+      <body className={`${inter.variable} ${grotesk.variable} min-h-screen bg-canvas font-sans text-slate-900 antialiased`}>
+        <a href="#content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-3 focus:py-2">
+          Skip to content
+        </a>
+        <SiteHeader login={session?.login ?? null} signIn={githubEnabled() || devLoginEnabled()} />
+        <main id="content" className="mx-auto max-w-[1600px] px-6 py-6">
+          {children}
+        </main>
       </body>
     </html>
   );
