@@ -378,7 +378,11 @@ def test_simulator_endpoints_label_not_validated_and_save_scenarios() -> None:
         validation=lambda: Validation(False, "test: not validated"),
     )
     client = TestClient(create_app(service=service, sim_store=store, ai=AIServices()))
-    assert client.get("/releases/v1.38/simulator").status_code == 404  # not calibrated yet
+    missing = client.get("/releases/v1.38/simulator")
+    assert missing.status_code == 404  # not calibrated yet
+    # Visitors read this (#60): no developer commands in it.
+    assert missing.json()["detail"].startswith("No simulator for v1.38 yet")
+    assert "make" not in missing.json()["detail"]
     store.save_calibration(calibration())
 
     info = client.get("/releases/v1.38/simulator").json()

@@ -302,7 +302,11 @@ export function Simulator({ release }: { release: string }) {
 
   const compared = useMemo(() => picked.map((id) => saved.find((s) => s.id === id)).filter(Boolean) as SavedScenario[], [picked, saved]);
 
-  if (error && !info) return <p className="rounded border border-rose-200 bg-rose-50 p-2 text-sm text-rose-800">{error}</p>;
+  if (error && !info) {
+    // No calibration for this release (no earlier release to learn from) is not a failure (#60).
+    const tone = error.startsWith("No simulator") ? "border-slate-200 bg-slate-50 text-slate-700" : "border-rose-200 bg-rose-50 text-rose-800";
+    return <p className={`rounded border p-2 text-sm ${tone}`}>{error}</p>;
+  }
   if (!info) return <p className="text-sm text-slate-500">Loading…</p>;
 
   return (
