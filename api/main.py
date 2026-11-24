@@ -7,6 +7,7 @@ import json
 import logging
 import threading
 import time
+from collections import OrderedDict
 from collections.abc import AsyncIterator, Awaitable, Callable
 from datetime import UTC, datetime
 from typing import Any
@@ -78,6 +79,7 @@ NO_SIMULATOR = (
 # and actions. The public simulator is CPU-heavy: at most a couple of runs at once.
 MAX_OPEN_STREAMS = 100
 MAX_PARALLEL_SIMULATIONS = 2
+DEPENDENCIES_CACHE_SIZE = 8  # (release, view version, include_removed) entries (#70)
 _SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
@@ -665,10 +667,26 @@ def create_app(
         """Release dependency graph: features, verified PR links, stated PR dependencies."""
         return graph_out(await view(name))
 
+    # The dependency graph is the costliest read (about 115 ms and 260 KiB for v1.38, 15x
+    # the other pages) and it ran on the event loop, so it delayed every request, /health
+    # included: read p95 about 2 s at 13 requests/s (#70). Build it once per release view,
+    # off the event loop, and serve the stored JSON until the data changes.
+    dependencies_cache: OrderedDict[tuple[Any, ...], bytes] = OrderedDict()
+
     @app.get("/releases/{name}/dependencies", response_model=DependenciesOut)
-    async def dependencies(name: str, include_removed: bool = False) -> DependenciesOut:
+    async def dependencies(name: str, include_removed: bool = False) -> Response:
         """Feature-to-feature dependencies: shared PRs, stated "depends on", waiting PRs."""
-        return dependencies_out(await view(name), include_removed)
+        v = await view(name)
+        key = (v.assessment.release.key, v.version, v.computed_at, include_removed)
+        body = dependencies_cache.get(key)
+        if body is None:
+            body = await run_in_threadpool(
+                lambda: dependencies_out(v, include_removed).model_dump_json().encode()
+            )
+            dependencies_cache[key] = body
+            while len(dependencies_cache) > DEPENDENCIES_CACHE_SIZE:
+                dependencies_cache.popitem(last=False)
+        return Response(content=body, media_type="application/json")
 
     @app.get("/releases/{name}/merge-dates", response_model=MergeDatesOut)
     async def merge_dates(name: str) -> MergeDatesOut:
