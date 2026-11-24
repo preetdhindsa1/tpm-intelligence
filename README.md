@@ -240,6 +240,10 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   its events in seconds (p95 9.7 s, small sample). Kubernetes and Kafka stay polled every
   5 minutes (the Kafka plan hourly), since webhooks need admin rights on the source
   repository.
+- **Review metrics for this repository start when pull requests exist under the ruleset**
+  (P3-M7, ADR-0023). Until then there is no measured review queue. Absence is not a measured
+  zero. The lab is a case study of tool lanes on this repository, not a ranking of people,
+  and a what-if comparison waits until 20 pull requests have merged.
 - **This project has no history yet** (ADR-0020). Its `Phase 3` release begins on
   2026-11-30 and has no earlier release to learn from, so its forecasts say "not enough
   history" instead of a number (#9).

@@ -16,3 +16,10 @@ code:
     - acme/service
 calendar:
   path: connectors/teams/acme-calendar.yaml
+# Optional. Omit both keys for a team with no development lab.
+# author_lanes:            # first matching rule wins: label, then branch, then trailer
+#   claude:
+#     labels: [claude-agent]
+#     branch_prefixes: ["claude/"]
+#     trailers: ["Co-Authored-By: Claude"]
+# reviewer_pool: []

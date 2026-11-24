@@ -1,0 +1,6 @@
+claude-agent:
+  - head-branch: ['^claude/']
+cursor-agent:
+  - head-branch: ['^cursor/']
+harpreet:
+  - head-branch: ['^harpreet/']

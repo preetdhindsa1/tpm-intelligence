@@ -26,6 +26,7 @@ class ReleaseOut(_Out):
     features_in_release: int
     features_ever_in_release: int
     as_of: datetime
+    has_lab: bool = False
 
 
 class FlagOut(_Out):
@@ -576,3 +577,66 @@ class MeOut(_Out):
     signed_in: bool
     approver: bool
     mode: str  # required | local
+
+
+class LabWeekOut(_Out):
+    week: str
+    lane: str
+    count: int
+
+
+class LabDayOut(_Out):
+    day: str
+    count: int
+
+
+class LabCollisionOut(_Out):
+    kind: str
+    pull_requests: list[str]
+    paths: list[str]
+    truncated: bool
+
+
+class LabCapOut(_Out):
+    observed_max_open: int
+    held: int | None
+    scenario_max_open: int | None
+    comparable: bool
+    assumption: str
+
+
+class LabFirstPassOut(_Out):
+    observed_median_hours: float | None
+    n: int
+    waiting: int
+    comparable: bool
+    assumption: str
+
+
+class LabSizeOut(_Out):
+    over_cap: int
+    extra_pull_requests: int | None
+    comparable: bool
+    assumption: str
+
+
+class LabOut(_Out):
+    """Development-lab counts. A case study of this repository, not a forecast."""
+
+    release: str
+    as_of: datetime
+    n_pull_requests: int
+    n_merged: int
+    small_sample: bool
+    arrivals: list[LabWeekOut]
+    queue: list[LabDayOut]
+    time_to_first_review_hours: list[float]
+    still_waiting: int
+    review_round_counts: list[int]
+    review_rounds_median: float | None
+    rework: int
+    ci_failures: int
+    collisions: list[LabCollisionOut]
+    cap: LabCapOut
+    first_pass: LabFirstPassOut
+    size: LabSizeOut

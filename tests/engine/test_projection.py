@@ -63,3 +63,38 @@ def test_no_future_data(as_of: datetime) -> None:
         e for e in events if e.occurred_at < as_of or isinstance(e.payload, SNAPSHOT_TYPES)
     ]
     assert project(events, as_of) == project(past_only, as_of)
+
+
+def test_mergeability_after_as_of_is_invisible() -> None:
+    from pipeline.events import MergeabilityObserved, Source, SubjectKind, SubjectRef, new_event
+
+    events = list(fixture_events())
+    snap = next(
+        e
+        for e in events
+        if e.subject.external_key == MAIN_PR and e.event_type == "pull_request.observed"
+    )
+    subject = SubjectRef(kind=SubjectKind.PULL_REQUEST, source=Source.GITHUB, external_key=MAIN_PR)
+    events.append(
+        new_event(
+            source=Source.GITHUB,
+            subject=subject,
+            occurred_at=utc(2026, 11, 21, 1),
+            observed_at=utc(2026, 11, 21, 1),
+            identity=("sha", "conflicting"),
+            payload=MergeabilityObserved(head_sha="sha", mergeable="conflicting"),
+        )
+    )
+    events.append(
+        new_event(
+            source=Source.GITHUB,
+            subject=subject,
+            occurred_at=utc(2026, 11, 22),
+            observed_at=utc(2026, 11, 22),
+            identity=("sha2", "mergeable"),
+            payload=MergeabilityObserved(head_sha="sha2", mergeable="mergeable"),
+        )
+    )
+    assert project(events, utc(2026, 11, 21, 12)).pull_requests[MAIN_PR].mergeable == "conflicting"
+    assert project(events, utc(2026, 11, 10)).pull_requests[MAIN_PR].mergeable == "unknown"
+    assert snap.payload.mergeable == "unknown"  # type: ignore[union-attr]

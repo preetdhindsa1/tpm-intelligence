@@ -14,3 +14,19 @@ code:
     - preetdhindsa1/tpm-intelligence
 calendar:
   path: connectors/teams/tpm-intelligence-calendar.yaml
+# First matching lane wins: label, then branch prefix, then trailer.
+# Dependabot is not a lane. The contributor login is not used.
+author_lanes:
+  claude:
+    labels: [claude-agent]
+    branch_prefixes: ["claude/"]
+    trailers: ["Co-Authored-By: Claude"]
+  cursor:
+    labels: [cursor-agent]
+    branch_prefixes: ["cursor/"]
+    trailers: ["Co-authored-by: Cursor Agent"]
+  human:
+    labels: [harpreet]
+    branch_prefixes: ["harpreet/"]
+    trailers: []
+reviewer_pool: [preetdhindsa1]

@@ -755,3 +755,75 @@ def test_dependencies_are_built_once_per_view_and_rebuilt_when_data_changes(
     client.get("/releases/v1.38/features")  # let the view recompute if it went stale
     assert client.get("/releases/v1.38/dependencies").status_code == 200
     assert len(builds) >= 2  # rebuilt for the new view
+
+
+def test_kubernetes_has_no_lab(after_readd: TestClient) -> None:
+    assert after_readd.get("/releases/v1.38/lab").status_code == 404
+    assert after_readd.get("/releases").json()[0]["has_lab"] is False
+
+
+def test_lab_reports_a_shared_file_collision() -> None:
+    """Two open pull requests in this repository that touch the same path."""
+    from pipeline.events import (
+        PullRequestObserved,
+        ReleaseObserved,
+        Source,
+        SubjectKind,
+        SubjectRef,
+        new_event,
+    )
+
+    repo = "preetdhindsa1/tpm-intelligence"
+    observed = utc(2026, 12, 2)
+    opened = utc(2026, 12, 1)
+
+    def ref(kind: SubjectKind, key: str) -> SubjectRef:
+        return SubjectRef(kind=kind, source=Source.GITHUB, external_key=key)
+
+    release = new_event(
+        source=Source.GITHUB,
+        subject=ref(SubjectKind.RELEASE, "tpm-intelligence:Phase 3"),
+        occurred_at=utc(2026, 11, 30),
+        observed_at=observed,
+        identity=("Phase 3",),
+        payload=ReleaseObserved(
+            project="tpm-intelligence",
+            name="Phase 3",
+            cycle_start_at=utc(2026, 11, 30),
+            code_freeze_at=utc(2027, 1, 14, 12),
+            release_at=utc(2027, 1, 20),
+        ),
+    )
+    events = [release]
+    for number, path in ((1, "engine/lab.py"), (2, "engine/lab.py")):
+        events.append(
+            new_event(
+                source=Source.GITHUB,
+                subject=ref(SubjectKind.PULL_REQUEST, f"{repo}#{number}"),
+                occurred_at=opened,
+                observed_at=observed,
+                identity=(number,),
+                payload=PullRequestObserved(
+                    repo=repo,
+                    number=number,
+                    title=f"PR {number}",
+                    state="open",
+                    head_ref=f"claude/{number}-lab",
+                    changed_files=(path,),
+                    labels=("claude-agent",),
+                    created_at=opened,
+                    updated_at=observed,
+                ),
+            )
+        )
+    client = client_at(observed, source=InMemoryEventSource(events))
+    body = client.get("/releases/Phase%203/lab").json()
+    assert body["n_pull_requests"] == 2
+    assert body["small_sample"] is True
+    assert body["arrivals"][0]["lane"] == "claude"
+    assert body["collisions"][0]["kind"] == "shared_files"
+    assert body["collisions"][0]["paths"] == ["engine/lab.py"]
+    assert body["cap"]["scenario_max_open"] is None
+    listed = client.get("/releases").json()
+    phase = next(r for r in listed if r["name"] == "Phase 3")
+    assert phase["has_lab"] is True

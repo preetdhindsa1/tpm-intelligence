@@ -29,6 +29,8 @@ from pipeline.events import (
     ChangeAction,
     CheckCompleted,
     CommentPosted,
+    CommitNote,
+    MergeabilityObserved,
     NormalizedEvent,
     PullRequestObserved,
     ReferenceObserved,
@@ -191,6 +193,14 @@ class PullRequest:
     reviews: tuple[Review, ...]
     checks: tuple[Check, ...]
     comments: tuple[Comment, ...] = ()
+    head_ref: str | None = None
+    changed_files: tuple[str, ...] = ()
+    files_truncated: bool = False
+    additions: int = 0
+    deletions: int = 0
+    commits: tuple[CommitNote, ...] = ()
+    commits_truncated: bool = False
+    mergeable: Literal["mergeable", "conflicting", "unknown"] = "unknown"
 
     @property
     def is_open(self) -> bool:
@@ -265,6 +275,7 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
     membership: dict[str, list[MembershipChange]] = defaultdict(list)
     label_hist: dict[str, list[LabelChange]] = defaultdict(list)
     pr_snap: dict[str, tuple[datetime, PullRequestObserved]] = {}
+    merge_state: dict[str, tuple[datetime, Literal["mergeable", "conflicting"]]] = {}
     reviews: dict[str, dict[str, Review]] = defaultdict(dict)
     comments: dict[str, dict[str, Comment]] = defaultdict(dict)
     checks: dict[str, dict[str, Check]] = defaultdict(dict)
@@ -307,6 +318,10 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
             prev = checks[key].get(p.check_name)
             if prev is None or at >= prev.at:
                 checks[key][p.check_name] = Check(p.check_name, p.conclusion.value, at)
+        elif isinstance(p, MergeabilityObserved):
+            current = merge_state.get(key)
+            if current is None or at >= current[0]:
+                merge_state[key] = (at, p.mergeable)
 
     features = {
         key: _feature(key, snap, spec_snap.get(key), membership[key], label_hist[key], as_of)
@@ -314,7 +329,9 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
         if snap.created_at < as_of
     }
     prs = {
-        key: _pull_request(key, snap, reviews[key], checks[key], as_of, comments[key])
+        key: _pull_request(
+            key, snap, reviews[key], checks[key], as_of, comments[key], merge_state.get(key)
+        )
         for key, (_, snap) in pr_snap.items()
         if snap.created_at < as_of
     }
@@ -385,12 +402,16 @@ def _pull_request(
     checks: Mapping[str, Check],
     as_of: datetime,
     comments: Mapping[str, Comment] | None = None,
+    mergeability: tuple[datetime, Literal["mergeable", "conflicting"]] | None = None,
 ) -> PullRequest:
     merged = snap.merged_at if snap.merged_at and snap.merged_at < as_of else None
     closed = snap.closed_at if snap.closed_at and snap.closed_at < as_of else None
     state: PRState = "merged" if merged else ("closed" if closed else "open")
     # Only the latest commit's checks are known; they only apply while the PR is that commit.
     known_checks = tuple(sorted(checks.values(), key=lambda c: c.name)) if snap.head_sha else ()
+    mergeable: Literal["mergeable", "conflicting", "unknown"] = snap.mergeable
+    if mergeability is not None and mergeability[0] >= snap.updated_at:
+        mergeable = mergeability[1]
     return PullRequest(
         key=key,
         repo=snap.repo,
@@ -399,6 +420,14 @@ def _pull_request(
         body=snap.body,
         author=snap.author,
         labels=snap.labels,
+        head_ref=snap.head_ref,
+        changed_files=snap.changed_files,
+        files_truncated=snap.files_truncated,
+        additions=snap.additions,
+        deletions=snap.deletions,
+        commits=snap.commits,
+        commits_truncated=snap.commits_truncated,
+        mergeable=mergeable,
         created_at=snap.created_at,
         state=state,
         merged_at=merged,

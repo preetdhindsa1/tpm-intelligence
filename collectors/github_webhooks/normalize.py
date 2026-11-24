@@ -27,6 +27,7 @@ from pipeline.events import (
     CheckCompleted,
     CheckConclusion,
     CommentPosted,
+    MergeabilityObserved,
     NormalizedEvent,
     PullRequestObserved,
     ReviewSubmitted,
@@ -56,6 +57,7 @@ def pull_request_snapshot(repo: str, pr: Json, *, observed_at: datetime) -> Norm
         labels=tuple(sorted(label["name"] for label in pr.get("labels") or [])),
         base_ref=(pr.get("base") or {}).get("ref"),
         head_sha=(pr.get("head") or {}).get("sha"),
+        head_ref=(pr.get("head") or {}).get("ref"),
         created_at=gh.parse_ts(pr["created_at"]),
         updated_at=gh.parse_ts(pr["updated_at"]),
         merged_at=gh.parse_ts(pr["merged_at"]) if pr.get("merged_at") else None,
@@ -69,6 +71,28 @@ def pull_request_snapshot(repo: str, pr: Json, *, observed_at: datetime) -> Norm
         observed_at=observed_at,
         payload=payload,
         identity=(pr["updated_at"],),
+    )
+
+
+def mergeability_event(repo: str, pr: Json, *, observed_at: datetime) -> NormalizedEvent | None:
+    """A mergeability fact, or None when GitHub has not computed it yet.
+
+    The first webhook delivery often sends ``mergeable: null``. That is not a conflict.
+    """
+    flag = pr.get("mergeable")
+    if not isinstance(flag, bool) or pr.get("mergeable_state") == "unknown":
+        return None
+    sha = (pr.get("head") or {}).get("sha")
+    if not sha:
+        return None
+    state: Literal["mergeable", "conflicting"] = "mergeable" if flag else "conflicting"
+    return new_event(
+        source=Source.GITHUB,
+        subject=gh.pull_request_ref(repo, pr["number"]),
+        occurred_at=gh.parse_ts(pr["updated_at"]),
+        observed_at=observed_at,
+        payload=MergeabilityObserved(head_sha=sha, mergeable=state),
+        identity=(sha, state),
     )
 
 
@@ -178,6 +202,9 @@ class WebhookNormalizer:
         pr = payload.get("pull_request")
         if event in ("pull_request", "pull_request_review") and pr:
             out.append(pull_request_snapshot(repo, pr, observed_at=observed_at))
+            mergeability = mergeability_event(repo, pr, observed_at=observed_at)
+            if mergeability is not None:
+                out.append(mergeability)
         if event == "pull_request_review" and pr and payload.get("review"):
             review = review_event(repo, pr["number"], payload["review"], observed_at=observed_at)
             if review is not None:
