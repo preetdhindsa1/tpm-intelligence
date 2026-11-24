@@ -12,6 +12,9 @@ planning:
 code:
   repos:
     - apache/kafka
+# Kafka's release managers drop slipped features from a fix version weeks after Feature
+# Freeze (the engine's Code Freeze), up to the release: judge "landed" at the release (#86).
+landed_at: release
 calendar:
   # Placeholder calendar path — replace with a real Kafka release calendar when collecting.
   path: connectors/teams/kafka-calendar.yaml

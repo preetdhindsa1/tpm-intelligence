@@ -56,6 +56,7 @@ class ReleaseInfo:
     enhancements_freeze_at: datetime | None
     code_freeze_at: datetime | None
     release_at: datetime | None
+    outcome_at: datetime | None = None  # "landed" judged here + 3 days; None = Code Freeze
 
 
 @dataclass(frozen=True)
@@ -291,6 +292,7 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
                 p.enhancements_freeze_at,
                 p.code_freeze_at,
                 p.release_at,
+                p.outcome_at,
             )
         elif isinstance(p, WorkItemObserved):
             item_snap[key] = _latest(item_snap.get(key), at, p)

@@ -73,6 +73,9 @@ class TeamConfig(BaseModel):
     # prefix, then trailer (engine/lab.py). Dict order is the lane order.
     author_lanes: dict[str, LaneRule] = Field(default_factory=dict)
     reviewer_pool: tuple[str, ...] = ()
+    # When "landed" is judged (#86): 3 days after Code Freeze, or 3 days after the release
+    # ships, for teams that drop slipped work from a release later than their freeze.
+    landed_at: Literal["code_freeze", "release"] = "code_freeze"
 
     def calendar_path(self, *, relative_to: Path) -> Path:
         """Resolve the calendar file (paths are repo-root relative unless absolute)."""

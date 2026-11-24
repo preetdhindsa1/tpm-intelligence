@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 
 from engine.forecast import (
     DEFAULT_FORECAST,
-    LANDED_WINDOW,
     Calibration,
     Forecast,
     ForecastConfig,
@@ -21,6 +20,7 @@ from engine.forecast import (
     finished_releases,
     forecast_release,
     landed,
+    outcome_cutoff,
 )
 from engine.projection import World, project
 from engine.recalibrate import Recalibration, fit
@@ -79,7 +79,10 @@ def training_pairs(
         if not finished_releases(past, t, exclude=key):
             continue  # nothing earlier to calibrate this release's raw forecast on
         _, _, raw = raw_forecasts(events, key, t, config, world=past)
-        truth = project(events, release.code_freeze_at + LANDED_WINDOW + timedelta(seconds=1))
+        cutoff = outcome_cutoff(release)
+        if cutoff is None:
+            continue
+        truth = project(events, cutoff + timedelta(seconds=1))
         for fc in raw:
             outcome = (
                 landed(truth.features[fc.feature_key], release)

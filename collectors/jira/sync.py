@@ -53,6 +53,7 @@ class JiraCollector:
     releases: Sequence[str]
     # Hand-entered freeze dates per release name (the team's calendar file, #8).
     plan: Mapping[str, ReleaseDates] = field(default_factory=dict)
+    landed_at: str = "code_freeze"
     now: Callable[[], datetime] = lambda: datetime.now(UTC)
     stats: JiraStats = field(default_factory=JiraStats)
 
@@ -108,6 +109,7 @@ class JiraCollector:
             base_url=self.base_url,
             observed_at=observed,
             plan=self.plan,
+            landed_at=self.landed_at,
         ):
             self.publisher.publish(event)
             self.stats.events_published += 1
