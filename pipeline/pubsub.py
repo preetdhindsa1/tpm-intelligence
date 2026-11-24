@@ -31,6 +31,7 @@ class PubSubTransport:
         publisher: Any | None = None,
         subscriber: Any | None = None,
         publish_timeout_s: float = 30.0,
+        min_pull_timeout_s: float = 20.0,
     ) -> None:
         if publisher is None or subscriber is None:
             from google.cloud import pubsub_v1
@@ -41,6 +42,7 @@ class PubSubTransport:
         self._publisher = publisher
         self._subscriber = subscriber
         self._publish_timeout_s = publish_timeout_s
+        self._min_pull_timeout_s = min_pull_timeout_s
 
     def _topic_path(self, topic: str) -> str:
         return f"projects/{self._project}/topics/{topic}"
@@ -61,6 +63,11 @@ class PubSubTransport:
         An empty subscription makes Pub/Sub's pull run out its deadline: that is "no
         messages", not a failure (it used to be logged as a worker crash every few seconds,
         each followed by a 5 s back-off, 2026-11-23).
+
+        The pull waits at least ``min_pull_timeout_s``. With a 2 s client timeout, Pub/Sub
+        leased messages to requests the client had already given up on; they stayed hidden
+        until the 60 s ack deadline and webhook events reached the page 60-90 s late
+        (2026-11-24, #43). A pull still returns as soon as messages exist.
         """
         from google.api_core.exceptions import DeadlineExceeded
 
@@ -70,7 +77,7 @@ class PubSubTransport:
                     "subscription": self._subscription_path(subscription),
                     "max_messages": max_messages,
                 },
-                timeout=timeout_s,
+                timeout=max(timeout_s, self._min_pull_timeout_s),
             )
         except DeadlineExceeded:
             return []
