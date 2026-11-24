@@ -53,7 +53,7 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 | Billing budget alert | ⬜ |
 | Fact-checker removal-rate and AI-spend-at-80% alerts (CLAUDE.md section 9) | ⬜ |
 | SLO dashboard (freshness, event to dashboard, simulator p95, availability, AI spend) | ⬜ |
-| Runbook (deploy, Terraform apply, rollback, each alert) | ⬜ |
+| Runbook (deploy, Terraform apply, rollback, each alert) | ✅ `docs/runbook.md` (#38) |
 | Cloud SQL backups | 🟡 configured; restore never tested |
 | Scheduled Jira and Kafka PR sync in the cloud | ⬜ (P3-M3 follow-up) |
 | Dependency and secret scanning in CI | ⬜ |
