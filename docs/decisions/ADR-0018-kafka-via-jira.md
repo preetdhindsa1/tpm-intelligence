@@ -115,3 +115,26 @@ a link exists, not whether it is right; precision is not labelled yet.
 - Kafka components are not mapped to teams yet, so team views show "no team label".
 - An umbrella outside the release whose sub-tasks are in it is not a release feature;
   those sub-task PRs count as unlinked load.
+
+## Addendum (2026-11-24, #8): freeze dates from the Apache release plans
+
+The deferred hand-entered freeze dates are now in `connectors/teams/kafka-calendar.yaml`,
+one entry per release with its Apache wiki release-plan page as `source_url`. The Jira
+collector and the poller merge them into each release event; Jira stays the source of the
+cycle start and the actual release date, and the plan's "no earlier than" date is used only
+while Jira has none.
+
+**Mapping.** Kafka's plans name three dates. The engine's Code Freeze means "the feature's
+code must be merged"; for Kafka that is the **Feature Freeze** (after it only fixes go in).
+So: KIP Freeze -> `enhancements_freeze`, Feature Freeze -> `code_freeze`; Kafka's later
+Code Freeze (blockers only) is noted per release but not modelled. The plans give dates
+without a time zone, so each is taken as the end of that day, UTC.
+
+| Release | KIP Freeze | Feature Freeze (engine Code Freeze) | Code Freeze | Release |
+|---|---|---|---|---|
+| 4.4.0 | 2026-07-08 | 2026-07-29 | 2026-08-12 | 2026-10-26 (Jira) |
+| 4.5.0 | 2027-01-13 | 2027-02-03 | 2027-02-17 | no earlier than 2027-03-17 (plan) |
+
+**Alternative considered:** mapping Kafka's Code Freeze to the engine's Code Freeze. It
+would count features merged in the two weeks after Feature Freeze as on time, which Kafka's
+own process does not allow. Plans can change; the dates are re-checked when a release ships.
