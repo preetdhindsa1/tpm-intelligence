@@ -63,3 +63,12 @@ real traffic, and the per-event measurement.
   as such.
 
 No AI is involved in any of this: it is queueing and storage.
+
+## Results (2026-11-24)
+
+- Webhook event -> live page after all six decisions: **p95 9.7 s**, p50 5.7 s, max 12.2 s
+  (n = 27; ADR-0020 has the breakdown).
+- Old revision gone 1 min 36 s after a deploy (was 5-10 min).
+- Oldest queued event stayed at 0-2 s through polls and the hourly Jira sync (it reached
+  833 s before batching). A one-time 2,400-event catch-up has not been repeated since the
+  fix; the local benchmark (5.2x) covers it.

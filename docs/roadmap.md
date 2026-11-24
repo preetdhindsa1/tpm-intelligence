@@ -38,7 +38,7 @@ Calendar (ADR-0020): cycle start 2026-11-30, planning freeze 2026-12-14, code fr
 | P3-M2 | Cloud deploy (live demo) | ✅ | ADR-0017; renamed URL in ADR-0021 |
 | P3-M3 | Apache Kafka via Jira | 🟡 | ADR-0018. Collector, linking (81% of 4.4.0 features) and UI done. Jira plan synced hourly and `apache/kafka` PRs every 5 minutes in the cloud since 2026-11-24 (#47). **Left:** no freeze dates, so no Kafka odds (#8); components not mapped to teams |
 | P3-M4 | Faster recompute | ✅ | ADR-0019 (link once, cache the calibration; incremental projection dropped after profiling). Cloud recompute p95 9.2 s |
-| P3-M5 | Webhooks end to end | 🟡 | ADR-0020 (this repo tracks itself; repository webhook), ADR-0022 (pipeline under real load). End-to-end timing live; five causes of slow events found and fixed (deploy overlap, short Pub/Sub pulls, one-event-at-a-time storing, skipped pushes, timing the wrong event). **Left:** publish the measured p95 on 30+ events (#6) |
+| P3-M5 | Webhooks end to end | ✅ | ADR-0020 (this repo tracks itself; repository webhook), ADR-0022 (pipeline under real load). End-to-end timing live; five causes of slow events found and fixed (deploy overlap, short Pub/Sub pulls, one-event-at-a-time storing, skipped pushes, timing the wrong event). Measured p95 **9.7 s** (n = 27), passes the 30 s target. ✅ |
 | P3-M6 | Operations | 🟡 | Alerts email the owner and fire on time (#14, #54); uptime checks, SLO dashboard, runbook, CI scanning, Kafka sync done. **Left:** see "Hardening" below (#7) |
 
 Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); forecasts say
@@ -66,7 +66,7 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 
 | Result | Status | Needs |
 |---|---|---|
-| Event to dashboard via webhooks, p95 < 30 s | ⬜ TBD | P3-M5 |
+| Event to dashboard via webhooks, p95 < 30 s | ✅ 9.7 s (n = 27, 2026-11-24) | More samples over time |
 | Linking precision per method | ⬜ TBD | The owner labels `evals/cases/linking.csv` (70 rows) |
 | Link suggester reviewed precision | ⬜ TBD | The owner reviews the 104 suggestions |
 | Fact-checker labels | 🟡 | The owner's review |

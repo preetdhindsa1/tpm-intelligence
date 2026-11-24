@@ -1,0 +1,56 @@
+{
+  "measured_at": "2026-11-24T04:45:32Z",
+  "window": [
+    "2026-11-24T04:29:00Z",
+    "2026-11-24T04:45:32Z"
+  ],
+  "webhook_deliveries": 45,
+  "per_event": {
+    "events": 27,
+    "total_seconds": {
+      "n": 27,
+      "p50": 5.67,
+      "p95": 9.65,
+      "max": 12.16
+    },
+    "github_to_receiver_seconds": {
+      "n": 27,
+      "p50": 2.22,
+      "p95": 6.06,
+      "max": 7.03
+    },
+    "receiver_to_push_seconds": {
+      "n": 27,
+      "p50": 3.63,
+      "p95": 7.28,
+      "max": 7.6
+    },
+    "target_p95_seconds": 30.0,
+    "meets_target": true
+  },
+  "per_push": {
+    "pushes": 33,
+    "unique_events": 18,
+    "total_seconds": {
+      "n": 18,
+      "p50": 6.21,
+      "p95": 10.9,
+      "max": 12.16
+    },
+    "github_to_receiver_seconds": {
+      "n": 18,
+      "p50": 2.89,
+      "p95": 6.22,
+      "max": 6.98
+    },
+    "receiver_to_push_seconds": {
+      "n": 18,
+      "p50": 3.29,
+      "p95": 8.11,
+      "max": 10.68
+    },
+    "target_p95_seconds": 30.0,
+    "meets_target": true
+  },
+  "note": "per_event (primary): every new webhook event in the window, timed to the first push after it was stored. total = push - GitHub's occurred_at (GitHub clock, whole seconds: about +-1 s). Window starts after all P3-M5 fixes were deployed (tpm-api-00033). One owner's activity on one repository: small sample."
+}

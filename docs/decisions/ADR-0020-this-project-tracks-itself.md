@@ -71,3 +71,27 @@ freeze. The owner set the cycle start and planning freeze.
 - **Linking is rules only.** The deterministic `github_issue` pack verifies a closing
   keyword (`Fixes #12`) or a `Feature: #12` line; a bare `#12` elsewhere stays
   `suggested` until a person confirms it. No AI is involved in this decision.
+
+## Results (P3-M5, measured 2026-11-24)
+
+Webhook event -> live page, in the cloud, after the pipeline fixes of ADR-0022
+(`scripts/measure_webhook_latency.py`, per-event method;
+`docs/results/webhook-latency-cloud-20261124T044532Z.json`):
+
+| | n | p50 | p95 | max |
+|---|---|---|---|---|
+| **GitHub event -> push to an open page** | 27 | 5.7 s | **9.7 s** | 12.2 s |
+| GitHub -> receiver (GitHub's delivery) | 27 | 2.2 s | 6.1 s | 7.0 s |
+| Receiver -> push (queue, store, recompute, send) | 27 | 3.6 s | 7.3 s | 7.6 s |
+
+- **Passes the 30 s target** (CLAUDE.md section 9), with Kubernetes and Kafka polls and the
+  hourly Jira sync running at the same time (window 04:29-04:45 UTC).
+- Each webhook event is timed to the first push after it was stored, from the receiver,
+  worker and API log lines. GitHub's timestamps are whole seconds on GitHub's clock, so
+  figures are accurate to about +-1 s.
+- Before the fixes, typical events were already 2-10 s, but some took 60 s to 14 minutes;
+  ADR-0022 lists the five causes.
+- **Small sample:** one owner's activity on one repository in one window, 3 short of the 30
+  planned (published at the owner's request; the count keeps growing with activity).
+- Pre-cycle PRs count: PRs opened before the 2026-11-30 cycle start link to Phase 3 features
+  (webhooks deliver them; the poller only looks from the cycle start).
