@@ -207,6 +207,32 @@ def test_hand_entered_plan_adds_freeze_dates_and_jira_keeps_the_release_date() -
     assert r45.cycle_start_at == datetime(2026, 10, 26, tzinfo=UTC)  # still from Jira
 
 
+def test_history_releases_carry_their_plan_dates() -> None:
+    """#83: 4.2.0 and 4.3.0 are the history 4.4.0's replayed forecast is calibrated on."""
+    from connectors import load_team
+    from connectors.load import release_plan
+
+    events = n.release_events(
+        load("versions_KAFKA.json"),
+        ["4.2.0", "4.3.0"],
+        project="KAFKA",
+        project_key="KAFKA",
+        base_url=BASE,
+        observed_at=OBSERVED,
+        plan=release_plan(load_team("kafka")),
+    )
+    by_name = {e.payload.name: e.payload for e in events}
+    r42, r43 = by_name["4.2.0"], by_name["4.3.0"]
+    assert r42.code_freeze_at == datetime(2025, 11, 20, tzinfo=UTC)  # Feature Freeze 19 Nov
+    assert r42.enhancements_freeze_at == datetime(2025, 10, 30, tzinfo=UTC)  # KIP Freeze 29 Oct
+    assert r42.release_at == datetime(2026, 2, 17, tzinfo=UTC)
+    assert r43.code_freeze_at == datetime(2026, 3, 19, tzinfo=UTC)  # Feature Freeze 18 Mar
+    assert r43.enhancements_freeze_at == datetime(2026, 2, 26, tzinfo=UTC)  # KIP Freeze 25 Feb
+    assert r43.release_at == datetime(2026, 5, 22, tzinfo=UTC)
+    # Each cycle starts when the one before it shipped.
+    assert r43.cycle_start_at == r42.release_at
+
+
 def test_without_a_plan_release_events_are_unchanged() -> None:
     events = n.release_events(
         load("versions_KAFKA.json"),
