@@ -77,7 +77,7 @@ Alerts email the owner (notification channel from `alert_email` in the gitignore
   secret (`github-webhook-secret` in Secret Manager) into the webhook settings.
 - The deploy workflow's smoke test sends one unsigned request per deploy (expected 401).
 
-### TPM: event queue backlog growing (oldest unacked event over 10 minutes)
+### TPM: event queue backlog growing (oldest unacked event over 3 minutes, for 2 minutes)
 
 - The API's in-process worker is not consuming. Check `tpm-api` logs for
   `in-process worker failed` and that the latest revision is serving.
