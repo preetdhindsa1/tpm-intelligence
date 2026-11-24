@@ -36,9 +36,11 @@ class FakePublisher:
 class FakeSubscriber:
     requests: list[tuple[str, dict[str, Any]]] = field(default_factory=list)
     to_return: list[Any] = field(default_factory=list)
+    timeouts: list[float] = field(default_factory=list)
 
     def pull(self, request: dict[str, Any], timeout: float) -> Any:
         self.requests.append(("pull", request))
+        self.timeouts.append(timeout)
         return type("R", (), {"received_messages": self.to_return})()
 
     def acknowledge(self, request: dict[str, Any]) -> None:
@@ -124,3 +126,12 @@ def test_empty_subscription_deadline_is_no_messages_not_a_failure() -> None:
 
     transport = PubSubTransport("demo-project", publisher=FakePublisher(), subscriber=TimingOut())
     assert transport.pull("events", "worker", 10, 2.0) == []
+
+
+def test_pull_waits_long_enough_for_the_server_to_answer() -> None:
+    """#43: a 2 s client timeout let Pub/Sub lease messages to abandoned pulls (60 s late)."""
+    transport, _, sub = _transport()
+    transport.pull("events", "worker", 10, 2.0)
+    assert sub.timeouts == [20.0]
+    transport.pull("events", "worker", 10, 30.0)  # a longer wait asked for is kept
+    assert sub.timeouts[-1] == 30.0
