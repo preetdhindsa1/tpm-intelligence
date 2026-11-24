@@ -50,3 +50,11 @@ What would make us revisit this: a required approval from an account that is not
 ## AI vs rules
 
 Lane classification, collisions, and every number on the lab page are deterministic code. AI is not asked who wrote a pull request or what the odds are. An agent may open the pull request. It does not compute the facts (CLAUDE.md section 2).
+
+## Addendum 1 (2026-11-24, #108): who wrote a review
+
+**Evidence.** On 2026-11-24 all 47 non-bot pull requests in this repository were opened from the owner's GitHub account, and so was every review and comment. The agents post with the owner's token (Dependabot is the only other author). `engine/review_rounds.activity()` drops activity by the PR author, so the lab counted no review at all in this repository. That included the owner's comments, which this ADR says should count. A login cannot tell an agent from the owner here.
+
+**Decision (owner, 2026-11-24).** Every agent review or comment starts with a marker line `<Kind> · <lane label>`, for example `Cross-review · claude-agent` or `Reply · cursor-agent`. The poller and the webhook receiver read the first non-empty line (bold or code marks allowed) and keep only a tag such as `cross-review:claude-agent`. The text is never stored, as with Prow commands. The separator must be `·`, so ordinary first lines ("LGTM - thanks") never match. When a marker is present it is part of the event identity: a review stored before markers were read is stored once more with its tag. Events without a marker keep their old ids. The projection keeps a tag whichever copy arrives first. The tag changes nothing in review rounds or calibration: the pod facts (#94) read it.
+
+**Limits.** An agent that forgets the marker is counted as the owner. A person could type a marker by hand. Both are visible in the PR thread, so a reviewer can catch them. Separate machine accounts per agent would remove both limits. They were not chosen now because they need accounts and tokens the owner does not have yet.

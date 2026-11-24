@@ -52,7 +52,7 @@ def activity(pr: PullRequest) -> list[Review]:
     items = list(pr.reviews)
     for c in pr.comments:
         state = "approved" if _APPROVING_COMMANDS & set(c.commands) else "commented"
-        items.append(Review(f"comment:{c.id}", c.author, state, c.at))
+        items.append(Review(f"comment:{c.id}", c.author, state, c.at, c.marker))
     return [
         r
         for r in items

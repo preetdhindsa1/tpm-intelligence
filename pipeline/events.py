@@ -222,6 +222,7 @@ class ReviewSubmitted(_Model):
     reviewer: str | None
     state: ReviewState
     submitted_at: AwareDatetime
+    marker: str | None = None  # pod marker tag, e.g. "cross-review:claude-agent" (ADR-0023)
 
 
 class CommentPosted(_Model):
@@ -236,6 +237,7 @@ class CommentPosted(_Model):
     author: str | None
     posted_at: AwareDatetime
     commands: tuple[str, ...] = ()  # e.g. ("lgtm",), ("approve",), ("hold_cancel",)
+    marker: str | None = None  # pod marker tag, e.g. "reply:cursor-agent" (ADR-0023)
 
 
 class CheckCompleted(_Model):

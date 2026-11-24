@@ -104,6 +104,7 @@ def review_event(
     if state is None or not review.get("submitted_at"):
         return None
     submitted = gh.parse_ts(review["submitted_at"])
+    marker = gh.pod_marker(review.get("body"))
     return new_event(
         source=Source.GITHUB,
         subject=gh.pull_request_ref(repo, number),
@@ -114,8 +115,9 @@ def review_event(
             reviewer=(review.get("user") or {}).get("login"),
             state=state,
             submitted_at=submitted,
+            marker=marker,
         ),
-        identity=(review["id"],),
+        identity=gh.marker_identity(review["id"], marker),
     )
 
 
@@ -124,6 +126,7 @@ def comment_event(
 ) -> NormalizedEvent:
     """``pull_request.comment_posted``: author, time and Prow commands; no text."""
     posted = gh.parse_ts(comment["created_at"])
+    marker = gh.pod_marker(comment.get("body"))
     return new_event(
         source=Source.GITHUB,
         subject=gh.pull_request_ref(repo, number),
@@ -134,8 +137,9 @@ def comment_event(
             author=(comment.get("user") or {}).get("login"),
             posted_at=posted,
             commands=gh.prow_commands(comment.get("body") or ""),
+            marker=marker,
         ),
-        identity=(comment["id"],),
+        identity=gh.marker_identity(comment["id"], marker),
     )
 
 

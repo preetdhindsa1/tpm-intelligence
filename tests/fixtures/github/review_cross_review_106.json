@@ -1,0 +1,10 @@
+{
+  "id": 6049255366,
+  "state": "COMMENTED",
+  "submitted_at": "2026-11-24T23:45:18Z",
+  "user": {
+    "login": "preetdhindsa1"
+  },
+  "body": "Cross-review · claude-agent\n\nRead the full diff (9 files). File ownership is fine: everything is under `web/` and ADR-0024. Tests and `make web-test` pass in CI. Comments, most important first:",
+  "_note": "PR #106 cross-review, 2026-11-24, REST/webhook shape, body trimmed to its first lines"
+}
