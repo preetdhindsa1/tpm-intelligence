@@ -9,6 +9,7 @@ from typing import Any, cast
 
 import httpx
 
+from collectors.http import RetryPolicy
 from collectors.jira.client import JiraClient
 from collectors.jira.sync import JiraCollector
 from pipeline.events import NormalizedEvent
@@ -171,3 +172,54 @@ def test_umbrella_with_a_kip_gets_a_spec_and_the_release_its_dates() -> None:
     assert [getattr(s, "spec_path", None) for s in specs] == ["KIP-1356"]
     releases = [e.payload for e in out.events if e.payload.type == "release.observed"]
     assert [getattr(r, "name", None) for r in releases] == ["4.2.0"]
+
+
+class BrokenLinks(FakeJira):
+    """Like Apache on 2026-11-24: one ticket's /remotelink answers 503 every time (#89)."""
+
+    def __init__(self, issues: list[dict[str, Any]], broken: str) -> None:
+        super().__init__(issues)
+        self.broken = broken
+
+    def __call__(self, request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith(f"/issue/{self.broken}/remotelink"):
+            self.calls.append(request.url.path)
+            return httpx.Response(503, json={})
+        return super().__call__(request)
+
+
+def test_one_ticket_with_failing_remote_links_does_not_abort_the_run() -> None:
+    fake = BrokenLinks(
+        [load("issue_KAFKA-19831.json"), load("issue_KAFKA-20682.json")], broken="KAFKA-19831"
+    )
+    cursors = InMemoryCursorStore()
+    out = Captured()
+    # Real retries (5 attempts), with no real waiting between them.
+    jira = JiraClient.from_base_url(
+        "https://issues.apache.org/jira",
+        transport=httpx.MockTransport(fake),
+        instrument=False,
+        policy=RetryPolicy(base_delay_s=0.0, max_delay_s=0.0),
+        sleep=lambda _: None,
+    )
+    stats = collector(jira, cursors, out).run()
+    assert not stats.failed
+    assert stats.issues == 2
+    assert sum(c.endswith("/issue/KAFKA-19831/remotelink") for c in fake.calls) == 5
+    assert stats.remote_link_failures == 1
+    by_key: dict[str, set[str]] = {}
+    for e in out.events:
+        by_key.setdefault(e.subject.external_key, set()).add(e.payload.type)
+    # The failing ticket still has its snapshot and history, but no link-based events...
+    assert {"work_item.observed", "work_item.release_changed"} <= by_key["KAFKA-19831"]
+    remote = [
+        e
+        for e in out.events
+        if e.payload.type == "reference.observed"
+        and e.subject.external_key == "KAFKA-19831"
+        and getattr(e.payload, "evidence", None) == "remote_link"
+    ]
+    assert remote == []
+    # ...and the next ticket still got its remote links.
+    assert any(c.endswith("/issue/KAFKA-20682/remotelink") for c in fake.calls)
+    assert cursors.get(collector(client(fake), cursors, out).stream) is not None
