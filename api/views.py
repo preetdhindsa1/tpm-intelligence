@@ -39,7 +39,7 @@ from api.schemas import (
 from api.service import ReleaseSummary, ReleaseView
 from connectors.load import display_name_for_project, team_for_project
 from engine.assess import FeatureAssessment
-from engine.forecast import Forecast
+from engine.forecast import Forecast, outcome_definition
 from engine.lab import LabReport, LaneSpec
 from engine.merge_date import MergeDateForecast
 from engine.projection import ReleaseInfo, key_number
@@ -154,7 +154,7 @@ def feature_detail(view: ReleaseView, a: FeatureAssessment) -> FeatureDetailOut:
             "base_rate": view.recalibration.base_rate,
         },
         "validation": view.validation.as_dict(),
-        "outcome_definition": "still in the release 3 days after Code Freeze",
+        "outcome_definition": outcome_definition(view.assessment.release),
         "note": "Decision support: if these measured inputs hold, the odds are likely in "
         "the range shown. Not a guarantee.",
     }
@@ -214,12 +214,12 @@ def feature_outcome(view: ReleaseView, a: FeatureAssessment) -> str:
     Based on ADR-0005's outcome (still in the release 3 days after Code Freeze), except
     that a feature removed at freeze and back in the release is always "re-added".
     """
-    from engine.forecast import LANDED_WINDOW, landed
+    from engine.forecast import landed, outcome_cutoff
 
     release = view.assessment.release
     codes = {f.code for f in a.flags}
-    freeze = release.code_freeze_at
-    if freeze is None or view.assessment.as_of < freeze + LANDED_WINDOW:
+    cutoff = outcome_cutoff(release)
+    if cutoff is None or view.assessment.as_of < cutoff:
         return "too_early"
     if a.in_release and "removed_at_freeze" in codes:
         # Removed at freeze and back by exception, even when re-added inside the 3-day

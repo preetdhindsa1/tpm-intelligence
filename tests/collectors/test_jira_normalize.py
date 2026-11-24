@@ -233,6 +233,26 @@ def test_history_releases_carry_their_plan_dates() -> None:
     assert r43.cycle_start_at == r42.release_at
 
 
+def test_landed_at_release_sets_the_outcome_date_to_the_release() -> None:
+    """#86: Kafka judges "landed" when the release ships."""
+
+    def r44(landed_at: str) -> Any:
+        [event] = n.release_events(
+            load("versions_KAFKA.json"),
+            ["4.4.0"],
+            project="KAFKA",
+            project_key="KAFKA",
+            base_url=BASE,
+            observed_at=OBSERVED,
+            landed_at=landed_at,
+        )
+        return event.payload
+
+    at_release = r44("release")
+    assert at_release.outcome_at == at_release.release_at == datetime(2026, 10, 26, tzinfo=UTC)
+    assert r44("code_freeze").outcome_at is None
+
+
 def test_without_a_plan_release_events_are_unchanged() -> None:
     events = n.release_events(
         load("versions_KAFKA.json"),

@@ -67,11 +67,30 @@ def releases_at(feature: Feature, when: datetime) -> frozenset[str]:
     return frozenset(state)
 
 
+def outcome_cutoff(release: ReleaseInfo) -> datetime | None:
+    """When "landed" is judged: ``LANDED_WINDOW`` after the release's outcome date.
+
+    The outcome date is Code Freeze unless the release sets ``outcome_at``: Kafka judges at
+    the release, because its release managers drop slipped features weeks after Feature
+    Freeze (#86). None if the date is unknown.
+    """
+    at = release.outcome_at or release.code_freeze_at
+    return at + LANDED_WINDOW if at is not None else None
+
+
+def outcome_definition(release: ReleaseInfo) -> str:
+    """The outcome in words, for the assumptions a result lists."""
+    if release.outcome_at is not None:
+        return "still in the release 3 days after it ships"
+    return "still in the release 3 days after Code Freeze"
+
+
 def landed(feature: Feature, release: ReleaseInfo) -> bool | None:
-    """Outcome: still in the release ``LANDED_WINDOW`` after Code Freeze (None if unknown)."""
-    if release.code_freeze_at is None:
+    """Outcome: still in the release at ``outcome_cutoff`` (None if unknown)."""
+    cutoff = outcome_cutoff(release)
+    if cutoff is None:
         return None
-    return release.key in releases_at(feature, release.code_freeze_at + LANDED_WINDOW)
+    return release.key in releases_at(feature, cutoff)
 
 
 # ---------------------------------------------------------------- calibration
@@ -226,18 +245,25 @@ def calibrate_tracked(
 
 
 def finished_releases(world: World, before: datetime, exclude: str) -> list[str]:
-    """Releases of ``exclude``'s project released before ``before`` (calibration may only
-    use these). Projects never calibrate each other: Kafka and Kubernetes differ in
-    process, cadence and review culture (ADR-0018)."""
+    """Releases of ``exclude``'s project released before ``before`` whose outcome is known
+    by then (calibration may only use these). Projects never calibrate each other: Kafka
+    and Kubernetes differ in process, cadence and review culture (ADR-0018).
+
+    The outcome check matters when "landed" is judged after the release (#86): a release
+    that shipped a day before ``before`` would otherwise be scored on later data.
+    """
     project = exclude.split(":", 1)[0]
-    return sorted(
-        k
-        for k, r in world.releases.items()
-        if k != exclude
-        and k.split(":", 1)[0] == project
-        and r.release_at is not None
-        and r.release_at <= before
-    )
+    out = []
+    for k, r in world.releases.items():
+        if k == exclude or k.split(":", 1)[0] != project:
+            continue
+        cutoff = outcome_cutoff(r)
+        if r.release_at is None or r.release_at > before:
+            continue
+        if cutoff is not None and cutoff > before:
+            continue
+        out.append(k)
+    return sorted(out)
 
 
 # ---------------------------------------------------------------- simulation

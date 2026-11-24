@@ -55,6 +55,7 @@ def main(argv: list[str] | None = None) -> int:
                 base_url=team.planning.base_url,
                 releases=args.release,
                 plan=release_plan(team),
+                landed_at=team.landed_at,
             ).run(backfill=args.backfill)
         finally:
             jira.close()

@@ -23,7 +23,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from api.snapshots import PostgresSnapshotStore, pick, score_merge_dates, score_odds
 from engine.backtest_dates import actual_day, baseline_days
-from engine.forecast import LANDED_WINDOW, finished_releases, landed, model_version
+from engine.forecast import finished_releases, landed, model_version, outcome_cutoff
 from engine.merge_date import TAIL, grid
 from engine.projection import project
 from pipeline.store.events_repo import iter_events
@@ -54,7 +54,10 @@ def main() -> None:
             f"{key} cannot be scored yet: wait until {release.release_at + TAIL:%Y-%m-%d}"
         )
     runs = PostgresSnapshotStore(sessionmaker(engine)).runs(key, version)
-    truth = project(events, release.code_freeze_at + LANDED_WINDOW + timedelta(seconds=1))
+    cutoff = outcome_cutoff(release)
+    if cutoff is None:
+        raise SystemExit(f"{key} has no outcome date")
+    truth = project(events, cutoff + timedelta(seconds=1))
 
     odds = []
     for lead in (28, 14, 7):

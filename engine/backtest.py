@@ -23,11 +23,11 @@ from itertools import pairwise
 
 from engine.forecast import (
     DEFAULT_FORECAST,
-    LANDED_WINDOW,
     ForecastConfig,
     Rate,
     bucket,
     landed,
+    outcome_cutoff,
 )
 from engine.odds import release_odds
 from engine.projection import project
@@ -121,7 +121,10 @@ def backtest(
     release = final.releases[release_key]
     if release.code_freeze_at is None:
         raise ValueError(f"{release_key} has no Code Freeze date")
-    truth = project(events, release.code_freeze_at + LANDED_WINDOW + timedelta(seconds=1))
+    cutoff = outcome_cutoff(release)
+    if cutoff is None:
+        raise ValueError(f"{release_key} has no outcome date")
+    truth = project(events, cutoff + timedelta(seconds=1))
 
     results: list[LeadResult] = []
     for lead in lead_days:

@@ -259,6 +259,8 @@ class ReleaseObserved(_Model):
     code_freeze_at: AwareDatetime | None = None
     release_at: AwareDatetime | None = None
     source_url: str | None = None
+    # When "landed" is judged, if not at Code Freeze (#86); 3 days are added to it.
+    outcome_at: AwareDatetime | None = None
 
 
 EventPayload = Annotated[

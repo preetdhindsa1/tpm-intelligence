@@ -373,8 +373,11 @@ def release_events(
     base_url: str,
     observed_at: datetime,
     plan: Mapping[str, ReleaseDates] | None = None,
+    landed_at: str = "code_freeze",
 ) -> list[NormalizedEvent]:
     """``release.observed`` for each named version (ADR-0018).
+
+    ``landed_at="release"`` sets ``outcome_at`` to the release date (#86).
 
     ``release_at`` is the Jira release date (None while unset). ``cycle_start_at`` is the
     release date of the previous x.y.0 version. Freeze dates come from ``plan``, the team's
@@ -397,16 +400,18 @@ def release_events(
             earlier = [day for n, day in feature_days if n < num]
             start = earlier[-1] if earlier else None
         planned = (plan or {}).get(name)
+        release_at = _day(version.get("releaseDate")) or (planned.release if planned else None)
         payload = ReleaseObserved(
             project=project,
             name=name,
             cycle_start_at=start or (planned.cycle_start if planned else None),
             enhancements_freeze_at=planned.enhancements_freeze if planned else None,
             code_freeze_at=planned.code_freeze if planned else None,
-            release_at=_day(version.get("releaseDate")) or (planned.release if planned else None),
+            release_at=release_at,
             source_url=planned.source_url
             if planned
             else f"{base_url.rstrip('/')}/projects/{project_key}/versions/{version['id']}",
+            outcome_at=release_at if landed_at == "release" else None,
         )
         out.append(
             new_event(

@@ -174,3 +174,42 @@ slipped features count as landed and the base rate reads ~97%. Six of 4.5.0's 16
 had already slipped out of earlier releases. The owner chose to judge Kafka's outcome at
 Kafka's Code Freeze + 3 days; that is a separate change (#86). Until then Kafka
 odds are labelled "not validated" and should not be read as a forecast.
+
+## Addendum (2026-11-24, #86): Kafka's outcome is judged when the release ships
+
+**Problem.** "Landed" meant "still in the release 3 days after Code Freeze" (ADR-0005), and
+Kafka's Code Freeze in the engine is its Feature Freeze. Kafka's release managers drop
+slipped features from a fix version weeks later, so slipped features counted as landed.
+
+**Options measured** (19 features slipped from 4.2.0-4.4.0; local backfill, 2026-11-24):
+
+| Judge "landed" at | 4.2.0 (6) | 4.3.0 (6) | 4.4.0 (7) | Caught |
+|---|---|---|---|---|
+| Feature Freeze + 3 days (before) | 0 | 0 | 0 | 0 of 19 |
+| Kafka Code Freeze + 3 days | 1 | 4 | 6 | 11 of 19 |
+| Kafka Code Freeze + 14 days | 4 | 6 | 7 | 17 of 19 |
+| Release + 3 days | 6 | 6 | 7 | 19 of 19 |
+
+**Decision (owner).** Release + 3 days. The owner first chose Kafka Code Freeze + 3 days;
+the table above changed that. Feature Freeze stays the merge deadline and the lead time.
+
+**How.** A team setting `landed_at: release` (`connectors/teams/kafka.yaml`; default
+`code_freeze`) makes the Jira collector set `outcome_at` on each release event. The engine
+judges at `outcome_cutoff = (outcome_at or Code Freeze) + 3 days` everywhere it scores an
+outcome: calibration, recalibration training, backtests, snapshot scoring and the feature
+page. A past release calibrates only once its outcome is known, so a Kafka release that
+shipped a day before the prediction point is not scored on later data. Kubernetes is
+unchanged: its cutoff is before its release.
+
+**Measured (local, 2026-11-24, 71 days before 4.5.0's Feature Freeze).** Of the 12 4.4.0
+features in the release at the replay date, 5 shipped (before: 12 of 12 "landed"). The
+base rate is 0.469 and every 4.5.0 feature reads 0.469 (range 0.430-0.469 for the 5 with
+no PRs), down from 0.979. The odds still barely separate features: all 12 training cases
+had raw score 0 (no PRs yet that far out). Closer to Feature Freeze the training cases
+have PRs (31 cases at 14 days out), which is when separation can appear. Kafka odds stay
+"not validated".
+
+**Cost.** A Kafka release is scored only after it ships: 4.5.0 around 2027-03-20.
+
+**Deploy note.** Release events with `outcome_at` reach the engine once the Jira job runs
+on the new image and the worker has stored them; the job re-emits them every hour.

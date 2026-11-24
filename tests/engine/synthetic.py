@@ -40,6 +40,7 @@ class Stream:
         freeze: datetime,
         release: datetime,
         project: str = "kubernetes",
+        outcome_at: datetime | None = None,
     ) -> str:
         key = f"{project}:{name}"
         self.events.append(
@@ -56,6 +57,7 @@ class Stream:
                     enhancements_freeze_at=start,
                     code_freeze_at=freeze,
                     release_at=release,
+                    outcome_at=outcome_at,
                 ),
             )
         )
