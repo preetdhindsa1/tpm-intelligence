@@ -68,6 +68,10 @@ SERVICE_NAME = "tpm-api"
 # (2026-11-23, ADR-0019).
 STREAM_MAX_S = 120.0  # 600 s still let an old revision run 5+ min after a deploy (P3-M5)
 STREAM_RETRY_MS = 1000
+NO_SIMULATOR = (
+    "No simulator for {name} yet: it is calibrated on earlier releases of the same project, "
+    "and none has been measured."
+)
 SIM_NOTE = (
     "Decision support, not a guarantee: if these assumptions hold, results are likely in "
     "these ranges."
@@ -485,9 +489,9 @@ def create_app(
         try:
             cal, st = await run_in_threadpool(simulator().state, v)
         except NoCalibrationError as exc:
-            raise HTTPException(
-                404, f"no simulator calibration for {name}; run `make sim-calibrate`"
-            ) from exc
+            # Visitors see the detail (#60); the developer hint stays in the log.
+            logger.info("no simulator calibration; run make sim-calibrate", extra={"release": name})
+            raise HTTPException(404, NO_SIMULATOR.format(name=name)) from exc
         return v, cal, st
 
     @app.get("/releases/{name}/simulator", response_model=SimulatorOut)
