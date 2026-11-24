@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
+
 import pytest
 
 from engine.odds import release_odds, training_pairs
 from engine.recalibrate import Recalibration, _pava, fit
 from tests.engine.conftest import utc
 from tests.engine.synthetic import Stream
-from tests.engine.test_forecast import FAST, two_releases
+from tests.engine.test_forecast import FAST, D, two_releases
 
 
 def test_pava_makes_values_non_decreasing() -> None:
@@ -71,3 +73,68 @@ def test_release_odds_keep_raw_and_calibrated() -> None:
     assert fc.low is not None
     assert fc.high is not None
     assert fc.low <= fc.probability <= fc.high
+
+
+R44, R45 = "kubernetes:4.4.0", "kubernetes:4.5.0"  # Kafka dates, see kafka_releases
+
+
+def _cycle(s: Stream, key: str, first: int, start: datetime, freeze: datetime) -> None:
+    """10 features with one PR each; 7 merge 10 days after opening, 3 slip at freeze.
+
+    Synthetic: each feature gets its fix version 30 days before the cycle starts, so it
+    is already in the release at a replay date that falls before the cycle (4.4.0 at 72
+    days out is replayed at May 19, before its May 22 start).
+    """
+    for i in range(10):
+        n = first + i
+        lands = i < 7
+        changes = [(start - 30 * D, True)]
+        if not lands:
+            changes.append((freeze + timedelta(hours=1), False))
+        s.feature(n, key, changes)
+        created = start + (10 + i) * D
+        s.pr(first * 10 + i, n, created, merged=created + 10 * D if lands else None)
+
+
+def kafka_releases(*, with_4_2: bool, history: bool = True) -> Stream:
+    """Kafka's real dates (#83): Feature Freeze is the engine's Code Freeze (ADR-0018).
+
+    The synthetic stream links PRs through KEP links, so the releases sit under its
+    default project; the training rule is the same for every project.
+
+    4.4.0 is the finished release 4.5.0 trains on; 4.3.0 and 4.2.0 matter only as the
+    history 4.4.0's own replayed forecast is calibrated on. ``history=False`` loads the
+    earlier releases' dates without their features and PRs.
+    """
+    s = Stream(utc(2026, 11, 24))
+    earlier = [("4.3.0", utc(2026, 2, 17), utc(2026, 3, 19), utc(2026, 5, 22), 300)]
+    if with_4_2:
+        earlier.insert(0, ("4.2.0", utc(2025, 9, 2), utc(2025, 11, 20), utc(2026, 2, 17), 400))
+    for name, start, freeze, shipped, first in earlier:
+        key = s.release(name, start, freeze, shipped)
+        if history:
+            _cycle(s, key, first, start, freeze)
+    r44 = s.release("4.4.0", utc(2026, 5, 22), utc(2026, 7, 30), utc(2026, 10, 26))
+    _cycle(s, r44, 200, utc(2026, 5, 22), utc(2026, 7, 30))
+    s.release("4.5.0", utc(2026, 10, 26), utc(2027, 2, 4), utc(2027, 3, 17))
+    return s
+
+
+def test_a_release_trains_only_if_a_release_before_it_had_shipped_by_its_replay_date() -> None:
+    """2026-11-24: 4.5.0 is 72 days from Feature Freeze, so 4.4.0 is replayed at May 19,
+    2026. 4.3.0 shipped May 22, three days later, so it cannot calibrate that replay and
+    4.4.0 does not train; every 4.5.0 probability was the base rate (#83)."""
+    only_4_3 = kafka_releases(with_4_2=False)
+    as_of = utc(2026, 11, 24)
+    assert training_pairs(only_4_3.events, R45, as_of, 72, FAST) == ([], [])
+    # From 69 days out the replay date passes May 22 and 4.3.0 counts.
+    _, used = training_pairs(only_4_3.events, R45, as_of, 69, FAST)
+    assert used == [R44]
+    # With 4.2.0 (shipped Feb 17, 2026) 4.4.0 trains at 72 days too.
+    pairs, used = training_pairs(kafka_releases(with_4_2=True).events, R45, as_of, 72, FAST)
+    assert used == [R44]
+    assert len(pairs) == 10
+    # A release record alone is not enough: without 4.2.0's PRs there is nothing to
+    # calibrate 4.4.0's replay on, so it yields no pairs.
+    bare = kafka_releases(with_4_2=True, history=False)
+    assert training_pairs(bare.events, R45, as_of, 72, FAST)[0] == []

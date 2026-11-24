@@ -10,6 +10,20 @@
 # The plans give dates without a time zone; each date is taken as the end of that day, UTC.
 project: KAFKA
 releases:
+  # 4.2.0 and 4.3.0 are history only (#83): 4.4.0's replayed forecast, which 4.5.0's
+  # recalibration trains on, needs a Kafka release that had shipped by its replay date.
+  - name: "4.2.0"
+    cycle_start: 2025-09-02T00:00:00Z # Jira: 4.1.0 released
+    enhancements_freeze: 2025-10-30T00:00:00Z # "KIP Freeze: October 29 (Wednesday)"; no year on the plan, 2025 (release "no earlier than January 7 2026")
+    code_freeze: 2025-11-20T00:00:00Z # "Feature Freeze: November 19 (Wednesday)"; Code Freeze 10 Dec 2025
+    release: 2026-02-17T00:00:00Z # Jira release date (plan: "no earlier than January 7 2026")
+    source_url: https://cwiki.apache.org/confluence/display/KAFKA/Release+Plan+4.2.0
+  - name: "4.3.0"
+    cycle_start: 2026-02-17T00:00:00Z # Jira: 4.2.0 released
+    enhancements_freeze: 2026-02-26T00:00:00Z # "KIP Freeze: February 25 2026 (Wednesday)"
+    code_freeze: 2026-03-19T00:00:00Z # "Feature Freeze: March 18 2026 (Wednesday)"; Code Freeze 8 Apr 2026
+    release: 2026-05-22T00:00:00Z # Jira release date (plan: "no earlier than May 6 2026")
+    source_url: https://cwiki.apache.org/confluence/display/KAFKA/Release+Plan+4.3.0
   - name: "4.4.0"
     cycle_start: 2026-05-22T00:00:00Z # Jira: 4.3.0 released
     enhancements_freeze: 2026-07-09T00:00:00Z # "KIP Freeze: (8th July 2026)"

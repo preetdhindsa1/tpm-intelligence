@@ -138,3 +138,39 @@ without a time zone, so each is taken as the end of that day, UTC.
 **Alternative considered:** mapping Kafka's Code Freeze to the engine's Code Freeze. It
 would count features merged in the two weeks after Feature Freeze as on time, which Kafka's
 own process does not allow. Plans can change; the dates are re-checked when a release ships.
+
+## Addendum (2026-11-24, #83): history for the recalibration, and what it showed
+
+**Problem.** After #79 and #81, every Kafka 4.5.0 probability equalled the base rate. The
+recalibration (ADR-0005) trains on finished releases, each replayed at the current lead
+time before its own Code Freeze, and that replay needs an even earlier release that had
+**shipped** by the replay date (`engine/odds.py`, `engine/forecast.finished_releases`). On
+2026-11-24 4.5.0 is 72 days from Feature Freeze, so 4.4.0 is replayed at 2026-05-19; 4.3.0
+shipped 2026-05-22, so 4.4.0 could not train and the fit had no data.
+
+**Decision.** Load 4.2.0 and 4.3.0 as history: calendar entries from their release plans,
+and both added to the hourly Jira job (`jira_releases`), since #79 showed a release outside
+it never gets its freeze dates into the engine. 4.3.0 itself still cannot train (it would
+need 4.1.0); that is accepted.
+
+| Release | KIP Freeze | Feature Freeze (engine Code Freeze) | Code Freeze | Release |
+|---|---|---|---|---|
+| 4.2.0 | 2025-10-29 | 2025-11-19 | 2025-12-10 | 2026-02-17 (Jira) |
+| 4.3.0 | 2026-02-25 | 2026-03-18 | 2026-04-08 | 2026-05-22 (Jira) |
+
+The 4.2.0 plan gives its freeze dates without a year; they precede its "no earlier than
+January 7 2026" release, so they are 2025.
+
+**Measured (local backfill, 2026-11-24).** 1,285 Jira issues; 1,126 PRs for 4.2.0 and 913
+for 4.3.0. 4.5.0's calibration now uses 4.2.0-4.4.0 (60 PR samples) and the recalibration
+trains on 4.4.0 (12 cases). The odds are **still flat** (0.979 for all 16 features): all 12
+training cases had raw score 0 (the 2026-05-19 replay is before 4.4.0's cycle opened) and
+all 12 landed. At shorter leads the training cases grow (34 at 7 days) but every one lands.
+
+**Why every case lands.** Kafka removes slipped features from a fix version about two weeks
+after Feature Freeze, at its own Code Freeze: 4.2.0 Dec 3-Feb 10, 4.3.0 Apr 9-17, 4.4.0 Aug
+13-21. The engine judges "landed" 3 days after Feature Freeze, before that cleanup, so
+slipped features count as landed and the base rate reads ~97%. Six of 4.5.0's 16 features
+had already slipped out of earlier releases. The owner chose to judge Kafka's outcome at
+Kafka's Code Freeze + 3 days; that is a separate change (#86). Until then Kafka
+odds are labelled "not validated" and should not be read as a forecast.
