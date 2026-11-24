@@ -654,3 +654,75 @@ class LabOut(_Out):
     cap: LabCapOut
     first_pass: LabFirstPassOut
     size: LabSizeOut
+
+
+class PortfolioMilestoneOut(_Out):
+    """A named calendar date."""
+
+    name: str
+    at: datetime
+
+
+class PortfolioStageOut(_Out):
+    """Calendar stage (ADR-0025 rule 2)."""
+
+    current: str | None
+    stages: list[dict[str, str]]
+    last_milestone: PortfolioMilestoneOut | None
+    next_milestone: PortfolioMilestoneOut | None
+    days_to_next_milestone: int | None
+
+
+class PortfolioBottleneckOut(_Out):
+    """The first bottleneck rule that fires (ADR-0025 rule 4)."""
+
+    kind: str
+    severity: str
+    headline: str
+    detail: str | None
+    facts: dict[str, Any]
+
+
+class PortfolioDecisionOut(_Out):
+    """A decision waiting on a person."""
+
+    kind: str
+    label: str
+    count: int
+    ref: dict[str, int] | None
+
+
+class PortfolioItemOut(PortfolioDecisionOut):
+    """A decision waiting on a person, with its program."""
+
+    program_key: str
+
+
+class PortfolioProgramOut(_Out):
+    """One Portfolio row."""
+
+    key: str
+    project: str
+    display_name: str
+    release: str
+    planning_tool: str
+    code_tools: list[str]
+    has_lab: bool
+    as_of: datetime
+    dates: dict[str, datetime | None]
+    stage: PortfolioStageOut
+    scope: dict[str, int]
+    bottleneck: PortfolioBottleneckOut
+    next_decision: PortfolioDecisionOut | None
+
+
+class PortfolioOut(_Out):
+    """GET /portfolio (docs/api/ux-v1-contract.md, ADR-0025)."""
+
+    as_of: datetime
+    totals: dict[str, Any]
+    programs: list[PortfolioProgramOut]
+    waiting_on_you: list[PortfolioItemOut]
+    across_programs: list[dict[str, Any]]
+    coming_next: list[dict[str, str]]
+    skipped: list[dict[str, str]]
