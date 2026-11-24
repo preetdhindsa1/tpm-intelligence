@@ -21,6 +21,7 @@ drafts the executive update for a human to approve.
 > results), so the dashboard labels forecast odds "not validated".
 > Numbers not in the results table are **TBD (not yet measured)**.
 > What is done and what is left, phase by phase: [`docs/roadmap.md`](docs/roadmap.md).
+> Operating the live deployment: [`docs/runbook.md`](docs/runbook.md).
 
 ![Front page: what Program Intelligence Platform does, with a live pulse of Kubernetes v1.38](docs/images/front-page.png)
 
