@@ -681,7 +681,12 @@ def create_app(
         state["updates"] = hub
 
         async def events() -> AsyncIterator[str]:
-            yield _sse("ready", {"release": name, "version": svc().version})
+            # Push when the data is newer than what this page last got, whoever refreshed
+            # it: comparing against the version before this stream's own refresh missed
+            # updates for up to 11 minutes when another page or request refreshed first
+            # (2026-11-24).
+            last_sent = svc().version
+            yield _sse("ready", {"release": name, "version": last_sent})
             yield f"retry: {STREAM_RETRY_MS}\n\n"
             deadline = time.monotonic() + STREAM_MAX_S
             async for notice in hub.subscribe(request.is_disconnected):
@@ -695,13 +700,13 @@ def create_app(
                     "api.push_update", context=notice.context, attributes={"tpm.release": name}
                 ):
                     notified = time.monotonic()
-                    before = svc().version
                     await run_in_threadpool(svc().refresh)
-                    if svc().version == before:
+                    if svc().version == last_sent:
                         continue
                     # Wait for the recomputed view here, in the stream, so the browser
                     # reloads only once the new data is ready (pages never wait for it).
                     v = await view(name, wait=True)
+                    last_sent = v.version
                     yield _sse(
                         "update",
                         {

@@ -606,3 +606,34 @@ def test_a_burst_is_timed_by_its_newest_event_not_its_first() -> None:
     notice = newest_notice([history, action, no_time])
     assert notice.event_id == "new"
     assert notice.batched == 3
+
+
+def test_a_page_still_gets_the_update_when_something_else_refreshed_first(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """2026-11-24: another page or request refreshed the data first, so this stream saw no
+    change during its own refresh and stayed silent for up to 11 minutes."""
+    import api.main as main_mod
+
+    monkeypatch.setattr(main_mod, "STREAM_MAX_S", 3.0)  # without the fix: ends, no update
+    events = list(fixture_events())
+    source = InMemoryEventSource(events[:-1])
+    updates = InMemoryUpdates(heartbeat_s=0.05)
+    client = client_at(utc(2026, 11, 21, 3), updates, source)
+
+    received: list[str] = []
+    with client.stream("GET", "/releases/v1.38/stream") as response:
+        lines = response.iter_lines()
+        assert next(lines) == "event: ready"
+
+        def store_then_someone_else_refreshes_then_notify() -> None:
+            source.events.append(events[-1])
+            client.get("/releases")  # another request refreshes the data first
+            updates.publish(notification(events[-1].event_id, "x"))
+
+        threading.Timer(0.1, store_then_someone_else_refreshes_then_notify).start()
+        for line in lines:
+            received.append(line)
+            if line == "event: update":
+                break
+    assert "event: update" in received
