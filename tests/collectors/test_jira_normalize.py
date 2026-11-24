@@ -178,3 +178,42 @@ def test_release_dates_only_and_cycle_starts_at_the_previous_feature_release() -
     assert r45.release_at is None  # not set in Jira yet (measured 2026-11-22)
     assert r45.cycle_start_at == datetime(2026, 10, 26, tzinfo=UTC)
     assert events[0].subject.external_key == "KAFKA:4.4.0"
+
+
+def test_hand_entered_plan_adds_freeze_dates_and_jira_keeps_the_release_date() -> None:
+    """#8: Kafka's release-plan freeze dates; Jira stays the source of the actual release."""
+    from connectors import load_team
+    from connectors.load import release_plan
+
+    plan = release_plan(load_team("kafka"))
+    events = n.release_events(
+        load("versions_KAFKA.json"),
+        ["4.4.0", "4.5.0"],
+        project="KAFKA",
+        project_key="KAFKA",
+        base_url=BASE,
+        observed_at=OBSERVED,
+        plan=plan,
+    )
+    by_name = {e.payload.name: e.payload for e in events}
+    r44, r45 = by_name["4.4.0"], by_name["4.5.0"]
+    # Feature Freeze 29 July 2026 is the engine's Code Freeze (end of that day, UTC).
+    assert r44.code_freeze_at == datetime(2026, 7, 30, tzinfo=UTC)
+    assert r44.enhancements_freeze_at == datetime(2026, 7, 9, tzinfo=UTC)  # KIP Freeze 8 July
+    assert r44.release_at == datetime(2026, 10, 26, tzinfo=UTC)  # Jira's actual date wins
+    assert r44.source_url == "https://cwiki.apache.org/confluence/display/KAFKA/Release+Plan+4.4.0"
+    assert r45.code_freeze_at == datetime(2027, 2, 4, tzinfo=UTC)  # Feature Freeze 3 Feb 2027
+    assert r45.release_at == datetime(2027, 3, 17, tzinfo=UTC)  # planned: no Jira date yet
+    assert r45.cycle_start_at == datetime(2026, 10, 26, tzinfo=UTC)  # still from Jira
+
+
+def test_without_a_plan_release_events_are_unchanged() -> None:
+    events = n.release_events(
+        load("versions_KAFKA.json"),
+        ["4.4.0"],
+        project="KAFKA",
+        project_key="KAFKA",
+        base_url=BASE,
+        observed_at=OBSERVED,
+    )
+    assert events[0].payload.code_freeze_at is None

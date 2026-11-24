@@ -10,12 +10,13 @@ IDs are deterministic, so overlap re-publishes duplicates that the worker ignore
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
 from opentelemetry import trace
 
+from collectors.github_poller.calendar import ReleaseDates
 from collectors.jira import normalize
 from collectors.jira.client import JiraClient
 from pipeline.events import NormalizedEvent
@@ -50,6 +51,8 @@ class JiraCollector:
     project_key: str  # Jira project key
     base_url: str
     releases: Sequence[str]
+    # Hand-entered freeze dates per release name (the team's calendar file, #8).
+    plan: Mapping[str, ReleaseDates] = field(default_factory=dict)
     now: Callable[[], datetime] = lambda: datetime.now(UTC)
     stats: JiraStats = field(default_factory=JiraStats)
 
@@ -104,6 +107,7 @@ class JiraCollector:
             project_key=self.project_key,
             base_url=self.base_url,
             observed_at=observed,
+            plan=self.plan,
         ):
             self.publisher.publish(event)
             self.stats.events_published += 1

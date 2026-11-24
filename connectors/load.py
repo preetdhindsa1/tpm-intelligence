@@ -5,11 +5,14 @@ from __future__ import annotations
 from collections.abc import Iterable
 from functools import lru_cache
 from pathlib import Path
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import yaml
 
 from connectors.schema import TeamConfig
+
+if TYPE_CHECKING:
+    from collectors.github_poller.calendar import ReleaseDates
 
 
 class _Key(Protocol):
@@ -84,6 +87,22 @@ def link_pack_for_project(project: str) -> str:
 def team_for_project(project: str) -> TeamConfig | None:
     """The team whose release keys use ``project`` (None if no team file says so)."""
     return next((t for t in load_teams().values() if t.project == project), None)
+
+
+def release_plan(team: TeamConfig) -> dict[str, ReleaseDates]:
+    """Hand-entered release dates by name, from the team's calendar file ({} if none).
+
+    For a Jira team the freeze dates come from here (#8); Jira gives the rest.
+    """
+    from collectors.github_poller.calendar import load_calendar
+
+    path = team.calendar_path(relative_to=teams_dir().parent.parent)
+    if not path.is_file():
+        return {}
+    calendar = load_calendar(path)
+    if calendar.project != team.project:
+        raise ValueError(f"{path}: calendar project {calendar.project!r} is not {team.project!r}")
+    return {r.name: r for r in calendar.releases}
 
 
 def projects_owning(subject_key: str) -> set[str]:

@@ -25,6 +25,7 @@ from collections.abc import Iterable, Mapping
 from datetime import UTC, datetime, time
 from typing import Any, Literal
 
+from collectors.github_poller.calendar import ReleaseDates
 from pipeline.events import (
     ChangeAction,
     NormalizedEvent,
@@ -371,11 +372,13 @@ def release_events(
     project_key: str,
     base_url: str,
     observed_at: datetime,
+    plan: Mapping[str, ReleaseDates] | None = None,
 ) -> list[NormalizedEvent]:
-    """``release.observed`` for each named version (ADR-0018: release dates only).
+    """``release.observed`` for each named version (ADR-0018).
 
     ``release_at`` is the Jira release date (None while unset). ``cycle_start_at`` is the
-    release date of the previous x.y.0 version; no freeze dates are known.
+    release date of the previous x.y.0 version. Freeze dates come from ``plan``, the team's
+    hand-entered calendar (#8); while Jira has no release date the plan's date is used.
     """
     by_name = {v["name"]: v for v in versions}
     feature_days = sorted(
@@ -393,12 +396,17 @@ def release_events(
         if start is None and num is not None:
             earlier = [day for n, day in feature_days if n < num]
             start = earlier[-1] if earlier else None
+        planned = (plan or {}).get(name)
         payload = ReleaseObserved(
             project=project,
             name=name,
-            cycle_start_at=start,
-            release_at=_day(version.get("releaseDate")),
-            source_url=f"{base_url.rstrip('/')}/projects/{project_key}/versions/{version['id']}",
+            cycle_start_at=start or (planned.cycle_start if planned else None),
+            enhancements_freeze_at=planned.enhancements_freeze if planned else None,
+            code_freeze_at=planned.code_freeze if planned else None,
+            release_at=_day(version.get("releaseDate")) or (planned.release if planned else None),
+            source_url=planned.source_url
+            if planned
+            else f"{base_url.rstrip('/')}/projects/{project_key}/versions/{version['id']}",
         )
         out.append(
             new_event(
