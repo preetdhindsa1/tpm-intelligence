@@ -1,0 +1,18 @@
+{
+  "measured_at": "2026-11-24T05:29:31Z",
+  "tool": "k6 0.54.0 from the owner's machine to the live API (us-central1)",
+  "reads": {
+    "profile": "ramping to 10 users for 60 s, then 20 users for 60 s; each user GETs /releases, /releases/v1.38/summary, /releases/v1.38/features, /releases/v1.38/dependencies, /releases/4.5.0/features, then sleeps 1 s",
+    "requests": 1580, "requests_per_second": 12.4, "errors": 0,
+    "client_seconds": {"p50": 0.73, "p95": 2.27, "max": 8.56},
+    "server_seconds_by_path_p95": {"/releases": 1.93, "/releases/v1.38/summary": 2.16, "/releases/4.5.0/features": 2.20, "/releases/v1.38/dependencies": 2.33, "/releases/v1.38/features": 1.76},
+    "api_cpu_p99_peak": 0.63
+  },
+  "simulator": {
+    "profile": "10 what-if scenarios one after another (POST /releases/v1.38/simulate, arrival_multiplier 1.2)",
+    "errors": 0,
+    "client_seconds": {"p50": 1.43, "p95": 2.4, "max": 3.12},
+    "server_seconds": {"n": 10, "p50": 1.34, "p95": 1.39, "max": 3.06},
+    "note": "Server time from Cloud Run request logs; client time adds the network from the owner's machine. 9 of 10 runs under 2 s; one 3.06 s. Small sample."
+  }
+}

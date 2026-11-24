@@ -152,6 +152,9 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Data freshness (polled Kubernetes, target < 10 min) | **Under 9 min worst case**: 24 of 24 polls succeeded every 5 min; longest gap between successful polls 6.2 min, poll run 74 s p50 / 124 s max. Measured 2026-11-23 20:02-22:03 UTC; `docs/results/poll-freshness-cloud-20261123.json` |
 | Stored event → live page in the cloud (p95), polled data | **15.9 s** (p50 12.7 s, n = 122 pushes, 2 open pages); v1.38 recompute p95 **9.2 s** (was about 56 s). Excludes the wait for the next poll. Measured 2026-11-23, 2-hour window, small sample; ADR-0019 |
 | Event → dashboard latency via webhooks (p95, target < 30 s) | **9.7 s: passes** (p50 5.7 s, max 12.2 s; n = 27 webhook events, each timed from GitHub's event time to the first push to an open page). GitHub's delivery p50 2.2 s, receipt → page p50 3.6 s. Measured 2026-11-24 04:29–04:45 UTC with Kubernetes, Kafka and webhooks flowing, after the P3-M5 fixes; before them some events took 60 s to 14 min (ADR-0022). Small sample, one repository. `docs/results/webhook-latency-cloud-20261124T044532Z.json` |
+| Simulator: one what-if scenario (target p95 < 2 s) | **Server p95 1.39 s** (p50 1.34 s, max 3.06 s; 9 of 10 runs under 2 s). n = 10 scenarios run one after another on the live API, 2026-11-24; small sample. `docs/results/load-test-cloud-20261124.json` |
+| API under load: 10 then 20 users, 1,580 requests | **0 errors**; read p95 about 2 s at 12 requests/s with CPU at 63%: requests queue inside the single API instance (#70). 2026-11-24 |
+| Database restore (point-in-time clone) | **Pass**: 9 minutes; schema and every row count up to the restore point matched production. 2026-11-24. `docs/results/restore-test-20261124.json` |
 
 Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 `DATABASE_URL=... uv run python scripts/measure_linking.py --release v1.38`.

@@ -56,11 +56,11 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 | Runbook (deploy, Terraform apply, rollback, each alert) | ✅ `docs/runbook.md` (#38) |
 | Event pipeline keeps up with polls and syncs (batched storing) | ✅ ADR-0022 (#50) |
 | Backlog alert fires in minutes, not 18 | ✅ 3 min held for 2 (#54) |
-| Cloud SQL backups | 🟡 configured; restore never tested |
+| Cloud SQL backups | ✅ restore tested 2026-11-24: 9 min, every row count matched |
 | Scheduled Jira and Kafka PR sync in the cloud | ✅ hourly Jira job, Kafka PRs in the 5-minute poll (#47) |
 | Dependency and secret scanning in CI | ✅ pip-audit, npm audit, gitleaks, Dependabot (#18, #34) |
 | Security review of the public endpoints (sign-in, webhooks, API) | ⬜ |
-| Load test of the API and live stream | ⬜ |
+| Load test of the API and live stream | ✅ 20 users, 0 errors; read p95 about 2 s (#70) |
 
 ## Proof (results still to measure or pass)
 
@@ -71,7 +71,7 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 | Link suggester reviewed precision | ⬜ TBD | The owner reviews the 104 suggestions |
 | Fact-checker labels | 🟡 | The owner's review |
 | Simulator validation (±20% on replay medians) | ❌ | Model work on review waits |
-| Simulator p95 < 2 s for a standard scenario | ⬜ not yet measured in the cloud | SLO dashboard |
+| Simulator p95 < 2 s for a standard scenario | 🟡 server p95 1.39 s, 9 of 10 runs under 2 s, max 3.06 s (n = 10, 2026-11-24) | More runs; dashboard tile (#62) |
 | Forecast on an unseen release (v1.39, scored as it runs) | ⬜ | Time: v1.39 starts after v1.38 ships (2026-12-16) |
 | Availability 99.5% | 🟡 uptime checks live since 2026-11-24 (#36); needs a month of data | Time |
 
