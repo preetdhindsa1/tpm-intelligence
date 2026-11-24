@@ -27,7 +27,7 @@ this page only says where things stand.
 | Shadow-org simulator (SimPy) | ❌ partly | ADR-0012. Built and calibrated, but **not validated**: median review wait misses the ±20% replay target (v1.37 +205%, v1.38 +350%); time to merge passes |
 | Dashboard redesign, forecast improvements, merge dates | ✅ / ❌ | ADR-0013, ADR-0015. Merge-date forecasts are **not validated** (full rule passed in 2 of 12) |
 
-## Phase 3: make it real (in progress)
+## Phase 3: make it real (M1-M6 done; follow-ups open)
 
 Calendar (ADR-0020): cycle start 2026-11-30, planning freeze 2026-12-14, code freeze
 2027-01-14, release 2027-01-20. Tracked in the `Phase 3` GitHub milestone.
@@ -39,7 +39,7 @@ Calendar (ADR-0020): cycle start 2026-11-30, planning freeze 2026-12-14, code fr
 | P3-M3 | Apache Kafka via Jira | 🟡 | ADR-0018. Collector, linking (81% of 4.4.0 features) and UI done. Jira plan synced hourly and `apache/kafka` PRs every 5 minutes in the cloud since 2026-11-24 (#47). **Left:** no freeze dates, so no Kafka odds (#8); components not mapped to teams |
 | P3-M4 | Faster recompute | ✅ | ADR-0019 (link once, cache the calibration; incremental projection dropped after profiling). Cloud recompute p95 9.2 s |
 | P3-M5 | Webhooks end to end | ✅ | ADR-0020 (this repo tracks itself; repository webhook), ADR-0022 (pipeline under real load). End-to-end timing live; five causes of slow events found and fixed (deploy overlap, short Pub/Sub pulls, one-event-at-a-time storing, skipped pushes, timing the wrong event). Measured p95 **9.7 s** (n = 27), passes the 30 s target. ✅ |
-| P3-M6 | Operations | 🟡 | Alerts email the owner and fire on time (#14, #54); uptime checks, SLO dashboard, runbook, CI scanning, Kafka sync done. **Left:** see "Hardening" below (#7) |
+| P3-M6 | Operations | ✅ | Alerts email the owner and fire on time (#14, #45, #54); uptime checks and a $150/month budget; SLO dashboard with every section 9 target; runbook; restore tested (9 min); CI scanning; security review; load test; Kafka sync; batched event storing (ADR-0022). Follow-ups: #65, #66, #70 |
 
 Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); forecasts say
 "not enough history" instead of a fake 50% (#9); poller fixes (#11).
