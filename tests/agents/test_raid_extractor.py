@@ -39,6 +39,7 @@ Updates:
 * Release Branch Management (Robin Moe / @rmoe):
    * We'll start planning for rc.0 soon, rc.0 is on Thursday 3rd December 2026
    * KEP-6395 was removed at Code Freeze and needs an exception.
+   * CNCF: We've emailed webinars@cncf.io to schedule the release webinar.
 """
 RETRO = "* [Kim + Lee] Exception requests arrived   too late this cycle.\n"
 MEETING = Meeting("doc-1", "kubernetes:v1.38", "K8S", "2026-11-18", NOTES)
@@ -71,6 +72,7 @@ def test_masking_hides_names_handles_and_speakers_but_keeps_test_tags() -> None:
     assert f"* {MASK} Exception requests" in masked
     assert "[Flaking Test] [sig-node]" in masked
     assert "kubernetes/website#59188" in masked
+    assert "webinars@cncf.io" in masked  # an organisation's address, not a person's handle
 
 
 def test_the_model_sees_only_masked_text() -> None:

@@ -19,7 +19,10 @@ _ATTENDEE = re.compile(
 # "Docs (APAC: Jane Doe / @jdoe | EMEA: Sam Roe)": everything inside the brackets.
 _HEADING = re.compile(r"\(([^()\n]*@[^()\n]*)\)")
 _HEADING_NAME = re.compile(r"(?:^|[:|,/])\s*([A-Z][\w.'-]+(?: [A-Z][\w.'-]+){0,3})\s*(?=$|[|,/])")
-_HANDLE = re.compile(r"@[A-Za-z0-9][\w-]*(?: [A-Za-z][\w-]*)?(?=\s*[|,)/]|$)|@[A-Za-z0-9][\w-]*")
+# "@jdoe" (and "@Jane Doe" before a separator), but not the "@" inside an email address.
+_HANDLE = re.compile(
+    r"(?<![\w.])@[A-Za-z0-9][\w-]*(?: [A-Za-z][\w-]*)?(?=\s*[|,)/]|$)|(?<![\w.])@[A-Za-z0-9][\w-]*"
+)
 # "* [Kat + Dipesh] ..." at the start of a line; "[Flaking Test]" and "[sig-node]" are not people.
 _SPEAKER = re.compile(r"^(\s*[*-]?\s*)\[([^\]\n]{1,40})\]", re.M)
 _NOT_SPEAKER = re.compile(r"^(?:sig\b|feature|flaking|failing|participant$)", re.I)
