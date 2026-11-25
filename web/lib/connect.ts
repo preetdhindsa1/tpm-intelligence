@@ -25,7 +25,7 @@ export type ProgramTools = { display_name: string; planning_tool?: string; code_
 export function usedBy(connector: Connector, programs: ProgramTools[]): string[] {
   return programs
     .filter((p) => [p.planning_tool, ...(p.code_tools ?? [])].some((t) => t && connector.tools.includes(t)))
-    .map((p) => p.display_name.replace(/\s*\(this project\)$/, ""));
+    .map((p) => p.display_name);
 }
 
 /** The release fields a team gives, in the order the stage uses them. */

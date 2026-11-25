@@ -16,6 +16,7 @@ export default async function ReleaseLayout({
     slug: g.slug,
     displayName: g.displayName,
     releases: g.releases.map((r) => r.name),
+    lab: g.releases.some((r) => r.has_lab),
   }));
   return (
     <div className="mx-auto max-w-[1400px] space-y-5">
@@ -24,6 +25,7 @@ export default async function ReleaseLayout({
         project={release.project.toLowerCase()}
         release={release.name}
         displayName={release.display_name || release.project}
+        hasLab={release.has_lab}
         stage={stageOf(release, new Date(release.as_of))}
         codeFreezeAt={release.code_freeze_at}
         releaseAt={release.release_at}

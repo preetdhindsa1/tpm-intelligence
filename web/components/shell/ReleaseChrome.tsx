@@ -10,6 +10,7 @@ import type { SwitcherGroup } from "@/components/ReleaseSwitcher";
 import { dayMonth, daysFrom } from "@/lib/cockpit";
 import { releasePath, switchPath } from "@/lib/routes";
 import { cockpitSection, writeLast } from "./model";
+import { programTitle } from "@/lib/names";
 
 const asOfLabel = (iso: string) => `${dayMonth(iso)}, ${new Date(iso).toISOString().slice(11, 16)} UTC`;
 
@@ -27,14 +28,14 @@ export function releaseText(release: string | null, asOf: string): string | null
   return d <= 0 ? `Released ${dayMonth(release)}` : `Release ${dayMonth(release)} · in ${d} day${d === 1 ? "" : "s"}`;
 }
 
-export function ReleaseChrome({ groups, project, release, displayName, stage, codeFreezeAt, releaseAt, asOf }: {
-  groups: SwitcherGroup[]; project: string; release: string; displayName: string;
+export function ReleaseChrome({ groups, project, release, displayName, hasLab, stage, codeFreezeAt, releaseAt, asOf }: {
+  groups: SwitcherGroup[]; project: string; release: string; displayName: string; hasLab?: boolean;
   stage: string; codeFreezeAt: string | null; releaseAt: string | null; asOf: string;
 }) {
   const router = useRouter();
   const path = usePathname() ?? "";
   useEffect(() => { writeLast(window.localStorage, { project, release, displayName }); }, [project, release, displayName]);
-  const options = groups.flatMap((g) => [...g.releases].reverse().map((name) => ({ value: `${g.slug}/${name}`, label: `${g.displayName} · ${name}` })));
+  const options = groups.flatMap((g) => [...g.releases].reverse().map((name) => ({ value: `${g.slug}/${name}`, label: g.lab ? g.displayName : `${g.displayName} · ${name}` })));
   const section = cockpitSection(path);
   const studio = path.endsWith("/simulate");
   const title = studio ? "Decision Studio" : section === "" && !path.includes("/features/") ? "Live Cockpit" : null;
@@ -44,7 +45,7 @@ export function ReleaseChrome({ groups, project, release, displayName, stage, co
       <nav aria-label="Program" className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
         <Link href="/portfolio" className="inline-flex min-h-11 items-center text-action hover:underline">Portfolio</Link>
         <span aria-hidden>/</span>
-        <select aria-label={`${displayName} · ${release}`} className="min-h-11 min-w-0 max-w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-800" value={`${project}/${release}`}
+        <select aria-label={programTitle(displayName, release, hasLab)} className="min-h-11 min-w-0 max-w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-800" value={`${project}/${release}`}
           onChange={(e) => { const i = e.target.value.indexOf("/"); router.push(switchPath(path, e.target.value.slice(0, i), e.target.value.slice(i + 1))); }}>
           {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
@@ -53,7 +54,7 @@ export function ReleaseChrome({ groups, project, release, displayName, stage, co
         <div>
           {title && (
             <h1 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-              {title} · {displayName.replace(/\s*\(this project\)$/, "")} {release}
+              {title} · {programTitle(displayName, release, hasLab)}
             </h1>
           )}
           <p className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-slate-600">

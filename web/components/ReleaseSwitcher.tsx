@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { releasePath, switchPath } from "@/lib/routes";
 
-export type SwitcherGroup = { slug: string; displayName: string; releases: string[] };
+export type SwitcherGroup = { slug: string; displayName: string; releases: string[]; lab?: boolean };
 
 export function ReleaseSwitcher({ groups, project, release }: { groups: SwitcherGroup[]; project: string; release: string }) {
   const router = useRouter();
