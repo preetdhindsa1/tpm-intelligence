@@ -16,14 +16,14 @@ stuck: review capacity, review depth and rework.
 
 ### The screens (UX v1, locked 2026-11-24: `docs/ux/ux-v1-locked.md`)
 
-| Screen | What it shows | Data |
-|---|---|---|
-| Front page | What it is, three real stories, the trust scorecard | Measured results below |
-| Portfolio | Every live program: stage, scope, biggest bottleneck, next decision, what waits on you | `GET /portfolio` (ADR-0025) |
-| Live Cockpit | One program live: lifecycle, stat tiles, #6395 time machine, Code Freeze chart, verified executive brief | Release endpoints |
-| Decision Studio | Reviewer what-ifs, powered by the Shadow-Org Simulator, labeled "not validated" | `GET /releases/{name}/simulator` (ADR-0012) |
-| AI-native PDLC | How this repository's pod (1 human, 2 AI agents, 1 bot) builds, checks and ships, checked against its own PRs | `GET /lab` pod facts (ADR-0023) |
-| Connect your tools | How a team plugs in its planning and code tools | Connector configs |
+| Screen | What it shows | Data | Status (2026-11-25) |
+|---|---|---|---|
+| Front page | What it is, three real stories, the trust scorecard | Measured results below | Landing in this wave (#125) |
+| Portfolio | Every live program: stage, scope, biggest bottleneck, next decision, what waits on you | `GET /portfolio` (ADR-0025) | Live |
+| Live Cockpit | One program live: lifecycle, stat tiles, #6395 time machine, Code Freeze chart, verified executive brief | Release endpoints | Live |
+| Decision Studio | Reviewer what-ifs, powered by the Shadow-Org Simulator, labeled "not validated" | `GET /releases/{name}/simulator` (ADR-0012) | Landing in this wave (#116) |
+| AI-native PDLC | How this repository's pod (1 human, 2 AI agents, 1 bot) builds, checks and ships, checked against its own PRs | `GET /lab` pod facts (ADR-0023) | Landing in this wave (#118); today's page is `/lab` |
+| Connect your tools | How a team plugs in its planning and code tools | Connector configs | Landing in this wave (#126) |
 
 JSON contracts for the new screens: [`docs/api/ux-v1-contract.md`](docs/api/ux-v1-contract.md).
 
