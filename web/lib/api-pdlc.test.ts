@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { metricValue, ruleValue, stageDetail, stageValue, type PodStage } from "./api-pdlc";
+import { MULTI_AGENT, metricValue, multiAgentFact, ruleValue, stageDetail, stageValue, type Pod, type PodStage } from "./api-pdlc";
 
 // Shapes and values from the contract example (this repository, 2026-11-25).
 const stage = (s: Partial<PodStage> & { stage: string }): PodStage => ({
@@ -30,5 +30,29 @@ describe("pod facts wording", () => {
     expect(ruleValue({ rule: "R13", title: "", status: "broken", count: 32, of: 38 })).toBe("32 of 38 break it");
     expect(ruleValue({ rule: "R5", title: "", status: "not_measured", count: null, of: null })).toBe("Not measured yet");
     expect(ruleValue({ rule: "R8", title: "", status: "held", count: 0, of: 12 })).toBe("Held · 0 of 12");
+  });
+});
+
+describe("multi-agent development section", () => {
+  const pod: Pod = {
+    members: [],
+    no_lane: 2,
+    metrics: [],
+    rules: [],
+    flow: [
+      stage({ stage: "build", value: { max_open_per_agent: 6, over_400_lines: 0, collisions: 0 } }),
+      stage({ stage: "cross_review", value: { cross_reviewed: 13, agent_merged: 60 } }),
+      stage({ stage: "human_review", value: { human_reviewed: 19, merged: 79 } }),
+    ],
+  };
+
+  it("states the pod rules as rules and checks each against the live data", () => {
+    expect(MULTI_AGENT.points.map((p) => p.title)).toEqual(["Separate lanes", "Agents check each other", "A human decides", "Measured, not claimed"]);
+    expect(MULTI_AGENT.points.slice(0, 3).every((p) => p.body.startsWith("The rule:"))).toBe(true);
+    expect(multiAgentFact("lanes", pod)).toBe("So far: at most 6 PRs open at once in one lane.");
+    expect(multiAgentFact("cross", pod)).toBe("So far: 13 of 60 merged agent PRs had one.");
+    expect(multiAgentFact("human", pod)).toBe("So far: 19 of 79 merged PRs had a human review.");
+    expect(multiAgentFact("measured", pod)).toBeNull();
+    expect(multiAgentFact("cross", { ...pod, flow: [] })).toBeNull();
   });
 });
