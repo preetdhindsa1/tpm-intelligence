@@ -7,6 +7,7 @@ const STORY = new Set([
   "untracked",
   "added_to_release",
   "removed_from_release",
+  "enhancements_freeze",
   "code_freeze",
   "pr_opened",
   "pr_merged",
@@ -14,5 +15,14 @@ const STORY = new Set([
 ]);
 
 export function storyStops(events: TimelineStop[]): TimelineStop[] {
-  return events.filter((e) => STORY.has(e.kind));
+  const seen = new Set<string>();
+  const stops: TimelineStop[] = [];
+  for (const event of events) {
+    if (!STORY.has(event.kind)) continue;
+    const key = `${event.at}\0${event.kind}\0${event.ref ?? ""}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    stops.push(event);
+  }
+  return stops;
 }

@@ -10,6 +10,7 @@ export function TimeMachine({ stops, error }: { stops: MachineStop[]; error: str
   return (
     <section className="rounded-lg bg-ink p-4 text-white">
       <h2 className="font-heading text-lg font-semibold">Time machine · #6395</h2>
+      <p className="text-sm text-slate-300">Replay of feature #6395&apos;s real events</p>
       {error && <p className="mt-2 text-sm text-slate-200">{error}</p>}
       {!error && stops.length === 0 && <p className="mt-2 text-sm text-slate-200">No timeline events for #6395.</p>}
       {stop && (

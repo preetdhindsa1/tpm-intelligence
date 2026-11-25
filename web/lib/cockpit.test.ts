@@ -11,4 +11,15 @@ describe("storyStops", () => {
     ]);
     expect(stops.map((s) => s.kind)).toEqual(["opted_in", "removed_from_release", "pr_merged"]);
   });
+
+  it("keeps Enhancements Freeze and drops a repeated untracked row and a future release", () => {
+    const untracked = { at: "2026-11-17T12:05:58Z", kind: "untracked", ref: null };
+    const stops = storyStops([
+      untracked,
+      { ...untracked },
+      { at: "2026-09-30T12:00:00Z", kind: "enhancements_freeze", ref: null },
+      { at: "2026-12-16T00:00:00Z", kind: "release", ref: null },
+    ]);
+    expect(stops).toEqual([untracked, { at: "2026-09-30T12:00:00Z", kind: "enhancements_freeze", ref: null }]);
+  });
 });
