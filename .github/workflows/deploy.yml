@@ -70,6 +70,10 @@ jobs:
           gcloud run services update tpm-api --region "$REGION" --container api --image "$REG/app:$SHA"
           gcloud run jobs update tpm-github-poller --region "$REGION" --container poller --image "$REG/app:$SHA"
           gcloud run jobs update tpm-jira-collector --region "$REGION" --container jira --image "$REG/app:$SHA"
+          # The calibration job exists once infra/simulator.tf is applied; skip it until then.
+          if gcloud run jobs describe tpm-sim-calibrate --region "$REGION" >/dev/null 2>&1; then
+            gcloud run jobs update tpm-sim-calibrate --region "$REGION" --container calibrate --image "$REG/app:$SHA"
+          fi
           gcloud run services update "$WEB_SERVICE" --image "$REG/web:$SHA" --region "$REGION"
           # Webhook receiver (ADR-0020), once Terraform has created it.
           if gcloud run services describe tpm-webhooks --region "$REGION" >/dev/null 2>&1; then
