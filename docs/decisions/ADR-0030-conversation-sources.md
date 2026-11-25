@@ -248,6 +248,13 @@ own where the label grouped three. The labels were not changed after seeing the 
 The stronger model did not help and costs ten times more, so the cheaper one stays. The real
 measure is Cursor's independent cases in `evals/cases/raid/`, which the gate picks up.
 
+**The gate reports before it blocks** (owner's decision, 2026-11-25). CI runs it and prints
+the real numbers on every run, marked failing while they are under the threshold. It blocks
+merges only once `evals/cases/raid/` holds at least 30 cases not marked `seed`
+(`MIN_INDEPENDENT` in `evals/raid_extractor.py`). Until then a builder-tuned score on five
+seeds would decide nothing useful either way, and no extracted item is shown or used before
+a person confirms it.
+
 **v1.38 run (#179)**, prompt v2 on claude-haiku-5-5, over the 13 stored meetings (2 Sep to
 25 Nov 2026, read from the shared core after `make notes-sync`):
 
