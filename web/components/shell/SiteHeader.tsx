@@ -31,7 +31,7 @@ export function SiteHeader({ login, signIn }: { login: string | null; signIn: bo
   }, [open]);
   const dest = destinations(path, last);
   const here = currentId(path);
-  const cockpit = dest.find((d) => d.id === "cockpit")?.href ?? "/releases";
+  const cockpit = dest.find((d) => d.id === "cockpit")?.href ?? "/portfolio";
   return (
     <header className="bg-ink text-white">
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-4 px-6">
@@ -46,6 +46,12 @@ export function SiteHeader({ login, signIn }: { login: string | null; signIn: bo
         <div className="ml-auto flex flex-wrap items-center gap-3">
           {front && !login && signIn && <Link href="/api/auth/signin" prefetch={false} className="inline-flex min-h-11 items-center text-sm text-slate-200">Sign in</Link>}
           {front && <Link href={cockpit} className="inline-flex min-h-11 items-center rounded-md bg-action px-3 text-sm font-medium text-white">Open the live demo</Link>}
+          {!front && (
+            <span className="inline-flex min-h-11 items-center gap-2 text-sm text-slate-200" title="Collectors poll the sources every few minutes. Each page shows its data-as-of time.">
+              <span aria-hidden className="h-2 w-2 rounded-full bg-emerald-400" />
+              Live
+            </span>
+          )}
           {!front && <button ref={searchBtn} type="button" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/20 px-3 text-sm" onClick={() => setOpen(true)}>Search <kbd className="text-xs text-slate-300">⌘K</kbd></button>}
           {login && (
             <span className="inline-flex min-h-11 items-center gap-2 text-sm">

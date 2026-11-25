@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { commandItems, currentId, destinations, readLast, stageOf, writeLast, type ReleaseDates } from "./model";
+import { cockpitSection, commandItems, currentId, destinations, readLast, stageOf, writeLast, type ReleaseDates } from "./model";
 
 const V138: ReleaseDates = {
   cycle_start_at: "2026-08-31T00:00:00Z",
@@ -17,17 +17,35 @@ describe("shell", () => {
     expect(stageOf({ ...V138, cycle_start_at: null }, new Date("2026-11-21T00:00:00Z"))).toBe("Dates not known");
   });
 
-  it("links the five screens to the last program, or the release index", () => {
+  it("links the five screens to the last program, or the portfolio", () => {
     const last = { project: "kubernetes", release: "v1.38", displayName: "Kubernetes" };
     const linked = destinations("/", last);
     expect(linked.map((d) => d.label)).toEqual(["Portfolio", "Live Cockpit", "Decision Studio", "AI-native PDLC", "Connect your tools"]);
     expect(linked.find((d) => d.id === "cockpit")?.href).toBe("/projects/kubernetes/releases/v1.38");
-    expect(linked.find((d) => d.id === "pdlc")?.href).toBe("/lab");
-    expect(destinations("/", null).find((d) => d.id === "studio")?.href).toBe("/releases");
+    expect(linked.find((d) => d.id === "pdlc")?.href).toBe("/pdlc");
+    expect(destinations("/", null).find((d) => d.id === "studio")?.href).toBe("/portfolio");
+    expect(destinations("/", null).find((d) => d.id === "cockpit")?.href).toBe("/portfolio");
     expect(currentId("/projects/kubernetes/releases/v1.38/simulate")).toBe("studio");
     expect(currentId("/projects/kubernetes/releases/v1.38")).toBe("cockpit");
     const labels = commandItems("/projects/kubernetes/releases/v1.38", null).map((i) => i.label);
-    expect(labels).toContain("Link review");
+    expect(labels).toContain("Live Cockpit · Link review");
+    expect(labels).not.toContain("Simulations");
+  });
+
+  it("underlines AI-native PDLC on the pod page and the lab report", () => {
+    expect(currentId("/pdlc")).toBe("pdlc");
+    expect(currentId("/lab")).toBe("pdlc");
+    expect(currentId("/connect")).toBe("connect");
+  });
+
+  it("puts feature pages under Overview and shows no tabs in Decision Studio", () => {
+    const base = "/projects/kubernetes/releases/v1.38";
+    expect(cockpitSection(base)).toBe("");
+    expect(cockpitSection(`${base}/features/6395`)).toBe("");
+    expect(cockpitSection(`${base}/dependencies`)).toBe("/dependencies");
+    expect(cockpitSection(`${base}/links`)).toBe("/links");
+    expect(cockpitSection(`${base}/simulate`)).toBeNull();
+    expect(cockpitSection("/portfolio")).toBeNull();
   });
 
   it("stores the last program and drops a broken value", () => {
