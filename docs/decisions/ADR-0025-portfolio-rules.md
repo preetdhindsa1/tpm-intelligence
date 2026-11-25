@@ -142,3 +142,22 @@ for continuous teams.
 **Trade-offs.** `"verify"` is a breaking change to the Portfolio contract. The only client is
 this repository's web app, which changes in the same PR. The Launch window and every other
 ADR-0025 rule are unchanged.
+
+## Addendum 2 (2026-11-25): the review gap counts human reviews
+
+**Context.** Rule 4's review gap compared merged pull requests with GitHub *approvals*. In
+this repository every PR, review and comment is posted from the owner's account, and GitHub
+does not let an author approve their own PR. So the Portfolio said "0 of 78 had an
+approving review", while the front page and AI-native PDLC page, which read the pod facts
+(ADR-0023 addendum 2), said "19 of 74 merged PRs had a human review". The same repository
+showed two different numbers.
+
+**Decision.** When the team has pod facts, the review gap uses them: merged people PRs (bots
+excluded) and how many had a human review or comment before merge. The detail and the
+"Review is the new bottleneck" text say "with a human review". The threshold is unchanged (a
+gap when fewer than half were reviewed, from at least 5 merged). A team without pod facts
+keeps the approval count. The row's facts carry both (`approved_merged`, plus
+`human_reviewed` and `reviewed_of`).
+
+**Trade-off.** "Human review" includes a comment by the owner without the agent marker line
+(the pod rule). That is how the PDLC page counts it, so the pages now agree.

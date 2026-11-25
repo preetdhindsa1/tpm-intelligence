@@ -29,6 +29,10 @@ class LabFacts:
     approved_merged: int
     median_hours_to_merge: float | None
     unassigned: int
+    # Pod facts (ADR-0023 addendum 2): merged people PRs (bots excluded) and how many had a
+    # human review or comment before merge. None when the team has no pod facts.
+    human_reviewed: int | None = None
+    reviewed_of: int | None = None
 
 
 @dataclass(frozen=True)
@@ -93,12 +97,23 @@ def stage(dates: dict[str, datetime | None], now: datetime) -> dict[str, Any]:
     }
 
 
+def _reviewed(lab: LabFacts) -> tuple[int, int, str]:
+    """(reviewed, of, what) for the review gap.
+
+    Human reviews from the pod facts when the team has them (ADR-0025 addendum 2): GitHub
+    approvals cannot exist where every PR and review is posted from one account. Approvals
+    otherwise.
+    """
+    if lab.human_reviewed is not None and lab.reviewed_of is not None:
+        return lab.human_reviewed, lab.reviewed_of, "a human review"
+    return lab.approved_merged, lab.merged, "an approving review"
+
+
 def _review_gap(lab: LabFacts | None) -> bool:
-    return (
-        lab is not None
-        and lab.merged >= REVIEW_GAP_MIN_MERGED
-        and lab.approved_merged * 2 < lab.merged
-    )
+    if lab is None:
+        return False
+    n, of, _ = _reviewed(lab)
+    return of >= REVIEW_GAP_MIN_MERGED and n * 2 < of
 
 
 def _minutes(lab: LabFacts) -> int | None:
@@ -137,9 +152,8 @@ def bottleneck(p: ProgramFacts, current_stage: str | None) -> dict[str, Any]:
             top_flag_features=n,
         )
     if p.lab is not None and _review_gap(p.lab):
-        detail = (
-            f"{p.lab.merged} pull requests merged, {p.lab.approved_merged} with an approving review"
-        )
+        n, of, what = _reviewed(p.lab)
+        detail = f"{of} pull requests merged, {n} with {what}"
         return _row("review_gap", "warning", "Review gap", detail, **_gap_facts(p.lab))
     n, linked = p.features_in_release, p.linked_features
     if current_stage in STAGES[1:] and n > linked:
@@ -168,6 +182,8 @@ def _gap_facts(lab: LabFacts) -> dict[str, Any]:
         "merged": lab.merged,
         "approved_merged": lab.approved_merged,
         "median_minutes_to_merge": _minutes(lab),
+        "human_reviewed": lab.human_reviewed,
+        "reviewed_of": lab.reviewed_of,
     }
 
 
@@ -249,7 +265,8 @@ def across(facts: list[ProgramFacts]) -> list[dict[str, Any]]:
         if p.lab is not None and _review_gap(p.lab):
             m = _minutes(p.lab)
             speed = f"merge in a median of {m} minutes, and " if m is not None else ""
-            gap = f"{p.lab.approved_merged} of {p.lab.merged} had an approving review."
+            n, of, what = _reviewed(p.lab)
+            gap = f"{n} of {of} had {what}."
             text = f"{p.display_name}: pull requests {speed}{gap}"
             out.append(
                 _pattern("review_gap", "Review is the new bottleneck", text, p, **_gap_facts(p.lab))
