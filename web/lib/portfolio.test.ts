@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { approvalNotes, decisionHref, missingRows, portfolioSummary, stageLabel, statusLabel } from "./portfolio";
+import { approvalNotes, bottleneckTag, bottleneckText, decisionHref, missingRows, portfolioSummary, programSubline, stageLabel, stageLine, statusLabel, waitingVerb } from "./portfolio";
 
 describe("portfolio display", () => {
   it("uses the contract stage names and says when the stage is unknown", () => {
@@ -38,5 +38,35 @@ describe("portfolio display", () => {
     expect(decisionHref("kubernetes", "v1.38", "review_link_suggestions")).toBe("/projects/kubernetes/releases/v1.38/links");
     expect(decisionHref("tpm-intelligence", "Phase 3", "classify_prs")).toBe("/lab");
     expect(decisionHref("kubernetes", "v1.38", "simulate")).toBeNull();
+  });
+});
+
+describe("portfolio rows from API dates", () => {
+  const base = {
+    key: "kubernetes:v1.38", project: "kubernetes", display_name: "Kubernetes", release: "v1.38", as_of: "2026-11-25T05:00:00Z",
+    planning_tool: "github", code_tools: ["github"],
+    dates: { cycle_start_at: "2026-08-31T00:00:00Z", enhancements_freeze_at: "2026-09-30T12:00:00Z", code_freeze_at: "2026-11-17T12:00:00Z", release_at: "2026-12-16T00:00:00Z" },
+    stage: { current: "freeze", stages: [], days_to_next_milestone: 21, next_milestone: { name: "release", at: "2026-12-16T00:00:00Z" } },
+    scope: { features_in_release: 70, features_ever: 106 },
+    bottleneck: { kind: "critical_flags", severity: "critical", headline: "28 critical flags", detail: "25 features past Code Freeze with the main PR not merged" },
+    next_decision: null,
+  };
+
+  it("says where each program is, with its real dates", () => {
+    expect(programSubline(base)).toBe("GitHub · release 16 Dec 2026");
+    expect(stageLine(base)).toBe("Past Code Freeze (17 Nov) · release in 21 days");
+    expect(stageLine({ ...base, stage: { ...base.stage, current: "build" } })).toBe("Building · Code Freeze 17 Nov 2026");
+    expect(stageLine({ ...base, stage: { ...base.stage, current: "plan" } })).toBe("Planning · cycle starts 31 Aug");
+    expect(stageLine({ ...base, stage: { ...base.stage, current: null } })).toBe("Stage unknown");
+  });
+
+  it("shortens known bottleneck kinds and keeps the API text", () => {
+    expect(bottleneckTag(base.bottleneck)).toBe("28 critical flags");
+    expect(bottleneckText(base.bottleneck)).toBe("25 features past Code Freeze with the main PR not merged");
+    const link = { kind: "linking_gap", severity: "warning", headline: "3 of 16 features have no linked code", detail: "13 of 16 features in the release are linked to a pull request" };
+    expect(bottleneckTag(link)).toBe("Linking");
+    expect(bottleneckText(link)).toBe("13 of 16 features in the release are linked to a pull request");
+    expect(waitingVerb("review_link_suggestions")).toBe("Confirm");
+    expect(waitingVerb("something_new")).toBe("Open");
   });
 });
