@@ -5,7 +5,7 @@ import Link from "next/link";
 import { api, type FeatureDetail, type Summary } from "@/lib/api";
 import { fetchPodLab, type PodLab } from "@/lib/api-pdlc";
 import { DEMO_CHAPTERS, DEMO_LENGTH, STAGES, fraction, freezeReplay, shortDate, trustTiles, trustProof, verdictSummary, TRUST_RULES, type Tag, type WaitingLite } from "@/lib/front";
-import { MEASURED, type Verdict } from "@/lib/measured";
+import { MEASURED } from "@/lib/measured";
 import { stageLabel, type Portfolio, type PortfolioProgram } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
 import { programTitle } from "@/lib/names";
@@ -233,8 +233,6 @@ function Stories({ facts, kube, tourHref }: { facts: Facts; kube: PortfolioProgr
   return <ul className="mt-6 grid gap-5 md:grid-cols-3">{cards}</ul>;
 }
 
-const VERDICT: Record<Verdict, string> = { pass: "Passes", partial: "Partly", fail: "Fails", pending: "Not measured" };
-
 function TrustRules({ waiting }: { waiting: WaitingLite[] }) {
   return (
     <section>
@@ -252,13 +250,6 @@ function TrustRules({ waiting }: { waiting: WaitingLite[] }) {
     </section>
   );
 }
-
-const VERDICT_TONE: Record<Verdict, string> = {
-  pass: "bg-healthy-bg text-healthy",
-  partial: "bg-warning-bg text-warning",
-  fail: "bg-critical-bg text-critical",
-  pending: "bg-slate-100 text-slate-600",
-};
 
 function Measured() {
   const tiles = trustTiles(MEASURED);
@@ -282,18 +273,11 @@ function Measured() {
           ))}
         </ul>
       </div>
-      <h3 className="mt-6 border-t border-slate-100 pt-5 font-heading text-lg font-semibold">Every measured result, including what failed</h3>
-      <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {MEASURED.map((item) => (
-          <li key={item.id} className="flex flex-col rounded-xl border border-slate-200 p-4">
-            <p><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${VERDICT_TONE[item.verdict]}`}>{VERDICT[item.verdict]}</span></p>
-            <p className="mt-2 font-heading text-xl font-semibold">{item.value}</p>
-            <p className="text-sm text-slate-800">{item.label}</p>
-            <p className="mt-1 flex-1 text-xs leading-5 text-slate-500">{item.detail}</p>
-            <p className="mt-2 text-xs text-slate-400">{item.measured ? `Measured ${item.measured}` : "TBD (not yet measured)"}</p>
-          </li>
-        ))}
-      </ul>
+      <p className="mt-5 border-t border-slate-100 pt-4">
+        <Link href="/measured" className="inline-flex min-h-11 items-center text-sm font-semibold text-action hover:underline">
+          Every measured result, including what failed ({MEASURED.length}) →
+        </Link>
+      </p>
     </section>
   );
 }
