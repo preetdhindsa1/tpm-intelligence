@@ -243,7 +243,9 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(prog="evals.agents")
     parser.add_argument(
-        "--suite", choices=["all", "risk_analyst", "vp_summary", "link_suggester"], default="all"
+        "--suite",
+        choices=["all", "risk_analyst", "vp_summary", "link_suggester", "raid_extractor"],
+        default="all",
     )
     args = parser.parse_args(argv)
 
@@ -251,8 +253,14 @@ def main(argv: list[str] | None = None) -> int:
     try:
         gateway = Gateway(AISettings(), PostgresLedger(sessionmaker(make_engine())))
         from evals.link_suggester import run as run_links
+        from evals.raid_extractor import run as run_raid
 
-        runners = {"risk_analyst": run, "vp_summary": run_vp, "link_suggester": run_links}
+        runners = {
+            "risk_analyst": run,
+            "vp_summary": run_vp,
+            "link_suggester": run_links,
+            "raid_extractor": run_raid,
+        }
         chosen = list(runners) if args.suite == "all" else [args.suite]
         all_passed = True
         for name in chosen:

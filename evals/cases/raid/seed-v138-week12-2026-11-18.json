@@ -1,0 +1,23 @@
+{
+ "id": "seed-v138-week12-2026-11-18",
+ "seed": true,
+ "author": "builder (claude-agent)",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {"document": "Kubernetes v1.38 release team meeting notes (public Google Doc)", "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0", "meeting_date": "2026-11-18", "fetched_at": "2026-11-25T20:53:00Z", "note": "Excerpt of the Updates section, people's names masked; template lines removed."},
+ "teams": ["Enhancements", "Release Signal", "Docs", "Comms", "Release Branch Management", "Subproject Leads", "Release Lead"],
+ "notes": "* Updates:\n   * In review the code freeze exception requests with Release Lead.\n* Release Signal (APAC: [participant]/ [participant] | EMEA: [participant] / [participant])\n* Current Status: Green\nfor APAC\n- awaiting signal on failing on master-informing: sig-release-master-informing#ec2-master-scale-performance-5000 - Fixed now\n- 3 flakes on master-informing\nsig-release-master-informing#gce-cos-master-serial: kubetest.Up\nsig-release-master-informing#gce-cos-slow-master kubetest.Up\nsig-release-master-informing#gce-cos-serial-maste [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (block volmode)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]\n   * Docs  (APAC: [participant] / EMEA:  [participant]) :\n   * Current Status:  Green\n   * Last week’s branch sync PR to k/website has been merged.\n   * The v1.38.0-beta.0 Release Notes PR has been reviewed, and /lgtm has been added. It's now awaiting approval.\n   * https://github.com/kubernetes/sig-release/pull/3134\n   * Ready-for-review outreach has started on GitHub:\n   * Draft PRs → Ready for review\n   * Ready PRs → Technical/docs review\n   * Comms (APAC/EMEA: [participant] / [participant]):\n   * Current Status: Green\n   * Progress Issue\n   * Mid cycle blog: [participant] has raised the PR (kubernetes/website#59188) for #sig-docs-blog to review. The blog publishes on Monday 23rd November 2026.\n   * CNCF: We’ve emailed webinars@cncf.io to schedule the v1.38 release webinar, aiming for the weeks of 4th or 11th January 2027. The press email to pr@cncf.io will come next.\n   * Feature blogs: Writing buddies have been paired across 21 feature blog PRs.\n   * Release highlights: We’re still collecting highlights and deprecations from SIGs on the Release Highlights GitHub Discussion, which closes on Tuesday 24th November 2026.\n   * Release Branch Management ([participant] / [participant]):\n   * Current Status: Green\n   * Progress issue\n   * Freeze enforcement was merged.\n   * We’ll start planning for rc.0 soon, rc.0 is on Thursday 3rd December 2026\n   * Subproject Leads ([participant] / [participant], [participant] / [participant]):\n   * It’s time to decide about succession. DM [participant] + [participant] + [participant] with your thoughts about your successors ASAP.\n",
+ "expected": [
+  {"type": "action", "quote": "In review the code freeze exception requests with Release Lead.", "owner": "Enhancements"},
+  {"type": "issue", "quote": "3 flakes on master-informing", "owner": "Release Signal"},
+  {"type": "action", "quote": "The press email to pr@cncf.io will come next.", "owner": "Comms"},
+  {"type": "action", "quote": "We’re still collecting highlights and deprecations from SIGs on the Release Highlights GitHub Discussion, which closes on Tuesday 24th November 2026.", "owner": "Comms"},
+  {"type": "action", "quote": "We’ll start planning for rc.0 soon, rc.0 is on Thursday 3rd December 2026", "owner": "Release Branch Management"},
+  {"type": "action", "quote": "DM [participant] + [participant] + [participant] with your thoughts about your successors ASAP.", "owner": "Subproject Leads"}
+ ],
+ "optional": [
+  {"type": "action", "quote": "The v1.38.0-beta.0 Release Notes PR has been reviewed, and /lgtm has been added. It's now awaiting approval."},
+  {"type": "decision", "quote": "It’s time to decide about succession."},
+  {"type": "issue", "quote": "awaiting signal on failing on master-informing"}
+ ]
+}
