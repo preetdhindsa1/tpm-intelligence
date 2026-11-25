@@ -13,6 +13,7 @@ export type PortfolioProgram = {
   planning_tool?: string;
   code_tools?: string[];
   has_lab?: boolean;
+  code_freeze_label?: string;
   dates?: { cycle_start_at: string | null; enhancements_freeze_at: string | null; code_freeze_at: string | null; release_at: string | null };
   stage: {
     current: string | null;
@@ -47,7 +48,8 @@ const MISSING_ROW = new Set(["no release yet", "release could not be computed"])
 const STAGE_LABEL: Record<string, string> = {
   plan: "Plan",
   build: "Build",
-  freeze: "Freeze",
+  verify: "Verify",
+  freeze: "Verify", // the API's name before the ADR-0025 addendum, kept for one deploy
   launch: "Launch",
   learn: "Learn",
 };
@@ -121,13 +123,15 @@ export function programSubline(p: PortfolioProgram): string {
 export function stageLine(p: PortfolioProgram): string {
   const d = p.dates;
   const days = p.stage.days_to_next_milestone;
+  const label = p.code_freeze_label ?? "Code Freeze";
   switch (p.stage.current) {
     case "plan":
       return d?.cycle_start_at ? `Planning · cycle starts ${day(d.cycle_start_at)}` : "Planning";
     case "build":
-      return d?.code_freeze_at ? `Building · Code Freeze ${dayYear(d.code_freeze_at)}` : "Building";
-    case "freeze": {
-      const past = d?.code_freeze_at ? `Past Code Freeze (${day(d.code_freeze_at)})` : "Past Code Freeze";
+      return d?.code_freeze_at ? `Building · ${label} ${dayYear(d.code_freeze_at)}` : "Building";
+    case "freeze": // older API name for the same stage
+    case "verify": {
+      const past = d?.code_freeze_at ? `Verifying · past ${label} (${day(d.code_freeze_at)})` : `Verifying · past ${label}`;
       return days !== null && p.stage.next_milestone?.name === "release" ? `${past} · release in ${days} day${days === 1 ? "" : "s"}` : past;
     }
     case "launch":
@@ -158,4 +162,4 @@ export function waitingVerb(kind: string): string {
   return VERB[kind] ?? "Open";
 }
 
-export const STAGE_NAMES = ["plan", "build", "freeze", "launch", "learn"] as const;
+export const STAGE_NAMES = ["plan", "build", "verify", "launch", "learn"] as const;

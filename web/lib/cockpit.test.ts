@@ -73,12 +73,14 @@ describe("Live Cockpit key stops for #6395", () => {
 
   it("fills the lifecycle up to the as-of date", () => {
     const d = { cycle_start_at: "2026-08-31T00:00:00Z", enhancements_freeze_at: "2026-09-30T12:00:00Z", code_freeze_at: "2026-11-17T12:00:00Z", release_at: "2026-12-16T00:00:00Z" };
-    const steps = lifecycle(d, "2026-11-25T00:00:00Z", "Freeze");
+    const steps = lifecycle(d, "2026-11-25T00:00:00Z", "Verify");
     expect(steps.map((s) => s.fill === 1)).toEqual([true, true, false, false, false]);
     expect(steps[2].fill).toBeGreaterThan(0.2);
     expect(steps[2].here).toBe(true);
     expect(steps[3].note).toBe("Release 16 Dec · in 21 days");
     expect(steps[2].note).toBe("Code Freeze 17 Nov, 12:00 UTC");
+    expect(steps[2].name).toBe("Verify");
+    expect(lifecycle(d, "2026-11-25T00:00:00Z", "Verify", "Feature Freeze")[2].note).toBe("Feature Freeze 17 Nov, 12:00 UTC");
   });
 });
 

@@ -141,11 +141,13 @@ export function keyStops(timeline: Ev[], prs: Pr[], teams: string[]): KeyStop[] 
 
 export type LifeStep = { name: string; note: string; fill: number; here: boolean };
 
-/** The lifecycle card: each stage's date line and how much of it has passed as of `asOf`. */
+/** The lifecycle card: each stage's date line and how much of it has passed as of `asOf`.
+ * Verify starts on the team's code-freeze date, named by `freezeLabel` (ADR-0025 addendum). */
 export function lifecycle(
   d: { cycle_start_at: string | null; enhancements_freeze_at: string | null; code_freeze_at: string | null; release_at: string | null },
   asOf: string,
   stage: string,
+  freezeLabel = "Code Freeze",
 ): LifeStep[] {
   const t = (s: string | null) => (s ? new Date(s).getTime() : NaN);
   const now = new Date(asOf).getTime();
@@ -153,7 +155,7 @@ export function lifecycle(
   const spans: [string, number, number, string][] = [
     ["Plan", t(d.cycle_start_at) - 30 * DAY, t(d.cycle_start_at), d.cycle_start_at ? `Cycle start ${dayMonth(d.cycle_start_at)}` : "Cycle start not known"],
     ["Build", t(d.cycle_start_at), t(d.code_freeze_at), d.enhancements_freeze_at ? `Enhancements Freeze ${dayMonth(d.enhancements_freeze_at)}` : "Building"],
-    ["Freeze", t(d.code_freeze_at), t(d.release_at), d.code_freeze_at ? `Code Freeze ${dayMonth(d.code_freeze_at)}, ${new Date(d.code_freeze_at).toISOString().slice(11, 16)} UTC` : "Code Freeze not known"],
+    ["Verify", t(d.code_freeze_at), t(d.release_at), d.code_freeze_at ? `${freezeLabel} ${dayMonth(d.code_freeze_at)}, ${new Date(d.code_freeze_at).toISOString().slice(11, 16)} UTC` : `${freezeLabel} not known`],
     ["Launch", t(d.release_at), t(d.release_at) + LAUNCH, d.release_at ? `Release ${dayMonth(d.release_at)}${now < t(d.release_at) ? ` · in ${daysFrom(asOf, d.release_at)} days` : ""}` : "Release not known"],
     ["Learn", t(d.release_at) + LAUNCH, t(d.release_at) + 60 * DAY, "Retro after release"],
   ];

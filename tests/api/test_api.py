@@ -79,6 +79,7 @@ def test_releases(after_readd: TestClient) -> None:
     assert release["name"] == "v1.38"
     assert release["code_freeze_at"] == "2026-11-17T12:00:00Z"
     assert release["features_ever_in_release"] == 2
+    assert release["code_freeze_label"] == "Code Freeze"
 
 
 def test_feature_table_row_for_6395(after_readd: TestClient) -> None:

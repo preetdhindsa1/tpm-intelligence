@@ -24,3 +24,4 @@ Each YAML file here is one cross-functional team. **Kubernetes is a live example
 | `planning` | Where the plan lives |
 | `code.repos` | Where PRs/reviews/CI live |
 | `calendar.path` | Freeze / release dates |
+| `code_freeze_label` | Optional. Your name for the `code_freeze` date (default "Code Freeze"; Kafka: "Feature Freeze"). The Verify stage starts on it. |

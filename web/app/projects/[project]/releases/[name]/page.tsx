@@ -46,7 +46,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
 
   return (
     <div className="space-y-5">
-      <LifecycleBar steps={lifecycle(r, r.as_of, stage)} />
+      <LifecycleBar steps={lifecycle(r, r.as_of, stage, r.code_freeze_label)} />
       <StatTiles summary={summary} />
       {machine && <TimeMachine {...machine} />}
 

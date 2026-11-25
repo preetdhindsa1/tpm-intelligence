@@ -42,7 +42,7 @@ export function subscribeLast(onChange: () => void): () => void {
 
 export type ReleaseDates = { cycle_start_at: string | null; code_freeze_at: string | null; release_at: string | null };
 
-const STAGES = ["Plan", "Build", "Freeze", "Launch", "Learn"] as const;
+const STAGES = ["Plan", "Build", "Verify", "Launch", "Learn"] as const;
 const LAUNCH_MS = 7 * 86_400_000;
 
 /** Same boundaries as ADR-0025: cycle start, Code Freeze, release, release + 7 days. */

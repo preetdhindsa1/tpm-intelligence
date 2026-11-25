@@ -27,6 +27,7 @@ class ReleaseOut(_Out):
     features_ever_in_release: int
     as_of: datetime
     has_lab: bool = False
+    code_freeze_label: str = "Code Freeze"  # the team's name for its code_freeze date
 
 
 class FlagOut(_Out):
@@ -761,6 +762,7 @@ class PortfolioProgramOut(_Out):
     planning_tool: str
     code_tools: list[str]
     has_lab: bool
+    code_freeze_label: str
     as_of: datetime
     dates: dict[str, datetime | None]
     stage: PortfolioStageOut

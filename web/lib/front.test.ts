@@ -39,7 +39,7 @@ describe("front page facts", () => {
   });
 
   it("has five stages and five chapters", () => {
-    expect(STAGES.map((s) => s.stage)).toEqual(["Plan", "Build", "Freeze", "Launch", "Learn"]);
+    expect(STAGES.map((s) => s.stage)).toEqual(["Plan", "Build", "Verify", "Launch", "Learn"]);
     expect(DEMO_CHAPTERS).toHaveLength(5);
   });
 });

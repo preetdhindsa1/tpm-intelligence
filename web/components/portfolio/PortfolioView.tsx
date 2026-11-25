@@ -83,7 +83,7 @@ function ProgramTable({ programs, skipped, filtered }: { programs: PortfolioProg
         <thead className="border-b border-slate-200">
           <tr>
             <th className={TH}>Program</th>
-            <th className={TH}>Where it is: stage: Plan → Build → Freeze → Launch → Learn</th>
+            <th className={TH}>Where it is: stage: Plan → Build → Verify → Launch → Learn</th>
             <th className={TH}>Scope</th>
             <th className={TH}>Biggest bottleneck</th>
             <th className={TH}>Next decision</th>

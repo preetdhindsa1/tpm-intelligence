@@ -109,3 +109,36 @@ times are UTC.
 
 Every field is rules. No AI is called by `GET /portfolio`. The text fields are templates
 filled with computed numbers, so there is nothing for the fact checker to remove.
+
+## Addendum (2026-11-25): the third stage is Verify, and each team names its boundary
+
+**Context.** The stage between Code Freeze and the release was called "Freeze". Teams that
+ship continuously (trunk-based development, feature flags, many deploys a day) have no code
+freeze, so the word ties the product to release trains. But the moment a freeze exists for,
+deciding that changes are checked and ready, does not go away for AI-native teams. It is the
+bottleneck the platform measures: agents write code at machine speed, people verify it at
+human speed.
+
+**Decision (owner, 2026-11-25).**
+1. The stage is renamed **Verify**: Plan → Build → **Verify** → Launch → Learn. Its
+   boundaries do not change: it runs from the release's `code_freeze` date to its release
+   date. The API's stage name changes from `"freeze"` to `"verify"`
+   (`GET /portfolio` `stage.current` and `stage.stages[].name`).
+2. Each team names the date that starts Verify in its connector file,
+   `code_freeze_label` (default `"Code Freeze"`). Kafka sets `"Feature Freeze"`, its own name
+   for the date the engine treats as Code Freeze (ADR-0018). A continuous team can use
+   "Release cut" or "Feature complete". The API returns it on every release and Portfolio
+   row (`code_freeze_label`). The web app shows it wherever the date appears ("Feature Freeze
+   passed 3 Feb", "Verifying · past Code Freeze (17 Nov)"), and the bottleneck text uses it
+   ("25 features past Code Freeze with the main PR not merged").
+3. Internal names stay: the `code_freeze` calendar field, the `removed_at_freeze` flag and
+   outcome codes, and Kubernetes copy that names its real milestone ("removed at Code
+   Freeze") are facts about that team's process, not the stage name.
+
+**Alternatives.** "Stabilize" or "Harden" (read as bug-fixing only), "Cutoff" (still a
+freeze), "Ready" (vague). Keeping "Freeze" with a footnote would leave the main word wrong
+for continuous teams.
+
+**Trade-offs.** `"verify"` is a breaking change to the Portfolio contract. The only client is
+this repository's web app, which changes in the same PR. The Launch window and every other
+ADR-0025 rule are unchanged.
