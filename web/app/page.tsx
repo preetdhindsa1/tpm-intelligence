@@ -165,7 +165,10 @@ function programLine(p: PortfolioProgram, facts: Facts): React.ReactNode {
       <>
         Pod of {lanes}: Claude, Cursor, Dependabot, human
         {human && human.merged != null && (
-          <span className="text-amber-300"> · {human.merged} merged, {human.human_reviewed ?? "?"} with a human review</span>
+          <span className="text-amber-300">
+            {" "}· {human.merged} merged
+            {human.approved_of ? `, ${human.approved ?? 0} approved by the human` : `, ${human.human_reviewed ?? "?"} with a human review`}
+          </span>
         )}
       </>
     );
@@ -176,7 +179,7 @@ function programLine(p: PortfolioProgram, facts: Facts): React.ReactNode {
     return `${s.features_in_release} features in · ${s.removed_at_freeze} removed at Code Freeze · ${s.critical_features} with a critical flag`;
   }
   const tool = p.planning_tool === "jira" ? " in Jira" : "";
-  return `${p.scope.features_in_release} features planned${tool}${freeze ? ` · Code Freeze ${shortDate(freeze)}` : ""}`;
+  return `${p.scope.features_in_release} features planned${tool}${freeze ? ` · ${p.code_freeze_label || "Code Freeze"} ${shortDate(freeze)}` : ""}`;
 }
 
 function StoryCard({ eyebrow, big, of, tone, title, body, href, cta }: {
@@ -215,10 +218,14 @@ function Stories({ facts, kube, tourHref }: { facts: Facts; kube: PortfolioProgr
   const merge = pod?.flow.find((st) => st.stage === "merge")?.value;
   if (human && human.merged != null && human.human_reviewed != null && human.merged > 0) {
     const median = merge?.median_minutes_to_merge;
+    // With merges stored (ADR-0023 add. 3) the headline is the human's approval; written
+    // reviews are the depth behind it.
+    const approved = human.approved_of ? { n: human.approved ?? 0, of: human.approved_of } : null;
     cards.push(
-      <StoryCard key="pod" eyebrow={`${facts.portfolio?.programs.find((p) => p.has_lab)?.display_name ?? "This platform"} · Claude + Cursor + Dependabot + human`} big={String(human.human_reviewed)} of={`of ${human.merged}`}
-        tone="text-warning" title="merged PRs had a human review"
-        body={`${median != null ? `Median time to merge: ${median} minutes. ` : ""}Agents write fast; verification is the gap. The platform measures it on its own development, honestly.`}
+      <StoryCard key="pod" eyebrow={`${facts.portfolio?.programs.find((p) => p.has_lab)?.display_name ?? "This platform"} · Claude + Cursor + Dependabot + human`}
+        big={String(approved ? approved.n : human.human_reviewed)} of={`of ${approved ? approved.of : human.merged}`}
+        tone="text-warning" title={approved ? "merged PRs approved by the human" : "merged PRs had a human review"}
+        body={`${approved ? `${human.human_reviewed} of ${human.merged} also had a written human review. ` : ""}${median != null ? `Median time to merge: ${median} minutes. ` : ""}Agents write fast; verification is the gap. The platform measures it on its own development, honestly.`}
         href="/pdlc" cta="See the pod flow" />,
     );
   }

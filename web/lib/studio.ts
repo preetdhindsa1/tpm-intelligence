@@ -80,3 +80,8 @@ export function mergedLine(o: PoolOutcome, horizon: string): { big: string; line
     line: `PRs merged by ${horizon} · range ${Math.round(o.merged.low)}–${Math.round(o.merged.high)}`,
   };
 }
+
+/** The simulator names its horizon "Code Freeze"; show the team's own word for it (Kafka: "Feature Freeze"). */
+export function teamHorizon<T extends { horizon_label: string }>(x: T, freezeLabel?: string): T {
+  return freezeLabel && x.horizon_label === "Code Freeze" ? { ...x, horizon_label: freezeLabel } : x;
+}

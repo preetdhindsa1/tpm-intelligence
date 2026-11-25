@@ -19,6 +19,8 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
   const { number } = await params;
   const name = release.name;
   const project = release.project;
+  // Only a whole number names a feature; anything else is a missing page, not an API error.
+  if (!/^\d+$/.test(number)) notFound();
   let f: FeatureDetail;
   try {
     f = await api.feature(name, Number(number));

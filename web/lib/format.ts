@@ -61,9 +61,26 @@ export function refLabel(ref: string): { label: string; href?: string } {
   if (prMatch) {
     return { label: `PR #${prMatch[2]} · ${field.replaceAll("_", " ")}`, href: `https://github.com/${prMatch[1]}/pull/${prMatch[2]}` };
   }
-  if (subject.startsWith("feature:")) return { label: field.replace(/^flag\./, "flag: ").replaceAll("_", " ") };
+  if (subject.startsWith("feature:")) {
+    // "feature:kubernetes/enhancements#5419::flag.main_pr_not_merged.message" → "#5419 · main PR not merged"
+    const id = subject.slice(8).match(/#\d+$/)?.[0] ?? subject.slice(8);
+    const [kind, name = "", detail = ""] = field.split(".");
+    const words = (x: string) => x.replaceAll("_", " ").replace(/\bpr\b/g, "PR").replace(/\bci\b/g, "CI");
+    const what =
+      kind === "flag" ? `${words(name)}${detail && detail !== "message" && detail !== "severity" ? `: ${words(detail)}` : ""}`
+      : kind === "ask" ? `ask: ${words(name)}`
+      : words(field);
+    return { label: `${id} · ${what}` };
+  }
+  if (subject === "release") return { label: `release · ${field.replaceAll("_", " ")}` };
   if (subject.startsWith("sig:")) return { label: `${subject.slice(4)} · ${field.replaceAll("_", " ")}` };
   return { label: field.replaceAll("_", " ") };
+}
+
+/** One chip per distinct label, in order (a flag's message and severity read the same). */
+export function refChips(refs: string[]): { ref: string; label: string; href?: string }[] {
+  const seen = new Set<string>();
+  return refs.map((ref) => ({ ref, ...refLabel(ref) })).filter((c) => !seen.has(c.label) && (seen.add(c.label), true));
 }
 
 /** One line under the claims: what the fact checker removed. */

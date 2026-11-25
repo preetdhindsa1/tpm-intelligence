@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import threading
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
@@ -147,6 +147,46 @@ def test_wait_returns_a_fresh_view() -> None:
     first = service.view("v1.38")
     source.events.append(held_back)
     assert service.view("v1.38", wait=True) is not first
+
+
+def test_the_warmer_leaves_a_release_nobody_viewed_lately() -> None:
+    """One look at an old release must not make it recompute on every poll (2026-11-25)."""
+    source = InMemoryEventSource(list(fixture_events()))
+    later = source.events[-2:]
+    del source.events[-2:]
+    computed: list[str] = []
+    service = ReleaseService(
+        source,
+        forecast=FAST,
+        now=lambda: AFTER_READD,
+        warm_window=timedelta(0),
+        on_computed=lambda v: computed.append(v.assessment.release.key),
+    )
+    service.view("v1.38")
+    source.events.append(later[0])  # the view is now stale
+    service.warm()
+    wait_for_background(service)
+    assert len(computed) == 1  # not viewed lately and not pinned: left alone
+
+    service.warm(["v1.38"])  # the current release is pinned and kept warm
+    wait_for_background(service)
+    source.events.append(later[1])
+    service.warm()
+    wait_for_background(service)
+    assert len(computed) == 3
+
+
+def test_an_unknown_release_fails_fast_without_computing() -> None:
+    computed: list[str] = []
+    service = ReleaseService(
+        InMemoryEventSource(list(fixture_events())),
+        forecast=FAST,
+        now=lambda: AFTER_READD,
+        on_computed=lambda v: computed.append(v.assessment.release.key),
+    )
+    with pytest.raises(KeyError):
+        service.view("nope")
+    assert computed == []
 
 
 def test_warm_computes_a_release_before_anyone_asks() -> None:

@@ -154,6 +154,7 @@ class ReleaseService:
         date_validation: Callable[[], Validation] = load_date_validation,
         extra_links: Callable[[str], Sequence[LinkCandidate]] | None = None,
         on_computed: Callable[[ReleaseView], None] | None = None,
+        warm_window: timedelta = timedelta(minutes=15),
     ) -> None:
         self._source = source
         self._project = project_name
@@ -197,6 +198,15 @@ class ReleaseService:
         self._refreshing_guard = threading.Lock()
         self._warmer: threading.Thread | None = None
         self._stop = threading.Event()
+        # The warmer keeps fresh the releases it was asked to warm (each project's current
+        # one) and those someone viewed in the last ``warm_window``. It used to keep every
+        # release ever viewed fresh: one look at v1.33 made it recompute (about 15 s of CPU)
+        # on every Kubernetes poll, beside v1.37 and v1.38, which slowed v1.38's own
+        # recompute from about 5 s to 35 s (2026-11-25). A view that drops out is still
+        # served at once on its next visit and refreshed in the background.
+        self._warm_window = warm_window.total_seconds()
+        self._pinned: set[str] = set()
+        self._viewed: dict[str, float] = {}
 
     @property
     def version(self) -> int:
@@ -328,6 +338,13 @@ class ReleaseService:
         """
         key = self.resolve(release_name)
         self.refresh()
+        with self._lock:
+            known = key in self._release_keys
+        if not known:
+            # Answer an unknown name at once: computing a view first projects every event of
+            # the project (3.5 s for a bad Kubernetes name, 2026-11-25) only to fail.
+            raise KeyError(key)
+        self._viewed[key] = time.monotonic()
         cached = self._views.get(key)
         if cached and self._is_fresh(cached):
             return cached
@@ -337,10 +354,12 @@ class ReleaseService:
         return self._compute_locked(key)
 
     def warm(self, release_names: Sequence[str] = ()) -> None:
-        """Start background recomputes for stale views and for ``release_names``."""
+        """Recompute ``release_names`` (kept warm from now on) and recently viewed views."""
         self.refresh()
-        keys = set(self._views) | {self.resolve(n) for n in release_names}
-        for key in keys:
+        self._pinned |= {self.resolve(n) for n in release_names}
+        recent = time.monotonic() - self._warm_window
+        viewed = {k for k in self._views if self._viewed.get(k, 0.0) >= recent}
+        for key in self._pinned | viewed:
             cached = self._views.get(key)
             if cached is None or not self._is_fresh(cached):
                 self._in_background(key, functools.partial(self._compute_locked, key))

@@ -892,6 +892,9 @@ def create_app(
                 unassigned,
                 human_reviewed=human["human_reviewed"] if human else None,
                 reviewed_of=human["merged"] if human else None,
+                human_approved=human.get("approved")
+                if human and human.get("approved_of")
+                else None,
             )
         return program_facts(v, team, draft_id=draft, suggested_links=suggested, lab=lab)
 

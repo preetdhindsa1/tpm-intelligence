@@ -9,7 +9,7 @@ describe("refLabel", () => {
     });
   });
   it("labels feature flags and SIG load", () => {
-    expect(refLabel("feature:kubernetes/enhancements#6395::flag.late_main_pr").label).toBe("flag: late main pr");
+    expect(refLabel("feature:kubernetes/enhancements#6395::flag.late_main_pr").label).toBe("#6395 · late main PR");
     expect(refLabel("sig:sig/node::unlinked_open_prs").label).toBe("sig/node · unlinked open prs");
   });
 });

@@ -17,7 +17,7 @@ import {
 } from "@/lib/api";
 import { simValidationText } from "@/lib/cockpit";
 import { daysLabel, formatUtc, rangeLabel, simDelta, type SimDelta } from "@/lib/format";
-import { STUDIO_LEVERS, leverSettings, mergedLine, poolName, poolsByLoad, scenarioNotes, type LeverId } from "@/lib/studio";
+import { STUDIO_LEVERS, leverSettings, mergedLine, poolName, poolsByLoad, scenarioNotes, teamHorizon, type LeverId } from "@/lib/studio";
 
 const LOW_EFFORT_DAYS = 0.03; // the fit's lower bound is 0.02 days (simulator/replay.py)
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -236,7 +236,8 @@ function runNote(sim: Simulation, pool: string, lever: string): string {
   if (!b || !s) return "";
   const wait = simDelta(b.review_wait_days, s.review_wait_days, "days", true);
   const merged = simDelta(b.merged, s.merged, "count", false);
-  const where = pool === "all" ? "across all pools" : `in ${poolName(pool)}`;
+  const only = sim.baseline.pools.length === 1;
+  const where = pool === "all" ? "across all pools" : only && pool === "other" ? "across all reviewers" : `in ${poolName(pool)}`;
   const parts = [
     b.review_wait_days && s.review_wait_days ? `median review wait goes from ${daysLabel(b.review_wait_days.median)} to ${daysLabel(s.review_wait_days.median)}` : null,
     b.merged && s.merged ? `PRs merged by ${sim.horizon_label} from ${Math.round(b.merged.median)} to ${Math.round(s.merged.median)}` : null,
@@ -268,7 +269,7 @@ function NoSimulator({ program, cockpit, detail }: { program: string; cockpit: s
   );
 }
 
-export function Simulator({ release, cockpit, program }: { release: string; cockpit: string; program?: string }) {
+export function Simulator({ release, cockpit, program, freezeLabel }: { release: string; cockpit: string; program?: string; freezeLabel?: string }) {
   const me = useMe();
   const canAct = me?.approver ?? false;
   const [info, setInfo] = useState<SimulatorInfo | null>(null);
@@ -289,7 +290,7 @@ export function Simulator({ release, cockpit, program }: { release: string; cock
     updatesRequest<SimulatorInfo>(`/releases/${release}/simulator`)
       .then((d) => {
         if (cancelled) return;
-        setInfo(d);
+        setInfo(teamHorizon(d, freezeLabel));
         setPool(poolsByLoad(d.pools)[0]?.pool ?? "");
       })
       .catch((e: Error) => !cancelled && setError(e.message));
@@ -297,7 +298,7 @@ export function Simulator({ release, cockpit, program }: { release: string; cock
     return () => {
       cancelled = true;
     };
-  }, [release, loadSaved]);
+  }, [release, loadSaved, freezeLabel]);
 
   const settings: ScenarioSettings = useMemo(() => ({ ...leverSettings(lever, pool), name: name.trim() }), [lever, pool, name]);
   const body = useMemo(() => JSON.stringify({ ...settings, name: settings.name || "scenario" }), [settings]);
@@ -310,7 +311,7 @@ export function Simulator({ release, cockpit, program }: { release: string; cock
       setBusy(true);
       setRunError(null);
       updatesRequest<Simulation>(`/releases/${release}/simulate`, { method: "POST", body: JSON.stringify({ ...leverSettings(lever, pool), name: "scenario" }) })
-        .then((r) => !cancelled && setSim(r))
+        .then((r) => !cancelled && setSim(teamHorizon(r, freezeLabel)))
         .catch((e: Error) => !cancelled && setRunError(e.message))
         .finally(() => !cancelled && setBusy(false));
     }, 250);
@@ -318,14 +319,14 @@ export function Simulator({ release, cockpit, program }: { release: string; cock
       cancelled = true;
       clearTimeout(t);
     };
-  }, [info, pool, lever, release]);
+  }, [info, pool, lever, release, freezeLabel]);
 
   async function save() {
     setBusy(true);
     setRunError(null);
     try {
       const row = await updatesRequest<SavedScenario>(`/releases/${release}/scenarios`, { method: "POST", body });
-      setSim(row.result);
+      setSim(teamHorizon(row.result, freezeLabel));
       setName("");
       await loadSaved();
     } catch (e) {
@@ -450,7 +451,7 @@ export function Simulator({ release, cockpit, program }: { release: string; cock
                   onChange={(e) => setPicked((p) => (e.target.checked ? [...p.filter((x) => x !== s.id), s.id].slice(-2) : p.filter((x) => x !== s.id)))} />
                 <span className="font-medium">{s.name}</span>
                 <span className="text-slate-500">{formatUtc(s.created_at)}</span>
-                <button type="button" onClick={() => setSim(s.result)} className="ml-auto text-action hover:underline">Show</button>
+                <button type="button" onClick={() => setSim(teamHorizon(s.result, freezeLabel))} className="ml-auto text-action hover:underline">Show</button>
               </li>
             ))}
           </ul>
@@ -458,7 +459,7 @@ export function Simulator({ release, cockpit, program }: { release: string; cock
         {compared.length === 2 && <div className="mt-3"><Compare a={compared[0]} b={compared[1]} /></div>}
         {saved.length > 1 && compared.length < 2 && <p className="mt-2 text-xs text-slate-500">Tick two scenarios to compare them.</p>}
         <p className="mt-3 text-xs text-slate-500">
-          Decisions go into the <Link href="./update" className="text-action hover:underline">executive update</Link> only after a person approves it.
+          Decisions go into the <Link href={`${cockpit}/update`} className="text-action hover:underline">executive update</Link> only after a person approves it.
         </p>
       </section>
     </div>

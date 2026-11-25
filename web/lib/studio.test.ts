@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { leverSettings, mergedLine, poolName, poolsByLoad, scenarioNotes } from "./studio";
+import { leverSettings, mergedLine, poolName, poolsByLoad, scenarioNotes, teamHorizon } from "./studio";
 
 const empty = { reviewers: 0, new_reviewers: 0, ramp_weeks: 0, interruption: 0 };
 
@@ -48,5 +48,13 @@ describe("Decision Studio layout", () => {
     const o = { pool: "sig/storage", reviewers: 3, review_wait_days: null, merged: { median: 11.4, low: 9, high: 14 }, not_merged: { median: 14.6, low: 12, high: 17 } };
     expect(mergedLine(o, "release day")).toEqual({ big: "11 of 26", line: "PRs merged by release day · range 9–14" });
     expect(mergedLine({ ...o, merged: null }, "release day")).toBeNull();
+  });
+});
+
+describe("teamHorizon", () => {
+  it("uses the team's word for Code Freeze and leaves other horizons alone", () => {
+    expect(teamHorizon({ horizon_label: "Code Freeze" }, "Feature Freeze").horizon_label).toBe("Feature Freeze");
+    expect(teamHorizon({ horizon_label: "Code Freeze" }).horizon_label).toBe("Code Freeze");
+    expect(teamHorizon({ horizon_label: "release day" }, "Feature Freeze").horizon_label).toBe("release day");
   });
 });
