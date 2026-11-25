@@ -21,7 +21,7 @@ A sign-in button on every screen (phishing flag). Hard-coding Kubernetes v1.38 a
 
 ## Trade-offs and consequences
 
-Launch is seven days, matching ADR-0025, because the API stores a release timestamp and not a separate launch window. The PDLC link moves to `/pdlc` when that page ships. Portfolio and Connect stay in the menu; their pages are the following issues.
+Launch is seven days, matching ADR-0025, because the API stores a release timestamp and not a separate launch window. The PDLC link moves to `/pdlc` when that page ships. Portfolio and Connect stay in the menu; their pages are the following issues. The time machine is only on Kubernetes v1.38, because that is the release #6395 belongs to. Other releases do not get a stand-in story.
 
 ## Portfolio page
 
@@ -29,4 +29,4 @@ Launch is seven days, matching ADR-0025, because the API stores a release timest
 
 ## AI vs rules
 
-No AI. Stage, links, and the last program are deterministic.
+No AI. Stage, links, and the last program are deterministic. The Live Cockpit time machine replays feature #6395's real timeline events from the API, including both freezes and each distinct pull-request event. Identical events at the same timestamp are shown once. The future release date is not shown as an event. It does not rebuild the page's tiles as of that date. The locked spec's "8 real dates" is not a cap on that list.
