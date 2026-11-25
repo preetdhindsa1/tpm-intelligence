@@ -58,7 +58,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
             <FreezeOutcome summary={summary} />
           )}
         </Card>
-        <Card eyebrow="Decide" title="Try a what-if before you commit people">
+        <Card eyebrow="Decide" title="Simulate and decide before you commit people">
           <p className="text-slate-600">
             See how adding a reviewer, more AI-written PRs or time lost to interruptions would change what gets merged by release day, per {vocab(project).team}. Nothing changes for real.
           </p>
