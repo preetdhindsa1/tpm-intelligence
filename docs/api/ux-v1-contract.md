@@ -74,44 +74,6 @@ All live programs at once. No query parameters. Example built from the live data
       }
     },
     {
-      "key": "KAFKA:4.5.0",
-      "project": "KAFKA",
-      "display_name": "Apache Kafka",
-      "release": "4.5.0",
-      "planning_tool": "jira",
-      "code_tools": ["github"],
-      "has_lab": false,
-      "as_of": "2026-11-24T23:21:55Z",
-      "dates": {
-        "cycle_start_at": "2026-10-26T00:00:00Z",
-        "enhancements_freeze_at": "2027-01-14T00:00:00Z",
-        "code_freeze_at": "2027-02-04T00:00:00Z",
-        "release_at": "2027-03-17T00:00:00Z"
-      },
-      "stage": {
-        "current": "build",
-        "stages": [
-          {"name": "plan", "status": "done"},
-          {"name": "build", "status": "current"},
-          {"name": "freeze", "status": "upcoming"},
-          {"name": "launch", "status": "upcoming"},
-          {"name": "learn", "status": "upcoming"}
-        ],
-        "last_milestone": {"name": "cycle_start", "at": "2026-10-26T00:00:00Z"},
-        "next_milestone": {"name": "enhancements_freeze", "at": "2027-01-14T00:00:00Z"},
-        "days_to_next_milestone": 51
-      },
-      "scope": {"features_in_release": 16, "features_ever": 18},
-      "bottleneck": {
-        "kind": "linking_gap",
-        "severity": "warning",
-        "headline": "3 of 16 features have no linked code",
-        "detail": "13 of 16 features in the release are linked to a pull request",
-        "facts": {"features_in_release": 16, "linked_features": 13, "unlinked_features": 3}
-      },
-      "next_decision": null
-    },
-    {
       "key": "tpm-intelligence:Phase 3",
       "project": "tpm-intelligence",
       "display_name": "Program Intelligence Platform (this project)",
@@ -153,6 +115,44 @@ All live programs at once. No query parameters. Example built from the live data
         "count": 2,
         "ref": null
       }
+    },
+    {
+      "key": "KAFKA:4.5.0",
+      "project": "KAFKA",
+      "display_name": "Apache Kafka",
+      "release": "4.5.0",
+      "planning_tool": "jira",
+      "code_tools": ["github"],
+      "has_lab": false,
+      "as_of": "2026-11-24T23:21:55Z",
+      "dates": {
+        "cycle_start_at": "2026-10-26T00:00:00Z",
+        "enhancements_freeze_at": "2027-01-14T00:00:00Z",
+        "code_freeze_at": "2027-02-04T00:00:00Z",
+        "release_at": "2027-03-17T00:00:00Z"
+      },
+      "stage": {
+        "current": "build",
+        "stages": [
+          {"name": "plan", "status": "done"},
+          {"name": "build", "status": "current"},
+          {"name": "freeze", "status": "upcoming"},
+          {"name": "launch", "status": "upcoming"},
+          {"name": "learn", "status": "upcoming"}
+        ],
+        "last_milestone": {"name": "cycle_start", "at": "2026-10-26T00:00:00Z"},
+        "next_milestone": {"name": "enhancements_freeze", "at": "2027-01-14T00:00:00Z"},
+        "days_to_next_milestone": 51
+      },
+      "scope": {"features_in_release": 16, "features_ever": 18},
+      "bottleneck": {
+        "kind": "linking_gap",
+        "severity": "warning",
+        "headline": "3 of 16 features have no linked code",
+        "detail": "13 of 16 features in the release are linked to a pull request",
+        "facts": {"features_in_release": 16, "linked_features": 13, "unlinked_features": 3}
+      },
+      "next_decision": null
     }
   ],
   "waiting_on_you": [
@@ -235,7 +235,7 @@ All live programs at once. No query parameters. Example built from the live data
 | `waiting_on_you[]` | object | Everything a person must act on, across programs, in that kind order, then by program order. |
 | `across_programs[]` | object | ADR-0025 rule 7. `kind`: `late_code` \| `review_gap` \| `unlinked_load`. Present only when its fact is above zero. |
 | `coming_next[]` | object | Planned modules. `status` is `planned`. They carry no numbers. |
-| `skipped[]` | `{team, reason}` | Teams with no release yet, or whose release could not be computed. The page may list them. |
+| `skipped[]` | `{team, reason}` | What could not be read. Reasons: `no release yet` and `release could not be computed` (the team has no row in `programs`); `exec updates could not be read` and `link suggestions could not be read` (the team **keeps** its row, and its waiting items may be incomplete). One team can appear in both `programs` and `skipped`: show the row and the note, never drop the row. |
 
 ### Where each example number comes from (2026-11-24)
 
@@ -259,3 +259,5 @@ version of this file.
 - `200` with an empty `programs` list when no team has a release.
 - A team whose release fails to compute is listed in `skipped` with a reason. The rest
   still return.
+- If the exec updates or link suggestions store cannot be read, the program still returns,
+  with a `skipped` entry naming the store, so the page can say its approvals may be missing.
