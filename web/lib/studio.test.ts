@@ -29,6 +29,7 @@ describe("Decision Studio layout", () => {
     expect(poolName("sig/api-machinery")).toBe("SIG API Machinery");
     expect(poolName("sig/cluster-lifecycle")).toBe("SIG Cluster Lifecycle");
     expect(poolName("other")).toBe("Other pools");
+    expect(poolName("other", true)).toBe("All reviewers");
   });
 
   it("puts the most loaded pool first and the shared pool last", () => {

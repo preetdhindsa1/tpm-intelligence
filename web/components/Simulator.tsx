@@ -4,7 +4,7 @@
 // this page only shows it. Baseline is always next to the scenario, and results are ranges.
 import Link from "next/link";
 import { useMe } from "@/components/Me";
-import { EmptyState, ErrorState, LoadingState } from "@/components/states/States";
+import { ErrorState, LoadingState } from "@/components/states/States";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   updatesRequest,
@@ -196,7 +196,7 @@ function Assumptions({ info }: { info: SimulatorInfo }) {
           <tbody className="divide-y divide-slate-100">
             {poolsByLoad(info.pools).map((p) => (
               <tr key={p.pool}>
-                <td className="py-3 pr-4 font-semibold text-slate-900">{poolName(p.pool)}</td>
+                <td className="py-3 pr-4 font-semibold text-slate-900">{poolName(p.pool, info.pools.length === 1)}</td>
                 <td className="py-3 pr-4">{p.reviewers_now}</td>
                 <td className="py-3 pr-4">{p.arrivals_per_week}</td>
                 <td className="py-3 pr-4">{p.open_prs_now}</td>
@@ -245,7 +245,30 @@ function runNote(sim: Simulation, pool: string, lever: string): string {
   return `Model output: with ${lever} ${where}, ${parts.join(", and ")}.${noise}`;
 }
 
-export function Simulator({ release }: { release: string }) {
+/** No calibration yet (#60): say why in plain words and offer a way forward, never a stand-in number. */
+function NoSimulator({ release, cockpit, detail }: { release: string; cockpit: string; detail: string }) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <h2 className="font-heading text-xl font-semibold">No simulation for {release} yet</h2>
+      <p className="mt-2 max-w-3xl text-slate-600">
+        The simulator learns how reviews really flow from earlier, finished releases of the same program, then replays them
+        with your change. It has not been calibrated for this program yet, so there is nothing to simulate. No example numbers
+        are shown instead.
+      </p>
+      <p className="mt-2 text-sm text-slate-500">{detail}</p>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link href={cockpit} className="inline-flex min-h-11 items-center rounded-lg bg-action px-4 text-sm font-semibold text-white hover:bg-action/90">
+          ← Back to Live Cockpit
+        </Link>
+        <Link href="/portfolio" className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-800 hover:bg-slate-50">
+          See every program
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+export function Simulator({ release, cockpit }: { release: string; cockpit: string }) {
   const me = useMe();
   const canAct = me?.approver ?? false;
   const [info, setInfo] = useState<SimulatorInfo | null>(null);
@@ -316,7 +339,7 @@ export function Simulator({ release }: { release: string }) {
 
   if (error && !info) {
     // No calibration for this release (no earlier release to learn from) is not a failure (#60).
-    if (error.startsWith("No simulator")) return <EmptyState title="No simulator for this release" body={error} />;
+    if (error.startsWith("No simulator")) return <NoSimulator release={release} cockpit={cockpit} detail={error} />;
     return <ErrorState title="Decision Studio could not be loaded" detail={error} />;
   }
   if (!info) return <LoadingState label="Loading the simulator…" />;
@@ -349,7 +372,7 @@ export function Simulator({ release }: { release: string }) {
                 <li key={p.pool}>
                   <button type="button" aria-pressed={on} onClick={() => setPool(p.pool)}
                     className={`w-full rounded-xl border px-4 py-3 text-left ${on ? "border-action bg-indigo-50" : "border-slate-200 hover:border-slate-300"}`}>
-                    <span className="block font-semibold text-slate-900">{poolName(p.pool)}</span>
+                    <span className="block font-semibold text-slate-900">{poolName(p.pool, pools.length === 1)}</span>
                     <span className="block text-sm text-slate-600">
                       {p.reviewers_now} reviewer{p.reviewers_now === 1 ? "" : "s"} · {p.arrivals_per_week} new PRs/week · {p.open_prs_now} open
                     </span>
@@ -375,7 +398,7 @@ export function Simulator({ release }: { release: string }) {
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-heading text-lg font-semibold">3 · Baseline vs scenario · {target === "all" ? "All pools" : poolName(target)}</h3>
+            <h3 className="font-heading text-lg font-semibold">3 · Baseline vs scenario · {target === "all" ? "All pools" : poolName(target, pools.length === 1)}</h3>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
               {busy ? "Running…" : info.validated ? "Model output" : "Model output · not validated"}
             </span>

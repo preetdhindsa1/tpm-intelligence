@@ -34,9 +34,10 @@ function poolNotes(pool: string, change: PoolChange): string[] {
 
 const ACRONYM: Record<string, string> = { api: "API", cli: "CLI", ui: "UI", k8s: "K8s" };
 
-/** "sig/api-machinery" → "SIG API Machinery"; "other" → "Other pools". */
-export function poolName(pool: string): string {
-  if (pool === "other") return "Other pools";
+/** "sig/api-machinery" → "SIG API Machinery"; "other" → "Other pools", or "All reviewers"
+ * when it is the program's only pool (a team without sig/* labels, such as Kafka). */
+export function poolName(pool: string, only = false): string {
+  if (pool === "other") return only ? "All reviewers" : "Other pools";
   const words = pool.replace(/^sig\//, "").split(/[-_]/).map((w) => ACRONYM[w] ?? w.charAt(0).toUpperCase() + w.slice(1));
   return pool.startsWith("sig/") ? `SIG ${words.join(" ")}` : words.join(" ");
 }
