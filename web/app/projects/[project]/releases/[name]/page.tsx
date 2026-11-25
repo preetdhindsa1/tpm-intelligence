@@ -13,7 +13,12 @@ import { OutcomeChart } from "@/components/OutcomeChart";
 import { api, type Summary } from "@/lib/api";
 import { briefToShow } from "@/lib/dashboard";
 import { recordedLabel } from "@/lib/delay";
-import { formatUtc } from "@/lib/format";
+import { DecideCard } from "@/components/cockpit/DecideCard";
+import { LifecycleBar } from "@/components/cockpit/LifecycleBar";
+import { TimeMachine, type MachineStop } from "@/components/cockpit/TimeMachine";
+import { stageOf } from "@/components/shell/model";
+import { storyStops } from "@/lib/cockpit";
+import { formatUtc, timelineLabel } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -33,21 +38,26 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
   const current = data.features.filter((f) => f.in_release);
   const removed = data.features.filter((f) => !f.in_release);
   const before = summary.phase === "before_freeze";
+  const stage = stageOf(r, new Date(r.as_of));
+  const machine = await timeMachine(project, name);
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">
-            {r.display_name || r.project || "Team"} {r.name} release health
+            Live Cockpit · {r.display_name || r.project} {r.name}
           </h1>
           <p className="text-sm text-slate-600">
-            Code Freeze {r.code_freeze_at ? formatUtc(r.code_freeze_at) : "unknown"} · release{" "}
+            {stage} · Code Freeze {r.code_freeze_at ? formatUtc(r.code_freeze_at) : "unknown"} · release{" "}
             {r.release_at ? formatUtc(r.release_at) : "unknown"} · data as of {formatUtc(r.as_of)}
           </p>
         </div>
         <LiveRefresh release={name} />
       </div>
+      <LifecycleBar stage={stage} />
+      {machine && <TimeMachine stops={machine.stops} error={machine.error} />}
+      <DecideCard href={releasePath(project, name, "/simulate")} reason={data.validation.validated ? null : data.validation.reason} />
 
       <StatTiles summary={summary} />
 
@@ -179,4 +189,18 @@ function FeatureTable({ title, rows, project, release }: { title: string; rows: 
       </div>
     </section>
   );
+}
+
+async function timeMachine(project: string, release: string): Promise<{ stops: MachineStop[]; error: string | null } | null> {
+  if (project.toLowerCase() !== "kubernetes" || release !== "v1.38") return null;
+  try {
+    const feature = await api.feature(release, 6395);
+    const stops = storyStops(feature.timeline).map((e) => ({
+      at: formatUtc(e.at),
+      label: e.ref ? `${timelineLabel(e.kind)} · ${e.ref}` : timelineLabel(e.kind),
+    }));
+    return { stops, error: null };
+  } catch (e) {
+    return { stops: [], error: e instanceof Error ? e.message : "Feature #6395 could not be loaded" };
+  }
 }

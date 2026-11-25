@@ -185,7 +185,7 @@ def waiting(p: ProgramFacts) -> list[dict[str, Any]]:
         items.append(("review_link_suggestions", label, p.suggested_links, None))
     if p.lab is not None and p.lab.unassigned > 0:
         n = p.lab.unassigned
-        label = f"{n} pull request{'s' if n != 1 else ''} in this repo with no lane"
+        label = f"{n} pull request{'s' if n != 1 else ''} with no lane · {p.display_name}"
         items.append(("classify_prs", label, n, None))
     return [
         {"kind": k, "program_key": p.key, "label": label, "count": c, "ref": ref}
@@ -245,7 +245,7 @@ def across(facts: list[ProgramFacts]) -> list[dict[str, Any]]:
             m = _minutes(p.lab)
             speed = f"merge in a median of {m} minutes, and " if m is not None else ""
             gap = f"{p.lab.approved_merged} of {p.lab.merged} had an approving review."
-            text = f"This repo: pull requests {speed}{gap}"
+            text = f"{p.display_name}: pull requests {speed}{gap}"
             out.append(
                 _pattern("review_gap", "Review is the new bottleneck", text, p, **_gap_facts(p.lab))
             )
