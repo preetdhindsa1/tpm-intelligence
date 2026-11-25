@@ -72,7 +72,7 @@ export function LinkQueue({ release }: { release: string }) {
             role="tab"
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
-            className={`-mb-px border-b-2 px-3 py-1.5 text-sm ${tab === t.id ? "border-indigo-600 font-medium text-indigo-700" : "border-transparent text-slate-600 hover:text-slate-900"}`}
+            className={`-mb-px border-b-2 px-3 py-1.5 text-sm ${tab === t.id ? "border-action font-medium text-action" : "border-transparent text-slate-600 hover:text-slate-900"}`}
           >
             {t.label} ({data.counts[t.id] ?? 0})
           </button>
@@ -86,14 +86,14 @@ export function LinkQueue({ release }: { release: string }) {
             <div className="grid gap-3 md:grid-cols-2">
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-500">Pull request · {s.pull_request_state ?? "unknown"}</p>
-                <a href={s.pull_request_url ?? "#"} target="_blank" rel="noreferrer" className="font-medium text-indigo-700 hover:underline">
+                <a href={s.pull_request_url ?? "#"} target="_blank" rel="noreferrer" className="font-medium text-action hover:underline">
                   {s.pull_request.split("/").pop()} {s.pull_request_title}
                 </a>
                 <blockquote className="mt-1 border-l-2 border-slate-200 pl-2 text-sm text-slate-700">“{s.pr_quote}”</blockquote>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-500">Suggested feature</p>
-                <a href={`${ENH}/${s.feature_number}`} target="_blank" rel="noreferrer" className="font-medium text-indigo-700 hover:underline">
+                <a href={`${ENH}/${s.feature_number}`} target="_blank" rel="noreferrer" className="font-medium text-action hover:underline">
                   #{s.feature_number} {s.feature_title}
                 </a>
                 <blockquote className="mt-1 border-l-2 border-slate-200 pl-2 text-sm text-slate-700">“{s.feature_quote}”</blockquote>

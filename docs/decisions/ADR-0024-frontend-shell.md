@@ -46,3 +46,7 @@ The headline and tagline are the locked words. Live program cards come from `GET
 ## Empty, loading, and error
 
 Portfolio, Live Cockpit, and Decision Studio share three states. An error shows the failure text and no stand-in numbers. A release with no simulator says so, which is an empty state rather than a failure. The front page and Connect page carry their own copy in their own changes.
+
+## Remaining pages
+
+Dependencies, Link review, Executive update, feature detail, the lab report and All releases use the same visual system: Space Grotesk headings and the action color for links and buttons. A failed API call shows the shared error state with the API's failure text instead of the Next error page. A missing feature is still a 404. The per-page "← release health" links are gone, because the Live Cockpit tabs replace them. The lab report sits under AI-native PDLC in a breadcrumb.

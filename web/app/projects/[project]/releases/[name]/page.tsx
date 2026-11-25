@@ -176,7 +176,7 @@ function FeatureTable({ title, rows, project, release }: { title: string; rows: 
             {rows.map((f) => (
               <tr key={f.key} className="align-top">
                 <td className="px-3 py-2">
-                  <Link className="font-medium text-indigo-700 hover:underline" href={releasePath(project, release, `/features/${f.number}`)}>
+                  <Link className="font-medium text-action hover:underline" href={releasePath(project, release, `/features/${f.number}`)}>
                     {featureLabel(f)}
                   </Link>{" "}
                   {f.title}

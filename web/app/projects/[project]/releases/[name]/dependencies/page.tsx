@@ -1,7 +1,9 @@
 import { featureLabel, vocab } from "@/lib/vocab";
 import Link from "next/link";
 import { DependencyMap } from "@/components/DependencyMap";
-import { api, type DepFeature } from "@/lib/api";
+import { api, type DepFeature, type Dependencies } from "@/lib/api";
+import { ErrorState } from "@/components/states/States";
+import { errorDetail } from "@/lib/errors";
 import { OUTCOME_META, STATUS } from "@/lib/dashboard";
 import { depStats, PR_NUM, shortSig } from "@/lib/dependencies";
 import { formatUtc } from "@/lib/format";
@@ -25,7 +27,13 @@ export default async function DependenciesPage({
   const v = vocab(project);
   const sp = await searchParams;
   const includeRemoved = sp.removed === "1";
-  const data = await api.dependencies(name, includeRemoved);
+  let data: Dependencies;
+  try {
+    data = await api.dependencies(name, includeRemoved);
+  } catch (e) {
+    const detail = errorDetail(e, "The dependencies API failed");
+    return <ErrorState title="Dependencies could not be loaded" detail={detail} />;
+  }
   const s = depStats(data);
   const byKey = new Map(data.features.map((f) => [f.key, f]));
   const initial = sp.feature ? (data.features.find((f) => String(f.number) === sp.feature)?.key ?? null) : null;
@@ -50,7 +58,7 @@ export default async function DependenciesPage({
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="font-heading text-2xl font-semibold">
             Dependencies · {release.display_name || release.project} {name}
           </h1>
           <p className="max-w-4xl text-sm text-slate-600">
@@ -77,7 +85,7 @@ export default async function DependenciesPage({
       </div>
 
       <section className="rounded-lg border bg-white p-4 shadow-sm">
-        <h2 className="font-semibold text-slate-800">Feature dependency map</h2>
+        <h2 className="font-heading font-semibold text-slate-800">Feature dependency map</h2>
         <p className="mb-3 text-xs text-slate-500">
           Only features tied to another feature are drawn, grouped by what ties them; the {standalone.length} stand-alone features are
           listed below. Shared PRs mean shared code, not proof that one blocks the other.
@@ -89,7 +97,7 @@ export default async function DependenciesPage({
 
       <div className="grid items-start gap-4 lg:grid-cols-2">
         <section className="rounded-lg border bg-white p-4 shadow-sm">
-          <h2 className="font-semibold text-slate-800">Open PRs waiting on an unmerged PR</h2>
+          <h2 className="font-heading font-semibold text-slate-800">Open PRs waiting on an unmerged PR</h2>
           <p className="mb-3 text-xs text-slate-500">The PR text says it depends on another PR that has not merged.</p>
           {data.waiting.length ? (
             <table className="w-full text-sm">
@@ -104,13 +112,13 @@ export default async function DependenciesPage({
                 {data.waiting.map((w) => (
                   <tr key={w.pr + w.waits_on} className="align-top">
                     <td className="py-2 pr-2">
-                      <a href={prUrl(w.pr)} className="font-medium text-indigo-700 hover:underline" target="_blank" rel="noopener">
+                      <a href={prUrl(w.pr)} className="font-medium text-action hover:underline" target="_blank" rel="noopener">
                         {PR_NUM(w.pr)}
                       </a>
                       <div className="text-xs text-slate-500">{w.pr_title}</div>
                     </td>
                     <td className="py-2 pr-2">
-                      <a href={prUrl(w.waits_on)} className="font-medium text-indigo-700 hover:underline" target="_blank" rel="noopener">
+                      <a href={prUrl(w.waits_on)} className="font-medium text-action hover:underline" target="_blank" rel="noopener">
                         {PR_NUM(w.waits_on)}
                       </a>{" "}
                       {w.waits_on_state === "closed" ? (
@@ -124,7 +132,7 @@ export default async function DependenciesPage({
                       {w.features.map((k) => {
                         const f = byKey.get(k);
                         return f ? (
-                          <Link key={k} href={releasePath(project, name, `/features/${f.number}`)} className="block text-indigo-700 hover:underline">
+                          <Link key={k} href={releasePath(project, name, `/features/${f.number}`)} className="block text-action hover:underline">
                             {featureLabel(f)} {f.title}
                           </Link>
                         ) : null;
@@ -140,7 +148,7 @@ export default async function DependenciesPage({
         </section>
 
         <section className="rounded-lg border bg-white p-4 shadow-sm">
-          <h2 className="font-semibold text-slate-800 first-letter:uppercase">{v.teams} that share features</h2>
+          <h2 className="font-heading font-semibold text-slate-800 first-letter:uppercase">{v.teams} that share features</h2>
           <p className="mb-3 text-xs text-slate-500">
             Features labelled with both {v.teams}, so the {v.teams} must coordinate. Counted per {v.team}, never per person.
           </p>
@@ -167,7 +175,7 @@ export default async function DependenciesPage({
 function StandaloneTable({ rows, project, release }: { rows: DepFeature[]; project: string; release: string }) {
   return (
     <section className="rounded-lg border bg-white p-4 shadow-sm">
-      <h2 className="font-semibold text-slate-800">Stand-alone features ({rows.length})</h2>
+      <h2 className="font-heading font-semibold text-slate-800">Stand-alone features ({rows.length})</h2>
       <p className="mb-3 text-xs text-slate-500">No shared PRs and no stated dependency on another feature.</p>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
@@ -187,7 +195,7 @@ function StandaloneTable({ rows, project, release }: { rows: DepFeature[]; proje
               return (
                 <tr key={f.key}>
                   <td className="py-1.5 pr-3">
-                    <Link href={releasePath(project, release, `/features/${f.number}`)} className="font-medium text-indigo-700 hover:underline">
+                    <Link href={releasePath(project, release, `/features/${f.number}`)} className="font-medium text-action hover:underline">
                       {featureLabel(f)}
                     </Link>{" "}
                     {f.title}

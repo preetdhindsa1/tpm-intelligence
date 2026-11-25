@@ -76,7 +76,7 @@ export function DependencySummary({ project, release, data }: { project: string;
           Border: <span style={{ color: STATUS.critical }}>critical</span> / <span style={{ color: "#b88a0e" }}>warning</span> flag. Verified
           links only.
         </span>
-        <Link href={page} className="font-medium text-indigo-700 hover:underline">
+        <Link href={page} className="font-medium text-action hover:underline">
           Explore the map →
         </Link>
       </div>

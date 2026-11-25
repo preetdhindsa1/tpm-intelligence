@@ -10,7 +10,7 @@ export function ExecBrief({ project, release, update }: { project: string; relea
     return (
       <p className="text-sm text-slate-500">
         No update drafted yet.{" "}
-        <Link href={releasePath(project, release, "/update")} className="text-indigo-700 hover:underline">
+        <Link href={releasePath(project, release, "/update")} className="text-action hover:underline">
           Draft one →
         </Link>
       </p>
@@ -52,7 +52,7 @@ export function ExecBrief({ project, release, update }: { project: string; relea
       <p className="border-t pt-2 text-xs text-slate-500">
         ✓ = checked against the data by the fact checker. {update.claims_removed} claim{update.claims_removed === 1 ? "" : "s"} removed. Drafted{" "}
         {formatUtc(update.created_at)} by AI; nothing is sent without approval.{" "}
-        <Link href={releasePath(project, release, "/update")} className="font-medium text-indigo-700 hover:underline">
+        <Link href={releasePath(project, release, "/update")} className="font-medium text-action hover:underline">
           Open report →
         </Link>
       </p>

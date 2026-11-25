@@ -439,7 +439,7 @@ export function Simulator({ release }: { release: string }) {
           <button
             onClick={run}
             disabled={busy}
-            className="rounded bg-indigo-600 px-3 py-1.5 font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="rounded bg-action px-3 py-1.5 font-medium text-white hover:bg-action/90 disabled:opacity-50"
           >
             {busy ? "Running…" : "Run vs baseline"}
           </button>
@@ -454,7 +454,7 @@ export function Simulator({ release }: { release: string }) {
             onClick={save}
             disabled={busy || !settings.name.trim() || !canAct}
             title={canAct ? undefined : "Sign in as an approver to save scenarios"}
-            className="rounded border px-3 py-1.5 font-medium text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
+            className="rounded border px-3 py-1.5 font-medium text-action hover:bg-indigo-50 disabled:opacity-50"
           >
             Run and save
           </button>
@@ -497,7 +497,7 @@ export function Simulator({ release }: { release: string }) {
                 <span className="text-slate-500">
                   {formatUtc(s.created_at)} · {s.created_by.replace("user:", "")}
                 </span>
-                <button onClick={() => load(s)} className="ml-auto text-indigo-700 hover:underline">
+                <button onClick={() => load(s)} className="ml-auto text-action hover:underline">
                   Load
                 </button>
               </li>

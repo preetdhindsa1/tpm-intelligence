@@ -1,7 +1,10 @@
 import { LabPicker } from "@/components/LabPicker";
 import { api, type LabReport } from "@/lib/api";
 import { groupByProject } from "@/lib/routes";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ErrorState } from "@/components/states/States";
+import { errorDetail } from "@/lib/errors";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +16,13 @@ export default async function LabPage({
   searchParams: Promise<{ project?: string; release?: string; cap?: string; lines?: string }>;
 }) {
   const query = await searchParams;
-  const groups = groupByProject(await api.releases()).map((g) => ({
+  let releases: Awaited<ReturnType<typeof api.releases>>;
+  try {
+    releases = await api.releases();
+  } catch (e) {
+    return <ErrorState title="The lab report could not be loaded" detail={errorDetail(e, "GET /releases failed")} />;
+  }
+  const groups = groupByProject(releases).map((g) => ({
     slug: g.slug,
     displayName: g.displayName,
     releases: g.releases.map((r) => r.name),
@@ -26,12 +35,22 @@ export default async function LabPage({
   if (project !== OWN && !release) notFound();
   const cap = clamp(query.cap, 2, 1, 20);
   const lines = clamp(query.lines, 400, 1, 5000);
-  const lab = await api.lab(project, release ?? undefined, cap, lines);
+  let lab: LabReport;
+  try {
+    lab = await api.lab(project, release ?? undefined, cap, lines);
+  } catch (e) {
+    return <ErrorState title="The lab report could not be loaded" detail={errorDetail(e, "GET /lab failed")} />;
+  }
   const medianReview = median(lab.time_to_first_review_hours);
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <h1 className="text-2xl font-semibold">Multi-Agent Development and PR Lab</h1>
+        <nav aria-label="Breadcrumb" className="text-sm">
+          <Link href="/pdlc" className="inline-flex min-h-11 items-center text-action hover:underline">AI-native PDLC</Link>
+          <span aria-hidden className="mx-2 text-slate-400">/</span>
+          <span className="text-slate-600">Lab report</span>
+        </nav>
+        <h1 className="font-heading text-2xl font-semibold">Lab report: pull requests by lane</h1>
         <p className="max-w-3xl text-sm text-slate-600">
           Counts come from pull requests already stored. Lanes are tools on this repository, not people. Under 20
           merges the sample is small. This is not a forecast.
@@ -54,7 +73,7 @@ export default async function LabPage({
       ) : (
         <>
           <section className="rounded-lg border bg-white p-4 text-sm">
-            <h2 className="font-medium">Pull requests by lane</h2>
+            <h2 className="font-heading font-medium">Pull requests by lane</h2>
             <table className="mt-2 w-full text-left">
               <thead className="text-slate-500">
                 <tr>
@@ -98,7 +117,7 @@ export default async function LabPage({
             {lab.lanes_configured && <Stat label="Open agent PRs, peak" value={String(lab.cap.observed_max_open)} />}
           </section>
           <section className="rounded-lg border bg-white p-4 text-sm">
-            <h2 className="font-medium">Collisions</h2>
+            <h2 className="font-heading font-medium">Collisions</h2>
             {lab.collisions.length === 0 ? (
               <p className="mt-2 text-slate-600">None in this window.</p>
             ) : (
@@ -115,7 +134,7 @@ export default async function LabPage({
           </section>
           {lab.lanes_configured && (
             <section className="rounded-lg border bg-white p-4 text-sm">
-              <h2 className="font-medium">What-if</h2>
+              <h2 className="font-heading font-medium">What-if</h2>
               <form className="mt-2 flex flex-wrap items-end gap-3" method="get">
                 <input type="hidden" name="project" value={project} />
                 {release && <input type="hidden" name="release" value={release} />}
@@ -127,7 +146,7 @@ export default async function LabPage({
                   Line cap
                   <input className="mt-1 block w-24 rounded border px-2 py-1" name="lines" type="number" min={1} max={5000} defaultValue={lines} />
                 </label>
-                <button className="rounded bg-indigo-600 px-3 py-1.5 text-white" type="submit">
+                <button className="rounded bg-action px-3 py-1.5 text-white" type="submit">
                   Replay
                 </button>
               </form>
@@ -151,7 +170,7 @@ export default async function LabPage({
             </section>
           )}
           <section className="rounded-lg border bg-white p-4 text-sm">
-            <h2 className="font-medium">Opened by week</h2>
+            <h2 className="font-heading font-medium">Opened by week</h2>
             <table className="mt-2 w-full text-left">
               <thead className="text-slate-500">
                 <tr>
