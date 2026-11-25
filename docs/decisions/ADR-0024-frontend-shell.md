@@ -30,3 +30,7 @@ Launch is seven days, matching ADR-0025, because the API stores a release timest
 ## AI vs rules
 
 No AI. Stage, links, and the last program are deterministic. The Live Cockpit time machine replays feature #6395's real timeline events from the API, including both freezes and each distinct pull-request event. Identical events at the same timestamp are shown once. The future release date is not shown as an event. It does not rebuild the page's tiles as of that date. The locked spec's "8 real dates" is not a cap on that list.
+
+## Connect
+
+`/connect` describes the three steps and names GitHub and Jira as used in the public demo. It does not start a sign-up and it does not show a connection count. The promises are the read-only scope, human approval, and public-demo privacy rules.
