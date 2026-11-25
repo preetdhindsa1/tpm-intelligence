@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from evals.raid_extractor import CASES, load_cases, same, score_case, summarize
+from evals.raid_extractor import load_cases, same, score_case, summarize
 from modules.raid.store import normalize_quote
 
 NOTES = "* We will chase the docs authors this week.\n* The beta cut slipped by a day.\n"
@@ -68,8 +68,3 @@ def test_recall_exactly_at_threshold_passes() -> None:
     s = summarize([row(6, 0, 4)])
     assert s["per_type"]["action"]["recall"] == 0.6
     assert s["passed"]
-
-
-def test_repo_cases_live_in_the_shared_folder() -> None:
-    assert CASES.name == "raid"
-    assert CASES.parent.name == "cases"

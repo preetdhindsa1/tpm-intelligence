@@ -4,12 +4,11 @@ Every ``evals/cases/raid/*.json`` case is a masked excerpt of public meeting not
 person's labels: ``expected`` items (type + quote) and ``optional`` ones that are fine
 either way (neither a false positive nor a miss). Seed cases are marked ``"seed": true``.
 
-* **Live run** (paid): ``python -m evals.raid_extractor`` runs the extractor on every
-  case and writes ``docs/results/agent-evals-<stamp>-raid_extractor.json`` with the items
-  it kept per case and each case's SHA.
+* **Live run** (paid, ``make evals-live SUITE=raid_extractor``): writes the items kept per
+  case and each case's SHA to ``docs/results/agent-evals-<stamp>-raid_extractor.json``.
 * **CI gate** (no paid calls, ``run_evals``; next PR): re-scores the stored items against
   the cases in the repo. A case added or changed since the last live run fails the gate
-  until ``make evals-live SUITE=raid_extractor`` is run again, so new cases always count.
+  until the live run is repeated, so new cases always count.
 
 Gate (all must hold): quote match 100% of kept items; no errors or unrun cases; for every
 type with at least ``MIN_SUPPORT`` expected items, precision >= 0.80 and recall >= 0.60.
@@ -22,6 +21,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from collections import Counter
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -123,7 +123,7 @@ def summarize(rows: Sequence[Mapping[str, Any]], missing: Sequence[str] = ()) ->
         "errors": len(rows) - len(ok),
         "not_run": list(missing),
         "quote_match": round(quotes / kept, 3) if kept else None,
-        "dropped": {k: sum(r.get("dropped", {}).get(k, 0) for r in ok) for k in _drops(ok)},
+        "dropped": dict(sum((Counter(r.get("dropped", {})) for r in ok), Counter())),
         "per_type": per_type,
         "failing_types": failing,
         "cost_usd": round(sum(r.get("cost_usd", 0.0) for r in ok), 6),
@@ -137,10 +137,6 @@ def summarize(rows: Sequence[Mapping[str, Any]], missing: Sequence[str] = ()) ->
         and not failing
     )
     return summary
-
-
-def _drops(rows: Sequence[Mapping[str, Any]]) -> list[str]:
-    return sorted({k for r in rows for k in r.get("dropped", {})})
 
 
 def run(gateway: Gateway, cases_dir: Path = CASES) -> dict[str, Any]:
