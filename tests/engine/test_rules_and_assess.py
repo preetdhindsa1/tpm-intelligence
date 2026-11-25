@@ -13,7 +13,7 @@ from engine.freeze import CodeStatus, check_pr
 from engine.graph import build_graph, critical_path, pr_dependencies
 from engine.links import link_release
 from engine.projection import Check, Feature, PullRequest, World, project
-from engine.rules import evaluate_feature, unlinked_open_load
+from engine.rules import evaluate_feature, unlinked_open_load, unlinked_open_prs
 from tests.engine.conftest import K2570, K6395, MAIN_PR, V138, fixture_events, utc
 
 KK = "kubernetes/kubernetes"
@@ -187,6 +187,9 @@ def test_unlinked_load_is_per_sig_at_release_level() -> None:
     )
     links = link_release(world, V138)
     assert unlinked_open_load(world, links) == Counter({"sig/storage": 1, "sig/node": 1})
+    # One PR with two SIG labels: the per-SIG sum is 2, the PR count is 1 (#107 review).
+    assert unlinked_open_prs(world, links) == 1
+    assert assess_release(world, V138, links=links).unlinked_open_prs == 1
     flags = evaluate_feature(_feature(), world.releases[V138], world, links)
     assert "high_unlinked_load" not in {f.code for f in flags}
 

@@ -265,7 +265,7 @@ def summary_out(view: ReleaseView) -> SummaryOut:
         open_linked_prs=sum(
             p.state == "open" for f in a.features if f.in_release for p in f.pull_requests
         ),
-        unlinked_open_prs=sum(n for _, n in a.unlinked_open_prs_by_sig),
+        unlinked_open_prs=a.unlinked_open_prs,
         outcomes={o: counts[o] for o in OUTCOMES if counts[o]},
         features=[
             FeatureOutcomeOut(
@@ -583,7 +583,7 @@ def program_facts(
         readded_after_freeze=sum(
             feature_outcome(view, f) == "readded_after_freeze" for f in a.features
         ),
-        unlinked_open_prs=sum(n for _, n in a.unlinked_open_prs_by_sig),
+        unlinked_open_prs=a.unlinked_open_prs,
         draft_update_id=draft_id,
         suggested_links=suggested_links,
         lab=lab,

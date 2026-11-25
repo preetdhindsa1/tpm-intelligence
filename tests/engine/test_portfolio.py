@@ -34,7 +34,7 @@ def facts(key: str, name: str, **kw: Any) -> ProgramFacts:
 K = facts("kubernetes:v1.38", "Kubernetes", features_in_release=70, features_ever=106,
           critical_codes=(("main_pr_not_merged",),) * 11
           + (("main_pr_not_merged", "removed_at_freeze"),) * 14 + (("removed_at_freeze",),) * 3,
-          linked_features=69, readded_after_freeze=17, unlinked_open_prs=1978,
+          linked_features=69, readded_after_freeze=17, unlinked_open_prs=1173,
           draft_update_id=2, suggested_links=101)  # fmt: skip
 KAFKA = facts("KAFKA:4.5.0", "Apache Kafka", planning_tool="jira",
               dates=cal(utc(2026, 10, 26), utc(2027, 1, 14), utc(2027, 2, 4), utc(2027, 3, 17)),
@@ -126,10 +126,10 @@ def test_whole_portfolio_matches_the_contract_example() -> None:
     kinds = [a["kind"] for a in body["across_programs"]]
     assert kinds == ["late_code", "review_gap", "unlinked_load"]
     assert body["across_programs"][1]["text"] == (
-        "This repo: pull requests merge in a median of 9 minutes, and 0 of 47 had an "
-        "approving review."
+        "Program Intelligence Platform (this project): pull requests merge in a median of "
+        "9 minutes, and 0 of 47 had an approving review."
     )
-    assert body["across_programs"][2]["text"].startswith("1,978 open Kubernetes pull requests")
+    assert body["across_programs"][2]["text"].startswith("1,173 open Kubernetes pull requests")
     assert all(m["status"] == "planned" for m in body["coming_next"])
 
 
