@@ -100,3 +100,15 @@ def test_gate_fails_until_every_case_has_a_live_run(tmp_path: Path) -> None:
     assert second["summary"]["not_run"] == []
     assert second["summary"]["quote_match"] == 1.0
     assert not second["passed"]  # one label is too few to gate: honest, not a pass
+    assert second["enforced"] is False  # 1 independent case of the 30 needed to block CI
+    assert second["independent_cases"] == 1
+
+
+def test_a_failing_suite_blocks_ci_only_when_enforced(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from evals import run_evals
+
+    suites = [{"suite": "a", "passed": True}, {"suite": "raid", "passed": False, "enforced": False}]
+    monkeypatch.setattr(run_evals, "run_all", lambda: suites)
+    assert run_evals.main(["--no-save"]) == 0
+    suites[1]["enforced"] = True
+    assert run_evals.main(["--no-save"]) == 1

@@ -37,6 +37,10 @@ RESULTS = Path(__file__).resolve().parent.parent / "docs" / "results"
 
 TYPES = ("risk", "action", "issue", "decision", "question")
 MIN_PRECISION, MIN_RECALL, MIN_SUPPORT, MIN_OVERLAP = 0.80, 0.60, 5, 0.5
+# The gate reports from the first case but blocks CI only once this many cases were written
+# by someone other than the builder (owner's decision, 2026-11-25): tuning on seeds alone
+# says little, and the extractor's items are never shown or used before a person confirms.
+MIN_INDEPENDENT = 30
 _WORD = re.compile(r"[a-z0-9]+")
 
 
@@ -211,12 +215,24 @@ def gate(results_dir: Path = RESULTS, cases_dir: Path = CASES) -> dict[str, Any]
             rows.append(row)
         else:
             rows.append({**row, "score": score_case(case, [parse_kept(k) for k in row["kept"]])})
+    cases = load_cases(cases_dir)
+    independent = sum(not c.get("seed") for c in cases)
     out = report(prompt.label, prompt.sha, model, rows, missing)
     out["suite"] = "agent_gate:raid_extractor"
+    out["enforced"] = independent >= MIN_INDEPENDENT
+    out["independent_cases"] = independent
+    if not out["enforced"]:
+        out["note"] = (
+            f"reporting only: {independent} of {MIN_INDEPENDENT} independent cases; "
+            "blocks CI once there are enough"
+        )
     if missing:
         out["reason"] = (
             f"{len(missing)} case(s) not run on {prompt.label} / {model}: "
             "run make evals-live SUITE=raid_extractor"
         )
-    keys = ("suite", "passed", "prompt", "model", "summary", "reason")
+    keys = (
+        "suite", "passed", "enforced", "independent_cases", "note", "prompt", "model", "summary",
+        "reason",
+    )  # fmt: skip
     return {k: out[k] for k in keys if k in out}

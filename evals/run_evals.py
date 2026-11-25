@@ -38,7 +38,11 @@ def main(argv: list[str] | None = None) -> int:
         OUT.mkdir(parents=True, exist_ok=True)
         (OUT / f"evals-{stamp}.json").write_text(json.dumps(report, indent=1) + "\n")
     print(json.dumps(report, indent=1))
-    failed = [r["suite"] for r in results if not r["passed"]]
+    # A suite can report without blocking yet ("enforced": false, e.g. the RAID gate).
+    failed = [r["suite"] for r in results if not r["passed"] and r.get("enforced", True)]
+    for r in results:
+        if not r["passed"] and not r.get("enforced", True):
+            print(f"NOT YET ENFORCED (failing): {r['suite']}: {r.get('note', '')}", file=sys.stderr)
     if failed:
         print(f"FAILED: {', '.join(failed)}", file=sys.stderr)
         return 1
