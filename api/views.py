@@ -28,6 +28,7 @@ from api.schemas import (
     MergeDateOut,
     MergeDatesOut,
     OddsOut,
+    PodOut,
     PullRequestOut,
     ReleaseOut,
     SigPairOut,
@@ -535,6 +536,7 @@ def lab_out(report: LabReport, *, project: str, lanes_configured: bool) -> LabOu
             comparable=report.size.comparable,
             assumption=report.size.assumption,
         ),
+        pod=PodOut.model_validate(report.pod) if report.pod else None,
     )
 
 

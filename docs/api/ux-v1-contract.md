@@ -1,8 +1,8 @@
 # UX v1 API contract
 
 The JSON the UX v1 screens read. Cursor builds against these examples while Claude builds
-the endpoints. Rules behind each field: ADR-0025 (Portfolio). The pod facts on `GET /lab`
-are added to this file by issue #94.
+the endpoints. Rules behind each field: ADR-0025 (Portfolio) and ADR-0023 addendum 2 (pod facts on
+`GET /lab`).
 
 Conventions for every endpoint here:
 
@@ -261,3 +261,68 @@ version of this file.
   still return.
 - If the exec updates or link suggestions store cannot be read, the program still returns,
   with a `skipped` entry naming the store, so the page can say its approvals may be missing.
+
+## `GET /lab`: pod facts (`pod`)
+
+`GET /lab?project=tpm-intelligence` keeps every existing field and adds `pod` (ADR-0023
+addendum 2). `pod` is `null` for teams without agent lanes (Kubernetes, Kafka). The window
+is the team's whole history for this repository, as for the rest of `/lab`.
+
+Example: this repository on 2026-11-25 (68 pull requests, 53 merged), computed from its
+GitHub pull requests, reviews and comments through the same normalizers the webhook
+receiver uses. That sample did not fetch CI check runs, so `failing_head_check` reads 0
+here by omission. The stored data has them.
+
+```json
+{
+  "members": [
+    {"lane": "human", "kind": "owner", "opened": 12, "merged": 12, "closed_unmerged": 0, "open": 0, "median_minutes_to_merge": 5},
+    {"lane": "claude", "kind": "agent", "opened": 34, "merged": 33, "closed_unmerged": 0, "open": 1, "median_minutes_to_merge": 11},
+    {"lane": "cursor", "kind": "agent", "opened": 7, "merged": 5, "closed_unmerged": 1, "open": 1, "median_minutes_to_merge": 14},
+    {"lane": "dependabot", "kind": "bot", "opened": 13, "merged": 1, "closed_unmerged": 12, "open": 0, "median_minutes_to_merge": null}
+  ],
+  "no_lane": 2,
+  "flow": [
+    {"stage": "contract", "rules": "R5 R6", "status": "not_measured", "value": null, "reason": "Issues and their acceptance tests are not collected yet"},
+    {"stage": "build", "rules": "R7 R8 R9", "status": "broken", "value": {"max_open_per_agent": 4, "over_400_lines": 6, "collisions": 0}, "reason": null},
+    {"stage": "cross_review", "rules": "R13", "status": "broken", "value": {"cross_reviewed": 6, "agent_merged": 38}, "reason": null},
+    {"stage": "ci", "rules": "R17", "status": "held", "value": {"failing_head_check": 0}, "reason": "Failing check on the latest commit only; run history (three red runs) is not collected"},
+    {"stage": "human_review", "rules": "R14 R15 R16", "status": "broken", "value": {"human_reviewed": 11, "merged": 52}, "reason": null},
+    {"stage": "merge", "rules": "R3 R21", "status": "held", "value": {"median_minutes_to_merge": 11}, "reason": null},
+    {"stage": "kept", "rules": "R21", "status": "not_measured", "value": {"kept": 0, "eligible": 0}, "reason": "No merged pull request is 30 days old yet (the first is on 2026-12-22)"}
+  ],
+  "metrics": [
+    {"metric": "review_rounds_per_pr", "target": "below 1.5", "value": 0.0, "unit": "rounds", "reason": null},
+    {"metric": "first_pass_approval", "target": "above 70%", "value": null, "unit": "share", "reason": "Not measurable here: GitHub does not let a PR's author approve it, and every pull request here is opened from the owner's account"},
+    {"metric": "open_to_merge", "target": "same day", "value": 11, "unit": "minutes", "reason": null},
+    {"metric": "three_plus_rounds", "target": "below 10%", "value": 0.0, "unit": "share", "reason": null},
+    {"metric": "kept_rate_30d", "target": "above 95%", "value": null, "unit": "share", "reason": "No merged pull request is 30 days old yet (the first is on 2026-12-22)"},
+    {"metric": "human_review_load", "target": "60-80%", "value": null, "unit": "share", "reason": "TBD (not yet measured)"}
+  ],
+  "rules": [
+    {"rule": "R2", "title": "No one approves their own work alone", "status": "broken", "count": 40, "of": 52},
+    {"rule": "R5", "title": "Contract first", "status": "not_measured", "count": null, "of": null},
+    {"rule": "R6", "title": "Every PR has exactly one risk tier", "status": "broken", "count": 48, "of": 55},
+    {"rule": "R8", "title": "Small PRs, under 400 lines", "status": "broken", "count": 6, "of": 55},
+    {"rule": "R9", "title": "Two open PRs per agent at most", "status": "broken", "count": 5, "of": 41},
+    {"rule": "R12", "title": "Every PR says who wrote it", "status": "broken", "count": 2, "of": 68},
+    {"rule": "R13", "title": "Cross-review before the human", "status": "broken", "count": 32, "of": 38},
+    {"rule": "R26", "title": "Limit bot noise", "status": "broken", "count": 12, "of": 13}
+  ]
+}
+```
+
+### Fields
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `members[]` | object | Always 4, in this order: `human` (owner), `claude`, `cursor` (agents), `dependabot` (bot). Counts of PRs opened, merged, closed unmerged, and open. `median_minutes_to_merge` is null below 5 merged PRs in that lane (R22). |
+| `no_lane` | int | PRs that match no lane and are not Dependabot (R12). |
+| `flow[]` | object | Always 7, in order: `contract`, `build`, `cross_review`, `ci`, `human_review`, `merge`, `kept`. `status`: `held` \| `broken` \| `not_measured`. `value` keys depend on the stage, as in the example; `null` for `contract`. `reason` says why a stage is not measured, or what it cannot see. |
+| `metrics[]` | object | Always 6: `review_rounds_per_pr`, `first_pass_approval`, `open_to_merge`, `three_plus_rounds`, `kept_rate_30d`, `human_review_load`. `value` null means not known, and `reason` says why ("Not enough data yet", "TBD (not yet measured)", or why it cannot be measured). Shares are 0 to 1. |
+| `rules[]` | object | Always 8: R2, R5, R6, R8, R9, R12, R13, R26. `count` = PRs that break the rule; `of` = PRs it applies to. R9 counts agent PRs opened while their lane already had 2 open. `not_measured` when there is nothing to check (`of` is 0) or no data (R5). |
+
+Who reviewed is read from the pod marker (ADR-0023 addendum 1), never from the login. An
+agent review is a `Cross-review · <lane>` marker. Any unmarked review or comment that is
+not from a bot counts as a human review. So an agent reply without a marker is counted
+as human: the page should say so next to the human-review numbers.
