@@ -114,6 +114,12 @@ def test_only_explicit_kep_and_pr_references_become_links() -> None:
     assert links_in("see https://github.com/kubernetes/kubernetes/pull/143709 now") == (
         "kubernetes/kubernetes#143709",
     )
+    assert links_in("Omar has raised the PR (kubernetes/website#59188) for review.") == (
+        "kubernetes/website#59188",
+    )
+    assert links_in("see github.com/kubernetes/enhancements/issues/6395 and KEP-6395") == (
+        "kubernetes/enhancements#6395",
+    )
     assert links_in("fixed in #59188") == ()  # a bare number names no repo: left to a person
 
 

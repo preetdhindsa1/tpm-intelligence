@@ -12,6 +12,7 @@ Non-essential: when the daily budget pauses it, the run stops and resumes anothe
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
@@ -24,13 +25,17 @@ from pydantic import BaseModel, ConfigDict, Field
 from agents.gateway import Gateway, TaskSpec
 from agents.prompts import Prompt
 from agents.settings import ModelRole
-from linker.refs import numbers_in, tracked_pull_requests
+from linker.refs import numbers_in
 from modules.raid.mask import mask_names
 from modules.raid.store import RaidItem, RaidStore, normalize_quote, suggestion_key
 
 TASK = TaskSpec("raid_extractor", ModelRole.SIMPLE, effort="low", max_tokens=6000, essential=False)
 MIN_QUOTE_WORDS = 4
 _tracer = trace.get_tracer("agents.raid_extractor")
+_REPO_REF = re.compile(
+    r"(?:github\.com/(?P<repo>[\w.-]+/[\w.-]+)/(?:issues|pull)/|(?<![\w/.])(?P<short>[\w.-]+/[\w.-]+)#)"
+    r"(?P<n>\d+)(?!\d)"
+)
 DropReason = Literal["quote_not_found", "quote_too_short", "duplicate"]
 
 
@@ -78,10 +83,15 @@ class ExtractionResult:
 
 
 def links_in(quote: str) -> tuple[str, ...]:
-    """Work-item and PR keys the quote names explicitly; nothing is guessed."""
+    """Work-item, issue and PR keys the quote names explicitly; nothing is guessed.
+
+    A KEP number (``linker.refs``), or an issue or PR named with its repository
+    (``github.com/o/r/issues/N``, ``o/r#N``). A bare ``#N`` names no repository and is left
+    for a person.
+    """
     keps = [f"kubernetes/enhancements#{n}" for n in numbers_in(quote)]
-    prs = [f"{repo}#{n}" for repo, n in tracked_pull_requests(quote)]
-    return tuple(dict.fromkeys(keps + prs))
+    named = [f"{m['repo'] or m['short']}#{int(m['n'])}" for m in _REPO_REF.finditer(quote)]
+    return tuple(dict.fromkeys(keps + named))
 
 
 def check_items(
