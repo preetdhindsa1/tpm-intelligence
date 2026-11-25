@@ -108,8 +108,8 @@ All live programs at once. No query parameters. Example built from the live data
         "kind": "review_gap",
         "severity": "warning",
         "headline": "Review gap",
-        "detail": "47 pull requests merged, 0 with an approving review",
-        "facts": {"merged": 47, "approved_merged": 0, "median_minutes_to_merge": 9}
+        "detail": "47 pull requests merged, 0 with a human review",
+        "facts": {"merged": 47, "approved_merged": 0, "median_minutes_to_merge": 9, "human_reviewed": 0, "reviewed_of": 47}
       },
       "next_decision": {
         "kind": "classify_prs",
@@ -192,9 +192,9 @@ All live programs at once. No query parameters. Example built from the live data
     {
       "kind": "review_gap",
       "title": "Review is the new bottleneck",
-      "text": "Program Intelligence Platform (Current Project): pull requests merge in a median of 9 minutes, and 0 of 47 had an approving review.",
+      "text": "Program Intelligence Platform (Current Project): pull requests merge in a median of 9 minutes, and 0 of 47 had a human review.",
       "program_key": "tpm-intelligence:Phase 3",
-      "facts": {"merged": 47, "approved_merged": 0, "median_minutes_to_merge": 9}
+      "facts": {"merged": 47, "approved_merged": 0, "median_minutes_to_merge": 9, "human_reviewed": 0, "reviewed_of": 47}
     },
     {
       "kind": "unlinked_load",
@@ -247,7 +247,7 @@ All live programs at once. No query parameters. Example built from the live data
 | 70, 106; 16, 18; 4, 4 | `GET /releases` `features_in_release`, `features_ever_in_release` |
 | 28 critical, 25 `main_pr_not_merged` | `GET /releases/v1.38/features`: in-release features with a critical flag, and the most common critical flag code among them |
 | 13 of 16 linked | `GET /releases/4.5.0/features`: in-release features with `prs_total > 0` |
-| 47 merged, 0 approved, 9 minutes | `GET /lab`: `n_merged`, `approved_merged`, `median_hours_to_merge` (0.156 h) |
+| 47 merged, 0 with a human review, 9 minutes | `GET /lab`: pod `human_review` stage (`human_reviewed`, `merged`) when the team has pod facts, else `n_merged` and `approved_merged`; `median_hours_to_merge` (0.156 h). ADR-0025 addendum 2 |
 | Draft update 2 | `GET /releases/v1.38/updates`: the newest update has `status: draft` |
 | 101 suggestions | `GET /releases/v1.38/link-suggestions`: `counts.suggested` |
 | 2 with no lane | `GET /lab`: bucket `unassigned` |

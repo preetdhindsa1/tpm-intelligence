@@ -881,7 +881,18 @@ def create_app(
                 since=_lab_since(team, v),
             )
             unassigned = sum(b.opened for b in r.buckets if b.lane == "unassigned")
-            lab = LabFacts(r.n_merged, r.approved_merged, r.median_hours_to_merge, unassigned)
+            human = next(
+                (s["value"] for s in (r.pod or {}).get("flow", []) if s["stage"] == "human_review"),
+                None,
+            )
+            lab = LabFacts(
+                r.n_merged,
+                r.approved_merged,
+                r.median_hours_to_merge,
+                unassigned,
+                human_reviewed=human["human_reviewed"] if human else None,
+                reviewed_of=human["merged"] if human else None,
+            )
         return program_facts(v, team, draft_id=draft, suggested_links=suggested, lab=lab)
 
     @app.get("/portfolio", response_model=PortfolioOut)
