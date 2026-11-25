@@ -29,6 +29,7 @@ export type Release = {
   features_ever_in_release: number;
   as_of: string;
   has_lab?: boolean;
+  code_freeze_label?: string;
 };
 
 export type LabReport = {

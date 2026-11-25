@@ -32,6 +32,7 @@ All live programs at once. No query parameters. Example built from the live data
       "display_name": "Kubernetes",
       "release": "v1.38",
       "planning_tool": "github",
+      "code_freeze_label": "Code Freeze",
       "code_tools": ["github"],
       "has_lab": false,
       "as_of": "2026-11-24T23:21:55Z",
@@ -42,11 +43,11 @@ All live programs at once. No query parameters. Example built from the live data
         "release_at": "2026-12-16T00:00:00Z"
       },
       "stage": {
-        "current": "freeze",
+        "current": "verify",
         "stages": [
           {"name": "plan", "status": "done"},
           {"name": "build", "status": "done"},
-          {"name": "freeze", "status": "current"},
+          {"name": "verify", "status": "current"},
           {"name": "launch", "status": "upcoming"},
           {"name": "learn", "status": "upcoming"}
         ],
@@ -79,6 +80,7 @@ All live programs at once. No query parameters. Example built from the live data
       "display_name": "Program Intelligence Platform (Current Project)",
       "release": "Phase 3",
       "planning_tool": "github",
+      "code_freeze_label": "Code Freeze",
       "code_tools": ["github"],
       "has_lab": true,
       "as_of": "2026-11-24T23:21:55Z",
@@ -93,7 +95,7 @@ All live programs at once. No query parameters. Example built from the live data
         "stages": [
           {"name": "plan", "status": "current"},
           {"name": "build", "status": "upcoming"},
-          {"name": "freeze", "status": "upcoming"},
+          {"name": "verify", "status": "upcoming"},
           {"name": "launch", "status": "upcoming"},
           {"name": "learn", "status": "upcoming"}
         ],
@@ -122,6 +124,7 @@ All live programs at once. No query parameters. Example built from the live data
       "display_name": "Apache Kafka",
       "release": "4.5.0",
       "planning_tool": "jira",
+      "code_freeze_label": "Feature Freeze",
       "code_tools": ["github"],
       "has_lab": false,
       "as_of": "2026-11-24T23:21:55Z",
@@ -136,7 +139,7 @@ All live programs at once. No query parameters. Example built from the live data
         "stages": [
           {"name": "plan", "status": "done"},
           {"name": "build", "status": "current"},
-          {"name": "freeze", "status": "upcoming"},
+          {"name": "verify", "status": "upcoming"},
           {"name": "launch", "status": "upcoming"},
           {"name": "learn", "status": "upcoming"}
         ],

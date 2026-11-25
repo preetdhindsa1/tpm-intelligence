@@ -21,7 +21,7 @@ Design canvas: https://claude.ai/artifact/QLp89uhmoeG8d1ZvXdUKW8 (version label 
 
 | # | Screen | Purpose | Key content |
 | --- | --- | --- | --- |
-| 1 | Front page | What it is and proof | Dark hero with 3 live programs; five stages (Plan · Build · Freeze · Launch · Learn) with module status; three real stories (33 removed at Code Freeze, 0 of 43 merged PRs human-reviewed, 81% Kafka features linked); Built for trust scorecard; Recorded demo section (2:00, 5 chapters) |
+| 1 | Front page | What it is and proof | Dark hero with 3 live programs; five stages (Plan · Build · Verify · Launch · Learn; Verify was "Freeze" until 2026-11-25, ADR-0025 addendum) with module status; three real stories (33 removed at Code Freeze, 0 of 43 merged PRs human-reviewed, 81% Kafka features linked); Built for trust scorecard; Recorded demo section (2:00, 5 chapters) |
 | 2 | Portfolio | All programs at once | "Here are the live programs." Table: program, stage bar, scope, biggest bottleneck, next decision; Waiting on you; Across programs; Coming next (RAID, readiness, retros) |
 | 3 | Live Cockpit | One program, live | Lifecycle bar (you are here), 5 stat tiles, **time machine** replay of #6395 (8 real dates), What happened at Code Freeze chart, Decide card, verified executive brief (#brief) |
 | 4 | Decision Studio | Test a fix | Pool picker (real SIG pools), lever picker, baseline vs scenario (illustrative until the live simulator fills them), "not validated" banner with real replay numbers, measured assumptions table |

@@ -32,6 +32,8 @@ def test_kafka_team_is_jira_shaped() -> None:
     assert team.link_pack == "jira_key"
     assert team.planning_repo is None
     assert team.primary_code_repo == "apache/kafka"
+    assert team.code_freeze_label == "Feature Freeze"  # Kafka's name for the engine's Code Freeze
+    assert load_team("kubernetes").code_freeze_label == "Code Freeze"  # the default
 
 
 def test_load_teams_indexes_examples() -> None:

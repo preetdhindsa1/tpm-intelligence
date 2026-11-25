@@ -51,7 +51,7 @@ def test_v138_stage_flips_at_code_freeze_noon_utc() -> None:
     freeze = V138["code_freeze_at"]
     assert stage(V138, freeze - timedelta(seconds=1))["current"] == "build"
     at = stage(V138, freeze)
-    assert at["current"] == "freeze"
+    assert at["current"] == "verify"
     assert at["last_milestone"] == {"name": "code_freeze", "at": freeze}
     statuses = [s["status"] for s in at["stages"]]
     assert statuses == ["done", "done", "current", "upcoming", "upcoming"]
@@ -87,6 +87,17 @@ def test_kubernetes_critical_flags_name_the_most_common_code() -> None:
     }  # fmt: skip
     assert row["next_decision"]["ref"] == {"update_id": 2}
     assert "program_key" not in row["next_decision"]
+
+
+def test_the_bottleneck_uses_the_teams_name_for_its_freeze_date() -> None:
+    kafka_flags = facts("KAFKA:4.4.0", "Apache Kafka", code_freeze_label="Feature Freeze",
+                        critical_codes=(("main_pr_not_merged",),) * 3, features_in_release=16,
+                        features_ever=18, linked_features=13)  # fmt: skip
+    row = program(kafka_flags)
+    assert row["code_freeze_label"] == "Feature Freeze"
+    detail = row["bottleneck"]["detail"]
+    assert detail == "3 features past Feature Freeze with the main PR not merged"
+    assert program(K)["code_freeze_label"] == "Code Freeze"
 
 
 def test_kafka_before_freeze_shows_the_linking_gap() -> None:

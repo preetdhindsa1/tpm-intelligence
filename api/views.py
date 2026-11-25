@@ -65,6 +65,7 @@ def _release_fields(release: ReleaseInfo) -> dict[str, Any]:
         "code_freeze_at": release.code_freeze_at,
         "release_at": release.release_at,
         "has_lab": bool(team and team.author_lanes),
+        "code_freeze_label": team.code_freeze_label if team else "Code Freeze",
     }
 
 
@@ -589,4 +590,5 @@ def program_facts(
         draft_update_id=draft_id,
         suggested_links=suggested_links,
         lab=lab,
+        code_freeze_label=team.code_freeze_label,
     )

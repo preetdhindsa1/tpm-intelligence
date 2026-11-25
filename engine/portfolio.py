@@ -10,12 +10,14 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-STAGES = ("plan", "build", "freeze", "launch", "learn")
+# "verify" runs from the team's code-freeze date to the release (ADR-0025 addendum: it was
+# called "freeze"; AI-native teams verify rather than freeze, and each team names the date).
+STAGES = ("plan", "build", "verify", "launch", "learn")
 LAUNCH_WINDOW = timedelta(days=7)
 REVIEW_GAP_MIN_MERGED = 5  # pod rule R22: no rate from fewer than 5 merged PRs
 _FLAG_DETAIL = {
-    "main_pr_not_merged": "{n} features past Code Freeze with the main PR not merged",
-    "removed_at_freeze": "{n} features removed at Code Freeze",
+    "main_pr_not_merged": "{n} features past {label} with the main PR not merged",
+    "removed_at_freeze": "{n} features removed at {label}",
 }
 
 
@@ -50,6 +52,7 @@ class ProgramFacts:
     draft_update_id: int | None = None
     suggested_links: int = 0
     lab: LabFacts | None = None
+    code_freeze_label: str = "Code Freeze"  # the team's own name for its code_freeze date
 
 
 def stage(dates: dict[str, datetime | None], now: datetime) -> dict[str, Any]:
@@ -121,7 +124,8 @@ def bottleneck(p: ProgramFacts, current_stage: str | None) -> dict[str, Any]:
         counts = Counter(code for codes in p.critical_codes for code in set(codes))
         top, n = min(counts.items(), key=lambda kv: (-kv[1], kv[0]))
         k = len(p.critical_codes)
-        detail = _FLAG_DETAIL.get(top, "{n} features flagged " + top).format(n=n)
+        template = _FLAG_DETAIL.get(top, "{n} features flagged " + top)
+        detail = template.format(n=n, label=p.code_freeze_label)
         headline = f"{k} critical flag{'s' if k != 1 else ''}"
         return _row(
             "critical_flags",
@@ -213,6 +217,7 @@ def program(p: ProgramFacts) -> dict[str, Any]:
         "planning_tool": p.planning_tool,
         "code_tools": list(p.code_tools),
         "has_lab": p.lab is not None,
+        "code_freeze_label": p.code_freeze_label,
         "as_of": p.as_of,
         "dates": p.dates,
         "stage": st,

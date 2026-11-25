@@ -11,7 +11,7 @@ describe("shell", () => {
   it("uses the portfolio stage boundaries", () => {
     expect(stageOf(V138, new Date("2026-08-01T00:00:00Z"))).toBe("Plan");
     expect(stageOf(V138, new Date("2026-11-17T11:59:59Z"))).toBe("Build");
-    expect(stageOf(V138, new Date("2026-11-17T12:00:00Z"))).toBe("Freeze");
+    expect(stageOf(V138, new Date("2026-11-17T12:00:00Z"))).toBe("Verify");
     expect(stageOf(V138, new Date("2026-12-22T23:00:00Z"))).toBe("Launch");
     expect(stageOf(V138, new Date("2026-12-23T00:00:00Z"))).toBe("Learn");
     expect(stageOf({ ...V138, cycle_start_at: null }, new Date("2026-11-21T00:00:00Z"))).toBe("Dates not known");

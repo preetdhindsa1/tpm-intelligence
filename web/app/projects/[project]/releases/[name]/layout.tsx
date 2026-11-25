@@ -28,6 +28,7 @@ export default async function ReleaseLayout({
         hasLab={release.has_lab}
         stage={stageOf(release, new Date(release.as_of))}
         codeFreezeAt={release.code_freeze_at}
+        codeFreezeLabel={release.code_freeze_label}
         releaseAt={release.release_at}
         asOf={release.as_of}
       />

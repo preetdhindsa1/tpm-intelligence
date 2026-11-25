@@ -16,6 +16,9 @@ code:
     - acme/service
 calendar:
   path: connectors/teams/acme-calendar.yaml
+# Optional. Your name for the calendar's code_freeze date, shown where the Verify stage
+# starts: "Code Freeze" (default), "Feature Freeze", "Release cut", "Feature complete".
+# code_freeze_label: Code Freeze
 # Optional. Omit both keys for a team with no development lab.
 # author_lanes:            # first matching rule wins: label, then branch, then trailer
 #   claude:

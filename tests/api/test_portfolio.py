@@ -23,6 +23,7 @@ PROGRAM_KEYS = {
     "release",
     "planning_tool",
     "code_tools",
+    "code_freeze_label",
     "has_lab",
     "as_of",
     "dates",
@@ -85,7 +86,8 @@ def test_portfolio_shape_and_v138_row() -> None:
     [row] = body["programs"]
     assert set(row) == PROGRAM_KEYS
     assert row["key"] == "kubernetes:v1.38"
-    assert row["stage"]["current"] == "freeze"  # 2026-11-21 is after Code Freeze
+    assert row["stage"]["current"] == "verify"  # 2026-11-21 is after Code Freeze
+    assert row["code_freeze_label"] == "Code Freeze"
     assert row["dates"]["code_freeze_at"] == "2026-11-17T12:00:00Z"
     assert row["next_decision"] == {
         "kind": "approve_exec_update",

@@ -14,11 +14,11 @@ import { programTitle } from "@/lib/names";
 
 const asOfLabel = (iso: string) => `${dayMonth(iso)}, ${new Date(iso).toISOString().slice(11, 16)} UTC`;
 
-/** "Code Freeze passed 17 Nov" / "Code Freeze 17 Nov · in 9 days". */
-export function freezeText(freeze: string | null, asOf: string): string | null {
+/** "Code Freeze passed 17 Nov" / "Feature Freeze 3 Feb · in 9 days", in the team's own words. */
+export function freezeText(freeze: string | null, asOf: string, label = "Code Freeze"): string | null {
   if (!freeze) return null;
   const d = daysFrom(asOf, freeze);
-  return d <= 0 ? `Code Freeze passed ${dayMonth(freeze)}` : `Code Freeze ${dayMonth(freeze)} · in ${d} day${d === 1 ? "" : "s"}`;
+  return d <= 0 ? `${label} passed ${dayMonth(freeze)}` : `${label} ${dayMonth(freeze)} · in ${d} day${d === 1 ? "" : "s"}`;
 }
 
 /** "Release 16 Dec · in 21 days" / "Released 16 Dec". */
@@ -28,8 +28,8 @@ export function releaseText(release: string | null, asOf: string): string | null
   return d <= 0 ? `Released ${dayMonth(release)}` : `Release ${dayMonth(release)} · in ${d} day${d === 1 ? "" : "s"}`;
 }
 
-export function ReleaseChrome({ groups, project, release, displayName, hasLab, stage, codeFreezeAt, releaseAt, asOf }: {
-  groups: SwitcherGroup[]; project: string; release: string; displayName: string; hasLab?: boolean;
+export function ReleaseChrome({ groups, project, release, displayName, hasLab, stage, codeFreezeAt, codeFreezeLabel, releaseAt, asOf }: {
+  groups: SwitcherGroup[]; project: string; release: string; displayName: string; hasLab?: boolean; codeFreezeLabel?: string;
   stage: string; codeFreezeAt: string | null; releaseAt: string | null; asOf: string;
 }) {
   const router = useRouter();
@@ -39,7 +39,7 @@ export function ReleaseChrome({ groups, project, release, displayName, hasLab, s
   const section = cockpitSection(path);
   const studio = path.endsWith("/simulate");
   const title = studio ? "Decision Studio" : section === "" && !path.includes("/features/") ? "Live Cockpit" : null;
-  const meta = [freezeText(codeFreezeAt, asOf), releaseText(releaseAt, asOf), `Data as of ${asOfLabel(asOf)}`].filter(Boolean) as string[];
+  const meta = [freezeText(codeFreezeAt, asOf, codeFreezeLabel), releaseText(releaseAt, asOf), `Data as of ${asOfLabel(asOf)}`].filter(Boolean) as string[];
   return (
     <div className="space-y-3">
       <nav aria-label="Program" className="flex flex-wrap items-center gap-2 text-sm text-slate-600">

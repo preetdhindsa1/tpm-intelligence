@@ -76,6 +76,10 @@ class TeamConfig(BaseModel):
     # When "landed" is judged (#86): 3 days after Code Freeze, or 3 days after the release
     # ships, for teams that drop slipped work from a release later than their freeze.
     landed_at: Literal["code_freeze", "release"] = "code_freeze"
+    # The team's own name for its code_freeze date, shown where the Verify stage starts
+    # (ADR-0025 addendum): "Code Freeze" for Kubernetes, "Feature Freeze" for Kafka, or
+    # "Release cut" for a team that ships continuously.
+    code_freeze_label: str = "Code Freeze"
 
     def calendar_path(self, *, relative_to: Path) -> Path:
         """Resolve the calendar file (paths are repo-root relative unless absolute)."""
