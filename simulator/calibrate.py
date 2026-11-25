@@ -110,8 +110,14 @@ def path_of(pr: PullRequest, horizon: datetime) -> Path:
 def reviewer_weeks(
     prs: Sequence[PullRequest], w: Window, pool_of: Mapping[str, str]
 ) -> dict[str, list[float]]:
-    """Per pool, the reviewer count of each week in the window (fractional, see docstring)."""
-    weeks = max(1, int(days(w.freeze - w.start) // 7))
+    """Per pool, the reviewer count of each week in the window (fractional, see docstring).
+
+    Only weeks that have happened count: for a release still before Code Freeze, the weeks
+    after the data end would otherwise count as zero reviewers and pull the median down
+    (Kafka 4.5.0 read as 1 reviewer for 176 open PRs, 2026-11-25).
+    """
+    end = min(w.freeze, w.horizon)
+    weeks = max(1, int(days(end - w.start) // 7))
     load: dict[tuple[int, str], Counter[str]] = defaultdict(Counter)
     for pr in prs:
         for rnd in review_rounds(pr):
