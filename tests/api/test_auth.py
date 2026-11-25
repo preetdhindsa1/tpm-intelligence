@@ -32,6 +32,9 @@ ACTIONS: list[tuple[str, str, Any]] = [
     ("POST", "/releases/v1.38/link-suggestions/1/confirm", {}),
     ("POST", "/releases/v1.38/link-suggestions/1/reject", {}),
     ("POST", "/releases/v1.38/scenarios", {"name": "x", "pools": {}}),
+    ("POST", "/raid/4/confirm", {}),
+    ("POST", "/raid/4/edit", {"owner": "SIG Node"}),
+    ("POST", "/raid/4/reject", {"reason": "not a risk"}),
 ]
 
 
