@@ -144,6 +144,7 @@ export const api = {
   features: (release: string) => get<FeaturesResponse>(`/releases/${release}/features`),
   feature: (release: string, n: number) => get<FeatureDetail>(`/releases/${release}/features/${n}`),
   summary: (release: string) => get<Summary>(`/releases/${release}/summary`),
+  simulator: (release: string) => get<SimulatorInfo>(`/releases/${release}/simulator`),
   mergeDates: (release: string) => get<MergeDates>(`/releases/${release}/merge-dates`),
   snapshots: (release: string) => get<Snapshots>(`/releases/${release}/snapshots`),
   dependencies: (release: string, includeRemoved = false) =>
