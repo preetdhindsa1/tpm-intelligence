@@ -1,20 +1,22 @@
-const STEPS = ["Plan", "Build", "Freeze", "Launch", "Learn"] as const;
+// Lifecycle card (UX vision p.4): five stages, each filled as far as the release has
+// got as of its data date. Steps come from lib/cockpit lifecycle().
+import type { LifeStep } from "@/lib/cockpit";
 
-export function LifecycleBar({ stage }: { stage: string }) {
-  const at = STEPS.indexOf(stage as (typeof STEPS)[number]);
+export function LifecycleBar({ steps }: { steps: LifeStep[] }) {
+  if (steps.length === 0) return null;
   return (
-    <ol aria-label="Lifecycle" className="flex flex-wrap gap-2 text-sm">
-      {STEPS.map((step, index) => {
-        const here = index === at;
-        const done = at > index;
-        const tone = here ? "bg-action font-medium text-white" : done ? "bg-action/20 font-medium text-action" : "bg-white text-slate-600";
-        return (
-          <li key={step} aria-current={here ? "step" : undefined} className={`inline-flex min-h-11 items-center rounded-full px-3 ${tone}`}>
-            {step}
-          </li>
-        );
-      })}
-      {stage === "Dates not known" && <li className="inline-flex min-h-11 items-center text-slate-500">Dates not known</li>}
+    <ol aria-label="Lifecycle" className="grid grid-cols-2 gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-5 sm:grid-cols-5">
+      {steps.map((s) => (
+        <li key={s.name} aria-current={s.here ? "step" : undefined}>
+          <div className="h-1.5 overflow-hidden rounded-full bg-slate-200" role="img" aria-label={`${s.name} ${Math.round(s.fill * 100)}% done`}>
+            <div className="h-full rounded-full bg-action" style={{ width: `${Math.round(s.fill * 100)}%` }} />
+          </div>
+          <p className={`mt-2.5 text-sm font-semibold ${s.here ? "text-action" : "text-slate-900"}`}>
+            {s.name}{s.here ? " · you are here" : ""}
+          </p>
+          <p className="text-sm text-slate-500">{s.note}</p>
+        </li>
+      ))}
     </ol>
   );
 }

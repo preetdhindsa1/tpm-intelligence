@@ -9,8 +9,6 @@ export default async function SimulatePage({ params }: { params: Promise<{ proje
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold">Decision Studio · {release.display_name || release.project} {name}</h1>
-        <p className="text-sm font-medium text-slate-700">Powered by the Shadow-Org Simulator</p>
         <p className="text-sm text-slate-600">
           Pick a reviewer pool and one lever. Baseline and scenario stay illustrative until a run fills them from the simulator.
           Results are ranges, not guarantees.
