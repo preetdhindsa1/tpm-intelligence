@@ -10,6 +10,7 @@ describe("pod facts wording", () => {
   it("words each stage from the API values", () => {
     expect(stageValue(stage({ stage: "cross_review", value: { cross_reviewed: 6, agent_merged: 38 } }))).toBe("6 of 38");
     expect(stageValue(stage({ stage: "human_review", value: { human_reviewed: 11, merged: 52 } }))).toBe("11 of 52");
+    expect(stageValue(stage({ stage: "human_review", value: { human_reviewed: 19, merged: 80, approved: 70, approved_of: 70 } }))).toBe("70 of 70 approved");
     expect(stageValue(stage({ stage: "merge", status: "held", value: { median_minutes_to_merge: 11 } }))).toBe("11 min median");
     expect(stageValue(stage({ stage: "contract", status: "not_measured" }))).toBe("Not measured");
     const kept = stage({ stage: "kept", status: "not_measured", value: { kept: 0, eligible: 0 },
@@ -42,7 +43,7 @@ describe("multi-agent development section", () => {
     flow: [
       stage({ stage: "build", value: { max_open_per_agent: 6, over_400_lines: 0, collisions: 0 } }),
       stage({ stage: "cross_review", value: { cross_reviewed: 13, agent_merged: 60 } }),
-      stage({ stage: "human_review", value: { human_reviewed: 19, merged: 79 } }),
+      stage({ stage: "human_review", value: { human_reviewed: 19, merged: 79, approved: 70, approved_of: 70 } }),
     ],
   };
 
@@ -51,7 +52,7 @@ describe("multi-agent development section", () => {
     expect(MULTI_AGENT.points.slice(0, 3).every((p) => p.body.startsWith("The rule:"))).toBe(true);
     expect(multiAgentFact("lanes", pod)).toBe("So far: at most 6 PRs open at once in one lane.");
     expect(multiAgentFact("cross", pod)).toBe("So far: 13 of 60 merged agent PRs had one.");
-    expect(multiAgentFact("human", pod)).toBe("So far: 19 of 79 merged PRs had a human review.");
+    expect(multiAgentFact("human", pod)).toBe("So far: 70 of 70 PRs merged since the rules started were approved by the human; 19 of 79 merged PRs had a written human review.");
     expect(multiAgentFact("measured", pod)).toBeNull();
     expect(multiAgentFact("cross", { ...pod, flow: [] })).toBeNull();
   });

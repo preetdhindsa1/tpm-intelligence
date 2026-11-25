@@ -63,6 +63,7 @@ def pull_request_snapshot(repo: str, pr: Json, *, observed_at: datetime) -> Norm
         merged_at=gh.parse_ts(pr["merged_at"]) if pr.get("merged_at") else None,
         closed_at=gh.parse_ts(pr["closed_at"]) if pr.get("closed_at") else None,
         url=pr.get("html_url"),
+        merged_by=(pr.get("merged_by") or {}).get("login"),
     )
     return new_event(
         source=Source.GITHUB,
@@ -70,7 +71,10 @@ def pull_request_snapshot(repo: str, pr: Json, *, observed_at: datetime) -> Norm
         occurred_at=payload.updated_at,
         observed_at=observed_at,
         payload=payload,
-        identity=(pr["updated_at"],),
+        identity=(
+            pr["updated_at"],
+            *((f"merged_by:{payload.merged_by}",) if payload.merged_by else ()),
+        ),
     )
 
 
