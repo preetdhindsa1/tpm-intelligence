@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  MEMBER_TEXT, METRIC_NAME, NEXT_RULES, STAGE_TEXT, metricValue, ruleValue, stageDetail, stageValue, statusTone,
+  MEMBER_TEXT, METRIC_NAME, MULTI_AGENT, NEXT_RULES, multiAgentFact, STAGE_TEXT, metricValue, ruleValue, stageDetail, stageValue, statusTone,
   type Pod,
 } from "@/lib/api-pdlc";
 
@@ -20,7 +20,8 @@ export function PdlcView({ pod, asOf, total, merged }: { pod: Pod; asOf: string;
           <span className="rounded-md border border-white/20 px-2.5 py-1 text-white">Pod: Program Intelligence repo</span>
           <span className="text-slate-300">Real pull requests · as of {asOf}</span>
         </nav>
-        <h1 className="mt-4 font-heading text-4xl font-bold tracking-tight">How the pod builds, checks and ships</h1>
+        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.14em] text-indigo-300">Multi-agent development</p>
+        <h1 className="mt-2 font-heading text-4xl font-bold tracking-tight">How the pod builds, checks and ships</h1>
         <p className="mt-2 max-w-3xl text-slate-200">
           In a pod of 1 human, 2 AI agents and a bot, code is cheap and the human&apos;s attention is the only scarce
           thing. Velocity is merged, kept and released changes, never PRs opened.
@@ -48,6 +49,22 @@ export function PdlcView({ pod, asOf, total, merged }: { pod: Pod; asOf: string;
           pod rules started on 24 Nov 2026, so older PRs show as breaking them.
         </p>
         </div>
+      </section>
+
+      <section aria-labelledby="multi-agent" className="rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 id="multi-agent" className="font-heading text-xl font-semibold">{MULTI_AGENT.title}</h2>
+        <div className="mt-2 max-w-4xl space-y-2 text-slate-600">
+          {MULTI_AGENT.intro.map((line) => <p key={line}>{line}</p>)}
+        </div>
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {MULTI_AGENT.points.map((pt) => (
+            <li key={pt.title} className="rounded-xl bg-slate-50 p-4">
+              <h3 className="font-heading font-semibold">{pt.title}</h3>
+              <p className="mt-1 text-sm leading-6 text-slate-600">{pt.body}</p>
+              {multiAgentFact(pt.id, pod) && <p className="mt-2 text-sm font-medium text-action">{multiAgentFact(pt.id, pod)}</p>}
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="rounded-2xl border bg-white p-6">

@@ -115,3 +115,36 @@ export const NEXT_RULES = [
   { title: "R2 · Require review before merge", body: "Branch rules: a PR, passing CI and a recorded review.",
     effect: "The human-review stage fills in. Medians per lane appear after 5 merged PRs in that lane." },
 ];
+
+/** Multi-agent development, in plain words (AI-native PDLC page). Rules are the pod's own (docs/pod/RULES.md). */
+export const MULTI_AGENT = {
+  title: "Multi-agent development: one person shipping with two AI agents",
+  intro: [
+    "Multi-agent development means more than one AI agent writes code on the same product, side by side with people. Here, Claude Code and Cursor each work in their own lane, a bot keeps dependencies current, and one human owns the plan and the merge button.",
+    "Writing code is no longer the hard part. The hard part is keeping several fast writers from colliding, and checking their work before it ships. That is what this page measures.",
+  ],
+  points: [
+    { id: "lanes", title: "Separate lanes", body: "The rule: each agent works from its own issues and branches (claude/, cursor/), with at most two open PRs at a time, so two agents do not change the same files at once." },
+    { id: "cross", title: "Agents check each other", body: "The rule: every agent PR is reviewed by the other agent before the human looks. The review starts with a marker line, so it counts as an agent review, not a human one." },
+    { id: "human", title: "A human decides", body: "The rule: agents never approve or merge. The owner reviews in set windows, by risk label, and presses merge." },
+    { id: "measured", title: "Measured, not claimed", body: "Everything below comes from this repository's real pull requests: who opened them, who reviewed them, and how fast they merged." },
+  ],
+} as const;
+
+/** The live check under a multi-agent point, from the pod flow. Null when the data has none. */
+export function multiAgentFact(id: string, pod: Pod): string | null {
+  const v = (stage: string) => pod.flow.find((s) => s.stage === stage)?.value ?? null;
+  if (id === "lanes") {
+    const b = v("build");
+    return b?.max_open_per_agent == null ? null : `So far: at most ${b.max_open_per_agent} PRs open at once in one lane.`;
+  }
+  if (id === "cross") {
+    const c = v("cross_review");
+    return c?.agent_merged ? `So far: ${c.cross_reviewed ?? 0} of ${c.agent_merged} merged agent PRs had one.` : null;
+  }
+  if (id === "human") {
+    const h = v("human_review");
+    return h?.merged ? `So far: ${h.human_reviewed ?? 0} of ${h.merged} merged PRs had a human review.` : null;
+  }
+  return null;
+}
