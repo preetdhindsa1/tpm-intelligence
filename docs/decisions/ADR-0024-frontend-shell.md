@@ -23,6 +23,10 @@ A sign-in button on every screen (phishing flag). Hard-coding Kubernetes v1.38 a
 
 Launch is seven days, matching ADR-0025, because the API stores a release timestamp and not a separate launch window. The PDLC link moves to `/pdlc` when that page ships. Portfolio and Connect stay in the menu; their pages are the following issues.
 
+## Portfolio page
+
+`/portfolio` renders `GET /portfolio` in the order the API returns. `stage.current` null is shown as "Stage unknown". A `coming_next` status of `planned` is shown as "Planned", with no counts added. If the endpoint is not deployed, the page shows the HTTP error and no example numbers.
+
 ## AI vs rules
 
 No AI. Stage, links, and the last program are deterministic.
