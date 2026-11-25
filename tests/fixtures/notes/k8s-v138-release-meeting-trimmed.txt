@@ -1,0 +1,42 @@
+﻿Kubernetes v1.38 Release Team Meeting
+This Meeting
+* Zoom: Click Here To Join
+* This Doc: Listed on https://rel.k8s.io/v1.38/releasemtg
+   * Everyone can comment
+Meeting Update Template
+Week N – Weekday Day Month 2026 Weekly/Burndown Meeting (recording)
+Host:
+Meeting Notes
+
+
+Week 13 – Wednesday 25 November 2026 Weekly Meeting (recording)
+Host:
+      APAC: [name]
+Attendees (pronouns, release team role):
+* [name] (he/him, Release Lead)
+What's happened since last week
+* Code Freeze exceptions reviewed; two approved.
+
+
+Week 13 – Monday 23 November 2026 Burndown Meeting (recording)
+Host:
+      APAC: [name]
+* Release Signal: CI is green on master-blocking.
+
+
+Week 12 – Wednesday 18 November 2026 Weekly Meeting (recording)
+* Code Freeze is in effect since 17 November 12:00 UTC.
+   * SIG-scalability(@[name], go.k8s.io/oncall):
+   * Current Status: Green
+   * Week 8 – Weekday 21 October 2026 Weekly Meeting (recording)
+Host:
+      APAC: [name] (he/him)
+* Enhancements: tracking 70 enhancements.
+
+
+Week 10 – Weekday 4 November 2026 Weekly Meeting (recording)
+* We will send out the Code Freeze reminder in Week 10 (early November).
+
+
+Week 1 –  Wednesday, 2nd September 2026 Weekly Meeting (recording)
+* Kickoff.

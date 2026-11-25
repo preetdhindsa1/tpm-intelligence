@@ -11,3 +11,10 @@ code:
     - kubernetes/kubernetes
 calendar:
   path: collectors/github_poller/release_calendar.yaml
+# Public release-team meeting notes (ADR-0030), linked from
+# kubernetes/sig-release/releases/release-1.38/links.md. Read with the Google Drive API.
+conversations:
+  - kind: google_doc
+    document_id: 1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0
+    title: Kubernetes v1.38 Release Team Meeting
+    release: v1.38
