@@ -55,6 +55,7 @@ packages = [
     "engine",
     "evals",
     "linker",
+    "modules",
     "observability",
     "pipeline",
     "simulator",
@@ -80,7 +81,7 @@ extend-immutable-calls = ["fastapi.Depends"]
 
 [tool.ruff.lint.isort]
 known-first-party = [
-    "agents", "api", "collectors", "connectors", "engine", "evals", "linker",
+    "agents", "api", "collectors", "connectors", "engine", "evals", "linker", "modules",
     "observability", "pipeline", "simulator", "verify",
 ]
 
@@ -88,7 +89,7 @@ known-first-party = [
 [tool.mypy]
 python_version = "3.12"
 packages = [
-    "agents", "api", "collectors", "connectors", "engine", "evals", "linker",
+    "agents", "api", "collectors", "connectors", "engine", "evals", "linker", "modules",
     "observability", "pipeline", "simulator", "verify",
 ]
 warn_unused_configs = true
@@ -99,7 +100,7 @@ disallow_incomplete_defs = true
 
 # CLAUDE.md section 4: strict for the fact-producing packages.
 [[tool.mypy.overrides]]
-module = ["engine.*", "linker.*", "verify.*", "simulator.*"]
+module = ["engine.*", "linker.*", "verify.*", "simulator.*", "modules.*"]
 strict = true
 
 [[tool.mypy.overrides]]
