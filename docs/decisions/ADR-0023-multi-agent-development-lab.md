@@ -58,3 +58,19 @@ Lane classification, collisions, and every number on the lab page are determinis
 **Decision (owner, 2026-11-24).** Every agent review or comment starts with a marker line `<Kind> · <lane label>`, for example `Cross-review · claude-agent` or `Reply · cursor-agent`. The poller and the webhook receiver read the first non-empty line (bold or code marks allowed) and keep only a tag such as `cross-review:claude-agent`. The text is never stored, as with Prow commands. The separator must be `·`, so ordinary first lines ("LGTM - thanks") never match. When a marker is present it is part of the event identity: a review stored before markers were read is stored once more with its tag. Events without a marker keep their old ids. The projection keeps a tag whichever copy arrives first. The tag changes nothing in review rounds or calibration: the pod facts (#94) read it.
 
 **Limits.** An agent that forgets the marker is counted as the owner. A person could type a marker by hand. Both are visible in the PR thread, so a reviewer can catch them. Separate machine accounts per agent would remove both limits. They were not chosen now because they need accounts and tokens the owner does not have yet.
+
+## Addendum 2 (2026-11-25, #94): pod facts on `GET /lab`
+
+**Decision.** `GET /lab` gains `pod` for teams with agent lanes: the 4 members, the 7-stage pod flow, metrics against starting targets, and 8 pod rules checked against real PRs. Contract: `docs/api/ux-v1-contract.md`. Code: `engine/pod.py` (pure). The owner chose the whole history as the window, the same as the rest of the lab here. PRs from before the pod rules (PR #91, 2026-11-24) therefore show as breaking them. That is what happened, and the page says the rules started on that date.
+
+**Rules, each defined before it was computed:**
+- *Review actions:* a `cross-review:<agent label>` marker counts as that agent's review. An unmarked review or comment from a non-bot counts as human. Other agent markers (`reply:…`) are not reviews. Rounds group one actor's actions within 60 minutes (as `engine.review_rounds`).
+- *Cross-reviewed:* a merged agent PR with a review by the other agent lane before merge (R13). *Human-reviewed:* a merged PR with a human action before merge. *R2:* a merged PR with no review from outside its own lane.
+- *R8:* additions + deletions over 400 without the `size:exception` label. *R6:* not exactly one `risk:` label. *R9:* agent PRs opened while their lane already had 2 open. *R12:* no lane. *R26:* Dependabot PRs closed unmerged.
+- *Kept (R21):* a merged PR is kept if no merged `Revert "…"` PR names it (`Reverts owner/repo#N`, GitHub's default) within the window. It is counted only once the merge is 30 days old; before that it is `not_measured` with the first eligible date.
+- *Not measured, with the reason shown:* contract-first (R5: issues are not collected); first-pass approval (GitHub does not let a PR's author approve it, and every PR here is opened from the owner's account); human review load; three red CI runs (R17: only the latest commit's checks are stored).
+- *Nothing to check is not "held":* a rule or stage with no PRs is `not_measured`. Medians need 5 merged PRs in the lane (R22).
+
+**First measurement (2026-11-25, 68 PRs, 53 merged):** 6 of 38 merged agent PRs cross-reviewed. 11 of 52 merged PRs had a human action before merge. 12 of 13 Dependabot PRs closed unmerged. 48 of 55 PRs without exactly one risk tier. Median 11 minutes from open to merge.
+
+**Limits.** An agent reply without a marker counts as human review (seen on #106). Review depth counts actions, not what was read.
