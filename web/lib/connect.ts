@@ -8,7 +8,7 @@ export const STEPS = [
   },
   {
     title: "Describe releases",
-    body: "Give each release its cycle start, Code Freeze, and release date. The stage and the forecast use those dates.",
+    body: "Give each release its cycle start, Enhancements Freeze, Code Freeze, and release date. The stage uses cycle start, Code Freeze, and the release date.",
   },
   {
     title: "First program filling in",

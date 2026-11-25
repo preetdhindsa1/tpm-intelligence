@@ -1,7 +1,5 @@
 import { CONNECTORS, PROMISES, STEPS } from "@/lib/connect";
 
-export const dynamic = "force-dynamic";
-
 export default function ConnectPage() {
   return (
     <div className="space-y-10">
