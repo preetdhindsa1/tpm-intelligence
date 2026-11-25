@@ -115,26 +115,26 @@ def test_an_empty_window_is_not_measured_not_held() -> None:
     assert {r["status"] for r in facts["rules"]} == {"not_measured"}
 
 
-def test_the_owners_merge_is_a_persons_approval_after_the_rules_started() -> None:
+def test_the_owners_merge_is_a_persons_approval() -> None:
     """Owner report 2026-11-25: every PR here is approved by the human who merges it."""
     prs = [
         pr(1, merged_by=OWNER),  # claude PR the owner merged, no review: approved
         pr(2, merged_by=OWNER),  # the owner's own PR, no agent review: still alone
         pr(3, merged_by=OWNER),  # cursor PR the owner merged
         pr(4, merged_by="someone-else"),  # merged by another login: not this pod's approval
-        pr(-30, merged_by=OWNER),  # merged before PR #76 set the rules: not counted
+        pr(-30, merged_by=OWNER),  # merged before PR #76 set the rules: still approved
     ]
     lanes = dict(zip([p.key for p in prs], ["claude", "human", "cursor", "claude", "claude"],
                      strict=True))  # fmt: skip
     facts = pod_facts(prs, lanes, RULES, collisions=0, as_of=T0 + timedelta(days=1),
                       approvers=[OWNER])  # fmt: skip
     human = {s["stage"]: s for s in facts["flow"]}["human_review"]
-    assert human["value"]["approved"] == 3
-    assert human["value"]["approved_of"] == 4
+    assert human["value"]["approved"] == 4
+    assert human["value"]["approved_of"] == 5
     assert human["status"] == "broken"  # PR 4 was not approved by the pod's human
     rules = {r["rule"]: (r["count"], r["of"]) for r in facts["rules"]}
-    # Alone: the owner's own PR 2, PR 4 (no approval) and PR -30 (before the rules).
-    assert rules["R2"] == (3, 5)
+    # Alone: the owner's own PR 2 and PR 4 (no approval).
+    assert rules["R2"] == (2, 5)
 
 
 def test_all_approved_holds_the_human_review_stage() -> None:

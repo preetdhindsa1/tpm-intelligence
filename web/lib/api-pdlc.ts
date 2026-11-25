@@ -68,7 +68,7 @@ export function stageDetail(s: PodStage): string {
     build: `At most ${n(v.max_open_per_agent)} PRs were open at once in one agent lane. ${n(v.over_400_lines)} PRs went over 400 changed lines without a size exception. ${n(v.collisions)} open PRs collide on the same files.`,
     cross_review: `${n(v.cross_reviewed)} of ${n(v.agent_merged)} merged agent PRs had a review from the other agent before merge.`,
     ci: `${n(v.failing_head_check)} PRs have a failing check on their latest commit.`,
-    human_review: `${v.approved_of ? `${n(v.approved)} of ${n(v.approved_of)} PRs merged since the pod rules started (24 Nov 2026) were approved by the human, who merges every PR. ` : ""}${n(v.human_reviewed)} of ${n(v.merged)} merged PRs also had a written human review or comment before merge. An agent comment without its marker line counts as human.`,
+    human_review: `${v.approved_of ? `${n(v.approved)} of ${n(v.approved_of)} merged PRs were approved by the human, who merges every PR. ` : ""}${n(v.human_reviewed)} of ${n(v.merged)} merged PRs also had a written human review or comment before merge. An agent comment without its marker line counts as human.`,
     merge: v.median_minutes_to_merge == null ? "" : `Median open to merge is ${v.median_minutes_to_merge} minutes.`,
     kept: s.status === "not_measured" ? "" : `${n(v.kept)} of ${n(v.eligible)} PRs merged 30+ days ago were not reverted.`,
   };
@@ -146,7 +146,7 @@ export function multiAgentFact(id: string, pod: Pod): string | null {
   if (id === "human") {
     const h = v("human_review");
     if (!h?.merged) return null;
-    const approved = h.approved_of ? `${h.approved ?? 0} of ${h.approved_of} PRs merged since the rules started were approved by the human; ` : "";
+    const approved = h.approved_of ? `${h.approved ?? 0} of ${h.approved_of} merged PRs were approved by the human; ` : "";
     return `So far: ${approved}${h.human_reviewed ?? 0} of ${h.merged} merged PRs had a written human review.`;
   }
   return null;

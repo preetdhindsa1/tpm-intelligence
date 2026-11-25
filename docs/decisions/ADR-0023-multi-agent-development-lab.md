@@ -85,10 +85,13 @@ account.
 
 **Decision.**
 - Pull requests store `merged_by` (poller: GraphQL `mergedBy`; webhooks: REST `merged_by`).
-- A merge by a login in the team's reviewer pool is a person's approval **from the time the
-  pod rules took effect** (PR #76 merged, 2026-11-24 07:02 UTC). Before that, agents
-  sometimes merged by pushing from the owner's account, so earlier merges prove nothing.
-- Human review stage: "N of M approved" (merged by the human since the rules started), and
+- A merge by a login in the team's reviewer pool is a person's approval. The owner
+  confirmed (2026-11-25) that they merged all 88 merged PRs: 51 with GitHub's merge
+  button and 37 (all before 2026-11-24 07:12 UTC) as a local merge pushed to main. So
+  every merge counts, with no start date. A draft of this addendum counted only merges
+  after PR #76 (2026-11-24 07:02 UTC), assuming agents had pushed the earlier ones; that
+  assumption was wrong and was dropped.
+- Human review stage: "N of M approved" (merged PRs merged by the human), and
   held when all of them were. Written reviews and comments are still counted and shown.
 - R2 (no one approves their own work alone): an agent's PR the owner merged is not alone.
   The owner's own PRs still need an agent's review.

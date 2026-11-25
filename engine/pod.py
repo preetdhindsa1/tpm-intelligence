@@ -7,7 +7,7 @@ posts from the owner's account. Counts by lane only. No AI anywhere here.
 from __future__ import annotations
 
 import re
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from statistics import median
 from typing import Any
 
@@ -20,10 +20,6 @@ MIN_MERGED = 5  # pod rule R22: no median from fewer than 5 merged PRs
 MAX_OPEN_PER_AGENT = 2  # R9
 MAX_LINES = 400  # R8
 KEPT_WINDOW = timedelta(days=30)
-# The pod rules took effect when PR #76 merged: from then on only the owner merges
-# (AGENTS.md). Earlier, agents sometimes merged by pushing from the owner's account, so
-# a merge by that account counts as a person's approval only from here (ADR-0023 add. 3).
-POD_RULES_START = datetime(2026, 11, 24, 7, 2, 8, tzinfo=UTC)
 ROUND_GAP = timedelta(minutes=60)  # one sitting, as in engine.review_rounds
 _REVERTS = re.compile(r"^Reverts\s+\S+#(\d+)", re.M)
 
@@ -90,7 +86,7 @@ def pod_facts(
     """Members, the 7-stage flow, metrics vs targets and rule checks for the PRs in the window.
 
     ``approvers`` are the logins whose merge is a person's approval (the team's reviewer
-    pool), counted from :data:`POD_RULES_START`.
+    pool). The owner merges every PR here (ADR-0023 addendum 3).
     """
     marker_lanes = {label: r.name for r in rules for label in r.labels if r.name in AGENT_LANES}
     acts = {pr.key: actions(pr, marker_lanes) for pr in prs}
@@ -104,10 +100,7 @@ def pod_facts(
     agent_merged = [pr for pr in merged if lane_of[pr.key] in AGENT_LANES]
     cross = [pr for pr in agent_merged if before_merge(pr, set(AGENT_LANES) - {lane_of[pr.key]})]
     human = [pr for pr in merged if before_merge(pr, {"human"})]
-    under_rules = [
-        pr for pr in merged if pr.merged_at is not None and pr.merged_at >= POD_RULES_START
-    ]
-    approved = [pr for pr in under_rules if pr.merged_by in set(approvers)]
+    approved = [pr for pr in merged if pr.merged_by in set(approvers)]
     approved_keys = {pr.key for pr in approved}
     # Alone: nobody from another lane reviewed it before merge. An agent's PR that the owner
     # merged was approved by a person, so it is not alone; the owner's own PRs still need a
@@ -191,11 +184,11 @@ def pod_facts(
             stage("ci", "R17", "held" if not red else "broken", {"failing_head_check": len(red)},
                   "Failing check on the latest commit only; run history (three red runs) is "
                   "not collected"),
-            # Held when a person approved (merged) every PR since the rules started.
-            stage("human_review", "R14 R15 R16", "not_measured" if not under_rules
-                  else "held" if len(approved) == len(under_rules) else "broken",
+            # Held when a person approved (merged) every merged PR.
+            stage("human_review", "R14 R15 R16", "not_measured" if not merged
+                  else "held" if len(approved) == len(merged) else "broken",
                   {"human_reviewed": len(human), "merged": len(merged),
-                   "approved": len(approved), "approved_of": len(under_rules)}),
+                   "approved": len(approved), "approved_of": len(merged)}),
             stage("merge", "R3 R21", "held" if enough else "not_measured",
                   {"median_minutes_to_merge": _median_minutes(merged)},
                   None if enough else "Not enough data yet: fewer than 5 merged pull requests"),

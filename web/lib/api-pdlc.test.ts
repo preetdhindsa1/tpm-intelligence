@@ -52,7 +52,7 @@ describe("multi-agent development section", () => {
     expect(MULTI_AGENT.points.slice(0, 3).every((p) => p.body.startsWith("The rule:"))).toBe(true);
     expect(multiAgentFact("lanes", pod)).toBe("So far: at most 6 PRs open at once in one lane.");
     expect(multiAgentFact("cross", pod)).toBe("So far: 13 of 60 merged agent PRs had one.");
-    expect(multiAgentFact("human", pod)).toBe("So far: 70 of 70 PRs merged since the rules started were approved by the human; 19 of 79 merged PRs had a written human review.");
+    expect(multiAgentFact("human", pod)).toBe("So far: 70 of 70 merged PRs were approved by the human; 19 of 79 merged PRs had a written human review.");
     expect(multiAgentFact("measured", pod)).toBeNull();
     expect(multiAgentFact("cross", { ...pod, flow: [] })).toBeNull();
   });
