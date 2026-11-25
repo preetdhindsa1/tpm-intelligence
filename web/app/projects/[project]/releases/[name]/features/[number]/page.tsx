@@ -1,13 +1,14 @@
 import { featureLabel, vocab } from "@/lib/vocab";
 import { releaseFromParams } from "@/lib/release-page";
-import { releasePath } from "@/lib/routes";
-import Link from "next/link";
 import { FlagList } from "@/components/Flags";
 import { LiveRefresh } from "@/components/LiveRefresh";
 import { OddsCell } from "@/components/Odds";
 import { RiskNotePanel } from "@/components/RiskNote";
 import { Timeline } from "@/components/Timeline";
-import { api } from "@/lib/api";
+import { api, type FeatureDetail } from "@/lib/api";
+import { ErrorState } from "@/components/states/States";
+import { errorDetail, isNotFound } from "@/lib/errors";
+import { notFound } from "next/navigation";
 import { dateOf, mergeRangeLabel, relDay } from "@/lib/delay";
 import { formatUtc } from "@/lib/format";
 
@@ -18,14 +19,20 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
   const { number } = await params;
   const name = release.name;
   const project = release.project;
-  const f = await api.feature(name, Number(number));
+  let f: FeatureDetail;
+  try {
+    f = await api.feature(name, Number(number));
+  } catch (e) {
+    const detail = errorDetail(e, "The feature API failed");
+    if (isNotFound(detail)) notFound();
+    return <ErrorState title="This feature could not be loaded" detail={detail} />;
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href={releasePath(project, name)} className="text-sm text-indigo-700 hover:underline">← {name} release health</Link>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="font-heading text-2xl font-semibold">
             <a className="hover:underline" href={f.url ?? "#"}>{featureLabel(f)}</a> {f.title}
           </h1>
           <p className="text-sm text-slate-600">
@@ -39,30 +46,31 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
 
       <RiskNotePanel release={name} number={f.number} />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <section className="rounded border bg-white p-4">
-          <h2 className="mb-2 font-medium">Odds of landing by Code Freeze</h2>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <section className="rounded-lg border bg-white p-4">
+          <h2 className="font-heading mb-2 font-medium">Odds of landing by Code Freeze</h2>
           <OddsCell odds={f.odds} />
           <p className="mt-3 text-xs text-slate-500">If the measured inputs below hold, the odds are likely in this range. Not a guarantee.</p>
         </section>
-        <section className="rounded border bg-white p-4 lg:col-span-2">
-          <h2 className="mb-2 font-medium">When will its required code merge?</h2>
+        <section className="rounded-lg border bg-white p-4 lg:col-span-2">
+          <h2 className="font-heading mb-2 font-medium">When will its required code merge?</h2>
           <MergeDateText f={f} freeze={release.code_freeze_at} />
         </section>
-        <section className="rounded border bg-white p-4 lg:col-span-3">
-          <h2 className="mb-2 font-medium">Flags</h2>
+        <section className="rounded-lg border bg-white p-4 lg:col-span-3">
+          <h2 className="font-heading mb-2 font-medium">Flags</h2>
           <FlagList flags={f.flags} />
         </section>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <section className="rounded border bg-white p-4">
-          <h2 className="mb-3 font-medium">Timeline</h2>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <section className="rounded-lg border bg-white p-4">
+          <h2 className="font-heading mb-3 font-medium">Timeline</h2>
           <Timeline entries={f.timeline} />
         </section>
         <section className="space-y-4 lg:col-span-2">
-          <div className="rounded border bg-white p-4">
-            <h2 className="mb-2 font-medium">Linked pull requests (verified)</h2>
+          <div className="rounded-lg border bg-white p-4">
+            <h2 className="font-heading mb-2 font-medium">Linked pull requests (verified)</h2>
+            <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="text-left text-xs uppercase text-slate-500">
                 <tr><th className="py-1">PR</th><th>State</th><th>Opened</th><th>Merged</th><th>Review rounds</th><th>Code Freeze</th></tr>
@@ -71,7 +79,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
                 {f.pull_requests.map((p) => (
                   <tr key={p.key} className="align-top">
                     <td className="py-1 pr-2">
-                      <a className="text-indigo-700 hover:underline" href={p.url}>#{p.key.split("#")[1]}</a>
+                      <a className="text-action hover:underline" href={p.url}>#{p.key.split("#")[1]}</a>
                       {p.is_main ? <span className="ml-1 rounded bg-indigo-100 px-1 text-[10px] text-indigo-800">main</span> : null}
                       <div className="text-xs text-slate-500">{p.title}</div>
                     </td>
@@ -84,21 +92,22 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
                 ))}
               </tbody>
             </table>
+            </div>
             {f.suggested_pull_requests.length ? (
               <p className="mt-2 text-xs text-slate-500">
                 Suggested, not counted until confirmed: {f.suggested_pull_requests.map((k) => `#${k.split("#")[1]}`).join(", ")}
               </p>
             ) : null}
           </div>
-          <div className="rounded border bg-white p-4">
-            <h2 className="mb-2 font-medium">Critical path (unmerged)</h2>
+          <div className="rounded-lg border bg-white p-4">
+            <h2 className="font-heading mb-2 font-medium">Critical path (unmerged)</h2>
             {f.critical_path.length ? (
               <p className="text-sm">{f.critical_path.map((k) => `#${k.split("#")[1]}`).join(" → ")}</p>
             ) : (
               <p className="text-sm text-slate-500">Nothing left unmerged.</p>
             )}
           </div>
-          <details className="rounded border bg-white p-4 text-xs">
+          <details className="rounded-lg border bg-white p-4 text-xs">
             <summary className="cursor-pointer font-medium">Measured inputs behind the odds</summary>
             <pre className="mt-2 overflow-x-auto whitespace-pre-wrap">{JSON.stringify(f.assumptions, null, 2)}</pre>
           </details>

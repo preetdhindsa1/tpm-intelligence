@@ -345,7 +345,7 @@ function FeatureDetail({
         <p className="text-xs text-slate-500">
           {OUTCOME_META[f.outcome].label} · {f.sigs.map(shortSig).join(", ") || "no team label"}
         </p>
-        <Link href={releasePath(project, release, `/features/${f.number}`)} className="text-xs font-medium text-indigo-700 hover:underline">
+        <Link href={releasePath(project, release, `/features/${f.number}`)} className="text-xs font-medium text-action hover:underline">
           Open feature page →
         </Link>
       </div>
@@ -386,7 +386,7 @@ function FeatureDetail({
         {main && (
           <p className="mt-1 text-xs">
             Main PR:{" "}
-            <a href={main.url} target="_blank" rel="noopener" className="text-indigo-700 hover:underline">
+            <a href={main.url} target="_blank" rel="noopener" className="text-action hover:underline">
               #{main.number}
             </a>{" "}
             <State s={main.state} /> {main.freeze_status === "merged_after_freeze" && <span className="text-[#b02a2a]">merged after freeze</span>}
@@ -396,7 +396,7 @@ function FeatureDetail({
           <ul className="mt-1 space-y-0.5 text-xs">
             {open.slice(0, 8).map((p) => (
               <li key={p.key} className="truncate">
-                <a href={p.url} target="_blank" rel="noopener" className="text-indigo-700 hover:underline">
+                <a href={p.url} target="_blank" rel="noopener" className="text-action hover:underline">
                   #{p.number}
                 </a>{" "}
                 <State s="open" /> <span className="text-slate-600">{p.title}</span>

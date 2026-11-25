@@ -31,7 +31,7 @@ export function ApproverNote({ me, action }: { me: Me | null; action: string }) 
         <>Signed in as {me.login}, who is not an approver, so you can read but not {action}.</>
       ) : (
         <>
-          <Link href="/api/auth/signin" prefetch={false} className="font-medium text-indigo-700 hover:underline">
+          <Link href="/api/auth/signin" prefetch={false} className="font-medium text-action hover:underline">
             Sign in with GitHub
           </Link>{" "}
           as an approver to {action}. Reading is open to everyone.

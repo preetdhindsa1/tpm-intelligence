@@ -39,7 +39,7 @@ export function RiskNotePanel({ release, number }: { release: string; number: nu
       {note && note.status === "sign_in_required" ? (
         <p className="text-sm text-slate-600">
           No explanation written yet.{" "}
-          <Link href="/api/auth/signin" prefetch={false} className="font-medium text-indigo-700 hover:underline">
+          <Link href="/api/auth/signin" prefetch={false} className="font-medium text-action hover:underline">
             Sign in as an approver
           </Link>{" "}
           to generate one (it uses paid AI).

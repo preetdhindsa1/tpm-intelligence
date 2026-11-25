@@ -69,7 +69,7 @@ export function ExecUpdatePanel({ release }: { release: string }) {
         <button
           onClick={draft}
           disabled={busy !== null || !canAct}
-          className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+          className="rounded bg-action px-3 py-1.5 text-sm font-medium text-white hover:bg-action/90 disabled:opacity-50"
         >
           Draft update
         </button>

@@ -18,7 +18,7 @@ export async function AuthStatus() {
       <span>
         Signed in as <strong className="font-medium text-slate-800">{session.login}</strong>
       </span>
-      <Link href="/api/auth/signout" prefetch={false} className="text-indigo-700 hover:underline">
+      <Link href="/api/auth/signout" prefetch={false} className="text-action hover:underline">
         Sign out
       </Link>
     </span>

@@ -9,7 +9,7 @@ const MARKER: Record<string, string> = {
   untracked: "bg-rose-400",
   added_to_release: "bg-emerald-600",
   tracked: "bg-emerald-400",
-  pr_merged: "bg-indigo-600",
+  pr_merged: "bg-action",
   pr_opened: "bg-indigo-300",
   pr_closed: "bg-slate-300",
 };
@@ -27,7 +27,7 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
             <div className="text-sm">
               {timelineLabel(e.kind)}
               {e.ref ? (
-                <a className="ml-1 text-indigo-700 underline" href={`https://github.com/${e.ref.replace("#", "/pull/")}`}>
+                <a className="ml-1 text-action underline" href={`https://github.com/${e.ref.replace("#", "/pull/")}`}>
                   {e.ref.split("/").pop()}
                 </a>
               ) : null}

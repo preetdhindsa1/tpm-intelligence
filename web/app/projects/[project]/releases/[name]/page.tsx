@@ -15,6 +15,7 @@ import { briefToShow } from "@/lib/dashboard";
 import { recordedLabel } from "@/lib/delay";
 import { DecideCard } from "@/components/cockpit/DecideCard";
 import { ErrorState } from "@/components/states/States";
+import { errorDetail } from "@/lib/errors";
 import { LifecycleBar } from "@/components/cockpit/LifecycleBar";
 import { TimeMachine, type MachineStop } from "@/components/cockpit/TimeMachine";
 import { stageOf } from "@/components/shell/model";
@@ -31,11 +32,11 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
   try {
     loaded = await loadCockpit(name);
   } catch (e) {
-    const detail = e instanceof Error ? e.message : "The release API failed";
+    const detail = errorDetail(e, "The release API failed");
     const display = release.display_name || release.project;
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold">
+        <h1 className="font-heading text-2xl font-semibold">
           Live Cockpit · {display} {name}
         </h1>
         <ErrorState title="Live Cockpit could not be loaded" detail={detail} />
@@ -54,13 +55,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="font-heading text-2xl font-semibold">
             Live Cockpit · {r.display_name || r.project} {r.name}
           </h1>
-          <p className="text-sm text-slate-600">
-            {stage} · Code Freeze {r.code_freeze_at ? formatUtc(r.code_freeze_at) : "unknown"} · release{" "}
-            {r.release_at ? formatUtc(r.release_at) : "unknown"} · data as of {formatUtc(r.as_of)}
-          </p>
         </div>
         <LiveRefresh release={name} />
       </div>
@@ -70,7 +67,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
 
       <StatTiles summary={summary} />
 
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]">
         <Panel title="Feature dependencies" subtitle="Features tied by shared PRs or a stated &quot;depends on&quot;">
           <div className="h-[480px]">
             <DependencySummary project={project} release={name} data={deps} />
@@ -176,7 +173,7 @@ function FeatureTable({ title, rows, project, release }: { title: string; rows: 
             {rows.map((f) => (
               <tr key={f.key} className="align-top">
                 <td className="px-3 py-2">
-                  <Link className="font-medium text-indigo-700 hover:underline" href={releasePath(project, release, `/features/${f.number}`)}>
+                  <Link className="font-medium text-action hover:underline" href={releasePath(project, release, `/features/${f.number}`)}>
                     {featureLabel(f)}
                   </Link>{" "}
                   {f.title}

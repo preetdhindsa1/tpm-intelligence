@@ -3,6 +3,8 @@
 // numbers are never added up across projects (their scopes and definitions differ).
 import Link from "next/link";
 import { Suspense } from "react";
+import { EmptyState, ErrorState } from "@/components/states/States";
+import { errorDetail } from "@/lib/errors";
 import { api, type Release } from "@/lib/api";
 import { formatUtc } from "@/lib/format";
 import { currentRelease, groupByProject, nextMilestone, releasePath } from "@/lib/routes";
@@ -12,25 +14,31 @@ export const dynamic = "force-dynamic";
 const DAY = 86_400_000;
 
 export default async function Home() {
-  const releases = await api.releases();
+  let releases: Release[];
+  try {
+    releases = await api.releases();
+  } catch (e) {
+    return <ErrorState title="Releases could not be loaded" detail={errorDetail(e, "GET /releases failed")} />;
+  }
   const groups = groupByProject(releases);
   const asOf = releases[0] ? new Date(releases[0].as_of) : new Date();
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Release health</h1>
+        <Link href="/portfolio" className="inline-flex min-h-11 items-center text-sm text-action hover:underline">Portfolio</Link>
+        <h1 className="font-heading text-2xl font-semibold">All releases</h1>
         <p className="text-sm text-slate-600">
           Every connected project and its releases. Data as of {formatUtc(asOf.toISOString())}. Projects are added by a team
           connector file; only projects with collected data appear here.
         </p>
       </div>
-      {groups.length === 0 && <p className="text-sm text-slate-500">No release data collected yet.</p>}
+      {groups.length === 0 && <EmptyState title="No releases yet" body="No release data has been collected yet." />}
       {groups.map((g) => {
         const cur = currentRelease(g.releases, asOf);
         return (
           <section key={g.slug} className="space-y-3">
-            <h2 className="text-lg font-semibold text-slate-800">{g.displayName}</h2>
+            <h2 className="font-heading text-lg font-semibold text-slate-800">{g.displayName}</h2>
             {cur && <CurrentCard release={cur} asOf={asOf} />}
             <ReleaseTable releases={g.releases} current={cur?.name} asOf={asOf} />
           </section>
@@ -61,7 +69,7 @@ function CurrentCard({ release: r, asOf }: { release: Release; asOf: Date }) {
       <Suspense fallback={<p className="mt-3 text-sm text-slate-500">Loading release facts…</p>}>
         <CardStats release={r} />
       </Suspense>
-      <p className="mt-3 text-sm font-medium text-indigo-700">Open release dashboard →</p>
+      <p className="mt-3 text-sm font-medium text-action">Open Live Cockpit →</p>
     </Link>
   );
 }
@@ -105,7 +113,7 @@ function ReleaseTable({ releases, current, asOf }: { releases: Release[]; curren
           {[...releases].reverse().map((r) => (
             <tr key={r.key}>
               <td className="px-3 py-2">
-                <Link href={releasePath(r.project, r.name)} className="font-medium text-indigo-700 hover:underline">
+                <Link href={releasePath(r.project, r.name)} className="font-medium text-action hover:underline">
                   {r.name}
                 </Link>
               </td>
