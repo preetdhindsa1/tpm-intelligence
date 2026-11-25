@@ -46,7 +46,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
 
       <RiskNotePanel release={name} number={f.number} />
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <section className="rounded-lg border bg-white p-4">
           <h2 className="font-heading mb-2 font-medium">Odds of landing by Code Freeze</h2>
           <OddsCell odds={f.odds} />
@@ -62,7 +62,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
         </section>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <section className="rounded-lg border bg-white p-4">
           <h2 className="font-heading mb-3 font-medium">Timeline</h2>
           <Timeline entries={f.timeline} />
@@ -70,6 +70,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
         <section className="space-y-4 lg:col-span-2">
           <div className="rounded-lg border bg-white p-4">
             <h2 className="font-heading mb-2 font-medium">Linked pull requests (verified)</h2>
+            <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="text-left text-xs uppercase text-slate-500">
                 <tr><th className="py-1">PR</th><th>State</th><th>Opened</th><th>Merged</th><th>Review rounds</th><th>Code Freeze</th></tr>
@@ -91,6 +92,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
                 ))}
               </tbody>
             </table>
+            </div>
             {f.suggested_pull_requests.length ? (
               <p className="mt-2 text-xs text-slate-500">
                 Suggested, not counted until confirmed: {f.suggested_pull_requests.map((k) => `#${k.split("#")[1]}`).join(", ")}

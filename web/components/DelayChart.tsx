@@ -56,7 +56,7 @@ export function DelayChart({ m, recorded }: { m: MergeDates; recorded?: string }
           Read the band as a rough guide.
         </p>
       )}
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={rows} margin={{ top: 22, right: 24, bottom: 4, left: 0 }}>

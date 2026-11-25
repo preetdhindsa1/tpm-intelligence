@@ -95,11 +95,12 @@ export default async function DependenciesPage({
         </div>
       </section>
 
-      <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <section className="rounded-lg border bg-white p-4 shadow-sm">
           <h2 className="font-heading font-semibold text-slate-800">Open PRs waiting on an unmerged PR</h2>
           <p className="mb-3 text-xs text-slate-500">The PR text says it depends on another PR that has not merged.</p>
           {data.waiting.length ? (
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-left text-xs uppercase text-slate-500">
                 <tr>
@@ -142,6 +143,7 @@ export default async function DependenciesPage({
                 ))}
               </tbody>
             </table>
+            </div>
           ) : (
             <p className="text-sm text-slate-500">None right now.</p>
           )}
@@ -154,7 +156,7 @@ export default async function DependenciesPage({
           </p>
           <ul className="space-y-1.5 text-sm">
             {data.sig_pairs.slice(0, 10).map((p) => (
-              <li key={p.a + p.b} className="grid grid-cols-[220px_1fr_28px] items-center gap-2">
+              <li key={p.a + p.b} className="grid grid-cols-[minmax(0,180px)_1fr_28px] items-center gap-2 sm:grid-cols-[220px_1fr_28px]">
                 <span className="truncate text-slate-700">
                   {shortSig(p.a)} + {shortSig(p.b)}
                 </span>

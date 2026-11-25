@@ -70,7 +70,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
 
       <StatTiles summary={summary} />
 
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]">
         <Panel title="Feature dependencies" subtitle="Features tied by shared PRs or a stated &quot;depends on&quot;">
           <div className="h-[480px]">
             <DependencySummary project={project} release={name} data={deps} />

@@ -89,7 +89,7 @@ function Assumptions({ info }: { info: SimulatorInfo }) {
         </li>
         <li>A PR&apos;s pool is its first sig/* label in sorted order. Reviewers are counted per pool, never per person.</li>
       </ul>
-      <table className="mt-3 w-full text-left text-xs">
+      <div className="mt-3 overflow-x-auto"><table className="w-full text-left text-xs">
         <thead className="text-slate-500">
           <tr>
             <th className="py-1">Pool</th>
@@ -117,7 +117,7 @@ function Assumptions({ info }: { info: SimulatorInfo }) {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table></div>
     </section>
   );
 }
@@ -254,7 +254,7 @@ function Results({ sim, onlyChanged }: { sim: Simulation; onlyChanged: boolean }
   const rows = [...sim.baseline.pools].sort(order).filter((p) => !onlyChanged || touched.has(p.pool) || sim.scenario.scenario.arrival_multiplier !== 1);
   return (
     <div className="overflow-x-auto rounded-lg border bg-white">
-      <table className="w-full text-left text-sm [&_td]:px-3 [&_th]:px-3">
+      <div className="overflow-x-auto"><table className="w-full text-left text-sm [&_td]:px-3 [&_th]:px-3">
         <thead className="bg-slate-50 text-xs text-slate-500">
           <tr>
             <th className="py-2">Pool</th>
@@ -274,7 +274,7 @@ function Results({ sim, onlyChanged }: { sim: Simulation; onlyChanged: boolean }
             <ResultRow key={b.pool} base={b} scen={sim.scenario.pools.find((s) => s.pool === b.pool)!} />
           ))}
         </tbody>
-      </table>
+      </table></div>
       <p className="border-t px-3 py-2 text-xs text-slate-500">
         {sim.note} Medians with 10th–90th percentile over {sim.replications} runs (seed {sim.seed}); &quot;~&quot; means the ranges
         overlap. Computed in {sim.seconds.toFixed(2)} s.
@@ -305,7 +305,7 @@ function Compare({ a, b }: { a: SavedScenario; b: SavedScenario }) {
           <span className="ml-2 text-xs font-normal text-amber-700">(different calibrations: not directly comparable)</span>
         )}
       </p>
-      <table className="w-full text-left text-sm">
+      <div className="overflow-x-auto"><table className="w-full text-left text-sm">
         <thead className="text-xs text-slate-500">
           <tr>
             <th className="py-2">Pool</th>
@@ -326,7 +326,7 @@ function Compare({ a, b }: { a: SavedScenario; b: SavedScenario }) {
             ),
           )}
         </tbody>
-      </table>
+      </table></div>
     </div>
   );
 }
