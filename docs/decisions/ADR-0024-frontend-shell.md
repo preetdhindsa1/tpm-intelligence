@@ -21,8 +21,8 @@ A sign-in button on every screen (phishing flag). Hard-coding Kubernetes v1.38 a
 
 ## Trade-offs and consequences
 
-Launch is seven days, matching ADR-0025, because the API stores a release timestamp and not a separate launch window. The PDLC link moves to `/pdlc` when that page ships. Portfolio and Connect stay in the menu; their pages are the following issues.
+Launch is seven days, matching ADR-0025, because the API stores a release timestamp and not a separate launch window. The PDLC link moves to `/pdlc` when that page ships. Portfolio and Connect stay in the menu; their pages are the following issues. The time machine is only on Kubernetes v1.38, because that is the release #6395 belongs to. Other releases do not get a stand-in story.
 
 ## AI vs rules
 
-No AI. Stage, links, and the last program are deterministic.
+No AI. Stage, links, and the last program are deterministic. The Live Cockpit time machine replays the #6395 timeline the API returns.
