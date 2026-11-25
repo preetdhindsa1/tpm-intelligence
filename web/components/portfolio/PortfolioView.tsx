@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { formatUtc } from "@/lib/format";
 import {
+  approvalNotes,
   decisionHref,
+  missingRows,
+  portfolioSummary,
   severityClass,
   stageLabel,
   statusLabel,
@@ -16,28 +19,19 @@ export function PortfolioView({ data }: { data: Portfolio }) {
       <header>
         <h1 className="text-2xl font-semibold">Here are the live programs.</h1>
         <p className="mt-1 text-sm text-slate-600">
-          {data.totals.programs} programs · data as of {formatUtc(data.as_of)}
+          {portfolioSummary(data.totals)} · data as of {formatUtc(data.as_of)}
         </p>
       </header>
-      <ProgramTable programs={data.programs} />
+      <ProgramTable programs={data.programs} skipped={data.skipped} />
       <Waiting data={data} />
       <Across items={data.across_programs} />
       <ComingNext items={data.coming_next} />
-      {data.skipped.length > 0 && (
-        <section>
-          <h2 className="text-lg font-semibold">Not shown</h2>
-          <ul className="mt-2 space-y-1 text-sm text-slate-600">
-            {data.skipped.map((s) => (
-              <li key={`${s.team}-${s.reason}`}>{s.team}: {s.reason}</li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <CouldNotRead skipped={missingRows(data.skipped)} />
     </div>
   );
 }
 
-function ProgramTable({ programs }: { programs: PortfolioProgram[] }) {
+function ProgramTable({ programs, skipped }: { programs: PortfolioProgram[]; skipped: Portfolio["skipped"] }) {
   if (programs.length === 0) return <p className="text-sm text-slate-600">No programs yet.</p>;
   return (
     <div className="overflow-x-auto rounded-lg border bg-white">
@@ -61,6 +55,9 @@ function ProgramTable({ programs }: { programs: PortfolioProgram[] }) {
                     {p.display_name}
                   </Link>
                   <div className="text-xs text-slate-500">{p.release}</div>
+                  {approvalNotes(p.project, skipped).map((note) => (
+                    <p key={note} className="mt-1 text-xs text-warning">{note}</p>
+                  ))}
                 </td>
                 <td className="px-3 py-3">
                   <StageBar stages={p.stage.stages} />
@@ -103,6 +100,20 @@ function StageBar({ stages }: { stages: { name: string; status: string }[] }) {
         <span key={s.name} className={`h-2 flex-1 rounded-sm ${s.status === "current" ? "bg-action" : s.status === "done" ? "bg-action/40" : "bg-slate-200"}`} />
       ))}
     </div>
+  );
+}
+
+function CouldNotRead({ skipped }: { skipped: Portfolio["skipped"] }) {
+  if (skipped.length === 0) return null;
+  return (
+    <section>
+      <h2 className="text-lg font-semibold">Could not read</h2>
+      <ul className="mt-2 space-y-1 text-sm text-slate-600">
+        {skipped.map((s) => (
+          <li key={`${s.team}-${s.reason}`}>{s.team}: {s.reason}</li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
