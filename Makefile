@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll jira-sync notes-sync migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links sim-validate sim-calibrate snapshot score-snapshots
+.PHONY: help install lint format typecheck pytest test test-integration web-test evals backfill poll jira-sync notes-sync slack-sync migrate up down logs tf-validate tf-plan langfuse-up langfuse-down ai-smoke evals-live suggest-links sim-validate sim-calibrate snapshot score-snapshots
 
 UV ?= uv
 RELEASE ?=
@@ -43,6 +43,9 @@ backfill: ## Load release data, e.g. make backfill TEAM=kubernetes RELEASE=v1.38
 poll: ## Incremental poll, e.g. make poll TEAM=kubernetes RELEASE=v1.38
 	@test -n "$(RELEASE)" || (echo "usage: make poll TEAM=kubernetes RELEASE=v1.38" && exit 2)
 	docker compose run --rm poller --team $(TEAM) --release $(RELEASE)
+
+slack-sync: ## Slack channels a team lists (needs SLACK_BOT_TOKEN), e.g. make slack-sync TEAM=tpm-intelligence
+	$(UV) run python -m collectors.slack --team $(TEAM)
 
 notes-sync: ## Public meeting notes for a team (ADR-0030), e.g. make notes-sync TEAM=kubernetes
 	$(UV) run python -m collectors.notes --team $(or $(TEAM),kubernetes)
