@@ -225,8 +225,8 @@ UI names (UX v1, locked in docs/ux/ux-v1-locked.md): Portfolio Â· Live Cockpit Â
 | Decision Studio (Shadow-Org Simulator) | What-ifs on review capacity and staffing | Built, not validated |
 | Stakeholder updates | Risk notes and VP update, fact-checked, TPM-approved | Built |
 | Link review | AI link suggestions confirmed by a person | Built |
-| AI-native PDLC | How the pod (people, AI agents, bots) builds, checks and ships; AI-era delivery signals (section 6) | Built for this repo (lab); pod facts next |
-| Portfolio | All programs at once: stage, bottleneck, next decision, waiting on you | Next (UX v1) |
+| AI-native PDLC | How the pod (people, AI agents, bots) builds, checks and ships; AI-era delivery signals (section 6) | Built for this repo: pod facts on `GET /lab` and the `/pdlc` page (Wave 1); AI-era signals across teams next (Wave 3) |
+| Portfolio | All programs at once: stage, bottleneck, next decision, waiting on you | Built (Wave 1): `GET /portfolio`, ADR-0025 |
 | RAID tracker | Risks, actions, issues, decisions from meetings and tickets | Planned |
 | Release readiness | Go/no-go from real signals and configurable criteria | Planned |
 | Retro insights | What slipped, why, and patterns across releases | Planned |

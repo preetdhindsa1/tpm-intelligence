@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from math import ceil
 from statistics import median
-from typing import Literal
+from typing import Any, Literal
 
 from engine.projection import PullRequest, World
 from engine.review_rounds import ReviewRound, review_rounds
@@ -126,6 +126,7 @@ class LabReport:
     cap: CapReplay
     first_pass: FirstPass
     size: SizeCap
+    pod: dict[str, Any] | None = None  # engine.pod facts; teams with agent lanes only
 
 
 def bucket_of(
@@ -224,6 +225,7 @@ def lab_report(
     waits = _first_review_hours(window, rounds)
     waiting = sum(1 for pr in window if not rounds[pr.key])
     round_counts = tuple(len(rounds[pr.key]) for pr in window)
+    found = collisions(window)
     merge_hours = [
         (pr.merged_at - pr.created_at).total_seconds() / 3600
         for pr in merged
@@ -248,11 +250,24 @@ def lab_report(
         review_rounds_median=float(median(round_counts)) if round_counts else None,
         rework=sum(1 for pr in window if _rework(pr, rounds[pr.key])),
         ci_failures=sum(1 for pr in window if any(c.conclusion == "failure" for c in pr.checks)),
-        collisions=collisions(window),
+        collisions=found,
         cap=cap_open_agent_prs(window, lanes, cap_n, n_merged=len(merged)),
         first_pass=ai_first_pass(waits, still_waiting=waiting, n_merged=len(merged)),
         size=smaller_pr_cap(window, max_lines, n_merged=len(merged)),
+        pod=_pod(window, lanes, rules, len(found), world.as_of),
     )
+
+
+def _pod(
+    prs: list[PullRequest],
+    lanes: dict[str, str],
+    rules: tuple[LaneSpec, ...] | list[LaneSpec],
+    collisions_n: int,
+    as_of: datetime,
+) -> dict[str, Any] | None:
+    from engine.pod import pod_facts  # engine.pod imports this module
+
+    return pod_facts(prs, lanes, rules, collisions_n, as_of) if rules else None
 
 
 def cap_open_agent_prs(

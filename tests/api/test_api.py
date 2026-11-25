@@ -770,6 +770,7 @@ def test_kubernetes_lab_has_no_agent_lanes(after_readd: TestClient) -> None:
     body = after_readd.get("/lab?project=kubernetes&release=v1.38")
     assert body.status_code == 200
     assert body.json()["lanes_configured"] is False
+    assert body.json()["pod"] is None  # pod facts only for teams with agent lanes
     assert after_readd.get("/releases").json()[0]["has_lab"] is False
 
 
@@ -853,6 +854,14 @@ def test_lab_reports_a_shared_file_collision() -> None:
     assert body["collisions"][0]["kind"] == "shared_files"
     assert body["collisions"][0]["paths"] == ["engine/lab.py"]
     assert body["cap"]["scenario_max_open"] is None
+    build = next(s for s in body["pod"]["flow"] if s["stage"] == "build")
+    assert build["value"]["collisions"] == 1
+    assert [m["lane"] for m in body["pod"]["members"]] == [
+        "human",
+        "claude",
+        "cursor",
+        "dependabot",
+    ]
     listed = client.get("/releases").json()
     phase = next(r for r in listed if r["name"] == "Phase 3")
     assert phase["has_lab"] is True

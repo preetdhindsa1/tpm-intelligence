@@ -2,13 +2,30 @@
 
 _Formerly TPM Intelligence (renamed 2026-11-23, ADR-0021)._
 
-Predicts which features in a large multi-team software release will slip, explains why, and
-drafts the executive update for a human to approve.
+**AI-native program management · every fact verified.** A program management platform that a
+company plugs into its own tools. It runs the routine parts of program management continuously
+(tracking, bottlenecks, risks, forecasts, stakeholder updates) so TPMs spend their time on
+decisions. Now that agents write code at machine speed, it shows where delivery is really
+stuck: review capacity, review depth and rework.
 
-- **The plan** comes from planning tickets (Kubernetes enhancement issues; later, Jira).
-- **The truth** comes from the code (PRs, reviews, CI, merges).
-- The platform links them, computes facts and odds with deterministic code and statistics,
-  and (in later phases) uses AI only to explain, with every AI claim checked against the data first.
+- **The plan** comes from planning tools (Kubernetes enhancement issues on GitHub, Apache Kafka on Jira).
+- **The truth** comes from the work (PRs, reviews, CI, merges).
+- The platform links them, computes facts and odds with deterministic code and statistics, and
+  uses AI only to explain, with every AI claim checked against the data first. A person approves
+  anything that leaves the platform.
+
+### The screens (UX v1, locked 2026-11-24: `docs/ux/ux-v1-locked.md`)
+
+| Screen | What it shows | Data | Status (2026-11-25) |
+|---|---|---|---|
+| Front page | What it is, three real stories, the trust scorecard | Measured results below | Landing in this wave (#125) |
+| Portfolio | Every live program: stage, scope, biggest bottleneck, next decision, what waits on you | `GET /portfolio` (ADR-0025) | Live |
+| Live Cockpit | One program live: lifecycle, stat tiles, #6395 time machine, Code Freeze chart, verified executive brief | Release endpoints | Live |
+| Decision Studio | Reviewer what-ifs, powered by the Shadow-Org Simulator, labeled "not validated" | `GET /releases/{name}/simulator` (ADR-0012) | Landing in this wave (#116) |
+| AI-native PDLC | How this repository's pod (1 human, 2 AI agents, 1 bot) builds, checks and ships, checked against its own PRs | `GET /lab` pod facts (ADR-0023) | Landing in this wave (#118); today's page is `/lab` |
+| Connect your tools | How a team plugs in its planning and code tools | Connector configs | Landing in this wave (#126) |
+
+JSON contracts for the new screens: [`docs/api/ux-v1-contract.md`](docs/api/ux-v1-contract.md).
 
 > **Status: phase 3, live in Google Cloud.** Live demo:
 > https://program-intelligence-platform-109199755245.us-central1.run.app (deployed 2026-11-23, ADR-0017; URL renamed
@@ -40,13 +57,15 @@ Copy `connectors/teams/_template.yaml`, point at planning + code repos + a relea
 ## Architecture
 
 ```
-Sources     Kubernetes GitHub (polled)
+Sources     Kubernetes GitHub (polled, 5 min) · Apache Kafka Jira (hourly) + GitHub (polled)
+            · this repository (GitHub webhooks + poll)
               │
-Collect     github_poller ──► normalized events
+Collect     github_poller · jira collector · webhook receiver ──► normalized events
               │
 Queue       Redis Streams (local) / Pub/Sub (cloud)  — trace context in message attributes
               │
 Facts       linker → dependency graph + critical path → rule flags → Monte Carlo forecast
+            → Portfolio rules (ADR-0025) · pod facts (ADR-0023) · Shadow-Org Simulator (ADR-0012)
               │
 Store       Postgres (source of truth) + Redis (cache, live push)
               │
@@ -142,7 +161,10 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Link suggester: shortlist recall (rule-linked PRs with keys hidden, no AI) | Right feature in the 12-item shortlist **88.1%** (v1.37, 1,040 PRs) and **86.8%** (v1.38, 949 PRs). Measured 2026-11-22; ADR-0011 |
 | Link suggester live eval (60 hidden-key cases, Haiku 5.5, `link_suggester.v1`) | **Precision 84.8%**, recall 70%, false links on negatives 20%, 5.7% dropped by checks, $0.025 per run. Measured 2026-11-22; small sample |
 | Link suggester on real v1.38 unlinked PRs | 1,797 unlinked → **104 suggestions** waiting for review, 1,636 "none", 11 dropped, 46 with no shortlist; **$0.54** in total. Reviewed precision: TBD (not yet reviewed). None of these count until a person confirms them |
-| Simulator validation (replay with real arrivals and staffing, fitted only on earlier releases, ±20% on medians) | **Not validated.** With `/lgtm` and `/approve` comments counted as review activity, both releases fail on median review wait (v1.37 +205%, v1.38 +350%) and pass on time to merge (−12%, −5%). Before comments were collected, v1.37 passed and v1.38 failed. Measured 2026-11-22; ADR-0012 |
+| Simulator validation (replay with real arrivals and staffing, fitted only on earlier releases, ±20% on medians) | **Not validated.** With `/lgtm` and `/approve` comments counted as review activity, both releases fail on median review wait (v1.37 +205%, v1.38 +350%) and pass on time to merge (−12%, −5%). Measured 2026-11-22; ADR-0012. **Cause found 2026-11-25** (ADR-0012 addendum, PR #121): GitHub GraphQL drops `[bot]` from app logins, so Prow, EasyCLA and the Copilot reviewer counted as human reviewers. From v1.37, most PRs' "first review" is a bot comment within a minute. One re-run with those accounts excluded (in memory, model unchanged): **v1.37 passes (−5.5%), v1.38 fails (−41%)**. The data fix is PR #123 and needs a backfill. |
+| Unlinked open PRs, Kubernetes v1.38 (summary tile) | **1,164 distinct** open PRs with no verified link (live API, 2026-11-25 01:02 UTC). The tile used to sum per-SIG counts (1,978 live on 2026-11-24; 1,956 vs 1,173 distinct on local data), which counted multi-SIG PRs twice. Fixed in #115 |
+| AI-native PDLC: this repository's pod against its own rules (whole history, 68 PRs, 53 merged) | Merged agent PRs cross-reviewed **6 of 38**. Merged PRs with a human review or comment before merge **11 of 52** (an agent reply without its marker counts as human). Dependabot PRs closed unmerged **12 of 13**. PRs without exactly one risk tier **48 of 55**. Median open to merge **11 min**. Kept rate (30 days): TBD (first eligible 2026-12-22). The pod rules began 2026-11-24 (PR #91), so earlier PRs break them. Measured 2026-11-25 from GitHub data; PR #117 |
+| Portfolio | Kubernetes v1.38 in Freeze (28 critical flags), Kafka 4.5.0 in Build (3 of 16 features with no linked code), this repository in Plan (review gap). Live values on 2026-11-24; `GET /portfolio` (ADR-0025) |
 | Engine: assess all 106 v1.38 features from 60,230 events | project 0.22 s + assess 0.89 s (single run, laptop, Docker; not a p95) |
 | API `/releases` (dashboard home), 162k events, 6 releases | cold cache **6.9 s**, warm 0.06 s (was several minutes cold: it forecast every release). Single runs, laptop, Docker; measured 2026-11-21, not a p95 |
 | API v1.38 feature table, cold cache, 3 concurrent requests | **~21 s** each, sharing **one** computation (was one computation per request). Single run, measured 2026-11-21 |
@@ -240,10 +262,16 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   its events in seconds (p95 9.7 s, small sample). Kubernetes and Kafka stay polled every
   5 minutes (the Kafka plan hourly), since webhooks need admin rights on the source
   repository.
-- **Review metrics for this repository start when pull requests exist under the ruleset**
-  (P3-M7, ADR-0023). Until then there is no measured review queue. Absence is not a measured
-  zero. The lab is a case study of tool lanes on this repository, not a ranking of people,
-  and a what-if comparison waits until 20 pull requests have merged.
+- **Who reviewed, in this repository, comes from a marker line, not the login** (ADR-0023
+  addenda). Every agent and the owner post from the owner's GitHub account, so agents start
+  each review with `Cross-review · <lane>`. An agent comment without the marker counts as the
+  owner's review. First-pass approval cannot be measured: GitHub does not let a PR's author
+  approve it. The lab is a case study of tool lanes on this repository, not a ranking of
+  people, and a what-if comparison waits until 20 pull requests have merged.
+- **Bot accounts read through GraphQL** were stored without `[bot]` until PR #123, so Prow,
+  EasyCLA and the Copilot reviewer counted as human review activity in the polled data
+  (ADR-0012 addendum). Review-round numbers for Kubernetes and Kafka are affected until the
+  fix is merged and the data is backfilled.
 - **This project has no history yet** (ADR-0020). Its `Phase 3` release begins on
   2026-11-30 and has no earlier release to learn from, so its forecasts say "not enough
   history" instead of a number (#9).
