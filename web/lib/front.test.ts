@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEMO_CHAPTERS, STAGES, daysBetween, fraction, freezeReplay, shortDate, trustTiles } from "./front";
+import { DEMO_CHAPTERS, PIPELINE, STAGES, TRUST_RULES, daysBetween, fraction, freezeReplay, shortDate, teamCards, trustProof, trustTiles, verdictSummary } from "./front";
 import { MEASURED } from "./measured";
 import { toolsLabel } from "./portfolio";
 
@@ -41,5 +41,49 @@ describe("front page facts", () => {
   it("has five stages and five chapters", () => {
     expect(STAGES.map((s) => s.stage)).toEqual(["Plan", "Build", "Freeze", "Launch", "Learn"]);
     expect(DEMO_CHAPTERS).toHaveLength(5);
+  });
+});
+
+describe("trust by design", () => {
+  it("backs each rule with data, never a stand-in", () => {
+    expect(TRUST_RULES.map((r) => r.title)).toEqual(["AI never computes facts", "Every AI sentence is verified", "Suggestions stay suggestions"]);
+    expect(trustProof("verified", MEASURED, [])).toBe("43 / 43 agreement with labelled claims (measured 2026-11-22).");
+    const waiting = [{ kind: "review_link_suggestions", count: 101, label: "101 AI link suggestions · v1.38" }];
+    expect(trustProof("suggestions", MEASURED, waiting)).toBe("101 v1.38 suggestions are waiting for review now; none of them count yet.");
+    expect(trustProof("suggestions", MEASURED, [])).toContain("Link suggester precision 84.8%");
+    expect(trustProof("verified", [], [])).toContain("TBD (not yet measured)");
+  });
+
+  it("counts verdicts, failures included", () => {
+    const s = verdictSummary(MEASURED);
+    expect(s).toMatch(/\d+ pass/);
+    expect(s).toMatch(/\d+ fail/);
+    const total = s.split(" · ").reduce((n, part) => n + Number(part.split(" ")[0]), 0);
+    expect(total).toBe(MEASURED.length);
+  });
+});
+
+describe("how it works and connected teams", () => {
+  it("lists seven steps, with AI only in Explain and a human in Approve", () => {
+    expect(PIPELINE.map((s) => s.title)).toEqual(["Collect", "Link", "Facts", "Forecast", "Explain", "Verify", "Approve"]);
+    expect(PIPELINE.filter((s) => s.kind === "ai").map((s) => s.title)).toEqual(["Explain"]);
+    expect(PIPELINE.filter((s) => s.kind === "human").map((s) => s.title)).toEqual(["Approve"]);
+  });
+
+  it("marks a team Live only when the portfolio serves it, using the API's name", () => {
+    const cards = teamCards(
+      [
+        { project: "kubernetes", release: "v1.38", display_name: "Kubernetes" },
+        { project: "tpm-intelligence", release: "Phase 3", display_name: "Program Intelligence Platform (Current Project)" },
+      ],
+      (p, r) => `/projects/${p}/releases/${r}`,
+    );
+    expect(cards.map((c) => [c.name, c.live])).toEqual([
+      ["Kubernetes", true],
+      ["Apache Kafka", false],
+      ["Program Intelligence Platform (Current Project)", true],
+      ["Your team", false],
+    ]);
+    expect(cards[3].href).toBe("/connect");
   });
 });

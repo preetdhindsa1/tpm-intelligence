@@ -119,3 +119,12 @@ export const MEASURED: Measured[] = [
     measured: "2026-11-23",
   },
 ];
+
+export const VERDICT_LABEL: Record<Verdict, string> = { pass: "Passes", partial: "Partly", fail: "Fails", pending: "Not measured" };
+
+export const VERDICT_TONE: Record<Verdict, string> = {
+  pass: "bg-healthy-bg text-healthy",
+  partial: "bg-warning-bg text-warning",
+  fail: "bg-critical-bg text-critical",
+  pending: "bg-slate-100 text-slate-600",
+};
