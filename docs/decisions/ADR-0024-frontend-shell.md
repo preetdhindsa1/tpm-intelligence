@@ -30,3 +30,7 @@ Launch is seven days, matching ADR-0025, because the API stores a release timest
 ## AI vs rules
 
 No AI. Stage, links, and the last program are deterministic. The Live Cockpit time machine replays feature #6395's real timeline events from the API, including both freezes and each distinct pull-request event. Identical events at the same timestamp are shown once. The future release date is not shown as an event. It does not rebuild the page's tiles as of that date. The locked spec's "8 real dates" is not a cap on that list.
+
+## Front page
+
+The headline and tagline are the locked words. Live program cards come from `GET /portfolio`. The three stories are omitted when their source is missing: the Kubernetes release summary for removals at Code Freeze, the lab report for approving reviews, and `lib/measured.ts` for Kafka linking. The recorded demo lists five chapters and a 2:00 running time, and says no recording is published.
