@@ -49,6 +49,15 @@ def parse_polls(
     return [(team or "kubernetes", release)]
 
 
+def parse_since(value: str) -> datetime:
+    """``2026-11-20`` as midnight UTC."""
+    try:
+        day = datetime.strptime(value, "%Y-%m-%d")
+    except ValueError as err:
+        raise argparse.ArgumentTypeError(f"--since expects YYYY-MM-DD, got {value!r}") from err
+    return day.replace(tzinfo=UTC)
+
+
 def main(argv: list[str] | None = None) -> int:
     """Parse args, wire dependencies, poll each requested team once."""
     parser = argparse.ArgumentParser(prog="github_poller")
@@ -61,11 +70,19 @@ def main(argv: list[str] | None = None) -> int:
         help="poll this team's release; repeat for several teams",
     )
     parser.add_argument("--backfill", action="store_true", help="ignore stored cursors")
+    parser.add_argument(
+        "--since",
+        type=parse_since,
+        help="with --backfill: re-read PRs from this UTC date (YYYY-MM-DD) to now, for history "
+        "before the release's cycle start (this repo's PRs predate Phase 3, 2026-11-25)",
+    )
     args = parser.parse_args(argv)
     try:
         polls = parse_polls(args.poll, args.team, args.release)
     except ValueError as err:
         parser.error(str(err))
+    if args.since is not None and not args.backfill:
+        parser.error("--since needs --backfill")
 
     from observability.telemetry import init_telemetry
 
@@ -81,7 +98,9 @@ def main(argv: list[str] | None = None) -> int:
         worst = 0
         for team_id, release in polls:
             try:
-                code = _poll_team(team_id, release, token=token, backfill=args.backfill)
+                code = _poll_team(
+                    team_id, release, token=token, backfill=args.backfill, since=args.since
+                )
             except Exception:
                 logger.exception("poll of team %s release %s crashed", team_id, release)
                 code = 1
@@ -91,7 +110,9 @@ def main(argv: list[str] | None = None) -> int:
         telemetry.shutdown()
 
 
-def _poll_team(team_id: str, release: str, *, token: str, backfill: bool) -> int:
+def _poll_team(
+    team_id: str, release: str, *, token: str, backfill: bool, since: datetime | None = None
+) -> int:
     """Poll one team's release once. 0 ok, 1 a stream failed, 2 configuration error."""
     from sqlalchemy.orm import sessionmaker
 
@@ -111,6 +132,8 @@ def _poll_team(team_id: str, release: str, *, token: str, backfill: bool) -> int
         if window is None:
             logger.error("release %s has no cycle start in Jira", release)
             return 2
+        if since is not None:
+            window = (since, None)
         poller = GitHubPoller(
             gh=GitHubClient.from_token(token),
             publisher=EventPublisher(create_transport()),
@@ -145,6 +168,7 @@ def _poll_team(team_id: str, release: str, *, token: str, backfill: bool) -> int
         code_repo=team.primary_code_repo,
         read_kep_specs=team.link_pack == "kep",  # only Kubernetes plans with kep.yaml
         lane_fields=bool(team.author_lanes),
+        window=(since, None) if since is not None else None,
     )
     stats = poller.run(backfill=backfill)
     return 1 if stats.failed_streams else 0

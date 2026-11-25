@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import pytest
 
 from collectors.github_poller import __main__ as entry
@@ -36,14 +38,21 @@ def test_bad_arguments_exit_with_usage_error() -> None:
     assert exc.value.code == 2
 
 
+seen_since: list[datetime | None] = []
+
+
 @pytest.fixture
 def polled(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str]]:
     """Replace the real poll with a recorder whose result depends on the team."""
     calls: list[tuple[str, str]] = []
+    seen_since.clear()
     results = {"ok": 0, "stream-failed": 1, "misconfigured": 2}
 
-    def fake_poll(team_id: str, release: str, *, token: str, backfill: bool) -> int:
+    def fake_poll(
+        team_id: str, release: str, *, token: str, backfill: bool, since: datetime | None = None
+    ) -> int:
         calls.append((team_id, release))
+        seen_since.append(since)
         if team_id == "crashes":
             raise RuntimeError("boom")
         return results[team_id]
@@ -79,3 +88,17 @@ def test_only_the_kep_link_pack_reads_kep_specs() -> None:
 
     assert load_team("kubernetes").link_pack == "kep"
     assert load_team("tpm-intelligence").link_pack != "kep"
+
+
+def test_since_reads_history_before_the_cycle_start(polled: list[tuple[str, str]]) -> None:
+    """2026-11-25: this repo's PRs predate Phase 3, so a plain backfill re-read none."""
+    assert entry.main(["--poll", "ok=r1", "--backfill", "--since", "2026-11-20"]) == 0
+    assert seen_since == [datetime(2026, 11, 20, tzinfo=UTC)]
+
+
+@pytest.mark.parametrize("argv", [["--since", "2026-11-20"], ["--backfill", "--since", "20 Nov"]])
+def test_since_needs_backfill_and_a_date(polled: list[tuple[str, str]], argv: list[str]) -> None:
+    with pytest.raises(SystemExit) as exc:
+        entry.main(["--poll", "ok=r1", *argv])
+    assert exc.value.code == 2
+    assert polled == []
