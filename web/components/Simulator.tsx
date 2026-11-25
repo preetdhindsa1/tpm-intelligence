@@ -332,9 +332,9 @@ export function Simulator({ release }: { release: string }) {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-heading text-2xl font-semibold">Test a fix before you commit people or money</h2>
+        <h2 className="font-heading text-2xl font-semibold">Simulate and decide before you commit people or money</h2>
         <p className="mt-1 max-w-3xl text-slate-600">
-          Pick a reviewer pool, pull one lever, and compare the baseline with the scenario. Inputs are measured from real review history.
+          Pick a reviewer pool and one change, and see what would happen next to what happens today. Nothing changes for real; inputs are measured from real review history.
         </p>
       </div>
       <Banner info={info} releaseKey={info.release} />

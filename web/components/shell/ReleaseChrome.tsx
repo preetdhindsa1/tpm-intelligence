@@ -64,7 +64,7 @@ export function ReleaseChrome({ groups, project, release, displayName, hasLab, s
         </div>
         {title === "Live Cockpit" && (
           <div className="flex flex-wrap gap-3">
-            <Link href={releasePath(project, release, "/simulate")} className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-800 hover:bg-slate-50">Test a fix</Link>
+            <Link href={releasePath(project, release, "/simulate")} className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-800 hover:bg-slate-50" title="See what changes if you add a reviewer, get more PRs or lose time to interruptions">Simulate and decide</Link>
             <Link href={releasePath(project, release, "/update")} className="inline-flex min-h-11 items-center rounded-lg bg-action px-4 text-sm font-semibold text-white hover:bg-action/90">Review exec update</Link>
           </div>
         )}

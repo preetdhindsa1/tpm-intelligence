@@ -59,7 +59,7 @@ export default async function FrontPage() {
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-slate-300">
               Plug in the tools your teams already use. The platform tracks the real work, finds where delivery is stuck, forecasts the
-              odds, lets leaders test a fix before they commit, and drafts the update. AI explains. It never computes a number.
+              odds, lets leaders simulate a change before they commit, and drafts the update. AI explains. It never computes a number.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href={tourHref} className="inline-flex min-h-11 items-center rounded-lg bg-action px-5 text-sm font-semibold text-white hover:bg-action/90">
