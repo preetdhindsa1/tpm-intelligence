@@ -55,7 +55,7 @@ export default async function FrontPage() {
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.14em] text-indigo-300">AI-native program management · every fact verified</p>
             <h1 className="mt-4 font-heading text-4xl font-bold leading-[1.08] tracking-tight md:text-[3.4rem]">
-              Run every program from plan to launch on facts, now that agents write the code.
+              Run every program from plan to launch on facts, not just status meetings.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-slate-300">
               Plug in the tools your teams already use. The platform tracks the real work, finds where delivery is stuck, forecasts the
@@ -80,7 +80,7 @@ export default async function FrontPage() {
       <div className="mx-auto max-w-6xl space-y-16 px-6 py-16">
         <section>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-action">The whole program, one platform</p>
-          <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">Five stages, from plan to launch and what you learn after</h2>
+          <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">From plan to launch, every stage has a module</h2>
           <p className="mt-2 text-sm text-slate-600">The same stages appear on every program in the product.</p>
           <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {STAGES.map((s) => (
