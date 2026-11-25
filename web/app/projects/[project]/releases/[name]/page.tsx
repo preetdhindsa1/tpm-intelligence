@@ -32,7 +32,15 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
     loaded = await loadCockpit(name);
   } catch (e) {
     const detail = e instanceof Error ? e.message : "The release API failed";
-    return <ErrorState title="Live Cockpit could not be loaded" detail={detail} />;
+    const display = release.display_name || release.project;
+    return (
+      <div className="space-y-4">
+        <h1 className="text-2xl font-semibold">
+          Live Cockpit · {display} {name}
+        </h1>
+        <ErrorState title="Live Cockpit could not be loaded" detail={detail} />
+      </div>
+    );
   }
   const [data, summary, deps, updates, dates, snaps] = loaded;
   const r = data.release;

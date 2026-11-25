@@ -13,6 +13,13 @@ export default async function PortfolioPage() {
   } catch (e) {
     message = e instanceof Error ? e.message : message;
   }
-  if (!data) return <ErrorState title="Portfolio could not be loaded" detail={message} />;
+  if (!data) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-2xl font-semibold">Here are the live programs.</h1>
+        <ErrorState title="Portfolio could not be loaded" detail={message} />
+      </div>
+    );
+  }
   return <PortfolioView data={data} />;
 }
