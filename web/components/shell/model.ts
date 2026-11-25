@@ -66,7 +66,7 @@ export function releaseFromPath(pathname: string): { project: string; release: s
 
 function hrefFor(section: "" | "/simulate", path: string, last: LastProgram | null): string {
   const here = releaseFromPath(path) ?? (last ? { project: last.project, release: last.release } : null);
-  if (!here) return "/releases";
+  if (!here) return "/portfolio";
   return `/projects/${encodeURIComponent(here.project)}/releases/${encodeURIComponent(here.release)}${section}`;
 }
 
@@ -75,26 +75,41 @@ export function destinations(path: string, last: LastProgram | null): Dest[] {
     { id: "portfolio", href: "/portfolio", label: "Portfolio" },
     { id: "cockpit", href: hrefFor("", path, last), label: "Live Cockpit" },
     { id: "studio", href: hrefFor("/simulate", path, last), label: "Decision Studio" },
-    { id: "pdlc", href: "/lab", label: "AI-native PDLC" },
+    { id: "pdlc", href: "/pdlc", label: "AI-native PDLC" },
     { id: "connect", href: "/connect", label: "Connect your tools" },
   ];
 }
 
 export function currentId(path: string): string | null {
   if (path.startsWith("/portfolio")) return "portfolio";
-  if (path.startsWith("/lab")) return "pdlc";
+  if (path.startsWith("/pdlc") || path.startsWith("/lab")) return "pdlc";
   if (path.startsWith("/connect")) return "connect";
   if (path.includes("/simulate")) return "studio";
   if (path.startsWith("/projects/")) return "cockpit";
   return null;
 }
 
-const SECTIONS: [string, string][] = [["", "Dashboard"], ["/dependencies", "Dependencies"], ["/simulate", "Simulations"], ["/update", "Reports"], ["/links", "Link review"]];
+/** Live Cockpit sections. Decision Studio is a top-level screen, so it is not a section. */
+export const COCKPIT_SECTIONS: { suffix: string; label: string }[] = [
+  { suffix: "", label: "Overview" },
+  { suffix: "/dependencies", label: "Dependencies" },
+  { suffix: "/update", label: "Executive update" },
+  { suffix: "/links", label: "Link review" },
+];
+
+/** The section a release path is on; feature pages belong to Overview. Null on Decision Studio. */
+export function cockpitSection(path: string): string | null {
+  const m = path.match(/^\/projects\/[^/]+\/releases\/[^/]+(\/[^/]*)?/);
+  if (!m) return null;
+  const rest = m[1] ?? "";
+  if (rest === "/simulate") return null;
+  return COCKPIT_SECTIONS.find((s) => s.suffix !== "" && s.suffix === rest)?.suffix ?? "";
+}
 
 export function commandItems(path: string, last: LastProgram | null): { href: string; label: string }[] {
   const top = destinations(path, last).map(({ href, label }) => ({ href, label }));
   const here = releaseFromPath(path);
   if (!here) return top;
   const base = `/projects/${encodeURIComponent(here.project)}/releases/${encodeURIComponent(here.release)}`;
-  return [...top, ...SECTIONS.map(([suffix, label]) => ({ href: `${base}${suffix}`, label }))];
+  return [...top, ...COCKPIT_SECTIONS.map(({ suffix, label }) => ({ href: `${base}${suffix}`, label: `Live Cockpit · ${label}` }))];
 }

@@ -1,6 +1,6 @@
+import { CockpitTabs } from "@/components/shell/CockpitTabs";
 import { ReleaseChrome } from "@/components/shell/ReleaseChrome";
 import { stageOf } from "@/components/shell/model";
-import { Sidebar } from "@/components/Sidebar";
 import { formatUtc } from "@/lib/format";
 import { releaseFromParams, releaseList } from "@/lib/release-page";
 import { groupByProject } from "@/lib/routes";
@@ -31,12 +31,8 @@ export default async function ReleaseLayout({
         releaseAt={when(release.release_at)}
         asOf={formatUtc(release.as_of)}
       />
-      <div className="flex gap-6">
-        <aside className="hidden w-44 shrink-0 md:block">
-          <Sidebar project={release.project} release={release.name} />
-        </aside>
-        <div className="min-w-0 flex-1">{children}</div>
-      </div>
+      <CockpitTabs project={release.project} release={release.name} />
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }
