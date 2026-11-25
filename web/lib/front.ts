@@ -28,7 +28,7 @@ export const DEMO_LENGTH = "2:00";
 export const DEMO_CHAPTERS = [
   { at: "0:00", title: "The problem: code is cheap, certainty isn't", target: "front" },
   { at: "0:20", title: "Live Cockpit: replay Kubernetes v1.38", target: "cockpit" },
-  { at: "0:50", title: "Decision Studio: test a fix", target: "studio" },
+  { at: "0:50", title: "Decision Studio: try a what-if", target: "studio" },
   { at: "1:15", title: "AI-native PDLC: the pod of 4", target: "pdlc" },
   { at: "1:40", title: "Trust: every number checked", target: "trust" },
 ] as const;
