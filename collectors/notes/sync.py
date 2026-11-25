@@ -11,7 +11,7 @@ from opentelemetry import trace
 
 from collectors.notes.normalize import to_events
 from collectors.notes.parse import split_meetings
-from connectors.schema import TeamConfig
+from connectors.schema import GoogleDocSource, TeamConfig
 from pipeline.events import NormalizedEvent, release_key
 
 logger = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ def collect(team: TeamConfig, fetcher: Fetcher, publisher: Publisher) -> Stats:
     """
     stats = Stats()
     now = datetime.now(UTC)
-    for source in team.conversations:
+    for source in (c for c in team.conversations if isinstance(c, GoogleDocSource)):
         with tracer.start_as_current_span("notes.collect_document") as span:
             span.set_attribute("notes.document_id", source.document_id)
             try:

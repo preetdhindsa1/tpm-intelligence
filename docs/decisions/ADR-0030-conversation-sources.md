@@ -127,3 +127,17 @@ meeting source, decided by the evidence below.
   receive one signed event. Record the limits actually returned.
 - Drive API `files.export` of the v1.38 notes with an API key, and the notes' licence.
 - The chosen meeting tool: one real transcript fetched end to end.
+
+## Addendum (2026-11-25): connectors built ahead of live checks
+
+The owner asked for the Slack, Zoom, Microsoft Teams and Google Meet connectors before the
+test accounts exist. They are built against the official documentation above and tested
+on synthetic payloads shaped like it. **None has been called against a real service.**
+Each runs only for a team that lists it under `conversations` and has its credentials
+set, so nothing runs by default. A connector counts as verified only after one real call
+end to end, recorded here with the date.
+
+- Slack (`collectors/slack`, `kind: slack_channel`, `SLACK_BOT_TOKEN`): channel history
+  and thread replies, people's messages only (no channel notices or bot posts), one
+  `chat` segment per message. It polls a window (default 14 days); the Events API webhook
+  comes later. **Not live-verified.**

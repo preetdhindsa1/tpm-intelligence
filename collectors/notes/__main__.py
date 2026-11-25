@@ -35,8 +35,8 @@ def main(argv: list[str] | None = None) -> int:
         from pipeline.queue import EventPublisher
 
         team = load_team(args.team)
-        if not team.conversations:
-            logger.error("team %s lists no conversation sources", team.id)
+        if not any(c.kind == "google_doc" for c in team.conversations):
+            logger.error("team %s lists no meeting-notes documents", team.id)
             return 2
         client = NotesClient(api_key=os.environ.get("GOOGLE_API_KEY") or None)
         try:

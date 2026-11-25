@@ -26,3 +26,13 @@ calendar:
 #     branch_prefixes: ["claude/"]
 #     trailers: ["Co-Authored-By: Claude"]
 # reviewer_pool: []
+# Optional. Conversations the team's programs read (ADR-0030). Read-only; secrets stay in
+# the environment (Secret Manager in the cloud), never here.
+# conversations:
+#   - kind: google_doc        # public meeting-notes document
+#     document_id: 1AbC...
+#     title: Release team meeting
+#     release: "1.0"
+#   - kind: slack_channel     # needs SLACK_BOT_TOKEN; add the bot to the channel
+#     channel_id: C0123456789
+#     title: "#release"

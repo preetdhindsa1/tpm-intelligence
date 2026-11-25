@@ -38,6 +38,10 @@ class Source(StrEnum):
     GITHUB = "github"
     JIRA = "jira"
     GOOGLE_DRIVE = "google_drive"  # publicly shared meeting-notes documents (ADR-0030)
+    SLACK = "slack"  # channel messages (ADR-0030)
+    ZOOM = "zoom"  # cloud-recording transcripts
+    MS_TEAMS = "ms_teams"  # Microsoft Teams meeting transcripts (Microsoft Graph)
+    GOOGLE_MEET = "google_meet"  # Google Meet transcript entries (Meet REST API)
 
 
 class SubjectKind(StrEnum):

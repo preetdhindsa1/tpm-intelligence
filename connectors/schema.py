@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -53,16 +53,52 @@ class CalendarRef(BaseModel):
     path: str
 
 
-class ConversationSource(BaseModel):
-    """A conversation the team's program reads (ADR-0030). Read-only, public sources only
-    in the demo; private sources come with their own connector and secrets."""
-
+class _Conversation(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    kind: Literal["google_doc"] = Field(description="publicly shared Google Doc of meeting notes")
-    document_id: str = Field(min_length=10)
     title: str
-    release: str | None = Field(default=None, description="release name these notes belong to")
+    release: str | None = Field(default=None, description="release name these belong to")
+
+
+class GoogleDocSource(_Conversation):
+    """A publicly shared Google Doc of meeting notes."""
+
+    kind: Literal["google_doc"] = "google_doc"
+    document_id: str = Field(min_length=10)
+
+
+class SlackChannelSource(_Conversation):
+    """A Slack channel the read-only bot is a member of (SLACK_BOT_TOKEN)."""
+
+    kind: Literal["slack_channel"]
+    channel_id: str = Field(min_length=2)
+
+
+class ZoomUserSource(_Conversation):
+    """Cloud-recording transcripts of one Zoom user's meetings (Server-to-Server OAuth)."""
+
+    kind: Literal["zoom_user"]
+    user: str = Field(min_length=2, description="Zoom user id or email")
+
+
+class TeamsOrganizerSource(_Conversation):
+    """Teams meeting transcripts organized by one user (Microsoft Graph, app permission)."""
+
+    kind: Literal["teams_organizer"]
+    organizer_id: str = Field(min_length=2, description="Microsoft Entra user object id")
+
+
+class MeetSource(_Conversation):
+    """Google Meet transcripts the authorized user can see (Meet REST API, OAuth)."""
+
+    kind: Literal["google_meet"]
+
+
+# Each kind names the connector that reads it (ADR-0030). Read-only everywhere.
+ConversationSource = Annotated[
+    GoogleDocSource | SlackChannelSource | ZoomUserSource | TeamsOrganizerSource | MeetSource,
+    Field(discriminator="kind"),
+]
 
 
 class TeamConfig(BaseModel):
