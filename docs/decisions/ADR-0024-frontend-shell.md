@@ -38,3 +38,11 @@ No AI. Stage, links, and the last program are deterministic. The Live Cockpit ti
 ## Front page
 
 The headline and tagline are the locked words. Live program cards come from `GET /portfolio`. The three stories are omitted when their source is missing: the Kubernetes release summary for removals at Code Freeze (and how many were added back, when the summary says so), and `lib/measured.ts` for Kafka linking and the fact checker. Approving-review counts stay off this page until cross-reviews are counted, because every pull request and review is posted from one account (issue #94). The recorded demo lists five chapters and a 2:00 running time, and says no recording is published.
+
+## Connect
+
+`/connect` describes the three steps and names GitHub and Jira as used in the public demo. It does not start a sign-up and it does not show a connection count. The promises are the read-only scope, human approval, and public-demo privacy rules.
+
+## Empty, loading, and error
+
+Portfolio, Live Cockpit, and Decision Studio share three states. An error shows the failure text and no stand-in numbers. A release with no simulator says so, which is an empty state rather than a failure. The front page and Connect page carry their own copy in their own changes.
