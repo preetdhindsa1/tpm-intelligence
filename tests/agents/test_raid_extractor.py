@@ -73,6 +73,8 @@ def test_masking_hides_names_handles_and_speakers_but_keeps_test_tags() -> None:
     assert "[Flaking Test] [sig-node]" in masked
     assert "kubernetes/website#59188" in masked
     assert "webinars@cncf.io" in masked  # an organisation's address, not a person's handle
+    short = mask_names("Thanks Rob and Robinson", {"Robinson Moe"})
+    assert short == f"Thanks {MASK} and {MASK}"  # short form of a listed first name
 
 
 def test_the_model_sees_only_masked_text() -> None:

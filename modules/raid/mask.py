@@ -27,6 +27,7 @@ _HANDLE = re.compile(
 _SPEAKER = re.compile(r"^(\s*[*-]?\s*)\[([^\]\n]{1,40})\]", re.M)
 _NOT_SPEAKER = re.compile(r"^(?:sig\b|feature|flaking|failing|participant$)", re.I)
 _SPLIT = re.compile(r"\s*(?:\+|/|,|\band\b|\(|\))\s*")
+_CAPITALISED = re.compile(r"\b[A-Z][a-z]{2,}\b")
 _NOT_NAMES = frozenset(
     {"APAC", "EMEA", "Americas", "Release", "Lead", "Shadow", "N/A", "NAME", "LMKTFY"}
 )
@@ -51,7 +52,14 @@ def mask_names(text: str, names: Iterable[str]) -> str:
     out = _SPEAKER.sub(
         lambda m: m.group(0) if _NOT_SPEAKER.match(m.group(2)) else m.group(1) + MASK, out
     )
-    ordered = sorted({n for n in names if len(n) > 1}, key=len, reverse=True)
+    names = {n for n in names if len(n) > 1}
+    firsts = {n.split()[0] for n in names if len(n.split()[0]) > 1}
+    names |= firsts
+    # Short forms of a listed first name ("Fred" for "Frederico"), as whole capitalised words.
+    names |= {
+        w for w in set(_CAPITALISED.findall(out)) if any(f.startswith(w) and f != w for f in firsts)
+    }
+    ordered = sorted(names, key=len, reverse=True)
     if ordered:
         alt = "|".join(map(re.escape, ordered))
         out = re.sub(rf"(?<![\w@])(?:{alt})(?![\w])", MASK, out)
