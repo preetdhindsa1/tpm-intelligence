@@ -173,7 +173,7 @@ All live programs at once. No query parameters. Example built from the live data
     {
       "kind": "classify_prs",
       "program_key": "tpm-intelligence:Phase 3",
-      "label": "2 pull requests in this repo with no lane",
+      "label": "2 pull requests with no lane · Program Intelligence Platform (this project)",
       "count": 2,
       "ref": null
     }
@@ -189,16 +189,16 @@ All live programs at once. No query parameters. Example built from the live data
     {
       "kind": "review_gap",
       "title": "Review is the new bottleneck",
-      "text": "This repo: pull requests merge in a median of 9 minutes, and 0 of 47 had an approving review.",
+      "text": "Program Intelligence Platform (this project): pull requests merge in a median of 9 minutes, and 0 of 47 had an approving review.",
       "program_key": "tpm-intelligence:Phase 3",
       "facts": {"merged": 47, "approved_merged": 0, "median_minutes_to_merge": 9}
     },
     {
       "kind": "unlinked_load",
       "title": "Unlinked work is real load",
-      "text": "1,978 open Kubernetes pull requests are not linked to any feature but still use the same reviewers.",
+      "text": "1,173 open Kubernetes pull requests are not linked to any feature but still use the same reviewers.",
       "program_key": "kubernetes:v1.38",
-      "facts": {"unlinked_open_prs": 1978}
+      "facts": {"unlinked_open_prs": 1173}
     }
   ],
   "coming_next": [
@@ -233,7 +233,7 @@ All live programs at once. No query parameters. Example built from the live data
 | `next_decision` | object \| null | ADR-0025 rule 5. Null means nothing waits on a person for this program. |
 | `next_decision.kind`, `waiting_on_you[].kind` | string | `approve_exec_update` (ref has `update_id`), `review_link_suggestions`, `classify_prs`. |
 | `waiting_on_you[]` | object | Everything a person must act on, across programs, in that kind order, then by program order. |
-| `across_programs[]` | object | ADR-0025 rule 7. `kind`: `late_code` \| `review_gap` \| `unlinked_load`. Present only when its fact is above zero. |
+| `across_programs[]` | object | ADR-0025 rule 7. `kind`: `late_code` \| `review_gap` \| `unlinked_load`. Present only when its fact is above zero. `unlinked_open_prs` counts distinct pull requests, not per-SIG load (`GET /releases/{name}/load` has that). |
 | `coming_next[]` | object | Planned modules. `status` is `planned`. They carry no numbers. |
 | `skipped[]` | `{team, reason}` | What could not be read. Reasons: `no release yet` and `release could not be computed` (the team has no row in `programs`); `exec updates could not be read` and `link suggestions could not be read` (the team **keeps** its row, and its waiting items may be incomplete). One team can appear in both `programs` and `skipped`: show the row and the note, never drop the row. |
 
@@ -249,7 +249,7 @@ All live programs at once. No query parameters. Example built from the live data
 | 101 suggestions | `GET /releases/v1.38/link-suggestions`: `counts.suggested` |
 | 2 with no lane | `GET /lab`: bucket `unassigned` |
 | 17 re-added | `GET /releases/v1.38/summary`: `outcomes.readded_after_freeze` |
-| 1,978 unlinked | `GET /releases/v1.38/summary`: `unlinked_open_prs` |
+| 1,173 unlinked | Distinct open PRs with no verified link (`GET /releases/v1.38/summary` `unlinked_open_prs`). Measured on the local database on 2026-11-25, where the old per-SIG sum was 1,956: a PR with two SIG labels counted twice. The cloud value updates after deploy. |
 
 The live numbers will move as data arrives. The shape will not change without a new
 version of this file.

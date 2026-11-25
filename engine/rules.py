@@ -99,6 +99,15 @@ def unlinked_open_load(world: World, links: ReleaseLinks) -> Counter[str]:
     return load
 
 
+def unlinked_open_prs(world: World, links: ReleaseLinks) -> int:
+    """Distinct open PRs without a verified link, with or without a SIG label.
+
+    The per-SIG counts above count a PR once per SIG label, so their sum is not a PR count.
+    """
+    linked = links.linked_pr_keys()
+    return sum(1 for pr in world.pull_requests.values() if pr.is_open and pr.key not in linked)
+
+
 def _days(delta: timedelta) -> float:
     return round(delta.total_seconds() / 86400, 1)
 
