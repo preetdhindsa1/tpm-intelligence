@@ -1,45 +1,85 @@
-// Front-page copy that is allowed to carry a number. Counts come from the caller
-// (the API or lib/measured.ts). This file never looks a number up itself.
+// Front-page text that carries a number. Every number comes from the caller: the API
+// (portfolio, release summary, feature timeline, pod facts) or lib/measured.ts.
 import type { Measured } from "@/lib/measured";
 
-export type Story = { title: string; detail: string; asOf: string };
+const DAY = 86_400_000;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export const STAGE_MODULES = [
-  { stage: "Plan", module: "Portfolio", status: "Live" },
-  { stage: "Build", module: "Live Cockpit", status: "Live" },
-  { stage: "Freeze", module: "Live Cockpit", status: "Live" },
-  { stage: "Launch", module: "Release readiness", status: "Planned" },
-  { stage: "Learn", module: "Retro insights", status: "Planned" },
-] as const;
+/** "4 Feb 2027" in UTC, the design's short date. */
+export function shortDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+
+export type Tag = { text: string; tone: "live" | "warn" | "next" | "planned" };
+
+/** The five stages and the module that covers each. Status is the product's own state. */
+export const STAGES: { n: string; stage: string; title: string; body: string; tags: Tag[] }[] = [
+  { n: "01", stage: "Plan", title: "Program setup", body: "Workstreams, owners, milestones and dependencies from GitHub or Jira.", tags: [{ text: "Live", tone: "live" }] },
+  { n: "02", stage: "Build", title: "Live tracking + AI-native PDLC", body: "Plan vs real work, and how the pod of people, agents and bots builds and checks code.", tags: [{ text: "Live", tone: "live" }] },
+  { n: "03", stage: "Freeze", title: "Forecast + Decision Studio", body: "Odds per feature, and what-ifs before you move people.", tags: [{ text: "Live · not validated", tone: "warn" }] },
+  { n: "04", stage: "Launch", title: "Verified updates + readiness", body: "Fact-checked exec updates today; go/no-go from real signals next.", tags: [{ text: "Live", tone: "live" }, { text: "Next", tone: "next" }] },
+  { n: "05", stage: "Learn", title: "Retros + RAID", body: "What slipped and when it was first visible; risks and decisions from meetings.", tags: [{ text: "Planned", tone: "planned" }] },
+];
 
 export const DEMO_LENGTH = "2:00";
 
+/** Chapters of the recorded demo. Each one links to the live screen it shows. */
 export const DEMO_CHAPTERS = [
-  "Live programs",
-  "Live Cockpit",
-  "Code Freeze",
-  "Decision Studio",
-  "What we measured",
+  { at: "0:00", title: "The problem: code is cheap, certainty isn't", target: "front" },
+  { at: "0:20", title: "Live Cockpit: replay Kubernetes v1.38", target: "cockpit" },
+  { at: "0:50", title: "Decision Studio: test a fix", target: "studio" },
+  { at: "1:15", title: "AI-native PDLC: the pod of 4", target: "pdlc" },
+  { at: "1:40", title: "Trust: every number checked", target: "trust" },
 ] as const;
 
-export function freezeStory(
-  display: string,
-  release: string,
-  removed: number,
-  readded: number,
-  asOf: string,
-): Story | null {
-  if (removed <= 0 || !asOf) return null;
-  const again = readded > 0 ? ` ${readded} were added back later.` : "";
-  return {
-    title: `${removed} removed at Code Freeze`,
-    detail: `${display} ${release}. From the release summary.${again}`,
-    asOf,
-  };
+/** Days between two timestamps, rounded to the nearest day; null when either is missing. */
+export function daysBetween(from: string | null | undefined, to: string | null | undefined): number | null {
+  if (!from || !to) return null;
+  return Math.round((new Date(to).getTime() - new Date(from).getTime()) / DAY);
 }
 
-export function measuredStory(rows: Measured[], id: string): Story | null {
-  const row = rows.find((item) => item.id === id);
-  if (!row || !row.measured || row.verdict === "pending") return null;
-  return { title: row.value, detail: row.label, asOf: row.measured };
+/**
+ * The replay sentence for a feature that missed Code Freeze, from its main PR's real dates.
+ * Null unless the main PR opened before the freeze and merged after it.
+ */
+export function freezeReplay(
+  feature: number,
+  mainOpened: string | null | undefined,
+  mainMerged: string | null | undefined,
+  codeFreeze: string | null | undefined,
+  readded: boolean,
+): string | null {
+  const before = daysBetween(mainOpened, codeFreeze);
+  const late = daysBetween(codeFreeze, mainMerged);
+  if (before === null || late === null || before < 0 || late < 0) return null;
+  const back = readded ? ", and was re-added after" : "";
+  return `Feature #${feature}'s main PR opened ${before} days before the freeze, missed it by ${late} day${late === 1 ? "" : "s"}${back}.`;
+}
+
+/** "21 / 26" → [21, 26], or null for a value that is not a fraction. */
+export function fraction(value: string): [number, number] | null {
+  const m = value.match(/^\s*(\d+)\s*\/\s*(\d+)\s*$/);
+  if (!m || Number(m[2]) === 0) return null;
+  return [Number(m[1]), Number(m[2])];
+}
+
+export type TrustTile = { value: string; label: string; warn: boolean };
+
+/** The four headline scorecard tiles, taken from the measured list. Missing rows are skipped. */
+export function trustTiles(rows: Measured[]): TrustTile[] {
+  const pick = (id: string) => rows.find((r) => r.id === id && r.verdict !== "pending");
+  const out: TrustTile[] = [];
+  const fc = pick("fact-checker");
+  if (fc) out.push({ value: fc.value, label: "fact-checker test claims judged correctly", warn: false });
+  const vp = pick("vp-summary");
+  if (vp) out.push({ value: vp.value, label: "VP-summary claims removed in live evals", warn: false });
+  const link = pick("linking");
+  if (link) {
+    const f = fraction(link.value);
+    out.push({ value: f ? `${((f[0] / f[1]) * 100).toFixed(1)}%` : link.value, label: "v1.38 features linked to a verified PR", warn: false });
+  }
+  const fo = pick("forecast");
+  if (fo) out.push({ value: fo.value, label: 'backtests where the forecast beats the base rate: labeled "not validated"', warn: fo.verdict !== "pass" });
+  return out;
 }

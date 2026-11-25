@@ -1,25 +1,27 @@
-// Front page. Live programs come from GET /portfolio. Story counts come from the
-// release summary or lib/measured.ts. A missing source omits that story.
-// Approving-review counts stay off this page until cross-reviews are counted:
-// every pull request and review is posted from one account (issue #94).
+// Front page (UX vision p.1–2). Programs come from GET /portfolio; story numbers from the
+// release summary, feature #6395's timeline and the pod facts (GET /lab); the trust strip
+// from lib/measured.ts. A missing source hides that piece and never shows a stand-in number.
 import Link from "next/link";
-import { api } from "@/lib/api";
-import { DEMO_CHAPTERS, DEMO_LENGTH, STAGE_MODULES, freezeStory, measuredStory, type Story } from "@/lib/front";
-import { formatUtc } from "@/lib/format";
+import { api, type FeatureDetail, type Summary } from "@/lib/api";
+import { fetchPodLab, type PodLab } from "@/lib/api-pdlc";
+import { DEMO_CHAPTERS, DEMO_LENGTH, STAGES, fraction, freezeReplay, shortDate, trustTiles, type Tag } from "@/lib/front";
 import { MEASURED, type Verdict } from "@/lib/measured";
 import { stageLabel, type Portfolio, type PortfolioProgram } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
 
 export const dynamic = "force-dynamic";
 
-const VERDICT: Record<Verdict, string> = {
-  pass: "Passes",
-  partial: "Partly",
-  fail: "Fails",
-  pending: "Not measured",
+const REPLAY_FEATURE = 6395;
+
+type Facts = {
+  portfolio: Portfolio | null;
+  error: string | null;
+  summaries: Map<string, Summary>;
+  pod: PodLab | null;
+  replay: FeatureDetail | null;
 };
 
-export default async function FrontPage() {
+async function load(): Promise<Facts> {
   let portfolio: Portfolio | null = null;
   let error: string | null = null;
   try {
@@ -28,123 +30,285 @@ export default async function FrontPage() {
     error = e instanceof Error ? e.message : "GET /portfolio failed";
   }
   const programs = portfolio?.programs ?? [];
-  const first = programs[0];
-  const demoHref = first ? releasePath(first.project, first.release) : "/portfolio";
-  const stories = portfolio ? await storiesFor(portfolio) : [];
+  const kube = programs.find((p) => p.project.toLowerCase() === "kubernetes");
+  const [sums, pod, replay] = await Promise.all([
+    Promise.all(programs.filter((p) => !p.has_lab).map(async (p) => [p.key, await api.summary(p.release).catch(() => null)] as const)),
+    programs.some((p) => p.has_lab) ? fetchPodLab().catch(() => null) : Promise.resolve(null),
+    kube ? api.feature(kube.release, REPLAY_FEATURE).catch(() => null) : Promise.resolve(null),
+  ]);
+  const summaries = new Map<string, Summary>();
+  for (const [key, s] of sums) if (s) summaries.set(key, s);
+  return { portfolio, error, summaries, pod, replay };
+}
+
+export default async function FrontPage() {
+  const facts = await load();
+  const programs = facts.portfolio?.programs ?? [];
+  const kube = programs.find((p) => p.project.toLowerCase() === "kubernetes");
+  const tourHref = kube ? releasePath(kube.project, kube.release) : programs[0] ? releasePath(programs[0].project, programs[0].release) : "/portfolio";
 
   return (
     <div className="-mx-6 -my-6">
-      <section className="bg-ink px-6 py-14 text-white">
-        <p className="text-sm text-slate-300">AI-native program management · every fact verified</p>
-        <h1 className="mt-3 max-w-4xl font-heading text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
-          Run every program from plan to launch on facts, now that agents write the code.
-        </h1>
-        <div className="mt-8">
-          <Link href={demoHref} className="inline-flex min-h-11 items-center rounded-md bg-action px-4 text-sm font-medium text-white">
-            Open the live demo
-          </Link>
+      <section className="bg-ink text-white">
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-indigo-300">AI-native program management · every fact verified</p>
+            <h1 className="mt-4 font-heading text-4xl font-bold leading-[1.08] tracking-tight md:text-[3.4rem]">
+              Run every program from plan to launch on facts, now that agents write the code.
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-7 text-slate-300">
+              Plug in the tools your teams already use. The platform tracks the real work, finds where delivery is stuck, forecasts the
+              odds, lets leaders test a fix before they commit, and drafts the update. AI explains. It never computes a number.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href={tourHref} className="inline-flex min-h-11 items-center rounded-lg bg-action px-5 text-sm font-semibold text-white hover:bg-action/90">
+                Take the {DEMO_LENGTH.replace(/^(\d+):00$/, "$1")}-minute live tour →
+              </Link>
+              <Link href="/portfolio" className="inline-flex min-h-11 items-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10">
+                See every program
+              </Link>
+            </div>
+            <p className="mt-6 text-xs text-slate-400">
+              Live on real public data: Kubernetes (GitHub), Apache Kafka (Jira) and this platform&apos;s own repository.
+            </p>
+          </div>
+          <LivePanel facts={facts} />
         </div>
-        {error && <p className="mt-8 max-w-2xl text-sm text-slate-200">Live programs could not be loaded. {error}</p>}
-        {!error && programs.length === 0 && <p className="mt-8 text-sm text-slate-300">No live programs yet.</p>}
-        {programs.length > 0 && (
-          <ul className="mt-10 grid gap-3 md:grid-cols-3">
-            {programs.map((program) => (
-              <li key={program.key}>
-                <ProgramCard program={program} />
-              </li>
-            ))}
-          </ul>
-        )}
-        {portfolio && <p className="mt-4 text-xs text-slate-400">Data as of {formatUtc(portfolio.as_of)}</p>}
       </section>
 
-      <div className="space-y-14 px-6 py-14">
+      <div className="mx-auto max-w-6xl space-y-16 px-6 py-16">
         <section>
-          <h2 className="font-heading text-2xl font-semibold">Plan · Build · Freeze · Launch · Learn</h2>
-          <ol className="mt-6 grid gap-3 sm:grid-cols-5">
-            {STAGE_MODULES.map((item) => (
-              <li key={item.stage} className="rounded-lg border bg-white p-4">
-                <p className="font-semibold">{item.stage}</p>
-                <p className="mt-1 text-sm text-slate-600">{item.module}</p>
-                <p className="mt-2 text-xs font-medium text-slate-500">{item.status}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-action">The whole program, one platform</p>
+          <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">Five stages, from plan to launch and what you learn after</h2>
+          <p className="mt-2 text-sm text-slate-600">The same stages appear on every program in the product.</p>
+          <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {STAGES.map((s) => (
+              <li key={s.stage} className="flex flex-col rounded-xl border border-slate-200 bg-white p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{s.n} · {s.stage}</p>
+                <p className="mt-2 font-heading font-semibold leading-snug">{s.title}</p>
+                <p className="mt-2 flex-1 text-xs leading-5 text-slate-600">{s.body}</p>
+                <p className="mt-4 flex flex-wrap gap-1.5">{s.tags.map((t) => <Pill key={t.text} tag={t} />)}</p>
               </li>
             ))}
           </ol>
         </section>
 
         <section>
-          <h2 className="font-heading text-2xl font-semibold">Three things the data already shows</h2>
-          {stories.length === 0 ? (
-            <p className="mt-4 text-sm text-slate-600">No measured story is available right now.</p>
-          ) : (
-            <ul className="mt-6 grid gap-4 md:grid-cols-3">
-              {stories.map((story) => (
-                <li key={story.title} className="rounded-lg border bg-white p-5">
-                  <p className="text-xl font-semibold">{story.title}</p>
-                  <p className="mt-2 text-sm text-slate-600">{story.detail}</p>
-                  <p className="mt-3 text-xs text-slate-500">Data as of {story.asOf.includes("T") ? formatUtc(story.asOf) : story.asOf}</p>
-                </li>
-              ))}
-            </ul>
-          )}
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-action">Proof, not promises</p>
+          <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">Three real stories the platform tells today</h2>
+          <Stories facts={facts} kube={kube} tourHref={tourHref} />
         </section>
 
-        <section id="measured">
-          <h2 className="font-heading text-2xl font-semibold">Built for trust</h2>
-          <p className="mt-2 max-w-3xl text-sm text-slate-600">Dated results from the repository, including the ones that failed.</p>
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {MEASURED.map((item) => (
-              <li key={item.id} className="rounded-lg border bg-white p-4">
-                <p className="text-xs text-slate-500">{VERDICT[item.verdict]}</p>
-                <p className="mt-1 text-2xl font-semibold">{item.value}</p>
-                <p className="mt-1 text-sm text-slate-700">{item.label}</p>
-                <p className="mt-2 text-xs text-slate-500">{item.detail}</p>
-                <p className="mt-2 text-xs text-slate-400">{item.measured ? `Measured ${item.measured}` : "TBD (not yet measured)"}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <Trust />
 
-        <section className="rounded-lg bg-ink p-6 text-white">
-          <h2 className="font-heading text-2xl font-semibold">Recorded demo · {DEMO_LENGTH}</h2>
-          <p className="mt-2 text-sm text-slate-300">No recording is published yet. The five chapters are:</p>
-          <ol className="mt-4 list-decimal space-y-1 pl-5 text-sm">
-            {DEMO_CHAPTERS.map((chapter) => (
-              <li key={chapter}>{chapter}</li>
-            ))}
-          </ol>
-        </section>
+        <Demo tourHref={tourHref} kube={kube} />
       </div>
     </div>
   );
 }
 
-function ProgramCard({ program }: { program: PortfolioProgram }) {
+function Pill({ tag }: { tag: Tag }) {
+  const tone = {
+    live: "bg-healthy-bg text-healthy",
+    warn: "bg-warning-bg text-warning",
+    next: "bg-indigo-50 text-action",
+    planned: "bg-slate-100 text-slate-600",
+  }[tag.tone];
+  return <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${tone}`}>{tag.text}</span>;
+}
+
+function LivePanel({ facts }: { facts: Facts }) {
+  const programs = facts.portfolio?.programs ?? [];
   return (
-    <Link href={releasePath(program.project, program.release)} className="block rounded-lg bg-white/10 p-4 hover:bg-white/15">
-      <p className="text-lg font-semibold">{program.display_name}</p>
-      <p className="text-sm text-slate-300">{program.release}</p>
-      <p className="mt-2 text-sm">{stageLabel(program.stage.current)}</p>
-      <p className="mt-1 text-xs text-slate-400">{program.scope.features_in_release} in the release</p>
-    </Link>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+      <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-slate-400">
+        <span className="inline-flex items-center gap-2">
+          <span aria-hidden className="h-2 w-2 rounded-full bg-emerald-400" />
+          Live · {programs.length} program{programs.length === 1 ? "" : "s"}
+        </span>
+        {facts.portfolio && <span className="normal-case tracking-normal">as of {shortDate(facts.portfolio.as_of)}</span>}
+      </div>
+      {facts.error && <p className="mt-4 text-sm text-slate-300">Live programs could not be loaded. {facts.error}</p>}
+      {!facts.error && programs.length === 0 && <p className="mt-4 text-sm text-slate-300">No live programs yet.</p>}
+      <ul className="mt-4 space-y-2.5">
+        {programs.map((p) => (
+          <li key={p.key}>
+            <Link href={releasePath(p.project, p.release)} className="block rounded-xl border border-white/10 bg-ink/60 px-4 py-3 hover:border-white/25">
+              <span className="flex items-baseline justify-between gap-3">
+                <span className="text-sm font-semibold text-white">{p.has_lab ? `This platform · ${p.release}` : `${p.display_name.replace(/\s*\(.*\)$/, "")} ${p.release}`}</span>
+                <span className="shrink-0 text-xs font-medium text-indigo-300">{stageLabel(p.stage.current)} stage</span>
+              </span>
+              <span className="mt-1 block text-xs text-slate-400">{programLine(p, facts)}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
-async function storiesFor(portfolio: Portfolio): Promise<Story[]> {
-  const kubernetes = portfolio.programs.find((program) => program.project.toLowerCase() === "kubernetes");
-  const summary = kubernetes ? await api.summary(kubernetes.release).catch(() => null) : null;
-  const stories = [
-    kubernetes && summary
-      ? freezeStory(
-          kubernetes.display_name,
-          kubernetes.release,
-          summary.removed_at_freeze,
-          summary.outcomes.readded_after_freeze ?? 0,
-          summary.as_of,
-        )
-      : null,
-    measuredStory(MEASURED, "kafka-linking"),
-    measuredStory(MEASURED, "fact-checker"),
-  ];
-  return stories.filter((story): story is Story => story !== null);
+/** One line of real facts per program. Unknown facts are left out, never guessed. */
+function programLine(p: PortfolioProgram, facts: Facts): React.ReactNode {
+  if (p.has_lab) {
+    const pod = facts.pod?.pod;
+    if (!pod) return `${p.scope.features_in_release} features planned`;
+    const lanes = pod.members.length;
+    const human = pod.flow.find((s) => s.stage === "human_review")?.value;
+    return (
+      <>
+        Pod of {lanes}: Claude, Cursor, Dependabot, human
+        {human && human.merged != null && (
+          <span className="text-amber-300"> · {human.merged} merged, {human.human_reviewed ?? "?"} with a human review</span>
+        )}
+      </>
+    );
+  }
+  const s = facts.summaries.get(p.key);
+  const freeze = p.dates?.code_freeze_at;
+  if (s && s.phase === "after_freeze") {
+    return `${s.features_in_release} features in · ${s.removed_at_freeze} removed at Code Freeze · ${s.critical_features} with a critical flag`;
+  }
+  const tool = p.planning_tool === "jira" ? " in Jira" : "";
+  return `${p.scope.features_in_release} features planned${tool}${freeze ? ` · Code Freeze ${shortDate(freeze)}` : ""}`;
+}
+
+function StoryCard({ eyebrow, big, of, tone, title, body, href, cta }: {
+  eyebrow: string; big: string; of?: string; tone: string; title: string; body: string; href: string; cta: string;
+}) {
+  return (
+    <li className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{eyebrow}</p>
+      <p className="mt-4 font-heading">
+        <span className={`text-5xl font-bold ${tone}`}>{big}</span>
+        {of && <span className="ml-2 text-xl font-semibold text-slate-500">{of}</span>}
+      </p>
+      <p className="mt-2 font-semibold text-slate-900">{title}</p>
+      <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{body}</p>
+      <Link href={href} className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-action hover:underline">{cta} →</Link>
+    </li>
+  );
+}
+
+function Stories({ facts, kube, tourHref }: { facts: Facts; kube: PortfolioProgram | undefined; tourHref: string }) {
+  const cards: React.ReactNode[] = [];
+  const s = kube ? facts.summaries.get(kube.key) : undefined;
+  if (kube && s && s.removed_at_freeze > 0) {
+    const main = facts.replay?.pull_requests.find((pr) => pr.is_main);
+    const readded = facts.replay ? facts.replay.in_release : false;
+    const replay = freezeReplay(REPLAY_FEATURE, main?.created_at, main?.merged_at, kube.dates?.code_freeze_at, readded);
+    cards.push(
+      <StoryCard key="freeze" eyebrow={`${kube.display_name} ${kube.release} · GitHub`} big={String(s.removed_at_freeze)} tone="text-critical"
+        title="features removed at Code Freeze"
+        body={`Replay any past day.${replay ? ` ${replay}` : ""} The platform shows what was knowable, and when.`}
+        href={tourHref} cta="Replay the release" />,
+    );
+  }
+  const pod = facts.pod?.pod;
+  const human = pod?.flow.find((st) => st.stage === "human_review")?.value;
+  const merge = pod?.flow.find((st) => st.stage === "merge")?.value;
+  if (human && human.merged != null && human.human_reviewed != null && human.merged > 0) {
+    const median = merge?.median_minutes_to_merge;
+    cards.push(
+      <StoryCard key="pod" eyebrow="This platform's own repo · Claude + Cursor + Dependabot + human" big={String(human.human_reviewed)} of={`of ${human.merged}`}
+        tone="text-warning" title="merged PRs had a human review"
+        body={`${median != null ? `Median time to merge: ${median} minutes. ` : ""}Agents write fast; verification is the gap. The platform measures it on its own development, honestly.`}
+        href="/pdlc" cta="See the pod flow" />,
+    );
+  }
+  const kafka = MEASURED.find((m) => m.id === "kafka-linking" && m.verdict !== "pending");
+  const f = kafka ? fraction(kafka.value) : null;
+  if (kafka && f) {
+    const version = kafka.label.match(/\d+\.\d+\.\d+/)?.[0];
+    cards.push(
+      <StoryCard key="kafka" eyebrow={`Apache Kafka${version ? ` ${version}` : ""} · Jira + GitHub`} big={`${Math.round((f[0] / f[1]) * 100)}%`} tone="text-blue-600"
+        title="of Jira features linked to real code"
+        body={`${f[0]} of ${f[1]} features tied to merged PRs through Jira keys and sub-tasks. Same engine, a different planning tool: the plug-in model works.`}
+        href="/portfolio" cta="Open the portfolio" />,
+    );
+  }
+  if (cards.length === 0) return <p className="mt-6 text-sm text-slate-600">No story has live data right now.</p>;
+  return <ul className="mt-6 grid gap-5 md:grid-cols-3">{cards}</ul>;
+}
+
+const VERDICT: Record<Verdict, string> = { pass: "Passes", partial: "Partly", fail: "Fails", pending: "Not measured" };
+
+function Trust() {
+  const tiles = trustTiles(MEASURED);
+  return (
+    <section id="measured" className="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:items-center">
+        <div>
+          <h2 className="font-heading text-2xl font-semibold">Built for trust</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Rules and statistics compute every fact. AI reads messy text and writes the story. A fact checker removes any claim the
+            data can&apos;t prove, and a person approves anything that leaves the platform. We publish the scorecard, failures included.
+          </p>
+        </div>
+        <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {tiles.map((t) => (
+            <li key={t.label} className={`rounded-xl p-3.5 ${t.warn ? "bg-warning-bg" : "bg-slate-50"}`}>
+              <p className={`font-heading text-2xl font-bold ${t.warn ? "text-warning" : "text-slate-900"}`}>{t.value}</p>
+              <p className={`mt-1 text-xs leading-4 ${t.warn ? "text-warning" : "text-slate-600"}`}>{t.label}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <details className="mt-5 border-t border-slate-100 pt-4">
+        <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-action">
+          Every measured result, failures included ({MEASURED.length})
+        </summary>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {MEASURED.map((item) => (
+            <li key={item.id} className="rounded-lg border border-slate-200 p-3">
+              <p className="text-xs text-slate-500">{VERDICT[item.verdict]}</p>
+              <p className="mt-0.5 font-heading text-lg font-semibold">{item.value}</p>
+              <p className="text-sm text-slate-700">{item.label}</p>
+              <p className="mt-1 text-xs text-slate-500">{item.detail}</p>
+              <p className="mt-1 text-xs text-slate-400">{item.measured ? `Measured ${item.measured}` : "TBD (not yet measured)"}</p>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </section>
+  );
+}
+
+function Demo({ tourHref, kube }: { tourHref: string; kube: PortfolioProgram | undefined }) {
+  const href: Record<string, string> = {
+    front: "/",
+    cockpit: tourHref,
+    studio: kube ? releasePath(kube.project, kube.release, "/simulate") : "/portfolio",
+    pdlc: "/pdlc",
+    trust: "#measured",
+  };
+  return (
+    <section>
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-action">Recorded demo</p>
+      <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">See it end to end in {DEMO_LENGTH.replace(/^(\d+):00$/, "$1")} minutes</h2>
+      <div className="mt-6 grid overflow-hidden rounded-2xl bg-ink text-white md:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+        <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 bg-[#11173A] p-6">
+          <span aria-hidden className="flex h-16 w-16 items-center justify-center rounded-full bg-action/60">
+            <svg viewBox="0 0 16 16" className="ml-1 h-6 w-6 fill-white"><path d="M4 2.5v11l9-5.5z" /></svg>
+          </span>
+          <p className="text-sm text-slate-300">Recording not published yet · {DEMO_LENGTH}</p>
+        </div>
+        <div className="p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">Chapters</p>
+          <ol className="mt-3 space-y-1">
+            {DEMO_CHAPTERS.map((c, i) => (
+              <li key={c.at}>
+                <Link href={href[c.target]} className={`block rounded-lg px-3 py-2 ${i === 0 ? "border border-indigo-400/60 bg-action/30" : "hover:bg-white/5"}`}>
+                  <span className="block text-[11px] text-slate-400">{c.at}</span>
+                  <span className="block text-sm font-semibold">{c.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+          <Link href={tourHref} className="mt-4 inline-flex min-h-11 items-center px-3 text-sm font-semibold text-indigo-300 hover:underline">
+            Prefer to explore? Try it live →
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
 }

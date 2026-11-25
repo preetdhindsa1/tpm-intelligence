@@ -35,7 +35,7 @@ export function SiteHeader({ login, signIn }: { login: string | null; signIn: bo
   return (
     <header className="bg-ink text-white">
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-4 px-6">
-        <Link href="/" className="inline-flex min-h-11 items-center font-heading font-semibold">Program Intelligence</Link>
+        <Link href="/" className="inline-flex min-h-11 items-center gap-2.5 font-heading font-semibold"><span aria-hidden className="h-5 w-5 rounded-md bg-[#6366F1]" />Program Intelligence</Link>
         <nav aria-label="Main" className="flex flex-wrap items-center gap-x-3">
           {dest.map((d) => (
             <Link key={d.id} href={d.href} aria-current={here === d.id ? "page" : undefined} className={`${linkCls} ${here === d.id ? "border-white font-medium" : "border-transparent text-slate-200 hover:text-white"}`}>

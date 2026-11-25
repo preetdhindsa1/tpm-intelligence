@@ -10,6 +10,10 @@ export type PortfolioProgram = {
   display_name: string;
   release: string;
   as_of: string;
+  planning_tool?: string;
+  code_tools?: string[];
+  has_lab?: boolean;
+  dates?: { cycle_start_at: string | null; enhancements_freeze_at: string | null; code_freeze_at: string | null; release_at: string | null };
   stage: {
     current: string | null;
     stages: StageStep[];
@@ -92,4 +96,12 @@ export function decisionHref(project: string, release: string, kind: string): st
   if (kind === "review_link_suggestions") return releasePath(project, release, "/links");
   if (kind === "classify_prs") return "/lab";
   return null;
+}
+
+const TOOL: Record<string, string> = { github: "GitHub", jira: "Jira", gitlab: "GitLab", linear: "Linear" };
+
+/** "Jira + GitHub" from the program's planning tool and code tools, each named once. */
+export function toolsLabel(p: Pick<PortfolioProgram, "planning_tool" | "code_tools">): string {
+  const names = [p.planning_tool, ...(p.code_tools ?? [])].filter((t): t is string => Boolean(t)).map((t) => TOOL[t] ?? t);
+  return [...new Set(names)].join(" + ");
 }
