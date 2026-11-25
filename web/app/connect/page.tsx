@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 import { CONNECTORS, PROMISES, RELEASE_FIELDS, STEPS, usedBy } from "@/lib/connect";
 import type { Portfolio } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
+import { programTitle } from "@/lib/names";
 
 export const dynamic = "force-dynamic";
 
@@ -105,7 +106,7 @@ function StepReleases({ programs }: { programs: Program[] }) {
             <tr>
               <th className="py-3 pr-4">Date</th>
               <th className="py-3 pr-4">What it means</th>
-              {example && <th className="py-3 pr-4">Example: {example.display_name.replace(/\s*\(this project\)$/, "")} {example.release}</th>}
+              {example && <th className="py-3 pr-4">Example: {programTitle(example.display_name, example.release, example.has_lab)}</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -139,7 +140,7 @@ function StepProgram({ programs }: { programs: Program[] }) {
           {programs.map((p) => (
             <li key={p.key}>
               <Link href={releasePath(p.project, p.release)} className="block rounded-xl border border-slate-200 p-5 hover:border-action">
-                <p className="font-heading text-lg font-semibold">{p.display_name.replace(/\s*\(this project\)$/, "")} {p.release}</p>
+                <p className="font-heading text-lg font-semibold">{programTitle(p.display_name, p.release, p.has_lab)}</p>
                 <p className="mt-1 text-sm text-slate-600">{p.scope.features_in_release} features · {p.bottleneck.headline}</p>
               </Link>
             </li>

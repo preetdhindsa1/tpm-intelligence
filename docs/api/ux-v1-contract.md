@@ -76,7 +76,7 @@ All live programs at once. No query parameters. Example built from the live data
     {
       "key": "tpm-intelligence:Phase 3",
       "project": "tpm-intelligence",
-      "display_name": "Program Intelligence Platform (this project)",
+      "display_name": "Program Intelligence Platform (Current Project)",
       "release": "Phase 3",
       "planning_tool": "github",
       "code_tools": ["github"],
@@ -173,7 +173,7 @@ All live programs at once. No query parameters. Example built from the live data
     {
       "kind": "classify_prs",
       "program_key": "tpm-intelligence:Phase 3",
-      "label": "2 pull requests with no lane · Program Intelligence Platform (this project)",
+      "label": "2 pull requests with no lane · Program Intelligence Platform (Current Project)",
       "count": 2,
       "ref": null
     }
@@ -189,7 +189,7 @@ All live programs at once. No query parameters. Example built from the live data
     {
       "kind": "review_gap",
       "title": "Review is the new bottleneck",
-      "text": "Program Intelligence Platform (this project): pull requests merge in a median of 9 minutes, and 0 of 47 had an approving review.",
+      "text": "Program Intelligence Platform (Current Project): pull requests merge in a median of 9 minutes, and 0 of 47 had an approving review.",
       "program_key": "tpm-intelligence:Phase 3",
       "facts": {"merged": 47, "approved_merged": 0, "median_minutes_to_merge": 9}
     },

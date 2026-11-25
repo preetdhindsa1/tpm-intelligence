@@ -83,6 +83,6 @@ def test_front_page_card_uses_this_projects_display_name() -> None:
     from connectors import load_team
 
     name = load_team("tpm-intelligence").display_name
-    assert name == "Program Intelligence Platform (this project)"
+    assert name == "Program Intelligence Platform (Current Project)"
     teams_ts = Path(__file__).parents[2] / "web" / "lib" / "teams.ts"
     assert f'SELF_PROJECT = "{name}"' in teams_ts.read_text()

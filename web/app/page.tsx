@@ -8,6 +8,7 @@ import { DEMO_CHAPTERS, DEMO_LENGTH, STAGES, fraction, freezeReplay, shortDate, 
 import { MEASURED, type Verdict } from "@/lib/measured";
 import { stageLabel, type Portfolio, type PortfolioProgram } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
+import { programTitle } from "@/lib/names";
 
 export const dynamic = "force-dynamic";
 
@@ -135,7 +136,7 @@ function LivePanel({ facts }: { facts: Facts }) {
           <li key={p.key}>
             <Link href={releasePath(p.project, p.release)} className="block rounded-xl border border-white/10 bg-ink/60 px-4 py-3 hover:border-white/25">
               <span className="flex items-baseline justify-between gap-3">
-                <span className="text-sm font-semibold text-white">{p.has_lab ? `This platform · ${p.release}` : `${p.display_name.replace(/\s*\(.*\)$/, "")} ${p.release}`}</span>
+                <span className="text-sm font-semibold text-white">{programTitle(p.display_name, p.release, p.has_lab)}</span>
                 <span className="shrink-0 text-xs font-medium text-indigo-300">{stageLabel(p.stage.current)} stage</span>
               </span>
               <span className="mt-1 block text-xs text-slate-400">{programLine(p, facts)}</span>
@@ -209,7 +210,7 @@ function Stories({ facts, kube, tourHref }: { facts: Facts; kube: PortfolioProgr
   if (human && human.merged != null && human.human_reviewed != null && human.merged > 0) {
     const median = merge?.median_minutes_to_merge;
     cards.push(
-      <StoryCard key="pod" eyebrow="This platform's own repo · Claude + Cursor + Dependabot + human" big={String(human.human_reviewed)} of={`of ${human.merged}`}
+      <StoryCard key="pod" eyebrow={`${facts.portfolio?.programs.find((p) => p.has_lab)?.display_name ?? "This platform"} · Claude + Cursor + Dependabot + human`} big={String(human.human_reviewed)} of={`of ${human.merged}`}
         tone="text-warning" title="merged PRs had a human review"
         body={`${median != null ? `Median time to merge: ${median} minutes. ` : ""}Agents write fast; verification is the gap. The platform measures it on its own development, honestly.`}
         href="/pdlc" cta="See the pod flow" />,

@@ -39,7 +39,7 @@ K = facts("kubernetes:v1.38", "Kubernetes", features_in_release=70, features_eve
 KAFKA = facts("KAFKA:4.5.0", "Apache Kafka", planning_tool="jira",
               dates=cal(utc(2026, 10, 26), utc(2027, 1, 14), utc(2027, 2, 4), utc(2027, 3, 17)),
               features_in_release=16, features_ever=18, linked_features=13)  # fmt: skip
-REPO = facts("tpm-intelligence:Phase 3", "Program Intelligence Platform (this project)",
+REPO = facts("tpm-intelligence:Phase 3", "Program Intelligence Platform (Current Project)",
              dates=cal(utc(2026, 11, 30), utc(2026, 12, 14, 12), utc(2027, 1, 14, 12),
                        utc(2027, 1, 20)),
              features_in_release=4, features_ever=4, linked_features=3,
@@ -126,7 +126,7 @@ def test_whole_portfolio_matches_the_contract_example() -> None:
     kinds = [a["kind"] for a in body["across_programs"]]
     assert kinds == ["late_code", "review_gap", "unlinked_load"]
     assert body["across_programs"][1]["text"] == (
-        "Program Intelligence Platform (this project): pull requests merge in a median of "
+        "Program Intelligence Platform (Current Project): pull requests merge in a median of "
         "9 minutes, and 0 of 47 had an approving review."
     )
     assert body["across_programs"][2]["text"].startswith("1,173 open Kubernetes pull requests")

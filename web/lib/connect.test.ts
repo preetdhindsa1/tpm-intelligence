@@ -5,14 +5,14 @@ describe("connect page", () => {
   const programs = [
     { display_name: "Kubernetes", planning_tool: "github", code_tools: ["github"] },
     { display_name: "Apache Kafka", planning_tool: "jira", code_tools: ["github"] },
-    { display_name: "Program Intelligence Platform (this project)", planning_tool: "github", code_tools: ["github"] },
+    { display_name: "Program Intelligence Platform (Current Project)", planning_tool: "github", code_tools: ["github"] },
   ];
 
   it("marks a connector Available only when a live program reads it", () => {
     const github = CONNECTORS.find((c) => c.id === "github")!;
     const jira = CONNECTORS.find((c) => c.id === "jira")!;
     const notes = CONNECTORS.find((c) => c.id === "notes")!;
-    expect(usedBy(github, programs)).toEqual(["Kubernetes", "Apache Kafka", "Program Intelligence Platform"]);
+    expect(usedBy(github, programs)).toEqual(["Kubernetes", "Apache Kafka", "Program Intelligence Platform (Current Project)"]);
     expect(usedBy(jira, programs)).toEqual(["Apache Kafka"]);
     expect(usedBy(notes, programs)).toEqual([]);
     expect(usedBy(github, [])).toEqual([]);

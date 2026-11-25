@@ -19,6 +19,7 @@ import {
   type PortfolioProgram,
 } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
+import { programTitle } from "@/lib/names";
 
 export function PortfolioView({ data, stage }: { data: Portfolio; stage?: string | null }) {
   const shown = stage ? data.programs.filter((p) => p.stage.current === stage) : data.programs;
@@ -96,7 +97,7 @@ function ProgramTable({ programs, skipped, filtered }: { programs: PortfolioProg
               <tr key={p.key} className="align-middle">
                 <td className="px-6 py-5">
                   <Link href={releasePath(p.project, p.release)} className="font-heading text-base font-semibold text-slate-900 hover:text-action hover:underline">
-                    {p.display_name.replace(/\s*\(this project\)$/, "")} {p.release}
+                    {programTitle(p.display_name, p.release, p.has_lab)}
                   </Link>
                   <p className="mt-0.5 text-slate-500">{p.has_lab ? "This repo · Claude, Cursor, Dependabot, human" : programSubline(p)}</p>
                   {approvalNotes(p.project, skipped).map((note) => (
@@ -167,7 +168,7 @@ function Waiting({ data }: { data: Portfolio }) {
             const href = program ? decisionHref(program.project, program.release, item.kind) : null;
             return (
               <li key={`${item.program_key}-${item.kind}`} className="flex min-h-11 items-center justify-between gap-3 rounded-lg bg-slate-50 px-4 py-2.5 text-sm">
-                <span className="text-slate-800">{item.label.replace(/\s*\(this project\)$/, "")}</span>
+                <span className="text-slate-800">{item.label}</span>
                 {href && <Link href={href} className="shrink-0 font-semibold text-action hover:underline">{waitingVerb(item.kind)}</Link>}
               </li>
             );
@@ -202,7 +203,7 @@ function Across({ items }: { items: Portfolio["across_programs"] }) {
             <li key={group.title}>
               <p className="text-sm font-semibold text-slate-900">{group.title}</p>
               {group.texts.map((text) => (
-                <p key={text} className="mt-0.5 text-sm leading-6 text-slate-600">{text.replace(" (this project)", "")}</p>
+                <p key={text} className="mt-0.5 text-sm leading-6 text-slate-600">{text}</p>
               ))}
             </li>
           ))}
