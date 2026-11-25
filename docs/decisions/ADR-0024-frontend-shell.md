@@ -30,3 +30,7 @@ Launch is seven days, matching ADR-0025, because the API stores a release timest
 ## AI vs rules
 
 No AI. Stage, links, and the last program are deterministic. The Live Cockpit time machine replays feature #6395's real timeline events from the API, including both freezes and each distinct pull-request event. Identical events at the same timestamp are shown once. The future release date is not shown as an event. It does not rebuild the page's tiles as of that date. The locked spec's "8 real dates" is not a cap on that list.
+
+## Empty, loading, and error
+
+Portfolio, Live Cockpit, and Decision Studio share three states. An error shows the failure text and no stand-in numbers. A release with no simulator says so, which is an empty state rather than a failure. The front page and Connect page carry their own copy in their own changes.

@@ -1,4 +1,5 @@
 import { PortfolioView } from "@/components/portfolio/PortfolioView";
+import { ErrorState } from "@/components/states/States";
 import { api } from "@/lib/api";
 import type { Portfolio } from "@/lib/portfolio";
 
@@ -12,13 +13,6 @@ export default async function PortfolioPage() {
   } catch (e) {
     message = e instanceof Error ? e.message : message;
   }
-  if (!data) {
-    return (
-      <section>
-        <h1 className="text-2xl font-semibold">Here are the live programs.</h1>
-        <p className="mt-2 text-sm text-slate-600">Portfolio could not be loaded. {message}</p>
-      </section>
-    );
-  }
+  if (!data) return <ErrorState title="Portfolio could not be loaded" detail={message} />;
   return <PortfolioView data={data} />;
 }

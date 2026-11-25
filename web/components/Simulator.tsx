@@ -3,6 +3,7 @@
 // What-if simulator (ADR-0012). Every number comes from the API's simulator; this page
 // only shows it. Baseline is always next to the scenario, and results are ranges.
 import { useMe } from "@/components/Me";
+import { EmptyState, ErrorState, LoadingState } from "@/components/states/States";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   updatesRequest,
@@ -304,10 +305,10 @@ export function Simulator({ release }: { release: string }) {
 
   if (error && !info) {
     // No calibration for this release (no earlier release to learn from) is not a failure (#60).
-    const tone = error.startsWith("No simulator") ? "border-slate-200 bg-slate-50 text-slate-700" : "border-rose-200 bg-rose-50 text-rose-800";
-    return <p className={`rounded border p-2 text-sm ${tone}`}>{error}</p>;
+    if (error.startsWith("No simulator")) return <EmptyState title="No simulator for this release" body={error} />;
+    return <ErrorState title="Decision Studio could not be loaded" detail={error} />;
   }
-  if (!info) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!info) return <LoadingState label="Loading the simulator…" />;
 
   return (
     <div className="space-y-4">
