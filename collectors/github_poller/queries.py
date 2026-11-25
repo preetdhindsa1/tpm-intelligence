@@ -20,7 +20,7 @@ fragment PRFields on PullRequest {
   labels(first: 50) { nodes { name } }
   reviews(first: 100) {
     pageInfo { hasNextPage endCursor }
-    nodes { databaseId author { login } state submittedAt }
+    nodes { databaseId author { login } state submittedAt body }
   }
   comments(first: 100) {
     pageInfo { hasNextPage endCursor }
@@ -65,7 +65,7 @@ query MoreReviews($owner: String!, $name: String!, $number: Int!, $after: String
     pullRequest(number: $number) {
       reviews(first: 100, after: $after) {
         pageInfo { hasNextPage endCursor }
-        nodes { databaseId author { login } state submittedAt }
+        nodes { databaseId author { login } state submittedAt body }
       }
     }
   }

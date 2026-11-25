@@ -155,16 +155,18 @@ class Review:
     reviewer: str | None
     state: str
     submitted_at: datetime
+    marker: str | None = None  # pod marker tag (ADR-0023), e.g. "cross-review:claude-agent"
 
 
 @dataclass(frozen=True)
 class Comment:
-    """One conversation comment: who, when and its Prow commands (no text)."""
+    """One conversation comment: who, when, its Prow commands and pod marker (no text)."""
 
     id: str
     author: str | None
     at: datetime
     commands: tuple[str, ...] = ()
+    marker: str | None = None
 
 
 @dataclass(frozen=True)
@@ -311,11 +313,18 @@ def project(events: Iterable[NormalizedEvent], as_of: datetime) -> World:
         elif isinstance(p, WorkItemLabelChanged):
             label_hist[key].append(LabelChange(at, p.label, p.action is ChangeAction.ADDED))
         elif isinstance(p, ReviewSubmitted):
+            # A record can arrive twice, before and after its marker was read (ADR-0023).
+            seen = reviews[key].get(p.review_id)
             reviews[key][p.review_id] = Review(
-                p.review_id, p.reviewer, p.state.value, p.submitted_at
-            )
+                p.review_id, p.reviewer, p.state.value, p.submitted_at,
+                p.marker or (seen.marker if seen else None),
+            )  # fmt: skip
         elif isinstance(p, CommentPosted):
-            comments[key][p.comment_id] = Comment(p.comment_id, p.author, p.posted_at, p.commands)
+            old = comments[key].get(p.comment_id)
+            comments[key][p.comment_id] = Comment(
+                p.comment_id, p.author, p.posted_at, p.commands,
+                p.marker or (old.marker if old else None),
+            )  # fmt: skip
         elif isinstance(p, CheckCompleted):
             prev = checks[key].get(p.check_name)
             if prev is None or at >= prev.at:

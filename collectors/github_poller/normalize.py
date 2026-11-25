@@ -407,6 +407,7 @@ def review_events(
         if state is None or not r.get("submittedAt"):
             continue
         submitted = parse_ts(r["submittedAt"])
+        marker = pod_marker(r.get("body"))
         out.append(
             new_event(
                 source=Source.GITHUB,
@@ -418,8 +419,9 @@ def review_events(
                     reviewer=(r.get("author") or {}).get("login"),
                     state=state,
                     submitted_at=submitted,
+                    marker=marker,
                 ),
-                identity=(r["databaseId"],),
+                identity=marker_identity(r["databaseId"], marker),
             )
         )
     return out
@@ -436,6 +438,24 @@ _CANCELS = {
     "remove-lgtm": "lgtm_cancel",
     "remove-approve": "approve_cancel",
 }
+
+
+# Pod marker (ADR-0023 addendum): agents post from the owner's account, so the first
+# non-empty line says who wrote it, e.g. "Cross-review · claude-agent". Only the tag is kept.
+_MARKER = re.compile(r"([A-Za-z][A-Za-z-]{0,30}) · ([a-z][a-z0-9-]{0,40})")
+
+
+def pod_marker(body: str | None) -> str | None:
+    """``"cross-review:claude-agent"`` from a first line like ``Cross-review · claude-agent``."""
+    first = next((line.strip() for line in (body or "").splitlines() if line.strip()), "")
+    m = _MARKER.fullmatch(first.strip("*_` "))
+    return f"{m[1].lower()}:{m[2]}" if m else None
+
+
+def marker_identity(record_id: object, marker: str | None) -> tuple[object, ...]:
+    """Event identity. A marker is part of it, so a record stored before markers were read
+    is stored again with its marker (events are insert-once); unmarked ids do not change."""
+    return (record_id, marker) if marker else (record_id,)
 
 
 def prow_commands(body: str) -> tuple[str, ...]:
@@ -456,6 +476,7 @@ def comment_events(
         if not c.get("createdAt") or c.get("databaseId") is None:
             continue
         posted = parse_ts(c["createdAt"])
+        marker = pod_marker(c.get("body"))
         out.append(
             new_event(
                 source=Source.GITHUB,
@@ -467,8 +488,9 @@ def comment_events(
                     author=(c.get("author") or {}).get("login"),
                     posted_at=posted,
                     commands=prow_commands(c.get("body") or ""),
+                    marker=marker,
                 ),
-                identity=(c["databaseId"],),
+                identity=marker_identity(c["databaseId"], marker),
             )
         )
     return out
