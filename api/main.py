@@ -130,6 +130,7 @@ def create_app(
     sim_store: Any = None,
     snapshot_store: Any = None,
     auth: AuthConfig | None = None,
+    raid_data: Any = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis.
 
@@ -165,8 +166,9 @@ def create_app(
 
     from api.raid import raid_router
 
-    # Wave 4 RAID tracker: synthetic fixtures until the store is wired in (ADR-0030, #180).
-    app.include_router(raid_router(approver))
+    # Wave 4 RAID tracker: the RAID store when a database is configured, else the synthetic
+    # fixture (ADR-0030, #180).
+    app.include_router(raid_router(approver, raid_data or _default_raid_data()))
     from api.readiness import readiness_router
 
     # Wave 5 readiness and retros: synthetic fixtures until #181 and #182 (ADR-0032).
@@ -962,6 +964,33 @@ def _default_service() -> ReleaseService:
         # The day's forecast is recorded once, append-only, for the unseen test (ADR-0015).
         on_computed=recorder(PostgresSnapshotStore(factory)),
     )
+
+
+def _default_raid_data() -> Any:
+    """``StoreRaid`` on Postgres when ``DATABASE_URL`` is set; None (the fixture) otherwise."""
+    from pipeline.env import configured
+
+    if configured("DATABASE_URL") is None:
+        return None
+    from functools import cache
+
+    from sqlalchemy.orm import sessionmaker
+
+    from api.raid_store import StoreRaid
+    from modules.raid.postgres import PostgresRaidStore
+    from pipeline.store.session import make_engine
+
+    @cache
+    def store() -> PostgresRaidStore:
+        return PostgresRaidStore(sessionmaker(make_engine()))
+
+    titles = {
+        doc: c.title
+        for t in load_teams().values()
+        for c in t.conversations
+        if (doc := getattr(c, "document_id", None))
+    }
+    return StoreRaid(store, titles)
 
 
 def _default_snapshot_store() -> Any:

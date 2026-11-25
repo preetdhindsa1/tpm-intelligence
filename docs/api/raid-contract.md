@@ -37,8 +37,14 @@ below is produced by the API's synthetic fixture and checked by `tests/api/test_
 | POST | `/raid/{item_id}/reject` | `{"reason"}` (required, 3+ characters) | The item, now `rejected`, no RAID ID |
 
 Errors: 401 not signed in, 403 not an approver, 404 unknown item, 409 the item was already
-rejected, 422 a missing reason or a bad field. Today the scope is one program
-(`kubernetes`, `v1.38`); `?project=&release=` filters arrive with the real store (#180).
+rejected, 422 a missing reason or a bad field.
+
+**Scope.** `GET /raid`, `/raid/queue` and `/raid/summary` take `?project=&release=`
+(default `kubernetes`, `v1.38`). With a database configured, the API serves the RAID store:
+real items extracted from public meeting notes, `"synthetic": false`, each source linking
+to its Google Doc with the meeting date in the title. Quotes have people's names masked as
+`[participant]` (ADR-0030 addendum 3). Without a database (tests, local runs without
+Postgres) the API serves the synthetic fixture below, `"synthetic": true`.
 
 ## Examples
 

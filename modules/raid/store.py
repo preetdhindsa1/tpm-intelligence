@@ -104,6 +104,7 @@ class RaidStore(Protocol):
         reason: str | None = None,
     ) -> RaidItem: ...
     def items(self, release_key: str) -> list[RaidItem]: ...
+    def get(self, item_id: int) -> RaidItem | None: ...
 
 
 class MemoryRaidStore:
@@ -165,3 +166,7 @@ class MemoryRaidStore:
     def items(self, release_key: str) -> list[RaidItem]:
         with self._lock:
             return [i for i in self._items.values() if i.release_key == release_key]
+
+    def get(self, item_id: int) -> RaidItem | None:
+        with self._lock:
+            return self._items.get(item_id)
