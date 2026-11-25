@@ -83,3 +83,54 @@ export function trustTiles(rows: Measured[]): TrustTile[] {
   if (fo) out.push({ value: fo.value, label: 'backtests where the forecast beats the base rate: labeled "not validated"', warn: fo.verdict !== "pass" });
   return out;
 }
+
+/** The three trust rules (UX: Trust by design). `proof` is filled from data by trustRules(). */
+export const TRUST_RULES = [
+  {
+    id: "facts",
+    title: "AI never computes facts",
+    body: "Counts, dates, links, critical paths and odds come from code and statistics. AI is used for messy text and explanation only.",
+  },
+  {
+    id: "verified",
+    title: "Every AI sentence is verified",
+    body: "Agents return structured claims. The fact checker keeps a claim only if the database supports it, and publishes how many it removed.",
+  },
+  {
+    id: "suggestions",
+    title: "Suggestions stay suggestions",
+    body: "When AI proposes that a PR belongs to a feature, it is stored as suggested and never counts until a rule or a person confirms it.",
+  },
+] as const;
+
+export type WaitingLite = { kind: string; count: number; label: string };
+
+/** The proof line under each rule: a measured result or a live count, never a stand-in. */
+export function trustProof(id: (typeof TRUST_RULES)[number]["id"], rows: Measured[], waiting: WaitingLite[]): string {
+  if (id === "facts") return "Every number on every page comes from a rule, a count or a statistical model.";
+  if (id === "verified") {
+    const fc = rows.find((r) => r.id === "fact-checker" && r.verdict !== "pending");
+    return fc ? `${fc.value} agreement with labelled claims (measured ${fc.measured}).` : "Fact-checker accuracy: TBD (not yet measured).";
+  }
+  const live = waiting.find((w) => w.kind === "review_link_suggestions" && w.count > 0);
+  if (live) {
+    const release = live.label.split("·").pop()?.trim();
+    return `${live.count.toLocaleString("en-US")}${release ? ` ${release}` : ""} suggestions are waiting for review now; none of them count yet.`;
+  }
+  const ls = rows.find((r) => r.id === "link-suggester" && r.verdict !== "pending");
+  return ls ? `Link suggester precision ${ls.value}; no suggestion counts until confirmed (measured ${ls.measured}).` : "No suggestions are waiting for review.";
+}
+
+/** "7 pass · 3 partly · 2 fail · 1 not measured yet" over the measured list. */
+export function verdictSummary(rows: Measured[]): string {
+  const n = (v: Measured["verdict"]) => rows.filter((r) => r.verdict === v).length;
+  return [
+    [n("pass"), "pass"],
+    [n("partial"), "partly"],
+    [n("fail"), "fail"],
+    [n("pending"), "not measured yet"],
+  ]
+    .filter(([c]) => Number(c) > 0)
+    .map(([c, w]) => `${c} ${w}`)
+    .join(" · ");
+}

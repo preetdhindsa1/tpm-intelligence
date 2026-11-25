@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEMO_CHAPTERS, STAGES, daysBetween, fraction, freezeReplay, shortDate, trustTiles } from "./front";
+import { DEMO_CHAPTERS, STAGES, TRUST_RULES, daysBetween, fraction, freezeReplay, shortDate, trustProof, trustTiles, verdictSummary } from "./front";
 import { MEASURED } from "./measured";
 import { toolsLabel } from "./portfolio";
 
@@ -41,5 +41,24 @@ describe("front page facts", () => {
   it("has five stages and five chapters", () => {
     expect(STAGES.map((s) => s.stage)).toEqual(["Plan", "Build", "Freeze", "Launch", "Learn"]);
     expect(DEMO_CHAPTERS).toHaveLength(5);
+  });
+});
+
+describe("trust by design", () => {
+  it("backs each rule with data, never a stand-in", () => {
+    expect(TRUST_RULES.map((r) => r.title)).toEqual(["AI never computes facts", "Every AI sentence is verified", "Suggestions stay suggestions"]);
+    expect(trustProof("verified", MEASURED, [])).toBe("43 / 43 agreement with labelled claims (measured 2026-11-22).");
+    const waiting = [{ kind: "review_link_suggestions", count: 101, label: "101 AI link suggestions · v1.38" }];
+    expect(trustProof("suggestions", MEASURED, waiting)).toBe("101 v1.38 suggestions are waiting for review now; none of them count yet.");
+    expect(trustProof("suggestions", MEASURED, [])).toContain("Link suggester precision 84.8%");
+    expect(trustProof("verified", [], [])).toContain("TBD (not yet measured)");
+  });
+
+  it("counts verdicts, failures included", () => {
+    const s = verdictSummary(MEASURED);
+    expect(s).toMatch(/\d+ pass/);
+    expect(s).toMatch(/\d+ fail/);
+    const total = s.split(" · ").reduce((n, part) => n + Number(part.split(" ")[0]), 0);
+    expect(total).toBe(MEASURED.length);
   });
 });

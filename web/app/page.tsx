@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { api, type FeatureDetail, type Summary } from "@/lib/api";
 import { fetchPodLab, type PodLab } from "@/lib/api-pdlc";
-import { DEMO_CHAPTERS, DEMO_LENGTH, STAGES, fraction, freezeReplay, shortDate, trustTiles, type Tag } from "@/lib/front";
+import { DEMO_CHAPTERS, DEMO_LENGTH, STAGES, fraction, freezeReplay, shortDate, trustTiles, trustProof, verdictSummary, TRUST_RULES, type Tag, type WaitingLite } from "@/lib/front";
 import { MEASURED, type Verdict } from "@/lib/measured";
 import { stageLabel, type Portfolio, type PortfolioProgram } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
@@ -100,7 +100,9 @@ export default async function FrontPage() {
           <Stories facts={facts} kube={kube} tourHref={tourHref} />
         </section>
 
-        <Trust />
+        <TrustRules waiting={facts.portfolio?.waiting_on_you ?? []} />
+
+        <Measured />
 
         <Demo tourHref={tourHref} kube={kube} />
       </div>
@@ -233,17 +235,43 @@ function Stories({ facts, kube, tourHref }: { facts: Facts; kube: PortfolioProgr
 
 const VERDICT: Record<Verdict, string> = { pass: "Passes", partial: "Partly", fail: "Fails", pending: "Not measured" };
 
-function Trust() {
+function TrustRules({ waiting }: { waiting: WaitingLite[] }) {
+  return (
+    <section>
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-action">Trust by design</p>
+      <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">Three rules that make the AI safe to act on</h2>
+      <ul className="mt-6 grid gap-5 md:grid-cols-3">
+        {TRUST_RULES.map((r) => (
+          <li key={r.id} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
+            <h3 className="font-heading text-lg font-semibold">{r.title}</h3>
+            <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{r.body}</p>
+            <p className="mt-4 border-t border-slate-200 pt-4 text-sm leading-6 text-action">{trustProof(r.id, MEASURED, waiting)}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+const VERDICT_TONE: Record<Verdict, string> = {
+  pass: "bg-healthy-bg text-healthy",
+  partial: "bg-warning-bg text-warning",
+  fail: "bg-critical-bg text-critical",
+  pending: "bg-slate-100 text-slate-600",
+};
+
+function Measured() {
   const tiles = trustTiles(MEASURED);
   return (
     <section id="measured" className="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:items-center">
         <div>
-          <h2 className="font-heading text-2xl font-semibold">Built for trust</h2>
+          <h2 className="font-heading text-2xl font-semibold">Measure, don&apos;t claim</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             Rules and statistics compute every fact. AI reads messy text and writes the story. A fact checker removes any claim the
             data can&apos;t prove, and a person approves anything that leaves the platform. We publish the scorecard, failures included.
           </p>
+          <p className="mt-3 text-sm font-medium text-slate-800">{verdictSummary(MEASURED)}</p>
         </div>
         <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {tiles.map((t) => (
@@ -254,22 +282,18 @@ function Trust() {
           ))}
         </ul>
       </div>
-      <details className="mt-5 border-t border-slate-100 pt-4">
-        <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-action">
-          Every measured result, failures included ({MEASURED.length})
-        </summary>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {MEASURED.map((item) => (
-            <li key={item.id} className="rounded-lg border border-slate-200 p-3">
-              <p className="text-xs text-slate-500">{VERDICT[item.verdict]}</p>
-              <p className="mt-0.5 font-heading text-lg font-semibold">{item.value}</p>
-              <p className="text-sm text-slate-700">{item.label}</p>
-              <p className="mt-1 text-xs text-slate-500">{item.detail}</p>
-              <p className="mt-1 text-xs text-slate-400">{item.measured ? `Measured ${item.measured}` : "TBD (not yet measured)"}</p>
-            </li>
-          ))}
-        </ul>
-      </details>
+      <h3 className="mt-6 border-t border-slate-100 pt-5 font-heading text-lg font-semibold">Every measured result, including what failed</h3>
+      <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {MEASURED.map((item) => (
+          <li key={item.id} className="flex flex-col rounded-xl border border-slate-200 p-4">
+            <p><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${VERDICT_TONE[item.verdict]}`}>{VERDICT[item.verdict]}</span></p>
+            <p className="mt-2 font-heading text-xl font-semibold">{item.value}</p>
+            <p className="text-sm text-slate-800">{item.label}</p>
+            <p className="mt-1 flex-1 text-xs leading-5 text-slate-500">{item.detail}</p>
+            <p className="mt-2 text-xs text-slate-400">{item.measured ? `Measured ${item.measured}` : "TBD (not yet measured)"}</p>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
