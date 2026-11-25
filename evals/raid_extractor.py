@@ -56,6 +56,17 @@ def same(a: str, b: str) -> bool:
     return bool(wa | wb) and len(wa & wb) / len(wa | wb) >= MIN_OVERLAP
 
 
+def kept_line(type_: str, owner: str | None, quote: str) -> str:
+    """One kept item as one line of the results file: ``type | owner | quote``."""
+    return f"{type_} | {owner or '-'} | {quote}"
+
+
+def parse_kept(line: str) -> dict[str, Any]:
+    """Inverse of ``kept_line`` (the quote may itself contain ``|``)."""
+    type_, owner, quote = line.split(" | ", 2)
+    return {"type": type_, "owner": None if owner == "-" else owner, "quote": quote}
+
+
 def score_case(case: Mapping[str, Any], kept: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """True/false positives and misses per type for one case (one-to-one matching)."""
     source = normalize_quote(case["notes"])
@@ -145,7 +156,7 @@ def run(gateway: Gateway, cases_dir: Path = CASES) -> dict[str, Any]:
         except AIError as exc:
             rows.append({**base, "error": str(exc)})
             continue
-        kept = [{"type": i.type, "quote": i.quote, "owner": i.owner} for i in result.items]
+        kept = [kept_line(i.type, i.owner, i.quote) for i in result.items]
         rows.append(
             {
                 **base,
@@ -153,7 +164,7 @@ def run(gateway: Gateway, cases_dir: Path = CASES) -> dict[str, Any]:
                 "returned": result.returned,
                 "dropped": result.dropped,
                 "cost_usd": round(result.cost_usd, 6),
-                "score": score_case(case, kept),
+                "score": score_case(case, [parse_kept(k) for k in kept]),
             }
         )
     return report(prompt.label, prompt.sha, gateway.settings.model_for(TASK.role), rows)
@@ -178,5 +189,5 @@ def report(
         },
         "passed": summary["passed"],
         "summary": summary,
-        "cases": rows,
+        "cases": [{k: v for k, v in r.items() if k != "score"} for r in rows],
     }
