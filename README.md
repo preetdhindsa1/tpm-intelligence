@@ -14,18 +14,37 @@ stuck: review capacity, review depth and rework.
   uses AI only to explain, with every AI claim checked against the data first. A person approves
   anything that leaves the platform.
 
-### The screens (UX v1, locked 2026-11-24: `docs/ux/ux-v1-locked.md`)
+### The screens (UX v1, locked 2026-11-24)
 
-| Screen | What it shows | Data | Status (2026-11-25) |
+Spec: [`docs/ux/ux-v1-locked.md`](docs/ux/ux-v1-locked.md). Shell, color, and stage: ADR-0024.
+JSON the screens read: [`docs/api/ux-v1-contract.md`](docs/api/ux-v1-contract.md).
+
+The menu on every page is **Portfolio · Live Cockpit · Decision Studio · AI-native PDLC · Connect your tools**.
+The current page is underlined. The front page also shows **Sign in** (only when GitHub or local login is
+configured) and **Open the live demo**, which opens Live Cockpit for the last program viewed, or Portfolio
+if there is none. Other screens show Search (⌘K: the five screens plus the open release's sections), a
+Live indicator, and the signed-in avatar. The Live label does not claim freshness; each page shows its
+own data-as-of time. Sentence case everywhere except Program Intelligence Platform, Live Cockpit,
+Decision Studio, and Shadow-Org Simulator.
+
+Live Cockpit and Decision Studio use the program in the URL, then the last program stored in the
+browser, otherwise Portfolio. The header is a breadcrumb (`Portfolio / Kubernetes · v1.38`) plus stage,
+Code Freeze, release date, and data as of. Live Cockpit sections are tabs: Overview, Dependencies,
+Executive update, Link review. Feature pages sit under Overview. Decision Studio has no tabs.
+
+| Screen | Route | What it shows | Data |
 |---|---|---|---|
-| Front page | What it is, three real stories, the trust scorecard | Measured results below | Landing in this wave (#125) |
-| Portfolio | Every live program: stage, scope, biggest bottleneck, next decision, what waits on you | `GET /portfolio` (ADR-0025) | Live |
-| Live Cockpit | One program live: lifecycle, stat tiles, #6395 time machine, Code Freeze chart, verified executive brief | Release endpoints | Live |
-| Decision Studio | Reviewer what-ifs, powered by the Shadow-Org Simulator, labeled "not validated" | `GET /releases/{name}/simulator` (ADR-0012) | Landing in this wave (#116) |
-| AI-native PDLC | How this repository's pod (1 human, 2 AI agents, 1 bot) builds, checks and ships, checked against its own PRs | `GET /lab` pod facts (ADR-0023) | Landing in this wave (#118); today's page is `/lab` |
-| Connect your tools | How a team plugs in its planning and code tools | Connector configs | Landing in this wave (#126) |
+| Front page | `/` | Dark hero and live program cards; five stages (Plan · Build · Freeze · Launch · Learn) with module status; three stories drawn from live facts (Code Freeze removals, human reviews on this repo's merged PRs, Kafka features linked to code) — a story is omitted when its source is missing; Built for trust scorecard, failures included; a 2:00 demo outline (five chapters, no recording published) | `GET /portfolio`, release summaries, `GET /lab`, `web/lib/measured.ts` |
+| Portfolio | `/portfolio` | "Here are the live programs." Stage, scope, biggest bottleneck, next decision; Waiting on you; Across programs; Coming next (RAID, readiness, retros, labeled Planned) | `GET /portfolio` (ADR-0025) |
+| Live Cockpit | `/projects/{project}/releases/{name}` | One program: lifecycle bar, five stat tiles, the #6395 time machine (Kubernetes v1.38 only), Code Freeze chart or pre-freeze odds, a decide card, and the verified executive brief | Release endpoints |
+| Decision Studio | `/projects/{project}/releases/{name}/simulate` | Pool and lever pickers, baseline vs scenario as ranges, powered by the Shadow-Org Simulator. Before a run the comparison says Illustrative and shows no numbers. The "not validated" banner uses the API's replay checks | `GET /releases/{name}/simulator` (ADR-0012) |
+| AI-native PDLC | `/pdlc` | How this repository's pod (1 human, 2 AI agents, 1 bot) builds, checks and ships: seven stages, metrics vs targets, rules checked against real PRs. `/lab` is the per-release report; the same menu item stays underlined | `GET /lab` (ADR-0023) |
+| Connect your tools | `/connect` | Three steps (connect, describe releases, first program). Connector status comes from live programs. Read-only, human approval, and public-demo privacy. It does not start a sign-up | `GET /portfolio` and connector configs |
+| All releases | `/releases` | Every collected release, including past ones. Not in the main menu. Old `/releases/{name}` links redirect to `/projects/{project}/releases/{name}` | `GET /releases` |
 
-JSON contracts for the new screens: [`docs/api/ux-v1-contract.md`](docs/api/ux-v1-contract.md).
+A failed API call shows the error text and no stand-in numbers. Unvalidated models say "not validated".
+Planned modules say Planned and show no invented counts. The screenshots further down are the
+2026-11-22 dashboard (ADR-0013), before this menu.
 
 > **Status: phase 3, live in Google Cloud.** Live demo:
 > https://program-intelligence-platform-109199755245.us-central1.run.app (deployed 2026-11-23, ADR-0017; URL renamed
@@ -40,13 +59,6 @@ JSON contracts for the new screens: [`docs/api/ux-v1-contract.md`](docs/api/ux-v
 > What is done and what is left, phase by phase: [`docs/roadmap.md`](docs/roadmap.md).
 > Operating the live deployment: [`docs/runbook.md`](docs/runbook.md).
 > Security review of the public endpoints: [`docs/security-review.md`](docs/security-review.md).
-
-![Front page: what Program Intelligence Platform does, with a live pulse of Kubernetes v1.38](docs/images/front-page.png)
-
-![v1.38 dashboard: stat tiles, feature dependencies, Code Freeze outcomes, verified executive brief](docs/images/dashboard-v1.38.png)
-
-_The v1.38 dashboard on 2026-11-22 (local Docker, real public data). Layout and decisions:
-ADR-0013._
 
 ### Plug in another team
 
@@ -69,7 +81,7 @@ Facts       linker → dependency graph + critical path → rule flags → Monte
               │
 Store       Postgres (source of truth) + Redis (cache, live push)
               │
-Serve       FastAPI (+ SSE) ──► Next.js dashboard
+Serve       FastAPI (+ SSE) ──► Next.js (UX v1: Portfolio, Live Cockpit, Decision Studio, PDLC, Connect)
 Operate     OpenTelemetry → Collector → Jaeger (local) / Cloud Trace (cloud)
 ```
 
@@ -83,7 +95,7 @@ make install                # Python deps into .venv
 make test                   # ruff + mypy + pytest
 make up                     # Postgres (+ migrations), Redis, OTel Collector, Jaeger, API, worker, web
 curl localhost:8000/healthz
-open http://localhost:3000  # front page → release health (/releases) → release dashboard → feature detail
+open http://localhost:3000  # front page → Portfolio, Live Cockpit, Decision Studio, AI-native PDLC, Connect
 open http://localhost:16686 # Jaeger: traces from tpm-api and tpm-worker
 ```
 
@@ -91,9 +103,12 @@ API (all numbers computed by `engine/`; odds are labelled `validated: false` unt
 backtest beats the base rate):
 
 ```bash
+curl localhost:8000/portfolio                        # every live program: stage, bottleneck, next decision
+curl localhost:8000/lab                              # this repository's pod facts (AI-native PDLC)
 curl localhost:8000/releases
 curl localhost:8000/releases/v1.38/features          # health table: odds, flags, linked PRs
 curl localhost:8000/releases/v1.38/features/6395     # timeline, critical path, PRs, assumptions
+curl localhost:8000/releases/v1.38/simulator         # Decision Studio inputs and the replay check
 curl localhost:8000/releases/v1.38/load              # open unlinked PRs per SIG (not per person)
 curl -N localhost:8000/releases/v1.38/stream         # Server-Sent Events: "update" on new data
 ```
@@ -125,11 +140,15 @@ make backfill TEAM=kubernetes RELEASE=v1.38   # full window, ignores cursors
 make poll TEAM=kubernetes RELEASE=v1.38       # incremental from the stored cursors
 ```
 
-Dashboard (Next.js, `web/`): the release page shows the feature health table (odds with
-range, flags, linked PRs, SIGs). Unlinked-PR load per SIG is API-only for now. A feature page shows its timeline
-(tracked, removed, re-added), critical path, PRs and the assumptions behind the odds. Pages
-refresh live over SSE when new data lands. The server renders with `API_URL` (in-network);
-the browser opens the SSE stream at `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`).
+Dashboard (Next.js, `web/`, UX v1): Portfolio lists every live program. Live Cockpit is one
+release (lifecycle, stat tiles, the #6395 time machine on Kubernetes v1.38, Code Freeze chart,
+verified brief). The feature table, merge-date chart and dependency summary sit under "More
+detail" on that page; Dependencies, Executive update and Link review are tabs. A feature page
+shows its timeline (tracked, removed, re-added), critical path, PRs and the assumptions behind
+the odds. Decision Studio is the simulator. AI-native PDLC reads `GET /lab`. Unlinked-PR load
+per SIG is API-only. Pages refresh live over SSE when new data lands. The server renders with
+`API_URL` (in-network); the browser opens the SSE stream at `NEXT_PUBLIC_API_URL` (default
+`http://localhost:8000`).
 
 ```bash
 make web-test               # eslint + tsc + vitest + next build, in Node 20 via Docker
@@ -197,22 +216,23 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   is opened and reused until facts change. LangGraph loop: draft → fact-check → one
   redraft if more than 30% of claims are removed. `make evals-live` runs paid agent evals;
   CI requires a passing run for the current prompt and model.
-- **M3b done: VP summarizer and TPM approval** (ADR-0010). "Executive update →" on the
-  release page. Opus drafts about 200 words in Summary / At risk / Removed / Asks, using
+- **M3b done: VP summarizer and TPM approval** (ADR-0010). Live Cockpit links to it as
+  **Review exec update**; the page is the Executive update tab. Opus drafts about 200 words
+  in Summary / At risk / Removed / Asks, using
   only verified claims; asks come from fixed rules. The TPM edits (edits are re-checked),
   then approves or rejects, recorded as "Harpreet (local, unauthenticated)". Nothing is
   ever sent: approved updates offer "Copy as Markdown".
 
 - **M4 done: AI link suggester and review queue** (ADR-0011). Code shortlists 12 features
   for each unlinked PR. Haiku picks one or says none, quoting both sides, and the quotes
-  are checked word for word. "Link review →" on the release page lists suggestions; only a
+  are checked word for word. The Link review tab lists suggestions; only a
   person's confirmation makes a link count. `make suggest-links RELEASE=v1.38` runs it
   within the daily budget.
 - **M5: what-if simulator, shipped not validated** (ADR-0012). SimPy model of PRs
   queueing for SIG reviewer pools, fitted on earlier releases and validated by replay.
   With PR comments counted as review activity it fails on both v1.37 and v1.38 (review
   wait far too long), so it is **not validated**.
-  - "Simulate →" on the release page lets you change reviewers, new reviewers and
+  - Decision Studio (**Test a fix** on Live Cockpit) lets you change reviewers, new reviewers and
     ramp-up, interruptions and the flow of new PRs per SIG pool.
   - It shows baseline vs scenario until the next milestone, as ranges over 8 seeded
     runs. Scenarios can be saved and compared.
@@ -221,6 +241,13 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
     2026-11-22).
   - `make sim-calibrate RELEASE=v1.38` fits and stores the calibration.
 - **M6: dashboard redesign** (ADR-0013), in light colours, based on the owner's mockup.
+  UX v1 (ADR-0024) replaced the sidebar and the Overview / Release health menu. The
+  screenshots are this layout, on 2026-11-22, local Docker, real public data.
+
+  ![Earlier front page: pipeline steps and a live pulse of Kubernetes v1.38](docs/images/front-page.png)
+
+  ![Earlier v1.38 dashboard: sidebar, stat tiles, dependencies, Code Freeze outcomes, verified brief](docs/images/dashboard-v1.38.png)
+
   - A sidebar, five stat tiles, and a summary of how features depend on each other.
   - A Dependencies page (rebuilt, see the ADR-0013 addendum): groups of features that share
     verified PRs or state a "depends on", a map with a per-feature side panel, open PRs
@@ -231,10 +258,10 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
     fact-checked.
   - Not copied from the mockup: the days-of-delay curve and "reallocate TPMs" lines,
     because nothing computes them. The curve is a candidate for M7.
-- **Front page** at `/`: what the product does, how the pipeline splits deterministic code,
-  AI and human approval, a live pulse of the current release (computed facts from the API),
-  and a scorecard of measured results with dates, including the ones that fail. Release
-  health moved to `/releases`.
+- **Front page** at `/` (phase 2): what the product does, how the pipeline splits
+  deterministic code, AI and human approval, a live pulse of the current release, and a
+  scorecard of measured results, including failures. UX v1 replaced that page. The current
+  front page is the screens table above. `/releases` is still All releases.
 - **M7 (forecast improvements).**
   - Release views are served from the cache while they recompute in the background. A
     cache expiry no longer makes anyone wait (ADR-0002 addendum).
@@ -246,9 +273,10 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
   - Every forecast is recorded daily in append-only tables, with its model version
     (ADR-0015). v1.39 will be the first test on a release the model has never seen:
     `make score-snapshots RELEASE=v1.39` once it finishes.
-- **Multi-project navigation** (ADR-0014): a "Release health" home page across projects,
-  a project/release switcher, and release URLs that carry the project
+- **Multi-project navigation** (ADR-0014): release URLs carry the project
   (`/projects/kubernetes/releases/v1.38`; old `/releases/v1.38` links redirect).
+  The switcher is the Portfolio / program breadcrumb on Live Cockpit and Decision Studio.
+  Portfolio is the cross-program screen. `/releases` lists every collected release.
   Apache Kafka (ADR-0018) and this project (ADR-0020) are shown alongside Kubernetes.
 
 ## Limitations
