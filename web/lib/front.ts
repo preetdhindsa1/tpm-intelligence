@@ -134,3 +134,40 @@ export function verdictSummary(rows: Measured[]): string {
     .map(([c, w]) => `${c} ${w}`)
     .join(" · ");
 }
+
+export type StepKind = "deterministic" | "ai" | "human";
+
+/** How it works: raw events to an update a VP can trust. Who does each step is a fixed design rule. */
+export const PIPELINE: { n: string; title: string; body: string; kind: StepKind }[] = [
+  { n: "01", title: "Collect", body: "Issues, PRs, reviews, CI and history as timestamped events. Nothing is overwritten.", kind: "deterministic" },
+  { n: "02", title: "Link", body: "PR → feature → release from explicit keys and tracking lists. AI only suggests the rest.", kind: "deterministic" },
+  { n: "03", title: "Facts", body: "Freeze status, review rounds, critical path, rule flags. Counted, never guessed.", kind: "deterministic" },
+  { n: "04", title: "Forecast", body: "Monte Carlo odds per feature, shown as ranges next to the base rate.", kind: "deterministic" },
+  { n: "05", title: "Explain", body: "Agents turn facts into risk notes and a VP summary, one claim at a time.", kind: "ai" },
+  { n: "06", title: "Verify", body: "Each claim is checked against the database. Wrong or unsupported claims are removed and counted.", kind: "deterministic" },
+  { n: "07", title: "Approve", body: "A TPM edits and approves. The platform never sends anything on its own.", kind: "human" },
+];
+
+export const STEP_TAG: Record<StepKind, { text: string; tone: string }> = {
+  deterministic: { text: "Deterministic", tone: "bg-slate-100 text-slate-700" },
+  ai: { text: "AI, then fact-checked", tone: "bg-violet-50 text-violet-700" },
+  human: { text: "Human", tone: "bg-healthy-bg text-healthy" },
+};
+
+/** What each connected team plugs in. The card is Live only when GET /portfolio serves the project. */
+export const TEAM_SOURCES: { project: string; name: string; body: string }[] = [
+  { project: "kubernetes", name: "Kubernetes", body: "GitHub enhancement issues (KEPs) + kubernetes/kubernetes PRs" },
+  { project: "kafka", name: "Apache Kafka", body: "Jira fix versions (New Features, umbrellas, KIPs) + apache/kafka PRs" },
+  { project: "tpm-intelligence", name: "Program Intelligence Platform", body: "Tracks its own development: GitHub issues and the PRs that close them, delivered by GitHub webhooks in seconds" },
+];
+
+export type TeamCard = { name: string; body: string; live: boolean; href: string | null };
+
+/** Team cards: the API's display name and Live state for connected teams, then "Your team". */
+export function teamCards(programs: { project: string; release: string; display_name: string }[], path: (project: string, release: string) => string): TeamCard[] {
+  const cards = TEAM_SOURCES.map((t) => {
+    const p = programs.find((x) => x.project.toLowerCase() === t.project);
+    return { name: p?.display_name ?? t.name, body: t.body, live: Boolean(p), href: p ? path(p.project, p.release) : null };
+  });
+  return [...cards, { name: "Your team", body: "Copy a connector file: where the plan lives, where the code lives, the release calendar", live: false, href: "/connect" }];
+}

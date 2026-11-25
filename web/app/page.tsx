@@ -4,8 +4,8 @@
 import Link from "next/link";
 import { api, type FeatureDetail, type Summary } from "@/lib/api";
 import { fetchPodLab, type PodLab } from "@/lib/api-pdlc";
-import { DEMO_CHAPTERS, DEMO_LENGTH, STAGES, fraction, freezeReplay, shortDate, trustTiles, trustProof, verdictSummary, TRUST_RULES, type Tag, type WaitingLite } from "@/lib/front";
-import { MEASURED } from "@/lib/measured";
+import { DEMO_CHAPTERS, DEMO_LENGTH, STAGES, fraction, freezeReplay, shortDate, trustTiles, trustProof, verdictSummary, teamCards, PIPELINE, STEP_TAG, TRUST_RULES, type Tag, type WaitingLite } from "@/lib/front";
+import { MEASURED, VERDICT_LABEL, VERDICT_TONE } from "@/lib/measured";
 import { stageLabel, type Portfolio, type PortfolioProgram } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
 import { programTitle } from "@/lib/names";
@@ -100,9 +100,13 @@ export default async function FrontPage() {
           <Stories facts={facts} kube={kube} tourHref={tourHref} />
         </section>
 
+        <HowItWorks />
+
         <TrustRules waiting={facts.portfolio?.waiting_on_you ?? []} />
 
         <Measured />
+
+        <Teams programs={programs} />
 
         <Demo tourHref={tourHref} kube={kube} />
       </div>
@@ -233,6 +237,65 @@ function Stories({ facts, kube, tourHref }: { facts: Facts; kube: PortfolioProgr
   return <ul className="mt-6 grid gap-5 md:grid-cols-3">{cards}</ul>;
 }
 
+function HowItWorks() {
+  return (
+    <section>
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-action">How it works</p>
+      <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">From raw events to an update a VP can trust</h2>
+      <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+        {PIPELINE.map((step, i) => (
+          <li key={step.n} className="relative flex flex-col rounded-2xl border border-slate-200 bg-white p-4">
+            <p className="text-xs font-medium text-slate-400">{step.n}</p>
+            <h3 className="mt-1 font-heading text-lg font-semibold">{step.title}</h3>
+            <p className="mt-1 flex-1 text-sm leading-6 text-slate-600">{step.body}</p>
+            <p className="mt-3">
+              <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium leading-5 ${STEP_TAG[step.kind].tone}`}>{STEP_TAG[step.kind].text}</span>
+            </p>
+            {i < PIPELINE.length - 1 && <span aria-hidden className="absolute -right-2.5 top-1/2 hidden -translate-y-1/2 text-xs text-slate-300 xl:block">›</span>}
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function Teams({ programs }: { programs: PortfolioProgram[] }) {
+  const cards = teamCards(programs, (project, release) => releasePath(project, release));
+  return (
+    <section>
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-action">Any cross-functional team</p>
+      <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">One model for plans in GitHub or Jira</h2>
+      <p className="mt-2 max-w-3xl text-slate-600">
+        Collectors turn every source into the same events, so the facts, forecast and AI work the same way for every team.
+      </p>
+      <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {cards.map((c) => {
+          const body = (
+            <>
+              <span className="flex items-start justify-between gap-3">
+                <span className="font-heading text-lg font-semibold text-slate-900">{c.name}</span>
+                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${c.live ? "bg-healthy-bg text-healthy" : "bg-slate-100 text-slate-600"}`}>
+                  {c.live ? "Live" : c.name === "Your team" ? "Plug in" : "Not live"}
+                </span>
+              </span>
+              <span className="mt-2 block text-sm leading-6 text-slate-600">{c.body}</span>
+            </>
+          );
+          return (
+            <li key={c.name}>
+              {c.href ? (
+                <Link href={c.href} className="block h-full rounded-2xl border border-slate-200 bg-white p-5 hover:border-action">{body}</Link>
+              ) : (
+                <div className="h-full rounded-2xl border border-slate-200 bg-white p-5">{body}</div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 function TrustRules({ waiting }: { waiting: WaitingLite[] }) {
   return (
     <section>
@@ -273,11 +336,23 @@ function Measured() {
           ))}
         </ul>
       </div>
-      <p className="mt-5 border-t border-slate-100 pt-4">
-        <Link href="/measured" className="inline-flex min-h-11 items-center text-sm font-semibold text-action hover:underline">
-          Every measured result, including what failed ({MEASURED.length}) →
-        </Link>
-      </p>
+      <details className="group mt-5 border-t border-slate-100 pt-4">
+        <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-action">
+          Every measured result, including what failed ({MEASURED.length})
+          <span aria-hidden className="text-xs transition group-open:rotate-180">▾</span>
+        </summary>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {MEASURED.map((item) => (
+            <li key={item.id} className="flex flex-col rounded-xl border border-slate-200 p-4">
+              <p><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${VERDICT_TONE[item.verdict]}`}>{VERDICT_LABEL[item.verdict]}</span></p>
+              <p className="mt-2 font-heading text-xl font-semibold">{item.value}</p>
+              <p className="text-sm text-slate-800">{item.label}</p>
+              <p className="mt-1 flex-1 text-xs leading-5 text-slate-500">{item.detail}</p>
+              <p className="mt-2 text-xs text-slate-400">{item.measured ? `Measured ${item.measured}` : "TBD (not yet measured)"}</p>
+            </li>
+          ))}
+        </ul>
+      </details>
     </section>
   );
 }
