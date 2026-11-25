@@ -195,7 +195,7 @@ def test_dependabot_is_not_the_cursor_lane() -> None:
     assert report.arrivals[0].lane == "dependabot"
 
 
-def test_approval_rate_counts_an_approving_round_and_not_the_merge() -> None:
+def test_approval_rate_counts_an_approving_round_or_a_merge_by_the_pool() -> None:
     approved = _pr(
         key="repo#1",
         number=1,
@@ -204,10 +204,14 @@ def test_approval_rate_counts_an_approving_round_and_not_the_merge() -> None:
         reviews=(Review("1", "preetdhindsa1", "approved", T0 + timedelta(hours=1)),),
     )
     bare = _pr(key="repo#2", number=2, state="merged", merged_at=T0 + timedelta(hours=6))
-    report = _report([approved, bare])
-    assert report.approved_merged == 1
+    by_owner = _pr(key="repo#3", number=3, state="merged", merged_at=T0 + timedelta(hours=6),
+                   merged_by="preetdhindsa1")  # fmt: skip
+    by_other = _pr(key="repo#4", number=4, state="merged", merged_at=T0 + timedelta(hours=6),
+                   merged_by="someone")  # fmt: skip
+    report = _report([approved, bare, by_owner, by_other])
+    assert report.approved_merged == 2  # the approving round and the owner's merge
     assert report.approval_rate == 0.5
-    assert report.median_hours_to_merge == 5.5
+    assert report.median_hours_to_merge == 6.0
     assert _report([_pr()]).approval_rate is None
 
 

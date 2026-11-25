@@ -220,7 +220,8 @@ def lab_report(
     pool = set(reviewer_pool)
     rounds = {pr.key: tuple(review_rounds(pr)) for pr in window}
     merged = [pr for pr in window if pr.merged_at is not None]
-    approved = [pr for pr in merged if _approved(rounds[pr.key])]
+    # A merge by someone in the reviewer pool is a person's approval (ADR-0023 add. 3).
+    approved = [pr for pr in merged if _approved(rounds[pr.key]) or pr.merged_by in pool]
     small = len(merged) < SMALL_SAMPLE_BELOW
     waits = _first_review_hours(window, rounds)
     waiting = sum(1 for pr in window if not rounds[pr.key])
