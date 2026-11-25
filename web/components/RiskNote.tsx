@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { RiskNote } from "@/lib/api";
-import { formatUtc, refLabel, removedSummary } from "@/lib/format";
+import { formatUtc, refChips, removedSummary } from "@/lib/format";
 
 /**
  * "Why at risk": AI-written, every claim verified against engine facts before it is shown.
@@ -61,8 +61,7 @@ export function RiskNotePanel({ release, number }: { release: string; number: nu
                 <span className="mr-1 text-emerald-600" aria-label="verified">✓</span>
                 {c.text}
                 <div className="mt-0.5 flex flex-wrap gap-1 pl-4">
-                  {c.refs.map((ref) => {
-                    const { label, href } = refLabel(ref);
+                  {refChips(c.refs).map(({ ref, label, href }) => {
                     const chip = "rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600";
                     return href ? (
                       <a key={ref} className={`${chip} hover:underline`} href={href} title={ref}>{label}</a>

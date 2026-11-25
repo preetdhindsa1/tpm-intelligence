@@ -9,5 +9,5 @@ export const dynamic = "force-dynamic";
 export default async function SimulatePage({ params }: { params: Promise<{ project: string; name: string }> }) {
   const release = await releaseFromParams(params);
   const title = programTitle(release.display_name || release.project, release.name, release.has_lab);
-  return <Simulator release={release.name} program={title} cockpit={releasePath(release.project, release.name)} />;
+  return <Simulator release={release.name} program={title} cockpit={releasePath(release.project, release.name)} freezeLabel={release.code_freeze_label} />;
 }

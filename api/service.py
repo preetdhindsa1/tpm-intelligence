@@ -337,8 +337,14 @@ class ReleaseService:
         per release at a time).
         """
         key = self.resolve(release_name)
-        self._viewed[key] = time.monotonic()
         self.refresh()
+        with self._lock:
+            known = key in self._release_keys
+        if not known:
+            # Answer an unknown name at once: computing a view first projects every event of
+            # the project (3.5 s for a bad Kubernetes name, 2026-11-25) only to fail.
+            raise KeyError(key)
+        self._viewed[key] = time.monotonic()
         cached = self._views.get(key)
         if cached and self._is_fresh(cached):
             return cached

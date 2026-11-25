@@ -137,6 +137,26 @@ def test_review_gap_counts_human_reviews_when_the_pod_facts_have_them() -> None:
     )
 
 
+def test_review_gap_says_the_human_approved_at_merge() -> None:
+    """Owner report 2026-11-25: the human merges, and so approves, every PR here."""
+    lab = LabFacts(merged=90, approved_merged=88, median_hours_to_merge=0.233, unassigned=0,
+                   human_reviewed=20, reviewed_of=88, human_approved=88)  # fmt: skip
+    repo = facts("tpm-intelligence:Phase 3", "Program Intelligence Platform (Current Project)",
+                 dates=REPO.dates, features_in_release=4, features_ever=4, linked_features=3,
+                 lab=lab)  # fmt: skip
+    row = program(repo)
+    assert row["bottleneck"]["detail"] == (
+        "88 pull requests merged, 88 approved by the human at merge, 20 with a written human review"
+    )
+    assert row["bottleneck"]["facts"]["human_approved"] == 88
+    [gap] = [a for a in portfolio([repo], [], NOW)["across_programs"] if a["kind"] == "review_gap"]
+    assert gap["text"] == (
+        "Program Intelligence Platform (Current Project): pull requests merge in a median of "
+        "14 minutes, and 88 of 88 were approved by the human at merge and 20 had a written "
+        "human review."
+    )
+
+
 def test_no_review_gap_when_most_prs_had_a_human_review() -> None:
     lab = LabFacts(merged=78, approved_merged=0, median_hours_to_merge=0.233, unassigned=0,
                    human_reviewed=40, reviewed_of=74)  # fmt: skip

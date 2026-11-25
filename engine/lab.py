@@ -224,7 +224,9 @@ def lab_report(
     approved = [pr for pr in merged if _approved(rounds[pr.key]) or pr.merged_by in pool]
     small = len(merged) < SMALL_SAMPLE_BELOW
     waits = _first_review_hours(window, rounds)
-    waiting = sum(1 for pr in window if not rounds[pr.key])
+    # Waiting means still open with no review yet. Merged and closed PRs are not waiting:
+    # counting them showed every one of this repo's 103 PRs as waiting (2026-11-25).
+    waiting = sum(1 for pr in window if pr.state == "open" and not rounds[pr.key])
     round_counts = tuple(len(rounds[pr.key]) for pr in window)
     found = collisions(window)
     merge_hours = [

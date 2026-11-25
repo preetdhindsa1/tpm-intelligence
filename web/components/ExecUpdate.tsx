@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { SECTION_TITLES, updatesRequest, type ExecUpdate, type VerifiedClaim } from "@/lib/api";
 import { ApproverNote, useMe } from "@/components/Me";
-import { formatUtc, refLabel } from "@/lib/format";
+import { formatUtc, refChips } from "@/lib/format";
 
 const ORDER = ["summary", "at_risk", "removed", "asks"];
 
@@ -204,8 +204,7 @@ function UpdateView({
                       <span className="mr-1 text-emerald-600" aria-label="verified">✓</span>
                       {c.text}
                       <div className="mt-0.5 flex flex-wrap gap-1 pl-4">
-                        {c.refs.map((ref) => {
-                          const { label, href } = refLabel(ref);
+                        {refChips(c.refs).map(({ ref, label, href }) => {
                           const chip = "rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600";
                           return href ? (
                             <a key={ref} className={`${chip} hover:underline`} href={href} title={ref}>{label}</a>

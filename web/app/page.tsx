@@ -179,7 +179,7 @@ function programLine(p: PortfolioProgram, facts: Facts): React.ReactNode {
     return `${s.features_in_release} features in · ${s.removed_at_freeze} removed at Code Freeze · ${s.critical_features} with a critical flag`;
   }
   const tool = p.planning_tool === "jira" ? " in Jira" : "";
-  return `${p.scope.features_in_release} features planned${tool}${freeze ? ` · Code Freeze ${shortDate(freeze)}` : ""}`;
+  return `${p.scope.features_in_release} features planned${tool}${freeze ? ` · ${p.code_freeze_label || "Code Freeze"} ${shortDate(freeze)}` : ""}`;
 }
 
 function StoryCard({ eyebrow, big, of, tone, title, body, href, cta }: {

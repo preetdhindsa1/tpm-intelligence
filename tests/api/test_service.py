@@ -176,6 +176,19 @@ def test_the_warmer_leaves_a_release_nobody_viewed_lately() -> None:
     assert len(computed) == 3
 
 
+def test_an_unknown_release_fails_fast_without_computing() -> None:
+    computed: list[str] = []
+    service = ReleaseService(
+        InMemoryEventSource(list(fixture_events())),
+        forecast=FAST,
+        now=lambda: AFTER_READD,
+        on_computed=lambda v: computed.append(v.assessment.release.key),
+    )
+    with pytest.raises(KeyError):
+        service.view("nope")
+    assert computed == []
+
+
 def test_warm_computes_a_release_before_anyone_asks() -> None:
     service = make_service()
     assert service.current_release_name() == "v1.38"

@@ -106,6 +106,13 @@ def test_two_reviews_inside_an_hour_are_one_round_and_the_author_does_not_start_
     assert report.still_waiting == 0
 
 
+def test_only_open_prs_without_a_review_are_waiting() -> None:
+    open_pr = _pr(key="repo#1", number=1)
+    merged = _pr(key="repo#2", number=2, state="merged", merged_at=T0 + timedelta(hours=1))
+    closed = _pr(key="repo#3", number=3, state="closed", closed_at=T0 + timedelta(hours=1))
+    assert _report([open_pr, merged, closed]).still_waiting == 1
+
+
 def test_queue_counts_until_the_pool_reviews() -> None:
     waiting = _pr(key="repo#1", number=1, head_ref="claude/1")
     reviewed = _pr(
