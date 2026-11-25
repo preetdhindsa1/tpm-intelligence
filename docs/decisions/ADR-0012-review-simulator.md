@@ -186,3 +186,42 @@ to move on, rather than rework the model now.
 ## AI vs rules
 
 No AI. Every number is measured, fitted on past releases, or simulated with fixed seeds.
+
+## Addendum (2026-11-25, #97): why the review wait failed after comments were collected
+
+**Evidence only. The model is unchanged. Each next step waits for the owner.**
+
+### Finding: bot accounts were counted as human reviewers
+
+`engine.review_rounds.is_bot()` recognizes logins that end in `[bot]`, `-bot` or `-robot`. GitHub's **GraphQL** API, which the poller uses, returns app accounts **without** the `[bot]` suffix. REST, which the webhook receiver uses, keeps it. Checked on 2026-11-25 on kubernetes/kubernetes#144449: REST `kubernetes-prow[bot]` (type `Bot`), GraphQL `kubernetes-prow` (`__typename: "Bot"`). So every bot comment the poller stored counts as a human review round.
+
+Accounts making a PR's **first review round within 1 minute of its opening** (`scripts/diagnose_sim_wait.py` and an ad-hoc count, local data until 2026-11-22). Bots and tools only:
+
+| Release | PRs with a review round | Instant first rounds | By account |
+|---|---|---|---|
+| v1.35 | 808 | 69 | `linux-foundation-easycla` 68 (CLA bot) |
+| v1.36 | 1,211 | 147 | `linux-foundation-easycla` 147 |
+| v1.37 | 1,304 | 762 | `kubernetes-prow` 602 (Prow bot, new for v1.37), `linux-foundation-easycla` 147, `copilot-pull-request-reviewer` 13 (AI reviewer) |
+| v1.38 | 2,091 | 1,946 | `kubernetes-prow` 1,761, `linux-foundation-easycla` 178, `copilot-pull-request-reviewer` 7 |
+
+In-sample (source releases only, the fit that validation uses for v1.38), the share of real waits under 1 minute is 3.7–4.4% for v1.33–v1.36 and **28%** for v1.37. 59% of v1.37's *first* rounds are under 1 minute, and its real first-round median is 0.0001 days. The simulated median stays near 0.26 days for every source release. The +205% and +350% errors of the second run came from this change in the data: Kubernetes' Prow started commenting from an app account in v1.37. They did not come from the model.
+
+### Effect, measured once
+
+`simulator.replay.validate` was run **once**, model unchanged, with only these three GraphQL bot accounts treated as bots (in memory; what the collector fix below will store):
+
+| Release | Median review wait: real → sim | Median time to merge: real → sim | Result |
+|---|---|---|---|
+| v1.37 | 0.433 → 0.409 days (−5.5%) | 3.78 → 3.32 days (−12%) | **pass** |
+| v1.38 | 0.615 → 0.361 days (**−41%**) | 2.55 → 2.67 days (+5%) | **fail** |
+
+**The simulator is still not validated.** v1.38's remaining miss is the one from the first run: reviewer effort is fitted at its floor (0.02 days), so capacity barely matters, and v1.38 had 56% more PRs than the source releases with about the same reviewers.
+
+### The proposed fixes, in order, each for the owner to approve
+
+1. **Data (no model change).** The poller fetches `author { login __typename }` and stores a `Bot` login as `<login>[bot]`, the same as REST and webhooks. A bot flag joins the event identity, so a backfill re-stores the old records with the right login. Then backfill Kubernetes v1.33–v1.38 and Kafka, and re-run every measured result that reads review rounds: this validation, the forecast backtests, and time to first review in the lab. **This changes published numbers.** It is a correction (CLAUDE.md section 6: bot and AI-reviewer actions are never human review). `copilot-pull-request-reviewer` is an AI reviewer: excluded from human review now, and counted as AI review when the Wave 3 signals land.
+2. **Model (v1.38 still fails).** Not changed and not tried. Options to choose from *before* any is run against the held-out releases:
+   - (a) Estimate reviewer effort from measured capacity (review rounds per active reviewer-week at the busiest weeks of the source releases), instead of fitting it to waits that barely respond to load.
+   - (b) Fit effort with v1.33–v1.37 as sources, and validate on v1.39 when it ships (the first release no fit has seen).
+   - (c) Keep the model, and keep "not validated" on the page, with these numbers.
+   Choosing among (a)–(c) by their v1.38 result would be tuning to the test, so the choice comes first.

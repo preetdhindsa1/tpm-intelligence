@@ -352,7 +352,7 @@ def pull_request_events(node: Json, *, observed_at: datetime) -> list[Normalized
         number=node["number"],
         title=node["title"],
         body=node.get("body") or "",
-        author=(node.get("author") or {}).get("login"),
+        author=actor_login(node.get("author")),
         state=_PR_STATES[node["state"]],
         labels=tuple(sorted(n["name"] for n in node["labels"]["nodes"])),
         base_ref=node.get("baseRefName"),
@@ -416,12 +416,12 @@ def review_events(
                 observed_at=observed_at,
                 payload=ReviewSubmitted(
                     review_id=str(r["databaseId"]),
-                    reviewer=(r.get("author") or {}).get("login"),
+                    reviewer=actor_login(r.get("author")),
                     state=state,
                     submitted_at=submitted,
                     marker=marker,
                 ),
-                identity=marker_identity(r["databaseId"], marker),
+                identity=marker_identity(r["databaseId"], marker, _is_app(r.get("author"))),
             )
         )
     return out
@@ -452,10 +452,24 @@ def pod_marker(body: str | None) -> str | None:
     return f"{m[1].lower()}:{m[2]}" if m else None
 
 
-def marker_identity(record_id: object, marker: str | None) -> tuple[object, ...]:
-    """Event identity. A marker is part of it, so a record stored before markers were read
-    is stored again with its marker (events are insert-once); unmarked ids do not change."""
-    return (record_id, marker) if marker else (record_id,)
+def marker_identity(record_id: object, marker: str | None, app: bool = False) -> tuple[object, ...]:
+    """Event identity. A marker or an app author is part of it, so a record stored before
+    they were read is stored again (events are insert-once); other ids do not change."""
+    return (record_id, *([marker] if marker else []), *(["app"] if app else []))
+
+
+def _is_app(author: Json | None) -> bool:
+    return (author or {}).get("__typename") == "Bot"
+
+
+def actor_login(author: Json | None) -> str | None:
+    """The login as REST and webhooks spell it. GraphQL drops the ``[bot]`` suffix of app
+    accounts (``kubernetes-prow`` is ``kubernetes-prow[bot]`` in REST), which made bot
+    comments count as human review (ADR-0012 addendum, #97)."""
+    login = (author or {}).get("login")
+    if login and _is_app(author) and not login.endswith("[bot]"):
+        return f"{login}[bot]"
+    return login
 
 
 def prow_commands(body: str) -> tuple[str, ...]:
@@ -485,12 +499,12 @@ def comment_events(
                 observed_at=observed_at,
                 payload=CommentPosted(
                     comment_id=str(c["databaseId"]),
-                    author=(c.get("author") or {}).get("login"),
+                    author=actor_login(c.get("author")),
                     posted_at=posted,
                     commands=prow_commands(c.get("body") or ""),
                     marker=marker,
                 ),
-                identity=marker_identity(c["databaseId"], marker),
+                identity=marker_identity(c["databaseId"], marker, _is_app(c.get("author"))),
             )
         )
     return out
