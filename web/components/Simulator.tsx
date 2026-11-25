@@ -199,11 +199,14 @@ function Levers({
         </label>
       )}
       {notes.length > 0 && (
-        <ul className="space-y-0.5 text-xs text-slate-600">
-          {notes.map((note) => (
-            <li key={note}>{note}</li>
-          ))}
-        </ul>
+        <div aria-live="polite">
+          <p className="text-xs font-medium text-slate-700">Changes in this scenario</p>
+          <ul className="mt-1 space-y-0.5 text-xs text-slate-600">
+            {notes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
