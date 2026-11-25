@@ -88,7 +88,7 @@ langfuse-up: ## Start self-hosted Langfuse (LLM traces) on http://localhost:3001
 langfuse-down: ## Stop Langfuse (data kept in its volumes)
 	$(LANGFUSE) down
 
-evals-live: ## Paid agent evals (risk analyst ~$0.03, VP summary ~$0.40); SUITE=all|risk_analyst|vp_summary|link_suggester
+evals-live: ## Paid agent evals (risk analyst ~$0.03, VP summary ~$0.40); SUITE=all|risk_analyst|vp_summary|link_suggester|raid_extractor
 	docker compose build -q api
 	docker run --rm --network tpm-intelligence_default --env-file .env \
 	  -e DATABASE_URL=postgresql+psycopg://tpm:tpm@postgres:5432/tpm \

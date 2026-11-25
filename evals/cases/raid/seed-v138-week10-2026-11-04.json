@@ -1,0 +1,23 @@
+{
+ "id": "seed-v138-week10-2026-11-04",
+ "seed": true,
+ "author": "builder (claude-agent)",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {"document": "Kubernetes v1.38 release team meeting notes (public Google Doc)", "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0", "meeting_date": "2026-11-04", "fetched_at": "2026-11-25T20:53:00Z", "note": "Excerpt of the Updates section, people's names masked; template lines removed."},
+ "teams": ["Enhancements", "Release Signal", "Docs", "Comms", "Release Branch Management", "Subproject Leads", "Release Lead"],
+ "notes": "   * Updates:\n   * ​​All Code Freeze reminders have been sent.\n   * Release Signal (APAC: [participant]/ [participant], EMEA: [participant] / [participant]):\n   * Current Status: Red\n   * We found a new flaky test that is on the master blocking board. Now we are checking whether this is a release blocker to sig api machinery.\nThis issue is only a release blocker for v1.38.0-beta.0 now.\nhttps://github.com/kubernetes/kubernetes/issues/143749\n   * Updates:\n   * We are scheduled to release v1.38.0-beta.0 on Wednesday, 4 November(today)\nWhat's happened since last week\n   * Placeholder PR deadline met: 100% of tracked KEPs have a docs PR or need no docs\n   * Last week’s branch sync PR to k/website has been merged\n   * Release Notes for v1.38.0-alpha.3 have been created and merged.\nImportant dates & upcoming work\n   * Ready-for-review outreach has started on GitHub (Draft PRs → ready for review; ready PRs → technical/docs  review)\n   * v1.38.0-beta.0 release notes: Wed 4 Nov, created by [participant], reviewed by [participant]\n   * Next k/website weekly sync: 6th Nov by [participant]\n   * KubeCon NA is next week (9th–12th November),\n   * Code Freeze is on Monday 16th November 2026 (AoE).\n   * Comms (APAC: [participant] / [participant] | EMEA: [participant]):\n   * Current Status: Green\n   * Progress Issue\n   * The final set of outreach to KEPs for feature blogs is complete. So far, 20 KEPs have opted in and 11 have opted out. Feature Blog freeze is on Wednesday 4th November 2026 (AoE).\n   * We have started the second set of outreach for SIGs asking for release highlights and deprecations this week. We got only 3 responses from the first set of outreach messages, they told us there's nothing to highlight (SIG UI, SIG Multicluster, SIG Cluster-lifecycle) on the Release Highlights GitHub Discussion. The Release Highlights discussion closes on Tuesday 24th November 2026\n   * We will start working on the mid-cycle blog this week. Mid cycle blog publication date is on Monday 23rd November 2026. We're aiming to have the k/website PR ready a week earlier for review by #sig-docs-blog. We're still confirming the list of deprecations with the respective SIGs.\n   * Release Branch Management ([participant] / [participant]):\n   * Current Status: Yellow\n   * Progress issue\n   * v1.38.0-beta.0 is scheduled for today, waiting for signal\n   * Release Lead ([participant]/ [participant]):\n   * All of the action items and progress can be found in https://github.com/kubernetes/sig-release/issues/3087\n   * We’re past the halfway point of the release cycle, thank you all for the great work so far!\n   * I’m preparing the mid-cycle update email to go out later today.\n",
+ "expected": [
+  {"type": "issue", "quote": "We found a new flaky test that is on the master blocking board. Now we are checking whether this is a release blocker to sig api machinery.", "owner": "Release Signal"},
+  {"type": "risk", "quote": "v1.38.0-beta.0 is scheduled for today, waiting for signal", "owner": "Release Branch Management"},
+  {"type": "risk", "quote": "We got only 3 responses from the first set of outreach messages", "owner": "Comms"},
+  {"type": "action", "quote": "We will start working on the mid-cycle blog this week.", "owner": "Comms"},
+  {"type": "action", "quote": "I’m preparing the mid-cycle update email to go out later today.", "owner": "Release Lead"}
+ ],
+ "optional": [
+  {"type": "issue", "quote": "This issue is only a release blocker for v1.38.0-beta.0 now."},
+  {"type": "action", "quote": "We have started the second set of outreach for SIGs asking for release highlights and deprecations this week."},
+  {"type": "risk", "quote": "KubeCon NA is next week (9th–12th November),"},
+  {"type": "action", "quote": "We're aiming to have the k/website PR ready a week earlier for review by #sig-docs-blog."}
+ ]
+}

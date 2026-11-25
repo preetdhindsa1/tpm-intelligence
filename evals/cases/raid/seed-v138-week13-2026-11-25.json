@@ -1,0 +1,27 @@
+{
+ "id": "seed-v138-week13-2026-11-25",
+ "seed": true,
+ "author": "builder (claude-agent)",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {"document": "Kubernetes v1.38 release team meeting notes (public Google Doc)", "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0", "meeting_date": "2026-11-25", "fetched_at": "2026-11-25T20:53:00Z", "note": "Excerpt of the Updates section, people's names masked; template lines removed."},
+ "teams": ["Enhancements", "Release Signal", "Docs", "Comms", "Release Branch Management", "Subproject Leads", "Release Lead"],
+ "notes": "* Release Signal (APAC: [participant] / [participant] | EMEA: [participant] / [participant]):\n* Current Status: Red\n* Master-blocking:\n   * #144411: TestClientReceivedGOAWAY. SIG API Machinery is investigating a possible regression following #144168.\n   * #144420: TestAggregatedAPIServer. Awaiting SIG API Machinery assessment.\n   * #144412: MirrorPod tests on CRI-O. Investigation is ongoing.\n   * #144421: Memory-backed volume resize flake. Closed and confirmed as non-release-blocking by SIG Node.\n* Master-informing:\n   * #144444: Dynamic Node-Local Ephemeral Volumes flake.\n   * #144231: EC2 scale performance 5000-node job. Reopened due to recurring DELETE latency SLO violations.\n* Updates:\n   * All three failing issues are on master-informing.\n   * Following up on outstanding release-impact assessments ahead of v1.38.0-rc.0 on December 3.\n* Docs (APAC:  [participant] / EMEA: [participant]):\n* Current Status:  Yellow\n      * The ready-for-review deadline has passed. 1 tracked KEP still has a draft docs PR, and most ready PRs are still waiting on technical review, with Docs Freeze on 2 December\n      * Last week's branch sync PR to k/website has been merged.\n      * The v1.38.0-beta.0 Release Notes PR has been merged.\n      * Ready-for-review outreach is done on GitHub, and a second wave of follow-ups has gone out in SIG Slack channels:\n   * Upcoming Deadlines\n      * Docs Freeze: Wednesday, 2 December 2026 (AoE)\n* Comms (APAC: [participant] / [participant] | EMEA: [participant] / [participant] ):\n* Current Status: Green\n* Progress Issue\n* The mid cycle blog is out. Thanks to all the comms shadows who wrote it, and to #sig-docs-blog for the reviews! https://kubernetes.io/blog/2026/11/23/kubernetes-v1-38-sneak-peek/\n* Feature blogs: all opted-in blogs with a PR now have a writing buddy assigned. Feature blogs need to be ready to review by Monday 30th November 2026, so this week we’ll chase authors who still have placeholder or WIP PRs.\n* Release highlights: the deadline was yesterday, Tuesday 24th November 2026. 10 SIGs have replied on the Release Highlights GitHub Discussion so far. SIG Windows, SIG CLI, SIG Apps, Scheduling and SIG Network sent highlights; SIG UI, SIG Multicluster, SIG Cluster Lifecycle, SIG Autoscaling, SIG Security and SIG Node have nothing to highlight.\n* Release blog: we’re starting the release announcement draft this week, with each shadow taking a few sections. It needs to be ready for review by Thursday 10th December 2026.\n* Release Branch Management ([participant] / [participant]):\n* Current Status: Green\n* Progress issue\n* Rc.0 instructions were shared within the team\n* Unblocked post branch creation tasks were prepared https://github.com/kubernetes/sig-release/issues/3139\n* Subproject Leads ([participant] / [participant], [participant] / [participant]):\n* Two teams still need to DM the subproject leads + release lead about succession!\n",
+ "expected": [
+  {"type": "issue", "quote": "#144411: TestClientReceivedGOAWAY. SIG API Machinery is investigating a possible regression following #144168.", "owner": "Release Signal"},
+  {"type": "issue", "quote": "#144420: TestAggregatedAPIServer. Awaiting SIG API Machinery assessment.", "owner": "Release Signal"},
+  {"type": "issue", "quote": "#144412: MirrorPod tests on CRI-O. Investigation is ongoing.", "owner": "Release Signal"},
+  {"type": "issue", "quote": "#144444: Dynamic Node-Local Ephemeral Volumes flake.", "owner": "Release Signal"},
+  {"type": "issue", "quote": "#144231: EC2 scale performance 5000-node job. Reopened due to recurring DELETE latency SLO violations.", "owner": "Release Signal"},
+  {"type": "action", "quote": "Following up on outstanding release-impact assessments ahead of v1.38.0-rc.0 on December 3.", "owner": "Release Signal"},
+  {"type": "risk", "quote": "1 tracked KEP still has a draft docs PR, and most ready PRs are still waiting on technical review, with Docs Freeze on 2 December", "owner": "Docs"},
+  {"type": "action", "quote": "this week we’ll chase authors who still have placeholder or WIP PRs.", "owner": "Comms"},
+  {"type": "action", "quote": "we’re starting the release announcement draft this week, with each shadow taking a few sections.", "owner": "Comms"},
+  {"type": "action", "quote": "Two teams still need to DM the subproject leads + release lead about succession!", "owner": "Subproject Leads"}
+ ],
+ "optional": [
+  {"type": "issue", "quote": "#144421: Memory-backed volume resize flake. Closed and confirmed as non-release-blocking by SIG Node."},
+  {"type": "issue", "quote": "All three failing issues are on master-informing."},
+  {"type": "risk", "quote": "10 SIGs have replied on the Release Highlights GitHub Discussion so far."}
+ ]
+}
