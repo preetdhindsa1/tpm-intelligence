@@ -69,7 +69,7 @@ export function ReleaseChrome({ groups, project, release, displayName, hasLab, s
           </div>
         )}
         {studio && (
-          <a href="#saved" className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-800 hover:bg-slate-50">Saved scenarios</a>
+          <Link href={releasePath(project, release)} className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-800 hover:bg-slate-50">← Back to Live Cockpit</Link>
         )}
       </div>
     </div>

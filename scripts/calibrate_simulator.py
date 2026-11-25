@@ -1,6 +1,7 @@
 """Fit the simulator for a release and store the calibration (ADR-0012).
 
-    make sim-calibrate RELEASE=v1.38
+    make sim-calibrate RELEASE=v1.38                 # Kubernetes (the default project)
+    make sim-calibrate RELEASE=KAFKA:4.5.0           # any project: <project>:<release>
 
 Fits on the releases that finished before ``RELEASE`` started (about 2 minutes), attaches
 the newest ``docs/results/sim-validation-*.json`` result, and saves it to
@@ -30,35 +31,55 @@ from simulator.scenario import Calibration
 RESULTS = Path(__file__).resolve().parent.parent / "docs" / "results"
 
 
-def validation_summary(results_dir: Path = RESULTS) -> dict[str, Any]:
-    """The newest validation run, trimmed for display. Not validated when there is none."""
-    files = sorted(results_dir.glob("sim-validation-*.json"))
-    if not files:
-        return {"passed": False, "reason": "no validation has been run", "releases": []}
-    data = json.loads(files[-1].read_text())
+def release_key(release: str) -> str:
+    """``v1.38`` -> ``kubernetes:v1.38``; a ``<project>:<release>`` key is kept as is."""
+    return release if ":" in release else f"kubernetes:{release}"
+
+
+def validation_summary(project: str, results_dir: Path = RESULTS) -> dict[str, Any]:
+    """The newest validation run for ``project``, trimmed for display.
+
+    A replay of one project never validates another (ADR-0018): with no run for this
+    project, the calibration is stored as not validated and says why.
+    """
+    for f in sorted(results_dir.glob("sim-validation-*.json"), reverse=True):
+        data = json.loads(f.read_text())
+        runs = [r for r in data.get("releases", []) if r["release"].split(":", 1)[0] == project]
+        if runs:
+            return {
+                "passed": all(r["passed"] for r in runs),
+                "source_file": f.name,
+                "measured_at": data.get("measured_at"),
+                "tolerance": data.get("tolerance"),
+                "releases": [
+                    {"release": r["release"], "passed": r["passed"], "checks": r["checks"]}
+                    for r in runs
+                ],
+            }
     return {
-        "passed": bool(data.get("passed", False)),
-        "source_file": files[-1].name,
-        "measured_at": data.get("measured_at"),
-        "tolerance": data.get("tolerance"),
-        "releases": [
-            {"release": r["release"], "passed": r["passed"], "checks": r["checks"]}
-            for r in data.get("releases", [])
-        ],
+        "passed": False,
+        "reason": f"no replay validation has been run for {project} yet",
+        "releases": [],
     }
 
 
 def main() -> None:
     """Fit, attach validation, store."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--release", default="v1.38")
+    parser.add_argument("--release", default="v1.38", help="v1.38 or <project>:<release>")
     args = parser.parse_args()
+    key = release_key(args.release)
+    proj = key.split(":", 1)[0]
     engine = make_engine(instrument=False)
     with Session(engine) as session:
-        events = list(iter_events(session, project="kubernetes"))
+        events = list(iter_events(session, project=proj))
     world = project(events, max(e.occurred_at for e in events) + timedelta(seconds=1))
-    key = f"kubernetes:{args.release}"
     sources = finished_releases(world, window(world, key).start, exclude=key)
+    if not sources:
+        raise SystemExit(
+            f"No finished {proj} release before {key} to calibrate on: the simulator learns "
+            "from earlier releases of the same project (ADR-0012)."
+        )
     inputs = measure(world, sources)
     fitted = fit(world, inputs)
     cal = Calibration(
@@ -66,7 +87,7 @@ def main() -> None:
         inputs=inputs,
         effort_days=fitted.effort_days,
         scales=fitted.scales,
-        validation=validation_summary(),
+        validation=validation_summary(proj),
         data_until=world.as_of,
     )
     row = PostgresSimStore(sessionmaker(engine)).save_calibration(cal)
