@@ -15,14 +15,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from evals import agent_gate, fact_checker, linking
+from evals import agent_gate, fact_checker, linking, raid_extractor
 
 OUT = Path(__file__).resolve().parent.parent / "docs" / "results"
 
 
 def run_all() -> list[dict[str, Any]]:
     """Results of every suite, in a stable order."""
-    return [fact_checker.run(), linking.run(), *agent_gate.run()]
+    return [fact_checker.run(), linking.run(), *agent_gate.run(), raid_extractor.gate()]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -38,7 +38,11 @@ def main(argv: list[str] | None = None) -> int:
         OUT.mkdir(parents=True, exist_ok=True)
         (OUT / f"evals-{stamp}.json").write_text(json.dumps(report, indent=1) + "\n")
     print(json.dumps(report, indent=1))
-    failed = [r["suite"] for r in results if not r["passed"]]
+    # A suite can report without blocking yet ("enforced": false, e.g. the RAID gate).
+    failed = [r["suite"] for r in results if not r["passed"] and r.get("enforced", True)]
+    for r in results:
+        if not r["passed"] and not r.get("enforced", True):
+            print(f"NOT YET ENFORCED (failing): {r['suite']}: {r.get('note', '')}", file=sys.stderr)
     if failed:
         print(f"FAILED: {', '.join(failed)}", file=sys.stderr)
         return 1

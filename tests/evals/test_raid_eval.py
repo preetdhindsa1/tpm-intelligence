@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from evals.raid_extractor import load_cases, same, score_case, summarize
+import json
+from pathlib import Path
+
+from agents.prompts import load_prompt
+from agents.raid_extractor import TASK
+from agents.settings import AISettings
+from evals.raid_extractor import gate, load_cases, same, score_case, summarize
 from modules.raid.store import normalize_quote
 
 NOTES = "* We will chase the docs authors this week.\n* The beta cut slipped by a day.\n"
@@ -68,3 +74,41 @@ def test_recall_exactly_at_threshold_passes() -> None:
     s = summarize([row(6, 0, 4)])
     assert s["per_type"]["action"]["recall"] == 0.6
     assert s["passed"]
+
+
+def test_gate_fails_until_every_case_has_a_live_run(tmp_path: Path) -> None:
+    cases = tmp_path / "cases"
+    cases.mkdir()
+    (cases / "c1.json").write_text(json.dumps(CASE))
+    results = tmp_path / "results"
+    results.mkdir()
+    first = gate(results, cases)
+    assert not first["passed"]
+    assert first["summary"]["not_run"] == ["c1"]
+
+    sha = load_cases(cases)[0]["sha"]
+    kept = ["action | - | We will chase the docs authors this week."]
+    prompt = load_prompt(TASK.name)
+    model = AISettings.model_fields[f"model_{TASK.role.value}"].default
+    stored = {
+        "prompt_sha": prompt.sha,
+        "model": model,
+        "cases": [{"id": "c1", "sha": sha, "kept": kept}],
+    }
+    (results / "agent-evals-20261125T000000Z-raid_extractor.json").write_text(json.dumps(stored))
+    second = gate(results, cases)
+    assert second["summary"]["not_run"] == []
+    assert second["summary"]["quote_match"] == 1.0
+    assert not second["passed"]  # one label is too few to gate: honest, not a pass
+    assert second["enforced"] is False  # 1 independent case of the 30 needed to block CI
+    assert second["independent_cases"] == 1
+
+
+def test_a_failing_suite_blocks_ci_only_when_enforced(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from evals import run_evals
+
+    suites = [{"suite": "a", "passed": True}, {"suite": "raid", "passed": False, "enforced": False}]
+    monkeypatch.setattr(run_evals, "run_all", lambda: suites)
+    assert run_evals.main(["--no-save"]) == 0
+    suites[1]["enforced"] = True
+    assert run_evals.main(["--no-save"]) == 1

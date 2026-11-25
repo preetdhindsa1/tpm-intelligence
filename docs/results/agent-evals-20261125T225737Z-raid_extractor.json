@@ -1,0 +1,165 @@
+{
+ "suite": "agent:raid_extractor",
+ "task": "raid_extractor",
+ "prompt": "raid_extractor.v2",
+ "prompt_sha": "8b2bcd3c4101c4391e0e6cf009726ae41c60528fb01b1f352f874a7eb36ee846",
+ "model": "claude-haiku-5-5",
+ "thresholds": {
+  "quote_match": 1.0,
+  "min_precision": 0.8,
+  "min_recall": 0.6,
+  "min_support": 5
+ },
+ "passed": false,
+ "summary": {
+  "cases": 5,
+  "seed_cases": 5,
+  "errors": 0,
+  "not_run": [],
+  "quote_match": 1.0,
+  "dropped": {},
+  "per_type": {
+   "risk": {
+    "support": 4,
+    "kept": 2,
+    "precision": 0.5,
+    "recall": 0.25,
+    "gated": false
+   },
+   "action": {
+    "support": 18,
+    "kept": 19,
+    "precision": 0.895,
+    "recall": 0.944,
+    "gated": true
+   },
+   "issue": {
+    "support": 10,
+    "kept": 13,
+    "precision": 0.769,
+    "recall": 1.0,
+    "gated": true
+   },
+   "decision": {
+    "support": 4,
+    "kept": 5,
+    "precision": 0.4,
+    "recall": 0.5,
+    "gated": false
+   },
+   "question": {
+    "support": 0,
+    "kept": 1,
+    "precision": 0.0,
+    "recall": null,
+    "gated": false
+   }
+  },
+  "failing_types": [
+   "issue"
+  ],
+  "cost_usd": 0.005594,
+  "passed": false
+ },
+ "cases": [
+  {
+   "id": "seed-v138-week05-2026-09-30",
+   "sha": "7bcbb0dff9705b674b51fa0de96954c68fe8f961b4656e5fa40508c48153d976",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | [Flaking Test] E2eNode Suite [It] [sig-node] Probing container should not be restarted with a non-local redirect http liveness probe [NodeConformance]",
+    "issue | Release Signal | [Flaking Test] E2eNode Suite [It] [sig-node] Probing restartable init container should not be restarted with a non-local redirect http liveness probe [NodeConformance]",
+    "issue | Release Signal | [Flaking Test] ci-kubernetes-e2e-gce-scale-performance-100.Overall fails with unknown flag: --metadata - [sig-scalability]",
+    "issue | Release Signal | [Flaking Test] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must call NodeUnprepareResources again if it's in progress for one plugin when Kubelet restarts [Serial]",
+    "issue | Release Signal | [Flaking Test] Kubernetes e2e suite.[It] [sig-node] Pod Allocated Endpoint [FeatureGate:KubeletAllocatedPodsEndpoint] should return all allocated pods with status cleared when listing [Alpha] [Feature:OffByDefault] - a fix is ready for this one - which is already lgtm\u2019ed and awaiting approval",
+    "issue | Release Signal | [FeatureGate:InPlacePodVerticalScaling] - was not a blocker for the alpha1 cut, a fix is currently being worked on.",
+    "action | Enhancements | Keeping an eye on the Enhancement Freeze Exception Request.",
+    "decision | Release Branch Management | The weekly branch sync is scheduled for Friday, October 2, and will be handled by [participant].",
+    "action | - | The v1.38.0-alpha.1 Release Notes PR has been created https://github.com/kubernetes/sig-release/pull/3116 and awaiting review",
+    "action | Comms | I'll be opening the Release Highlights GitHub Discussion and the internal tracking issue this week so we can start collecting input from SIGs as soon as the enhancements list settles.",
+    "action | Comms | Feature Blog opt-in reach-out starts once the freeze is in effect.",
+    "action | - | Please feel free to review and add your +1s in the exception requests in #sig-release!"
+   ],
+   "returned": 12,
+   "dropped": {},
+   "cost_usd": 0.001534
+  },
+  {
+   "id": "seed-v138-week07-2026-10-14",
+   "sha": "4545a3029e5ed1af14667d6a121799ce1cefcc6aaac4f13ad5026236daab3474",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | kubetest.Timout on sig-release-master-blocking#gce-cos-alphafeatures-master board is flaky, but sig node leadership said it\u2019s not a release blocker for the alpha release, so our current status is now green.",
+    "action | - | We will send out the Code Freeze reminder in Week 10 (early November).",
+    "decision | - | Since this Code Freeze falls after KubeCon NA (Week 11), we\u2019ll plan for communication a week early in case anything unexpected comes up and everyone can raise exception requests earlier if they need.",
+    "risk | - | Release Notes for v1.38.0-alpha.2 has been created and currently waiting review/approval",
+    "issue | Enhancements | Missing Placeholder PR: 35 (~40 % remaining)",
+    "action | Enhancements | We will continue the next outreach (3rd) for Docs Placeholder reminders on Slack",
+    "action | Comms | This week we'll start reaching out to SIGs on slack for release highlights.",
+    "action | Comms | We'll aim to have writeup available as k/website PR a week before for #sig-docs-blog to review.",
+    "decision | Subproject Leads | Missing shadow onboarding session scheduled.",
+    "decision | Release Lead | Mid cycle retro scheduled for October 28 (week 9 out of 16)",
+    "decision | Release Lead | Burndown meetings scheduled on Monday and Friday starting November 23rd"
+   ],
+   "returned": 11,
+   "dropped": {},
+   "cost_usd": 0.001412
+  },
+  {
+   "id": "seed-v138-week10-2026-11-04",
+   "sha": "6b395407de10028c9457bb932d4809aa80d4b3d2614371d4b19910bf06de040d",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | We found a new flaky test that is on the master blocking board.",
+    "question | Release Signal | Now we are checking whether this is a release blocker to sig api machinery.",
+    "risk | Release Branch Management | v1.38.0-beta.0 is scheduled for today, waiting for signal",
+    "action | Release Lead | I\u2019m preparing the mid-cycle update email to go out later today.",
+    "action | Comms | We have started the second set of outreach for SIGs asking for release highlights and deprecations this week.",
+    "action | Comms | We will start working on the mid-cycle blog this week.",
+    "action | Comms | We're still confirming the list of deprecations with the respective SIGs."
+   ],
+   "returned": 7,
+   "dropped": {},
+   "cost_usd": 0.000384
+  },
+  {
+   "id": "seed-v138-week12-2026-11-18",
+   "sha": "2db1a56168a55082311c0ca42705c773d1652886767ef5404776035fa4f23f52",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | - 3 flakes on master-informing",
+    "issue | Release Signal | sig-release-master-informing#gce-cos-serial-maste [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (block volmode)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]",
+    "action | Release Lead | In review the code freeze exception requests with Release Lead.",
+    "action | Release Branch Management | We\u2019ll start planning for rc.0 soon, rc.0 is on Thursday 3rd December 2026",
+    "action | Comms | The press email to pr@cncf.io will come next.",
+    "action | Comms | We\u2019re still collecting highlights and deprecations from SIGs on the Release Highlights GitHub Discussion, which closes on Tuesday 24th November 2026.",
+    "action | Subproject Leads | DM [participant] + [participant] + [participant] with your thoughts about your successors ASAP."
+   ],
+   "returned": 7,
+   "dropped": {},
+   "cost_usd": 0.001027
+  },
+  {
+   "id": "seed-v138-week13-2026-11-25",
+   "sha": "eb21480d8dcce1962bdef32144f05c183d86f6393a5b8014a38c8dc109f84706",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | #144411: TestClientReceivedGOAWAY. SIG API Machinery is investigating a possible regression following #144168.",
+    "issue | Release Signal | #144420: TestAggregatedAPIServer. Awaiting SIG API Machinery assessment.",
+    "issue | Release Signal | #144412: MirrorPod tests on CRI-O. Investigation is ongoing.",
+    "decision | Release Signal | #144421: Memory-backed volume resize flake. Closed and confirmed as non-release-blocking by SIG Node.",
+    "issue | Release Signal | #144444: Dynamic Node-Local Ephemeral Volumes flake.",
+    "issue | Release Signal | #144231: EC2 scale performance 5000-node job. Reopened due to recurring DELETE latency SLO violations.",
+    "action | Release Signal | Following up on outstanding release-impact assessments ahead of v1.38.0-rc.0 on December 3.",
+    "issue | Docs | The ready-for-review deadline has passed. 1 tracked KEP still has a draft docs PR, and most ready PRs are still waiting on technical review, with Docs Freeze on 2 December",
+    "action | Comms | Feature blogs need to be ready to review by Monday 30th November 2026, so this week we\u2019ll chase authors who still have placeholder or WIP PRs.",
+    "action | Comms | we\u2019re starting the release announcement draft this week, with each shadow taking a few sections.",
+    "action | Subproject Leads | Two teams still need to DM the subproject leads + release lead about succession!"
+   ],
+   "returned": 11,
+   "dropped": {},
+   "cost_usd": 0.001237
+  }
+ ],
+ "measured_at": "20261125T225737Z"
+}

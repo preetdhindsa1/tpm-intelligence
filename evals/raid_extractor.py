@@ -6,7 +6,7 @@ either way (neither a false positive nor a miss). Seed cases are marked ``"seed"
 
 * **Live run** (paid, ``make evals-live SUITE=raid_extractor``): writes the items kept per
   case and each case's SHA to ``docs/results/agent-evals-<stamp>-raid_extractor.json``.
-* **CI gate** (no paid calls, ``run_evals``; next PR): re-scores the stored items against
+* **CI gate** (no paid calls, ``run_evals``): re-scores the stored items against
   the cases in the repo. A case added or changed since the last live run fails the gate
   until the live run is repeated, so new cases always count.
 
@@ -29,12 +29,18 @@ from typing import Any
 from agents.gateway import AIError, Gateway
 from agents.prompts import load_prompt
 from agents.raid_extractor import TASK, Meeting, extract
+from agents.settings import AISettings
 from modules.raid.store import normalize_quote
 
 CASES = Path(__file__).parent / "cases" / "raid"
+RESULTS = Path(__file__).resolve().parent.parent / "docs" / "results"
 
 TYPES = ("risk", "action", "issue", "decision", "question")
 MIN_PRECISION, MIN_RECALL, MIN_SUPPORT, MIN_OVERLAP = 0.80, 0.60, 5, 0.5
+# The gate reports from the first case but blocks CI only once this many cases were written
+# by someone other than the builder (owner's decision, 2026-11-25): tuning on seeds alone
+# says little, and the extractor's items are never shown or used before a person confirms.
+MIN_INDEPENDENT = 30
 _WORD = re.compile(r"[a-z0-9]+")
 
 
@@ -187,3 +193,46 @@ def report(
         "summary": summary,
         "cases": [{k: v for k, v in r.items() if k != "score"} for r in rows],
     }
+
+
+def gate(results_dir: Path = RESULTS, cases_dir: Path = CASES) -> dict[str, Any]:
+    """CI: re-score the newest live run for this prompt and model against today's cases."""
+    prompt = load_prompt(TASK.name)
+    model = AISettings.model_fields[f"model_{TASK.role.value}"].default
+    runs = [
+        json.loads(p.read_text())
+        for p in sorted(results_dir.glob("agent-evals-*-raid_extractor.json"))
+    ]
+    runs = [r for r in runs if (r.get("prompt_sha"), r.get("model")) == (prompt.sha, model)]
+    stored = {c["sha"]: c for c in runs[-1]["cases"]} if runs else {}
+    rows: list[dict[str, Any]] = []
+    missing: list[str] = []
+    for case in load_cases(cases_dir):
+        row = stored.get(case["sha"])
+        if row is None:
+            missing.append(case["id"])
+        elif "error" in row:
+            rows.append(row)
+        else:
+            rows.append({**row, "score": score_case(case, [parse_kept(k) for k in row["kept"]])})
+    cases = load_cases(cases_dir)
+    independent = sum(not c.get("seed") for c in cases)
+    out = report(prompt.label, prompt.sha, model, rows, missing)
+    out["suite"] = "agent_gate:raid_extractor"
+    out["enforced"] = independent >= MIN_INDEPENDENT
+    out["independent_cases"] = independent
+    if not out["enforced"]:
+        out["note"] = (
+            f"reporting only: {independent} of {MIN_INDEPENDENT} independent cases; "
+            "blocks CI once there are enough"
+        )
+    if missing:
+        out["reason"] = (
+            f"{len(missing)} case(s) not run on {prompt.label} / {model}: "
+            "run make evals-live SUITE=raid_extractor"
+        )
+    keys = (
+        "suite", "passed", "enforced", "independent_cases", "note", "prompt", "model", "summary",
+        "reason",
+    )  # fmt: skip
+    return {k: out[k] for k in keys if k in out}

@@ -139,4 +139,4 @@ def test_cost_is_reported_and_the_prompt_file_loads() -> None:
     result, _ = run([])
     assert result.cost_usd > 0
     assert result.items == ()
-    assert load_prompt("raid_extractor").label == "raid_extractor.v1"
+    assert load_prompt("raid_extractor").label == "raid_extractor.v2"
