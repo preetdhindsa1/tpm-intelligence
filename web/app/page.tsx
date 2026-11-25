@@ -29,7 +29,7 @@ export default async function FrontPage() {
   }
   const programs = portfolio?.programs ?? [];
   const first = programs[0];
-  const demoHref = first ? releasePath(first.project, first.release) : "/releases";
+  const demoHref = first ? releasePath(first.project, first.release) : "/portfolio";
   const stories = portfolio ? await storiesFor(portfolio) : [];
 
   return (

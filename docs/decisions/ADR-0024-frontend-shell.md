@@ -46,3 +46,7 @@ The headline and tagline are the locked words. Live program cards come from `GET
 ## Empty, loading, and error
 
 Portfolio, Live Cockpit, and Decision Studio share three states. An error shows the failure text and no stand-in numbers. A release with no simulator says so, which is an empty state rather than a failure. The front page and Connect page carry their own copy in their own changes.
+
+## Menu and Live Cockpit sections
+
+The AI-native PDLC menu item opens `/pdlc` (the pod page). `/lab`, the per-release lab report it links to, still underlines AI-native PDLC. With no last program, Live Cockpit and Decision Studio open Portfolio instead of the old release index. The old release sidebar is gone: Live Cockpit shows its sections (Overview, Dependencies, Executive update, Link review) as tabs under the program header, and Decision Studio, a top-level screen, shows none. App screens show a Live indicator. Its tooltip says collectors poll every few minutes and each page carries its own data-as-of time, so the indicator makes no freshness claim of its own.
