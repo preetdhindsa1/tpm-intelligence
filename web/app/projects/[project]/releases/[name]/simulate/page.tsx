@@ -1,22 +1,19 @@
-import { releaseFromParams } from "@/lib/release-page";
-import { releasePath } from "@/lib/routes";
-import Link from "next/link";
 import { Simulator } from "@/components/Simulator";
+import { releaseFromParams } from "@/lib/release-page";
 
 export const dynamic = "force-dynamic";
 
 export default async function SimulatePage({ params }: { params: Promise<{ project: string; name: string }> }) {
   const release = await releaseFromParams(params);
   const name = release.name;
-  const project = release.project;
   return (
     <div className="space-y-4">
       <div>
-        <Link href={releasePath(project, name)} className="text-sm text-indigo-700 hover:underline">← {name} release health</Link>
-        <h1 className="text-2xl font-semibold">What-if simulator · {release.display_name || release.project} {name}</h1>
+        <h1 className="text-2xl font-semibold">Decision Studio · {release.display_name || release.project} {name}</h1>
+        <p className="text-sm font-medium text-slate-700">Powered by the Shadow-Org Simulator</p>
         <p className="text-sm text-slate-600">
-          Change reviewer staffing, interruptions or the flow of new PRs and see the effect on review waits and merges, next to
-          the baseline. Results are ranges from a model calibrated on past releases, not guarantees.
+          Pick a reviewer pool and one lever. Baseline and scenario stay illustrative until a run fills them from the simulator.
+          Results are ranges, not guarantees.
         </p>
       </div>
       <Simulator release={name} />
