@@ -13,8 +13,10 @@ import {
   type ScenarioSettings,
   type Simulation,
   type SimulatorInfo,
+  type SimPool,
 } from "@/lib/api";
 import { daysLabel, errorPct, formatUtc, rangeLabel, simDelta, type SimDelta } from "@/lib/format";
+import { LEVERS, scenarioNotes, type LeverId } from "@/lib/studio";
 
 const LOW_EFFORT_DAYS = 0.03; // the fit's lower bound is 0.02 days (simulator/replay.py)
 const NO_CHANGE: PoolChange = { reviewers: 0, new_reviewers: 0, ramp_weeks: 0, interruption: 0 };
@@ -70,8 +72,8 @@ function NotValidated({ info }: { info: SimulatorInfo }) {
 
 function Assumptions({ info }: { info: SimulatorInfo }) {
   return (
-    <details className="rounded-lg border bg-white p-4 text-sm">
-      <summary className="cursor-pointer font-medium text-slate-800">Assumptions and measured inputs</summary>
+    <section className="rounded-lg border bg-white p-4 text-sm">
+      <h2 className="font-medium text-slate-800">Measured assumptions</h2>
       <ul className="mt-2 space-y-0.5 text-slate-600">
         <li>
           Measured on {info.source_releases.map((r) => r.replace("kubernetes:", "")).join(", ")} (data until{" "}
@@ -116,7 +118,111 @@ function Assumptions({ info }: { info: SimulatorInfo }) {
           ))}
         </tbody>
       </table>
-    </details>
+    </section>
+  );
+}
+
+function Levers({
+  pools,
+  pool,
+  lever,
+  settings,
+  onPool,
+  onLever,
+  onChange,
+  onArrival,
+  onReset,
+}: {
+  pools: SimPool[];
+  pool: string;
+  lever: LeverId;
+  settings: ScenarioSettings;
+  onPool: (pool: string) => void;
+  onLever: (lever: LeverId) => void;
+  onChange: (pool: string, field: keyof PoolChange, value: number) => void;
+  onArrival: (value: number) => void;
+  onReset: () => void;
+}) {
+  const row = pools.find((p) => p.pool === pool) ?? pools[0];
+  const change = (row && settings.pools[row.pool]) || NO_CHANGE;
+  const notes = scenarioNotes(settings);
+  return (
+    <div className="space-y-3 text-sm">
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="flex min-w-48 flex-col">
+          <span className="text-xs text-slate-500">Pool</span>
+          <select className="min-h-11 rounded border px-2" value={row?.pool ?? ""} disabled={lever === "arrival" || !row} onChange={(e) => onPool(e.target.value)}>
+            {pools.map((p) => (
+              <option key={p.pool} value={p.pool}>{p.pool}</option>
+            ))}
+          </select>
+        </label>
+        <label className="flex min-w-64 flex-col">
+          <span className="text-xs text-slate-500">Lever</span>
+          <select className="min-h-11 rounded border px-2" value={lever} onChange={(e) => onLever(e.target.value as LeverId)}>
+            {LEVERS.map((item) => (
+              <option key={item.id} value={item.id}>{item.label}</option>
+            ))}
+          </select>
+        </label>
+        <button type="button" onClick={onReset} className="inline-flex min-h-11 items-center rounded border px-3 text-slate-700 hover:bg-slate-50">
+          Reset to baseline
+        </button>
+      </div>
+      {lever === "arrival" && (
+        <label className="flex max-w-sm flex-col">
+          <span className="text-xs text-slate-500">Applies to every pool · ×{settings.arrival_multiplier.toFixed(1)}</span>
+          <input type="range" min={0.5} max={2} step={0.1} value={settings.arrival_multiplier} onChange={(e) => onArrival(Number(e.target.value))} />
+        </label>
+      )}
+      {lever === "reviewers" && row && (
+        <label className="flex flex-col">
+          <span className="text-xs text-slate-500">{row.pool} has {row.reviewers_now} reviewers now</span>
+          <input className="w-24 min-h-11 rounded border px-2" type="number" min={-row.reviewers_now} max={50} value={change.reviewers} onChange={(e) => onChange(row.pool, "reviewers", Number(e.target.value))} />
+        </label>
+      )}
+      {lever === "new_reviewers" && row && (
+        <div className="flex flex-wrap gap-4">
+          <label className="flex flex-col">
+            <span className="text-xs text-slate-500">New reviewers</span>
+            <input className="w-24 min-h-11 rounded border px-2" type="number" min={0} max={50} value={change.new_reviewers} onChange={(e) => onChange(row.pool, "new_reviewers", Number(e.target.value))} />
+          </label>
+          <label className="flex flex-col">
+            <span className="text-xs text-slate-500">Ramp-up (weeks)</span>
+            <input className="w-24 min-h-11 rounded border px-2 disabled:bg-slate-50" type="number" min={0} max={52} disabled={change.new_reviewers === 0} value={change.ramp_weeks} onChange={(e) => onChange(row.pool, "ramp_weeks", Number(e.target.value))} />
+          </label>
+        </div>
+      )}
+      {lever === "interruption" && row && (
+        <label className="flex max-w-sm flex-col">
+          <span className="text-xs text-slate-500">{row.pool} · {Math.round(change.interruption * 100)}% of reviewer time</span>
+          <input type="range" min={0} max={0.9} step={0.05} value={change.interruption} onChange={(e) => onChange(row.pool, "interruption", Number(e.target.value))} />
+        </label>
+      )}
+      {notes.length > 0 && (
+        <div aria-live="polite">
+          <p className="text-xs font-medium text-slate-700">Changes in this scenario</p>
+          <ul className="mt-1 space-y-0.5 text-xs text-slate-600">
+            {notes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Illustrative() {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {["Baseline", "Scenario"].map((title) => (
+        <section key={title} className="rounded-lg border bg-white p-4">
+          <h2 className="font-semibold text-slate-800">{title}</h2>
+          <p className="mt-1 text-sm text-slate-600">Illustrative until you run the simulator. No scenario numbers yet.</p>
+        </section>
+      ))}
+    </div>
   );
 }
 
@@ -236,6 +342,8 @@ export function Simulator({ release }: { release: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [onlyChanged, setOnlyChanged] = useState(false);
+  const [lever, setLever] = useState<LeverId>("reviewers");
+  const [pool, setSelectedPool] = useState("");
 
   const loadSaved = useCallback(
     () => updatesRequest<SavedScenario[]>(`/releases/${release}/scenarios`).then(setSaved),
@@ -258,7 +366,7 @@ export function Simulator({ release }: { release: string }) {
     };
   }, [release, loadSaved]);
 
-  function setPool(pool: string, field: keyof PoolChange, value: number) {
+  function setPoolChange(pool: string, field: keyof PoolChange, value: number) {
     setSettings((s) => ({ ...s, pools: { ...s.pools, [pool]: { ...(s.pools[pool] ?? NO_CHANGE), [field]: value } } }));
   }
 
@@ -316,91 +424,17 @@ export function Simulator({ release }: { release: string }) {
       <Assumptions info={info} />
 
       <div className="rounded-lg border bg-white p-4">
-        <div className="flex flex-wrap items-end gap-4 text-sm">
-          <label className="flex flex-col">
-            <span className="text-xs text-slate-500">New PRs vs measured rate</span>
-            <input
-              type="range"
-              min={0.5}
-              max={2}
-              step={0.1}
-              value={settings.arrival_multiplier}
-              onChange={(e) => setSettings((s) => ({ ...s, arrival_multiplier: Number(e.target.value) }))}
-            />
-            <span>×{settings.arrival_multiplier.toFixed(1)}</span>
-          </label>
-          <button
-            onClick={() => setSettings((s) => ({ ...s, pools: {}, arrival_multiplier: 1 }))}
-            className="rounded border px-3 py-1.5 text-slate-700 hover:bg-slate-50"
-          >
-            Reset to baseline
-          </button>
-        </div>
-        <table className="mt-3 w-full text-left text-sm">
-          <thead className="text-xs text-slate-500">
-            <tr>
-              <th className="py-1">Pool</th>
-              <th>Reviewers now</th>
-              <th>Add / remove experienced</th>
-              <th>New reviewers</th>
-              <th>Ramp-up (weeks)</th>
-              <th>Time lost to interruptions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {info.pools.map((p) => {
-              const c = settings.pools[p.pool] ?? NO_CHANGE;
-              return (
-                <tr key={p.pool} className={`border-t ${changed(c) ? "bg-indigo-50/50" : ""}`}>
-                  <td className="py-1 font-medium">{p.pool}</td>
-                  <td>{p.reviewers_now}</td>
-                  <td>
-                    <input
-                      type="number"
-                      min={-p.reviewers_now}
-                      max={50}
-                      value={c.reviewers}
-                      onChange={(e) => setPool(p.pool, "reviewers", Number(e.target.value))}
-                      className="w-16 rounded border px-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      min={0}
-                      max={50}
-                      value={c.new_reviewers}
-                      onChange={(e) => setPool(p.pool, "new_reviewers", Number(e.target.value))}
-                      className="w-16 rounded border px-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      min={0}
-                      max={52}
-                      value={c.ramp_weeks}
-                      disabled={c.new_reviewers === 0}
-                      onChange={(e) => setPool(p.pool, "ramp_weeks", Number(e.target.value))}
-                      className="w-16 rounded border px-1 disabled:bg-slate-50"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="range"
-                      min={0}
-                      max={0.9}
-                      step={0.05}
-                      value={c.interruption}
-                      onChange={(e) => setPool(p.pool, "interruption", Number(e.target.value))}
-                    />{" "}
-                    {Math.round(c.interruption * 100)}%
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <Levers
+          pools={info.pools}
+          pool={pool || info.pools[0]?.pool || ""}
+          lever={lever}
+          settings={settings}
+          onPool={setSelectedPool}
+          onLever={setLever}
+          onChange={setPoolChange}
+          onArrival={(value) => setSettings((s) => ({ ...s, arrival_multiplier: value }))}
+          onReset={() => setSettings((s) => ({ ...s, pools: {}, arrival_multiplier: 1 }))}
+        />
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
           <button
             onClick={run}
@@ -428,6 +462,7 @@ export function Simulator({ release }: { release: string }) {
         </div>
       </div>
 
+      {!sim && <Illustrative />}
       {sim && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">

@@ -627,6 +627,58 @@ class LabBucketOut(_Out):
     still_open: int
 
 
+class PodMemberOut(_Out):
+    """One pod member: a lane (human, claude, cursor) or the Dependabot bot lane."""
+
+    lane: str
+    kind: str  # owner | agent | bot
+    opened: int
+    merged: int
+    closed_unmerged: int
+    open: int
+    median_minutes_to_merge: int | None  # null below 5 merged PRs (R22)
+
+
+class PodStageOut(_Out):
+    """One of the 7 pod-flow stages."""
+
+    stage: str
+    rules: str
+    status: str  # held | broken | not_measured
+    value: dict[str, int | None] | None
+    reason: str | None
+
+
+class PodMetricOut(_Out):
+    """A pod metric against its starting target."""
+
+    metric: str
+    target: str
+    value: float | None
+    unit: str
+    reason: str | None
+
+
+class PodRuleOut(_Out):
+    """A pod rule checked against real PRs."""
+
+    rule: str
+    title: str
+    status: str  # held | broken | not_measured
+    count: int | None  # PRs that break it
+    of: int | None  # PRs it applies to
+
+
+class PodOut(_Out):
+    """Pod facts (ADR-0023 addendum 2). Reviews are attributed by marker, never by login."""
+
+    members: list[PodMemberOut]
+    no_lane: int
+    flow: list[PodStageOut]
+    metrics: list[PodMetricOut]
+    rules: list[PodRuleOut]
+
+
 class LabOut(_Out):
     """Development-lab counts. A case study, not a forecast."""
 
@@ -654,6 +706,7 @@ class LabOut(_Out):
     cap: LabCapOut
     first_pass: LabFirstPassOut
     size: LabSizeOut
+    pod: PodOut | None = None
 
 
 class PortfolioMilestoneOut(_Out):
