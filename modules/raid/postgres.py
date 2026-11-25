@@ -106,6 +106,11 @@ class PostgresRaidStore:
             recs = list(s.scalars(select(R).where(R.release_key == release_key).order_by(R.id)))
             return [self._load(s, r) for r in recs]
 
+    def get(self, item_id: int) -> RaidItem | None:
+        with self._sessions() as s:
+            rec = s.get(R, item_id)
+            return None if rec is None else self._load(s, rec)
+
     def count(self) -> int:
         with self._sessions() as s:
             return int(s.scalar(select(func.count()).select_from(R)) or 0)

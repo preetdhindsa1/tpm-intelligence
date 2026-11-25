@@ -51,6 +51,10 @@ def test_replay_ids_and_rejects_match_the_memory_store(store: PostgresRaidStore)
     assert store.suggest(item("Still no approver on the #6395 main PR"), AT) is None
     with pytest.raises(ValueError, match="rejected"):
         store.decide(c.item_id, "confirmed", "owner", AT)
+    got = store.get(a.item_id)
+    assert got is not None
+    assert (got.raid_id, len(got.history)) == ("K8S-R-001", 3)
+    assert store.get(10**9) is None
 
 
 def test_the_database_refuses_an_id_without_a_confirm(engine: Engine) -> None:

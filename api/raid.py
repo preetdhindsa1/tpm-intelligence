@@ -1,9 +1,9 @@
 """RAID tracker API (Wave 4, ADR-0030; contract: docs/api/raid-contract.md).
 
-Until the RAID store is wired in, every endpoint serves a **synthetic** fixture: each
-response says ``"synthetic": true`` and every item's source is labelled synthetic. Nothing
-here is real meeting content. Decisions made against the fixture change only this process's
-copy, so the web app can be built against the real shapes.
+With a database (``DATABASE_URL``), the endpoints serve the RAID store (``api.raid_store``):
+real items extracted from public meeting notes, ``"synthetic": false``. Without one (tests,
+a laptop without Postgres) they serve a **synthetic** fixture, and every response says
+``"synthetic": true``; decisions against the fixture change only this process's copy.
 
 AI never confirms an item: an item stays ``suggested`` until a person confirms, edits or
 rejects it here, and it gets its RAID ID (``{WORKSTREAM}-{TYPE}-{SEQ}``) on first confirm.
@@ -119,7 +119,12 @@ def _history(item: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 class FixtureRaid:
-    """In-memory synthetic RAID data for one process (until the store lands, #176)."""
+    """In-memory synthetic RAID data for one process, used when no database is configured.
+
+    It has one scope (kubernetes v1.38): the ``release_key`` arguments are ignored.
+    """
+
+    synthetic = True
 
     def __init__(self, now: Callable[[], datetime] = lambda: datetime.now(UTC)) -> None:
         self._now = now
@@ -127,11 +132,11 @@ class FixtureRaid:
         self._items = {i["item_id"]: i for i in fixture_items()}
         self._history = {k: _history(v) for k, v in self._items.items()}
 
-    def all_items(self) -> list[dict[str, Any]]:
+    def all_items(self, release_key: str = "") -> list[dict[str, Any]]:
         with self._lock:
             return [copy.deepcopy(i) for i in self._items.values()]
 
-    def items(self, *, queue: bool) -> list[dict[str, Any]]:
+    def items(self, release_key: str = "", *, queue: bool) -> list[dict[str, Any]]:
         rows = self.all_items()
         if queue:
             return [i for i in rows if i["review"] == "suggested"]
@@ -149,7 +154,7 @@ class FixtureRaid:
             return copy.deepcopy(self._history[item_id])
 
     def decide(
-        self, item_id: int, action: str, changes: dict[str, Any], reason: str | None
+        self, item_id: int, action: str, changes: dict[str, Any], reason: str | None, by: str = ""
     ) -> dict[str, Any]:
         """Confirm, edit or reject; a RAID ID is given on the first confirm or edit."""
         with self._lock:
@@ -220,13 +225,19 @@ def summary(items: list[dict[str, Any]]) -> dict[str, Any]:
 
 def raid_router(
     approver: Callable[[Request], Awaitable[Any]],
-    data: FixtureRaid | None = None,
+    data: Any = None,
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
 ) -> APIRouter:
-    """RAID endpoints. ``approver`` is the app's sign-in dependency (ADR-0016)."""
+    """RAID endpoints. ``approver`` is the app's sign-in dependency (ADR-0016).
+
+    ``data`` is a ``FixtureRaid`` (synthetic) or an ``api.raid_store.StoreRaid`` (real).
+    """
     router = APIRouter(tags=["raid"])
     raid = data or FixtureRaid(now)
-    scope = {"project": "kubernetes", "release": "v1.38"}
+    fake = bool(raid.synthetic)
+
+    def scope(project: str, release: str) -> dict[str, Any]:
+        return {"project": project, "release": release, "as_of": now(), "synthetic": fake}
 
     def found(item_id: int) -> dict[str, Any]:
         try:
@@ -234,27 +245,25 @@ def raid_router(
         except KeyError as exc:
             raise HTTPException(404, f"unknown RAID item {item_id}") from exc
 
-    def listing(queue: bool) -> RaidListOut:
-        return RaidListOut.model_validate(
-            {**scope, "as_of": now(), "synthetic": True, "items": raid.items(queue=queue)}
-        )
+    def listing(project: str, release: str, queue: bool) -> RaidListOut:
+        items = raid.items(f"{project}:{release}", queue=queue)
+        return RaidListOut.model_validate({**scope(project, release), "items": items})
 
     @router.get("/raid", response_model=RaidListOut)
-    async def raid_list() -> RaidListOut:
+    async def raid_list(project: str = "kubernetes", release: str = "v1.38") -> RaidListOut:
         """Confirmed and edited items (the tracker). Suggested items are in /raid/queue."""
-        return listing(queue=False)
+        return listing(project, release, queue=False)
 
     @router.get("/raid/queue", response_model=RaidListOut)
-    async def raid_queue() -> RaidListOut:
+    async def raid_queue(project: str = "kubernetes", release: str = "v1.38") -> RaidListOut:
         """Items the extractor suggested, waiting for a person."""
-        return listing(queue=True)
+        return listing(project, release, queue=True)
 
     @router.get("/raid/summary", response_model=RaidSummaryOut)
-    async def raid_summary() -> RaidSummaryOut:
+    async def raid_summary(project: str = "kubernetes", release: str = "v1.38") -> RaidSummaryOut:
         """Counts by type and state, risks without an owner, items waiting for review."""
-        return RaidSummaryOut.model_validate(
-            {**scope, "as_of": now(), "synthetic": True, **summary(raid.all_items())}
-        )
+        counts = summary(raid.all_items(f"{project}:{release}"))
+        return RaidSummaryOut.model_validate({**scope(project, release), **counts})
 
     @router.get("/raid/{item_id}/history", response_model=RaidHistoryOut)
     async def raid_history(item_id: int) -> RaidHistoryOut:
@@ -264,17 +273,18 @@ def raid_router(
             {
                 "item_id": item_id,
                 "raid_id": item["raid_id"],
-                "synthetic": True,
+                "synthetic": fake,
                 "history": raid.history(item_id),
             }
         )
 
     def decide(
-        item_id: int, action: str, changes: dict[str, Any], reason: str | None
+        item_id: int, action: str, changes: dict[str, Any], reason: str | None, who: Any
     ) -> RaidItemOut:
         found(item_id)
+        by = str(getattr(who, "login", None) or "")  # audit only, never returned
         try:
-            return RaidItemOut.model_validate(raid.decide(item_id, action, changes, reason))
+            return RaidItemOut.model_validate(raid.decide(item_id, action, changes, reason, by))
         except ValueError as exc:
             raise HTTPException(409, str(exc)) from exc
 
@@ -283,7 +293,7 @@ def raid_router(
         item_id: int, body: RaidConfirmIn, who: Any = Depends(approver)
     ) -> RaidItemOut:
         """A person confirms the item as suggested. It gets its RAID ID now."""
-        return decide(item_id, "confirmed", {}, body.note)
+        return decide(item_id, "confirmed", {}, body.note, who)
 
     @router.post("/raid/{item_id}/edit", response_model=RaidItemOut)
     async def raid_edit(
@@ -291,13 +301,13 @@ def raid_router(
     ) -> RaidItemOut:
         """A person corrects and confirms the item. The quote stays the source's words."""
         changes = body.model_dump(exclude={"note"}, exclude_none=True)
-        return decide(item_id, "edited", changes, body.note)
+        return decide(item_id, "edited", changes, body.note, who)
 
     @router.post("/raid/{item_id}/reject", response_model=RaidItemOut)
     async def raid_reject(
         item_id: int, body: RaidRejectIn, who: Any = Depends(approver)
     ) -> RaidItemOut:
         """A person rejects the item, with a reason. It never gets a RAID ID."""
-        return decide(item_id, "rejected", {}, body.reason)
+        return decide(item_id, "rejected", {}, body.reason, who)
 
     return router
