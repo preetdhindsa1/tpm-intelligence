@@ -1,85 +1,129 @@
+// Portfolio (UX vision p.3). Every value is from GET /portfolio; this view only lays it out.
 import Link from "next/link";
 import { EmptyState } from "@/components/states/States";
 import { formatUtc } from "@/lib/format";
 import {
+  STAGE_NAMES,
   approvalNotes,
+  bottleneckTag,
+  bottleneckText,
   decisionHref,
   missingRows,
   portfolioSummary,
+  programSubline,
   severityClass,
   stageLabel,
-  statusLabel,
+  stageLine,
+  waitingVerb,
   type Portfolio,
   type PortfolioProgram,
 } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
 
-export function PortfolioView({ data }: { data: Portfolio }) {
+export function PortfolioView({ data, stage }: { data: Portfolio; stage?: string | null }) {
+  const shown = stage ? data.programs.filter((p) => p.stage.current === stage) : data.programs;
   return (
-    <div className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-semibold">Here are the live programs.</h1>
-        <p className="mt-1 text-sm text-slate-600">
-          {portfolioSummary(data.totals)} · data as of {formatUtc(data.as_of)}
-        </p>
+    <div className="mx-auto max-w-[1400px] space-y-8 py-4">
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-heading text-4xl font-bold tracking-tight">Here are the live programs.</h1>
+          <p className="mt-2 text-slate-600">{portfolioSummary(data.totals)}</p>
+          <p className="mt-1 text-xs text-slate-500">Data as of {formatUtc(data.as_of)}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <StageFilter current={stage ?? null} />
+          <Link href="/connect" className="inline-flex min-h-11 items-center rounded-lg bg-action px-4 text-sm font-semibold text-white hover:bg-action/90">
+            + Add a program
+          </Link>
+        </div>
       </header>
-      <ProgramTable programs={data.programs} skipped={data.skipped} />
-      <Waiting data={data} />
-      <Across items={data.across_programs} />
-      <ComingNext items={data.coming_next} />
+      <ProgramTable programs={shown} skipped={data.skipped} filtered={Boolean(stage)} />
+      <div className="grid gap-5 lg:grid-cols-3">
+        <Waiting data={data} />
+        <Across items={data.across_programs} />
+        <ComingNext items={data.coming_next} />
+      </div>
       <CouldNotRead skipped={missingRows(data.skipped)} />
     </div>
   );
 }
 
-function ProgramTable({ programs, skipped }: { programs: PortfolioProgram[]; skipped: Portfolio["skipped"] }) {
-  if (programs.length === 0) return <EmptyState title="No programs yet" body="No team has a release the portfolio can show." />;
+function StageFilter({ current }: { current: string | null }) {
   return (
-    <div className="overflow-x-auto rounded-lg border bg-white">
-      <table className="min-w-full text-sm">
-        <thead className="bg-slate-50 text-left text-xs text-slate-500">
+    <details className="relative">
+      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-800">
+        {current ? `Stage: ${stageLabel(current)}` : "All stages"} <span aria-hidden className="ml-2 text-xs">▾</span>
+      </summary>
+      <ul className="absolute right-0 z-10 mt-1 w-40 rounded-lg border bg-white py-1 shadow-lg">
+        <li><Link href="/portfolio" className="flex min-h-11 items-center px-3 text-sm hover:bg-slate-50">All stages</Link></li>
+        {STAGE_NAMES.map((s) => (
+          <li key={s}>
+            <Link href={`/portfolio?stage=${s}`} aria-current={current === s ? "true" : undefined} className="flex min-h-11 items-center px-3 text-sm hover:bg-slate-50">
+              {stageLabel(s)}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
+const TH = "px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500";
+
+function ProgramTable({ programs, skipped, filtered }: { programs: PortfolioProgram[]; skipped: Portfolio["skipped"]; filtered: boolean }) {
+  if (programs.length === 0) {
+    return filtered
+      ? <EmptyState title="No program is in this stage" body="Choose All stages to see every program." />
+      : <EmptyState title="No programs yet" body="No team has a release the portfolio can show." />;
+  }
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+      <table className="w-full min-w-[960px] text-sm">
+        <thead className="border-b border-slate-200">
           <tr>
-            <th className="px-3 py-2 font-medium">Program</th>
-            <th className="px-3 py-2 font-medium">Stage</th>
-            <th className="px-3 py-2 font-medium">Scope</th>
-            <th className="px-3 py-2 font-medium">Biggest bottleneck</th>
-            <th className="px-3 py-2 font-medium">Next decision</th>
+            <th className={TH}>Program</th>
+            <th className={TH}>Where it is: stage: Plan → Build → Freeze → Launch → Learn</th>
+            <th className={TH}>Scope</th>
+            <th className={TH}>Biggest bottleneck</th>
+            <th className={TH}>Next decision</th>
           </tr>
         </thead>
-        <tbody className="divide-y">
+        <tbody className="divide-y divide-slate-100">
           {programs.map((p) => {
             const href = p.next_decision ? decisionHref(p.project, p.release, p.next_decision.kind) : null;
+            const text = bottleneckText(p.bottleneck);
             return (
-              <tr key={p.key} className="align-top">
-                <td className="px-3 py-3">
-                  <Link href={releasePath(p.project, p.release)} className="font-medium text-action hover:underline">
-                    {p.display_name}
+              <tr key={p.key} className="align-middle">
+                <td className="px-6 py-5">
+                  <Link href={releasePath(p.project, p.release)} className="font-heading text-base font-semibold text-slate-900 hover:text-action hover:underline">
+                    {p.display_name.replace(/\s*\(this project\)$/, "")} {p.release}
                   </Link>
-                  <div className="text-xs text-slate-500">{p.release}</div>
+                  <p className="mt-0.5 text-slate-500">{p.has_lab ? "This repo · Claude, Cursor, Dependabot, human" : programSubline(p)}</p>
                   {approvalNotes(p.project, skipped).map((note) => (
                     <p key={note} className="mt-1 text-xs text-warning">{note}</p>
                   ))}
                 </td>
-                <td className="px-3 py-3">
+                <td className="w-[28%] px-6 py-5">
                   <StageBar stages={p.stage.stages} />
-                  <div className="mt-1 text-xs text-slate-600">
-                    {stageLabel(p.stage.current)}
-                    {p.stage.days_to_next_milestone !== null && p.stage.next_milestone
-                      ? ` · ${p.stage.days_to_next_milestone} days to ${p.stage.next_milestone.name.replaceAll("_", " ")}`
-                      : ""}
-                  </div>
+                  <p className="mt-2 text-slate-600">{stageLine(p)}</p>
                 </td>
-                <td className="px-3 py-3 text-slate-700">
-                  {p.scope.features_in_release} in the release
-                  <div className="text-xs text-slate-500">{p.scope.features_ever} ever</div>
+                <td className="px-6 py-5">
+                  <p className="font-heading text-2xl font-bold text-slate-900">{p.scope.features_in_release}</p>
+                  <p className="whitespace-nowrap text-slate-500">{p.has_lab ? "features planned" : `features in · ${p.scope.features_ever} ever`}</p>
                 </td>
-                <td className="px-3 py-3">
-                  <span className={`rounded px-2 py-0.5 text-xs font-medium ${severityClass(p.bottleneck.severity)}`}>{p.bottleneck.headline}</span>
-                  {p.bottleneck.detail && <p className="mt-1 text-xs text-slate-600">{p.bottleneck.detail}</p>}
+                <td className="px-6 py-5">
+                  <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${severityClass(p.bottleneck.severity)}`}>
+                    {bottleneckTag(p.bottleneck)}
+                  </span>
+                  {text && <p className="mt-1.5 text-slate-600">{text}</p>}
                 </td>
-                <td className="px-3 py-3">
+                <td className="px-6 py-5">
                   {p.next_decision ? (
-                    href ? <Link href={href} className="text-action hover:underline">{p.next_decision.label}</Link> : p.next_decision.label
+                    href ? (
+                      <Link href={href} className="inline-flex min-h-11 items-center font-semibold text-action hover:underline">{p.next_decision.label} →</Link>
+                    ) : (
+                      <span className="text-slate-600">{p.next_decision.label}</span>
+                    )
                   ) : (
                     <span className="text-slate-500">Nothing waiting</span>
                   )}
@@ -96,42 +140,35 @@ function ProgramTable({ programs, skipped }: { programs: PortfolioProgram[]; ski
 function StageBar({ stages }: { stages: { name: string; status: string }[] }) {
   const text = stages.map((s) => `${stageLabel(s.name)} ${s.status}`).join(", ");
   return (
-    <div className="flex w-36 gap-1" role="img" aria-label={text}>
+    <div className="flex gap-1.5" role="img" aria-label={text}>
       {stages.map((s) => (
-        <span key={s.name} className={`h-2 flex-1 rounded-sm ${s.status === "current" ? "bg-action" : s.status === "done" ? "bg-action/40" : "bg-slate-200"}`} />
+        <span
+          key={s.name}
+          className={`h-2 flex-1 rounded-full ${s.status === "done" ? "bg-action" : s.status === "current" ? "bg-indigo-300" : "bg-slate-200"}`}
+        />
       ))}
     </div>
   );
 }
 
-function CouldNotRead({ skipped }: { skipped: Portfolio["skipped"] }) {
-  if (skipped.length === 0) return null;
-  return (
-    <section>
-      <h2 className="text-lg font-semibold">Could not read</h2>
-      <ul className="mt-2 space-y-1 text-sm text-slate-600">
-        {skipped.map((s) => (
-          <li key={`${s.team}-${s.reason}`}>{s.team}: {s.reason}</li>
-        ))}
-      </ul>
-    </section>
-  );
-}
+const CARD = "rounded-2xl border border-slate-200 bg-white p-6";
 
 function Waiting({ data }: { data: Portfolio }) {
   return (
-    <section>
-      <h2 className="text-lg font-semibold">Waiting on you</h2>
+    <section className={CARD}>
+      <h2 className="font-heading text-xl font-semibold">Waiting on you</h2>
+      <p className="mt-1 text-sm text-slate-500">Nothing leaves the platform until you approve it.</p>
       {data.waiting_on_you.length === 0 ? (
-        <p className="mt-2 text-sm text-slate-600">Nothing waiting.</p>
+        <p className="mt-4 text-sm text-slate-600">Nothing waiting.</p>
       ) : (
-        <ul className="mt-2 space-y-1 text-sm">
+        <ul className="mt-4 space-y-2.5">
           {data.waiting_on_you.map((item) => {
             const program = data.programs.find((p) => p.key === item.program_key);
             const href = program ? decisionHref(program.project, program.release, item.kind) : null;
             return (
-              <li key={`${item.program_key}-${item.kind}`}>
-                {href ? <Link href={href} className="text-action hover:underline">{item.label}</Link> : item.label}
+              <li key={`${item.program_key}-${item.kind}`} className="flex min-h-11 items-center justify-between gap-3 rounded-lg bg-slate-50 px-4 py-2.5 text-sm">
+                <span className="text-slate-800">{item.label.replace(/\s*\(this project\)$/, "")}</span>
+                {href && <Link href={href} className="shrink-0 font-semibold text-action hover:underline">{waitingVerb(item.kind)}</Link>}
               </li>
             );
           })}
@@ -141,32 +178,70 @@ function Waiting({ data }: { data: Portfolio }) {
   );
 }
 
+/** One heading per pattern; programs that share it are listed under it. */
+function groupByTitle(items: Portfolio["across_programs"]): { title: string; texts: string[] }[] {
+  const out: { title: string; texts: string[] }[] = [];
+  for (const item of items) {
+    const group = out.find((g) => g.title === item.title);
+    if (group) group.texts.push(item.text);
+    else out.push({ title: item.title, texts: [item.text] });
+  }
+  return out;
+}
+
 function Across({ items }: { items: Portfolio["across_programs"] }) {
-  if (items.length === 0) return null;
   return (
-    <section>
-      <h2 className="text-lg font-semibold">Across programs</h2>
-      <ul className="mt-2 space-y-2">
-        {items.map((item) => (
-          <li key={`${item.program_key}-${item.kind}`} className="rounded-lg border bg-white p-3">
-            <p className="text-sm font-medium">{item.title}</p>
-            <p className="text-sm text-slate-600">{item.text}</p>
-          </li>
-        ))}
-      </ul>
+    <section className={CARD}>
+      <h2 className="font-heading text-xl font-semibold">Across programs</h2>
+      <p className="mt-1 text-sm text-slate-500">Patterns the platform sees in more than one program.</p>
+      {items.length === 0 ? (
+        <p className="mt-4 text-sm text-slate-600">No pattern yet.</p>
+      ) : (
+        <ul className="mt-4 space-y-4">
+          {groupByTitle(items).map((group) => (
+            <li key={group.title}>
+              <p className="text-sm font-semibold text-slate-900">{group.title}</p>
+              {group.texts.map((text) => (
+                <p key={text} className="mt-0.5 text-sm leading-6 text-slate-600">{text.replace(" (this project)", "")}</p>
+              ))}
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
 
+const SHORT: Record<string, string> = { raid: "RAID", readiness: "readiness", retro: "retros" };
+
 function ComingNext({ items }: { items: Portfolio["coming_next"] }) {
+  const names = items.map((i) => SHORT[i.module] ?? i.name);
+  const title = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : (names[0] ?? "");
+  const planned = items.length > 0 && items.every((i) => i.status === "planned");
+  return (
+    <section className="rounded-2xl bg-ink p-6 text-white">
+      <p className="text-xs font-medium uppercase tracking-wider text-indigo-300">Coming next · Preview</p>
+      <h2 className="mt-2 font-heading text-xl font-semibold">{title || "Nothing planned"}</h2>
+      <p className="mt-3 text-sm leading-6 text-slate-300">
+        Risks and decisions pulled from meeting notes, a go/no-go from real signals before launch, and a retro that shows when each slip was first visible.
+      </p>
+      <p className="mt-4">
+        <span className="inline-block rounded-full border border-white/25 px-3 py-1 text-xs text-slate-200">
+          {planned ? "Planned modules · no data yet" : items.map((i) => `${i.name} · ${i.status}`).join(" · ")}
+        </span>
+      </p>
+    </section>
+  );
+}
+
+function CouldNotRead({ skipped }: { skipped: Portfolio["skipped"] }) {
+  if (skipped.length === 0) return null;
   return (
     <section>
-      <h2 className="text-lg font-semibold">Coming next</h2>
-      <ul className="mt-2 flex flex-wrap gap-2">
-        {items.map((item) => (
-          <li key={item.module} className="rounded-lg border bg-white px-3 py-2 text-sm">
-            {item.name} <span className="ml-2 rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{statusLabel(item.status)}</span>
-          </li>
+      <h2 className="font-heading text-lg font-semibold">Could not read</h2>
+      <ul className="mt-2 space-y-1 text-sm text-slate-600">
+        {skipped.map((s) => (
+          <li key={`${s.team}-${s.reason}`}>{s.team}: {s.reason}</li>
         ))}
       </ul>
     </section>

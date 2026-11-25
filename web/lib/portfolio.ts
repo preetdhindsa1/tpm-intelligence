@@ -105,3 +105,57 @@ export function toolsLabel(p: Pick<PortfolioProgram, "planning_tool" | "code_too
   const names = [p.planning_tool, ...(p.code_tools ?? [])].filter((t): t is string => Boolean(t)).map((t) => TOOL[t] ?? t);
   return [...new Set(names)].join(" + ");
 }
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const day = (iso: string) => `${new Date(iso).getUTCDate()} ${MONTHS[new Date(iso).getUTCMonth()]}`;
+const dayYear = (iso: string) => `${day(iso)} ${new Date(iso).getUTCFullYear()}`;
+
+/** "GitHub · release 16 Dec 2026": the program's tools and its release date. */
+export function programSubline(p: PortfolioProgram): string {
+  const tools = toolsLabel(p);
+  const release = p.dates?.release_at ? `release ${dayYear(p.dates.release_at)}` : "";
+  return [tools, release].filter(Boolean).join(" · ");
+}
+
+/** One line under the stage bar, from the stage and the release dates the API sent. */
+export function stageLine(p: PortfolioProgram): string {
+  const d = p.dates;
+  const days = p.stage.days_to_next_milestone;
+  switch (p.stage.current) {
+    case "plan":
+      return d?.cycle_start_at ? `Planning · cycle starts ${day(d.cycle_start_at)}` : "Planning";
+    case "build":
+      return d?.code_freeze_at ? `Building · Code Freeze ${dayYear(d.code_freeze_at)}` : "Building";
+    case "freeze": {
+      const past = d?.code_freeze_at ? `Past Code Freeze (${day(d.code_freeze_at)})` : "Past Code Freeze";
+      return days !== null && p.stage.next_milestone?.name === "release" ? `${past} · release in ${days} day${days === 1 ? "" : "s"}` : past;
+    }
+    case "launch":
+      return d?.release_at ? `Launching · released ${day(d.release_at)}` : "Launching";
+    case "learn":
+      return d?.release_at ? `Released ${dayYear(d.release_at)} · retro` : "Released · retro";
+    default:
+      return "Stage unknown";
+  }
+}
+
+/** Short tag for the bottleneck; the API's headline when there is no shorter name. */
+export function bottleneckTag(b: PortfolioProgram["bottleneck"]): string {
+  if (b.kind === "linking_gap") return "Linking";
+  if (b.kind === "review_gap") return "Review gap";
+  return b.headline;
+}
+
+/** The text under the tag: the API's detail, or its headline when the tag is shortened. */
+export function bottleneckText(b: PortfolioProgram["bottleneck"]): string | null {
+  return bottleneckTag(b) === b.headline ? b.detail : (b.detail ?? b.headline);
+}
+
+const VERB: Record<string, string> = { approve_exec_update: "Review", review_link_suggestions: "Confirm", classify_prs: "Classify" };
+
+/** The action word on a waiting row. */
+export function waitingVerb(kind: string): string {
+  return VERB[kind] ?? "Open";
+}
+
+export const STAGE_NAMES = ["plan", "build", "freeze", "launch", "learn"] as const;
