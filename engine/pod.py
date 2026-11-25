@@ -81,8 +81,13 @@ def pod_facts(
     rules: tuple[LaneSpec, ...] | list[LaneSpec],
     collisions: int,
     as_of: datetime,
+    approvers: tuple[str, ...] | list[str] = (),
 ) -> dict[str, Any]:
-    """Members, the 7-stage flow, metrics vs targets and rule checks for the PRs in the window."""
+    """Members, the 7-stage flow, metrics vs targets and rule checks for the PRs in the window.
+
+    ``approvers`` are the logins whose merge is a person's approval (the team's reviewer
+    pool). The owner merges every PR here (ADR-0023 addendum 3).
+    """
     marker_lanes = {label: r.name for r in rules for label in r.labels if r.name in AGENT_LANES}
     acts = {pr.key: actions(pr, marker_lanes) for pr in prs}
     people = [pr for pr in prs if lane_of[pr.key] != "dependabot"]
@@ -95,9 +100,15 @@ def pod_facts(
     agent_merged = [pr for pr in merged if lane_of[pr.key] in AGENT_LANES]
     cross = [pr for pr in agent_merged if before_merge(pr, set(AGENT_LANES) - {lane_of[pr.key]})]
     human = [pr for pr in merged if before_merge(pr, {"human"})]
+    approved = [pr for pr in merged if pr.merged_by in set(approvers)]
+    approved_keys = {pr.key for pr in approved}
+    # Alone: nobody from another lane reviewed it before merge. An agent's PR that the owner
+    # merged was approved by a person, so it is not alone; the owner's own PRs still need a
+    # review from an agent.
     alone = [
         pr for pr in merged
         if not before_merge(pr, ({"human"} | set(AGENT_LANES)) - {lane_of[pr.key]})
+        and not (lane_of[pr.key] in AGENT_LANES and pr.key in approved_keys)
     ]  # fmt: skip
     over = [
         pr for pr in people
@@ -173,9 +184,11 @@ def pod_facts(
             stage("ci", "R17", "held" if not red else "broken", {"failing_head_check": len(red)},
                   "Failing check on the latest commit only; run history (three red runs) is "
                   "not collected"),
+            # Held when a person approved (merged) every merged PR.
             stage("human_review", "R14 R15 R16", "not_measured" if not merged
-                  else "held" if len(human) == len(merged) else "broken",
-                  {"human_reviewed": len(human), "merged": len(merged)}),
+                  else "held" if len(approved) == len(merged) else "broken",
+                  {"human_reviewed": len(human), "merged": len(merged),
+                   "approved": len(approved), "approved_of": len(merged)}),
             stage("merge", "R3 R21", "held" if enough else "not_measured",
                   {"median_minutes_to_merge": _median_minutes(merged)},
                   None if enough else "Not enough data yet: fewer than 5 merged pull requests"),

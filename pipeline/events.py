@@ -210,6 +210,7 @@ class PullRequestObserved(_Model):
     merged_at: AwareDatetime | None = None
     closed_at: AwareDatetime | None = None
     url: str | None = None
+    merged_by: str | None = None  # login that merged it: a person's approval (ADR-0023 add. 3)
 
 
 class MergeabilityObserved(_Model):

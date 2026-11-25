@@ -204,6 +204,7 @@ class PullRequest:
     commits: tuple[CommitNote, ...] = ()
     commits_truncated: bool = False
     mergeable: Literal["mergeable", "conflicting", "unknown"] = "unknown"
+    merged_by: str | None = None
 
     @property
     def is_open(self) -> bool:
@@ -442,6 +443,7 @@ def _pull_request(
         created_at=snap.created_at,
         state=state,
         merged_at=merged,
+        merged_by=snap.merged_by if merged else None,
         closed_at=closed,
         reviews=tuple(sorted(reviews.values(), key=lambda r: (r.submitted_at, r.id))),
         checks=known_checks,

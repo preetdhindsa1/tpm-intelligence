@@ -74,3 +74,28 @@ Lane classification, collisions, and every number on the lab page are determinis
 **First measurement (2026-11-25, 68 PRs, 53 merged):** 6 of 38 merged agent PRs cross-reviewed. 11 of 52 merged PRs had a human action before merge. 12 of 13 Dependabot PRs closed unmerged. 48 of 55 PRs without exactly one risk tier. Median 11 minutes from open to merge.
 
 **Limits.** An agent reply without a marker counts as human review (seen on #106). Review depth counts actions, not what was read.
+
+## Addendum 3 (2026-11-25): the owner's merge is a person's approval
+
+**Context.** The owner reported that the AI-native PDLC page undercounts human approval:
+every PR here is approved by the human who merges it, but the page only counted written
+reviews ("19 of 80"), and rule R2 called most agent PRs "approved alone". The platform
+never stored who merged a PR. GitHub records all 88 merged PRs as merged by the owner's
+account.
+
+**Decision.**
+- Pull requests store `merged_by` (poller: GraphQL `mergedBy`; webhooks: REST `merged_by`).
+- A merge by a login in the team's reviewer pool is a person's approval. The owner
+  confirmed (2026-11-25) that they merged all 88 merged PRs: 51 with GitHub's merge
+  button and 37 (all before 2026-11-24 07:12 UTC) as a local merge pushed to main. So
+  every merge counts, with no start date. A draft of this addendum counted only merges
+  after PR #76 (2026-11-24 07:02 UTC), assuming agents had pushed the earlier ones; that
+  assumption was wrong and was dropped.
+- Human review stage: "N of M approved" (merged PRs merged by the human), and
+  held when all of them were. Written reviews and comments are still counted and shown.
+- R2 (no one approves their own work alone): an agent's PR the owner merged is not alone.
+  The owner's own PRs still need an agent's review.
+- A merged PR's snapshot id now includes who merged it, so each merged PR is re-stored once
+  on the next sync. That also stores the commit messages of PRs collected before commits
+  were kept, which is why #67 and #77 showed as "no lane" (their `Co-Authored-By: Claude`
+  trailer puts them in the Claude lane).

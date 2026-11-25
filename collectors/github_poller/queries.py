@@ -13,6 +13,7 @@ fragment PRFields on PullRequest {
   createdAt
   updatedAt
   mergedAt
+  mergedBy { login __typename }
   closedAt
   baseRefName
   repository { nameWithOwner }

@@ -254,7 +254,7 @@ def lab_report(
         cap=cap_open_agent_prs(window, lanes, cap_n, n_merged=len(merged)),
         first_pass=ai_first_pass(waits, still_waiting=waiting, n_merged=len(merged)),
         size=smaller_pr_cap(window, max_lines, n_merged=len(merged)),
-        pod=_pod(window, lanes, rules, len(found), world.as_of),
+        pod=_pod(window, lanes, rules, len(found), world.as_of, tuple(sorted(pool))),
     )
 
 
@@ -264,10 +264,13 @@ def _pod(
     rules: tuple[LaneSpec, ...] | list[LaneSpec],
     collisions_n: int,
     as_of: datetime,
+    approvers: tuple[str, ...] = (),
 ) -> dict[str, Any] | None:
     from engine.pod import pod_facts  # engine.pod imports this module
 
-    return pod_facts(prs, lanes, rules, collisions_n, as_of) if rules else None
+    if not rules:
+        return None
+    return pod_facts(prs, lanes, rules, collisions_n, as_of, approvers=sorted(approvers))
 
 
 def cap_open_agent_prs(

@@ -362,8 +362,13 @@ def pull_request_events(node: Json, *, observed_at: datetime) -> list[Normalized
         merged_at=parse_ts(node["mergedAt"]) if node.get("mergedAt") else None,
         closed_at=parse_ts(node["closedAt"]) if node.get("closedAt") else None,
         url=node.get("url"),
+        merged_by=actor_login(node.get("mergedBy")),
         **lane,
     )
+    # A merged PR rarely updates again, so its snapshot id (updatedAt) would never change
+    # and fields added later (merged_by, commits for lanes) would never be stored. Adding
+    # who merged it re-stores each merged PR once; open PRs keep their ids.
+    merged_id = (f"merged_by:{pr.merged_by}",) if pr.merged_by else ()
     out = [
         new_event(
             source=Source.GITHUB,
@@ -371,7 +376,7 @@ def pull_request_events(node: Json, *, observed_at: datetime) -> list[Normalized
             occurred_at=updated,
             observed_at=observed_at,
             payload=pr,
-            identity=(node["updatedAt"],),
+            identity=(node["updatedAt"], *merged_id),
         )
     ]
     raw_mergeable = node.get("mergeable")
