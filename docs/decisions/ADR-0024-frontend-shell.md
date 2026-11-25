@@ -26,3 +26,7 @@ Launch is seven days, matching ADR-0025, because the API stores a release timest
 ## AI vs rules
 
 No AI. Stage, links, and the last program are deterministic.
+
+## Decision Studio
+
+`/simulate` is Decision Studio. The pool list and the four levers come from `GET /releases/{name}/simulator`. Before a run, baseline and scenario say "Illustrative" and show no numbers. After a run, the numbers are that response's ranges. The "not validated" banner uses the API's replay checks only. The page names the engine Shadow-Org Simulator.
