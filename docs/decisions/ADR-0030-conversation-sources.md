@@ -213,3 +213,49 @@ person confirms it.
 - Precision ≥ **0.80** and recall ≥ **0.60** for each type with at least 5 labelled items in
   `evals/cases/raid/`. Types with fewer are reported but do not gate.
 - Every run reports real numbers, failures included.
+
+## Addendum 3 (2026-11-25): RAID extractor, eval and the v1.38 run (#177–#179)
+
+**Masking is applied before storage, not only on output** (stricter than addendum 2). The
+extractor sees only masked text, and the quote is checked against that text, so the stored
+quote is the source's words with names, handles and speaker tags replaced by
+`[participant]`. Names come from the notes themselves: attendee and host lines, team
+headings ("Docs (Name / @handle)"), leading speaker tags, their first names and short forms
+of those first names ("Fred" for "Frederico"). Roster lines are removed before extraction.
+Email addresses of organisations (`pr@cncf.io`) are kept. Owners are the team headings found
+in the notes (Enhancements, Release Signal, Docs, Comms, Release Branch Management,
+Subproject Leads, Release Lead), never people.
+
+**Known gap.** A person named in passing who is on no roster in the notes is not masked: in
+the v1.38 run, one first name in 2 of 126 kept items. The fix is a second name source (the
+public release-team roster in `kubernetes/sig-release`). It is owed before RAID items are
+served publicly (#180).
+
+**Eval (#178), 5 builder-written seed cases** (masked excerpts of five v1.38 meetings, 35
+expected items). Every run is in `docs/results/` or summarised here:
+
+| Run (UTC) | Prompt | Model | Quote match | Action P / R | Issue P / R | Gate | Cost |
+|---|---|---|---|---|---|---|---|
+| 2026-11-25 22:56 | v1 | claude-haiku-5-5 | 100% | 0.789 / 0.833 | 0.778 / 0.700 | **fail** | $0.006 |
+| 2026-11-25 22:57 | v2 | claude-haiku-5-5 | 100% | 0.895 / 0.944 | 0.769 / 1.000 | **fail** (issue precision) | $0.006 |
+| 2026-11-25 22:58 | v2 | claude-sonnet-5-5 | 100% | 0.938 / 0.833 | 0.692 / 0.900 | **fail** (issue precision) | $0.057 |
+
+Risk (4 labels), decision (4) and question (0) are below the 5-label minimum and do not
+gate. v2's rules were written after reading v1's errors on these same seeds, so its numbers
+are optimistic. Most remaining issue "false positives" are type disagreements (the model
+calls a missing docs PR an issue; the label calls it a risk) or one flaky test listed on its
+own where the label grouped three. The labels were not changed after seeing the outputs.
+The stronger model did not help and costs ten times more, so the cheaper one stays. The real
+measure is Cursor's independent cases in `evals/cases/raid/`, which the gate picks up.
+
+**v1.38 run (#179)**, prompt v2 on claude-haiku-5-5, over the 13 stored meetings (2 Sep to
+25 Nov 2026, read from the shared core after `make notes-sync`):
+
+| Meetings | Returned | Dropped (quote under 4 words) | Dropped (quote not found) | Kept | Action | Issue | Risk | Decision | Question | With team owner | With explicit link | Possible repeats | Cost |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 13 | 132 | 6 | 0 | 126 | 59 | 37 | 14 | 14 | 2 | 121 | 5 | 23 | $0.016 (first run; re-runs are cache hits) |
+
+All 126 are `suggested`. None has a RAID ID until a person confirms it. The run above kept
+items in memory (`--dry-run`) because the RAID tables (migration 0010, #176) are not merged
+yet. Re-running without `--dry-run` after that merge puts the same items in the queue at no
+AI cost.
