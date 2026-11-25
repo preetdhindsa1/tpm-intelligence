@@ -125,7 +125,7 @@ meeting source, decided by the evidence below.
 
 - Slack: create the app in this project's workspace, call `conversations.history` and
   receive one signed event. Record the limits actually returned.
-- Drive API `files.export` of the v1.38 notes with an API key, and the notes' licence.
+- Drive API `files.export` of the v1.38 notes with an API key (the public export works, addendum 2). The notes' licence: not confirmed (addendum 2).
 - The chosen meeting tool: one real transcript fetched end to end.
 
 ## Addendum (2026-11-25): connectors built ahead of live checks
@@ -141,3 +141,75 @@ end to end, recorded here with the date.
   and thread replies, people's messages only (no channel notices or bot posts), one
   `chat` segment per message. It polls a window (default 14 days); the Events API webhook
   comes later. **Not live-verified.**
+
+## Addendum 2 (2026-11-25): source check for Wave 4 and 5, and the RAID model
+
+### Source check (#175)
+
+Fetched with `collectors/notes/client.py` as it is. No `GOOGLE_API_KEY` is set, so every
+fetch used the **public plain-text export** (`/document/d/{id}/export?format=txt`), not the
+Drive API. Each call returned HTTP 200 with the document text.
+
+| Document | ID | Fetched (UTC) | Size | Content |
+|---|---|---|---|---|
+| Kubernetes v1.38 Release Team meeting notes | `1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0` | 2026-11-25 20:53 | 85,338 characters, 1,925 lines | 12 dated meetings from Week 1 (2 Sep 2026) to Week 13 (25 Nov 2026), weekly and burndown |
+| Kubernetes v1.37 Release Retrospective | `1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE` | 2026-11-25 20:53 | 21,949 characters, 222 lines | One retro, linked from `kubernetes/sig-release/releases/release-1.37/links.md` |
+| Kubernetes v1.36 Release Retrospective (fallback) | `11C7O8cgDxhjUJ-FcuOYwn_-tjcFva3SwADCFEUPN3NI` | 2026-11-25 20:53 | 30,662 characters, 446 lines | One retro |
+
+**Decision: real sources.** The v1.38 notes and the v1.37 retro are fetchable, non-empty and
+public, so both are used. The v1.36 retro stays the fallback, and no synthetic notes are
+needed. Fixture endpoints (#174) remain labelled synthetic until the store is wired in.
+
+**Licence: not confirmed.** `kubernetes/community` and `kubernetes/sig-release` are both
+Apache-2.0 (GitHub licence API, `LICENSE` at each root, checked 2026-11-25). The documents
+themselves are Google Docs outside those repositories and carry no licence or reuse notice
+(searched the fetched text for "licen", "copyright", "creative"). So the platform stores only
+the text it needs for each RAID item (its verbatim quote and the meeting date), links every
+item to the source document, and never republishes a whole document.
+
+**Privacy.** The notes attribute lines to people (`[Name] …`: 46 tags in the v1.38 notes, 84
+in the v1.37 retro, 93 in the v1.36 retro) and include meeting links and passcodes.
+- A leading speaker tag is attribution, not part of the quote. The quote check runs on the
+  line after the tag.
+- A quote is stored verbatim for verification. Any `[Name]` left inside it is masked as
+  `[participant]` whenever it is returned by the API or sent to an AI model.
+- Owners are roles or teams ("Release lead", "SIG Node"), never names. Passcodes and meeting
+  links are never stored.
+
+### RAID model
+
+**Fields.** `item_id` (internal, stable), `raid_id`, `workstream`, `type` (risk, action,
+issue, decision, question), `title`, `quote` (verbatim), source (kind, document ID, meeting
+date, URL), `owner` (role or team), `status`, `review`, links (method and status), an
+optional merge suggestion with its reason, and timestamps. Contract:
+`docs/api/raid-contract.md`.
+
+**ID rule.** `{WORKSTREAM}-{TYPE}-{SEQ}`: workstream from the team's connector (`K8S`,
+`KAFKA`, `PIP`), type letter R, A, I, D or Q, and a three-digit sequence per workstream and
+type. The ID is given on the first confirm or edit, never changed, never reused (a rejected
+or superseded item keeps its number used), and never given to a rejected item. Suggested
+items have no RAID ID.
+
+**Identity of a suggestion.** Hash of (source document, meeting date, type, normalized
+quote). Re-running the extractor on the same notes finds the same suggestion and adds
+nothing, so a replay is idempotent. A rejected suggestion is never suggested again.
+
+**Lifecycle.** `status`: open → in_progress → closed or superseded. `review`: suggested →
+confirmed, edited or rejected. Every change appends a history row (who as a role, when,
+what changed, reason). Rows are never updated or deleted.
+
+**Merge rules.** The platform only suggests a merge, with a stored reason, when two items
+have the same type and release and either share an explicit key (a KEP or issue number) or
+have quotes whose word overlap is at least 0.6 (Jaccard on lowercased word sets). A person
+accepts it by superseding one item, which keeps its ID and history.
+
+**Links.** An explicit KEP or issue number in the quote links through the linker as
+`explicit_key` and is verified. Anything else the model proposes stays `ai_suggested` until a
+person confirms it.
+
+**Eval threshold (the CI gate, #178).**
+- Quote match: **100%** of kept items must match their source word for word (whitespace
+  differences only). Any miss fails the gate.
+- Precision ≥ **0.80** and recall ≥ **0.60** for each type with at least 5 labelled items in
+  `evals/cases/raid/`. Types with fewer are reported but do not gate.
+- Every run reports real numbers, failures included.

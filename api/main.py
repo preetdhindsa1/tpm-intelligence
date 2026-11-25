@@ -163,6 +163,15 @@ def create_app(
             response.headers.setdefault(key, value)
         return response
 
+    from api.raid import raid_router
+
+    # Wave 4 RAID tracker: synthetic fixtures until the store is wired in (ADR-0030, #180).
+    app.include_router(raid_router(approver))
+    from api.readiness import readiness_router
+
+    # Wave 5 readiness and retros: synthetic fixtures until #181 and #182 (ADR-0032).
+    app.include_router(readiness_router(approver))
+
     simulations = asyncio.Semaphore(MAX_PARALLEL_SIMULATIONS)
     open_streams = {"n": 0}
     state: dict[str, Any] = {
