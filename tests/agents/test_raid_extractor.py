@@ -1,7 +1,7 @@
 """RAID extractor and name masking, with a fake Claude client (no API calls).
 
-The notes excerpt is trimmed from the public Kubernetes v1.38 release-team meeting notes
-(Week 12, 18 November 2026); the retro lines are shaped like the v1.37 retro's.
+The notes excerpt is shaped like the public Kubernetes v1.38 release-team meeting notes
+(Week 12, 18 November 2026) and the v1.37 retro, with made-up names.
 """
 
 from __future__ import annotations
@@ -28,19 +28,19 @@ NOW = datetime(2026, 11, 25, 12, tzinfo=UTC)
 PROMPT = Prompt("raid_extractor", 1, "List RAID items.")
 TEAMS = ["Enhancements", "Release Signal", "Docs", "Comms", "Release Branch Management"]
 NOTES = """Attendees (pronouns, release team role):
-* Rajalakshmi Girish (she/her, Enhancements Shadow)
-* Omar Nasser (he/him, Release Comms Shadow)
+* Jane Roe (she/her, Enhancements Shadow)
+* Alex Doe (he/him, Release Comms Shadow)
 Updates:
-* Enhancements (APAC: Rajalakshmi Girish / @Rajalakshmi Girish | EMEA: ChengHao Yang / @tico88612):
+* Enhancements (APAC: Jane Roe / @Jane Roe | EMEA: Sam Poe / @spoe88):
    * In review the code freeze exception requests with Release Lead.
-* Comms (APAC/EMEA: Omar Nasser / @naseyro):
-   * Mid cycle blog: Omar has raised the PR (kubernetes/website#59188) for review.
+* Comms (APAC/EMEA: Alex Doe / @adoe):
+   * Mid cycle blog: Alex has raised the PR (kubernetes/website#59188) for review.
    * [Flaking Test] [sig-node] Pod Allocated Endpoint should return all allocated pods
-* Release Branch Management (Agus Barbetta / @aibarbetta):
+* Release Branch Management (Robin Moe / @rmoe):
    * We'll start planning for rc.0 soon, rc.0 is on Thursday 3rd December 2026
    * KEP-6395 was removed at Code Freeze and needs an exception.
 """
-RETRO = "* [Kat + Dipesh] Exception requests arrived   too late this cycle.\n"
+RETRO = "* [Kim + Lee] Exception requests arrived   too late this cycle.\n"
 MEETING = Meeting("doc-1", "kubernetes:v1.38", "K8S", "2026-11-18", NOTES)
 
 
@@ -60,13 +60,13 @@ def run(items: list[ExtractedItemOut], text: str = NOTES) -> tuple:
 
 def test_names_come_from_attendees_headings_and_speaker_tags() -> None:
     names = names_in(NOTES + RETRO)
-    assert {"Rajalakshmi Girish", "Omar", "ChengHao Yang", "Agus Barbetta", "Kat"} <= names
+    assert {"Jane Roe", "Alex", "Sam Poe", "Robin Moe", "Kim"} <= names
     assert not {"Release", "APAC", "EMEA", "Flaking Test", "sig-node"} & names
 
 
 def test_masking_hides_names_handles_and_speakers_but_keeps_test_tags() -> None:
     masked = mask_names(NOTES + RETRO, names_in(NOTES + RETRO))
-    for hidden in ("Omar", "Rajalakshmi", "@tico88612", "@naseyro", "Agus", "Kat", "Dipesh"):
+    for hidden in ("Alex", "Jane", "@spoe88", "@adoe", "Robin", "Kim", "Lee"):
         assert hidden not in masked
     assert f"* {MASK} Exception requests" in masked
     assert "[Flaking Test] [sig-node]" in masked
@@ -76,8 +76,8 @@ def test_masking_hides_names_handles_and_speakers_but_keeps_test_tags() -> None:
 def test_the_model_sees_only_masked_text() -> None:
     _, client = run([])
     sent = str(client.calls[0])
-    assert "Omar" not in sent
-    assert "@aibarbetta" not in sent
+    assert "Alex" not in sent
+    assert "@rmoe" not in sent
     assert MASK in sent
 
 
@@ -96,7 +96,7 @@ def test_quotes_must_match_word_for_word_and_failures_are_counted() -> None:
 
 
 def test_quote_with_a_name_is_checked_against_the_masked_text() -> None:
-    result, _ = run([item("action", "Mid cycle blog: Omar has raised the PR")])
+    result, _ = run([item("action", "Mid cycle blog: Alex has raised the PR")])
     assert result.items == ()
     result, _ = run([item("action", f"Mid cycle blog: {MASK} has raised the PR")])
     assert len(result.items) == 1
@@ -104,7 +104,7 @@ def test_quote_with_a_name_is_checked_against_the_masked_text() -> None:
 
 def test_owner_must_be_a_listed_team_never_a_person() -> None:
     quote = "In review the code freeze exception requests with Release Lead."
-    result, _ = run([item("action", quote, "Enhancements"), item("risk", quote, "Omar Nasser")])
+    result, _ = run([item("action", quote, "Enhancements"), item("risk", quote, "Alex Doe")])
     assert [i.owner for i in result.items] == ["Enhancements", None]
     assert result.unknown_owners == 1
 
@@ -114,7 +114,7 @@ def test_only_explicit_kep_and_pr_references_become_links() -> None:
     assert links_in("see https://github.com/kubernetes/kubernetes/pull/143709 now") == (
         "kubernetes/kubernetes#143709",
     )
-    assert links_in("Omar has raised the PR (kubernetes/website#59188) for review.") == (
+    assert links_in("Alex has raised the PR (kubernetes/website#59188) for review.") == (
         "kubernetes/website#59188",
     )
     assert links_in("see github.com/kubernetes/enhancements/issues/6395 and KEP-6395") == (
