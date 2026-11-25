@@ -20,7 +20,7 @@ export function ReleaseChrome({ groups, project, release, displayName, stage, co
       <nav aria-label="Program" className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
         <Link href="/portfolio" className="inline-flex min-h-11 items-center text-action hover:underline">Portfolio</Link>
         <span aria-hidden>/</span>
-        <select aria-label={`${displayName} · ${release}`} className="min-h-11 rounded-md border bg-white px-2 text-sm font-medium text-slate-800" value={`${project}/${release}`}
+        <select aria-label={`${displayName} · ${release}`} className="min-h-11 min-w-0 max-w-full rounded-md border bg-white px-2 text-sm font-medium text-slate-800" value={`${project}/${release}`}
           onChange={(e) => { const i = e.target.value.indexOf("/"); router.push(switchPath(path, e.target.value.slice(0, i), e.target.value.slice(i + 1))); }}>
           {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
