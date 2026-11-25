@@ -620,3 +620,60 @@ class ForecastSnapshotRecord(Base):
     by_release: Mapped[float | None] = mapped_column(Float)
     # [day, P(merged by day), low, high] for scoring merge dates later (CRPS).
     cdf: Mapped[list[Any]] = mapped_column(JSONB)
+
+
+class RaidItemRecord(Base):
+    """A RAID item (migration 0010, ADR-0030 addendum 2). Logic: ``modules.raid``."""
+
+    __tablename__ = "raid_items"
+    __table_args__ = (
+        CheckConstraint(_in("type", ("risk", "action", "issue", "decision", "question")),
+                        name="type"),
+        CheckConstraint(_in("status", ("open", "in_progress", "closed", "superseded")),
+                        name="status"),
+        CheckConstraint(_in("review", ("suggested", "confirmed", "edited", "rejected")),
+                        name="review"),
+        CheckConstraint("(review IN ('confirmed', 'edited')) = (raid_id IS NOT NULL)",
+                        name="id_on_confirm"),
+        Index("ix_raid_items_release_key", "release_key", "review"),
+    )  # fmt: skip
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    key: Mapped[str] = mapped_column(String(32), unique=True)
+    release_key: Mapped[str] = mapped_column(String(128))
+    workstream: Mapped[str] = mapped_column(String(16))
+    type: Mapped[str] = mapped_column(String(16))
+    title: Mapped[str] = mapped_column(Text)
+    quote: Mapped[str] = mapped_column(Text)
+    document_id: Mapped[str] = mapped_column(String(128))
+    meeting_date: Mapped[str] = mapped_column(String(10))
+    owner: Mapped[str | None] = mapped_column(String(120))
+    status: Mapped[str] = mapped_column(String(16), server_default="open")
+    review: Mapped[str] = mapped_column(String(16), server_default="suggested")
+    raid_id: Mapped[str | None] = mapped_column(String(32), unique=True)
+    links: Mapped[list[Any]] = mapped_column(JSONB, server_default="[]")
+    merge_into: Mapped[int | None] = mapped_column(ForeignKey("raid_items.id"))
+    merge_reason: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
+class RaidHistoryRecord(Base):
+    """One append-only change to a RAID item. ``by_login`` is for audit, never shown."""
+
+    __tablename__ = "raid_history"
+    __table_args__ = (
+        CheckConstraint(_in("actor", ("extractor", "approver")), name="actor"),
+        CheckConstraint("action <> 'rejected' OR length(trim(coalesce(reason, ''))) > 0",
+                        name="reject_reason"),
+        Index("ix_raid_history_item_id", "item_id", "id"),
+    )  # fmt: skip
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    item_id: Mapped[int] = mapped_column(ForeignKey("raid_items.id"))
+    at: Mapped[datetime] = mapped_column(_tz())
+    actor: Mapped[str] = mapped_column(String(16))
+    action: Mapped[str] = mapped_column(String(16))
+    changes: Mapped[dict[str, Any]] = mapped_column(JSONB, server_default="{}")
+    reason: Mapped[str | None] = mapped_column(Text)
+    by_login: Mapped[str | None] = mapped_column(String(64))
