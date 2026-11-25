@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EmptyState } from "@/components/states/States";
 import { formatUtc } from "@/lib/format";
 import {
   approvalNotes,
@@ -32,7 +33,7 @@ export function PortfolioView({ data }: { data: Portfolio }) {
 }
 
 function ProgramTable({ programs, skipped }: { programs: PortfolioProgram[]; skipped: Portfolio["skipped"] }) {
-  if (programs.length === 0) return <p className="text-sm text-slate-600">No programs yet.</p>;
+  if (programs.length === 0) return <EmptyState title="No programs yet" body="No team has a release the portfolio can show." />;
   return (
     <div className="overflow-x-auto rounded-lg border bg-white">
       <table className="min-w-full text-sm">

@@ -14,6 +14,7 @@ import { api, type Summary } from "@/lib/api";
 import { briefToShow } from "@/lib/dashboard";
 import { recordedLabel } from "@/lib/delay";
 import { DecideCard } from "@/components/cockpit/DecideCard";
+import { ErrorState } from "@/components/states/States";
 import { LifecycleBar } from "@/components/cockpit/LifecycleBar";
 import { TimeMachine, type MachineStop } from "@/components/cockpit/TimeMachine";
 import { stageOf } from "@/components/shell/model";
@@ -26,14 +27,22 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
   const release = await releaseFromParams(params);
   const name = release.name;
   const project = release.project;
-  const [data, summary, deps, updates, dates, snaps] = await Promise.all([
-    api.features(name),
-    api.summary(name),
-    api.dependencies(name),
-    api.updates(name).catch(() => []),
-    api.mergeDates(name).catch(() => null),
-    api.snapshots(name).catch(() => null),
-  ]);
+  let loaded: Awaited<ReturnType<typeof loadCockpit>>;
+  try {
+    loaded = await loadCockpit(name);
+  } catch (e) {
+    const detail = e instanceof Error ? e.message : "The release API failed";
+    const display = release.display_name || release.project;
+    return (
+      <div className="space-y-4">
+        <h1 className="text-2xl font-semibold">
+          Live Cockpit · {display} {name}
+        </h1>
+        <ErrorState title="Live Cockpit could not be loaded" detail={detail} />
+      </div>
+    );
+  }
+  const [data, summary, deps, updates, dates, snaps] = loaded;
   const r = data.release;
   const current = data.features.filter((f) => f.in_release);
   const removed = data.features.filter((f) => !f.in_release);
@@ -189,6 +198,17 @@ function FeatureTable({ title, rows, project, release }: { title: string; rows: 
       </div>
     </section>
   );
+}
+
+function loadCockpit(name: string) {
+  return Promise.all([
+    api.features(name),
+    api.summary(name),
+    api.dependencies(name),
+    api.updates(name).catch(() => []),
+    api.mergeDates(name).catch(() => null),
+    api.snapshots(name).catch(() => null),
+  ]);
 }
 
 async function timeMachine(project: string, release: string): Promise<{ stops: MachineStop[]; error: string | null } | null> {
