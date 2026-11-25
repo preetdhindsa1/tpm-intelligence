@@ -7,6 +7,7 @@ import { EmptyState, ErrorState } from "@/components/states/States";
 import { errorDetail } from "@/lib/errors";
 import { api, type Release } from "@/lib/api";
 import { formatUtc } from "@/lib/format";
+import { programTitle } from "@/lib/names";
 import { currentRelease, groupByProject, nextMilestone, releasePath } from "@/lib/routes";
 
 export const dynamic = "force-dynamic";
@@ -58,7 +59,7 @@ function CurrentCard({ release: r, asOf }: { release: Release; asOf: Date }) {
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="text-xl font-semibold text-slate-900">
-          {r.display_name || r.project} {r.name}
+          {programTitle(r.display_name || r.project, r.name, r.has_lab)}
         </p>
         <p className="text-sm text-slate-600">
           {next

@@ -246,10 +246,10 @@ function runNote(sim: Simulation, pool: string, lever: string): string {
 }
 
 /** No calibration yet (#60): say why in plain words and offer a way forward, never a stand-in number. */
-function NoSimulator({ release, cockpit, detail }: { release: string; cockpit: string; detail: string }) {
+function NoSimulator({ program, cockpit, detail }: { program: string; cockpit: string; detail: string }) {
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6">
-      <h2 className="font-heading text-xl font-semibold">No simulation for {release} yet</h2>
+      <h2 className="font-heading text-xl font-semibold">No simulation for {program} yet</h2>
       <p className="mt-2 max-w-3xl text-slate-600">
         The simulator learns how reviews really flow from earlier, finished releases of the same program, then replays them
         with your change. It has not been calibrated for this program yet, so there is nothing to simulate. No example numbers
@@ -268,7 +268,7 @@ function NoSimulator({ release, cockpit, detail }: { release: string; cockpit: s
   );
 }
 
-export function Simulator({ release, cockpit }: { release: string; cockpit: string }) {
+export function Simulator({ release, cockpit, program }: { release: string; cockpit: string; program?: string }) {
   const me = useMe();
   const canAct = me?.approver ?? false;
   const [info, setInfo] = useState<SimulatorInfo | null>(null);
@@ -339,7 +339,7 @@ export function Simulator({ release, cockpit }: { release: string; cockpit: stri
 
   if (error && !info) {
     // No calibration for this release (no earlier release to learn from) is not a failure (#60).
-    if (error.startsWith("No simulator")) return <NoSimulator release={release} cockpit={cockpit} detail={error} />;
+    if (error.startsWith("No simulator")) return <NoSimulator program={program ?? release} cockpit={cockpit} detail={error} />;
     return <ErrorState title="Decision Studio could not be loaded" detail={error} />;
   }
   if (!info) return <LoadingState label="Loading the simulator…" />;

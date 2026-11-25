@@ -60,10 +60,10 @@ def test_this_project_tracks_itself_in_one_repo() -> None:
     assert team.link_pack == "github_issue"
     assert team.planning_repo == team.primary_code_repo == "preetdhindsa1/tpm-intelligence"
     assert team.owns("preetdhindsa1/tpm-intelligence#5")
-    assert team.owns("tpm-intelligence:Phase 3")
+    assert team.owns("tpm-intelligence:Paltform Intelligence Release")
     assert not team.owns("kubernetes/kubernetes#5")
     calendar = load_calendar(team.calendar_path(relative_to=Path.cwd()))
-    assert calendar.get("Phase 3").code_freeze.isoformat() == "2027-01-14T12:00:00+00:00"
+    assert calendar.get("Paltform Intelligence Release").code_freeze.isoformat() == "2026-08-14T12:00:00+00:00"
     assert get_pack("github_issue").name == "github_issue"
     assert tuple(team.author_lanes) == ("claude", "cursor", "human")
     assert team.author_lanes["cursor"].labels == ("cursor-agent",)

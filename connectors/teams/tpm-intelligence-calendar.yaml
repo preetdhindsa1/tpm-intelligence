@@ -4,9 +4,9 @@
 # code freeze falls ten working days after people return. Times are UTC.
 project: tpm-intelligence
 releases:
-  - name: "Phase 3"
-    cycle_start: 2026-11-30T00:00:00Z
-    enhancements_freeze: 2026-12-14T12:00:00Z # planning freeze: Phase 3 issues set
-    code_freeze: 2027-01-14T12:00:00Z
-    release: 2027-01-20T00:00:00Z
+  - name: "Paltform Intelligence Release"
+    cycle_start: 2026-05-30T00:00:00Z
+    enhancements_freeze: 2026-07-14T12:00:00Z # planning freeze: Phase 3 issues set
+    code_freeze: 2026-08-14T12:00:00Z
+    release: 2027-11-20T00:00:00Z
     source_url: https://github.com/preetdhindsa1/tpm-intelligence/milestones

@@ -7,6 +7,7 @@ import { errorDetail } from "@/lib/errors";
 import { OUTCOME_META, STATUS } from "@/lib/dashboard";
 import { depStats, PR_NUM, shortSig } from "@/lib/dependencies";
 import { formatUtc } from "@/lib/format";
+import { programTitle } from "@/lib/names";
 import { releaseFromParams } from "@/lib/release-page";
 import { releasePath } from "@/lib/routes";
 
@@ -59,7 +60,7 @@ export default async function DependenciesPage({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-heading text-2xl font-semibold">
-            Dependencies · {release.display_name || release.project} {name}
+            Dependencies · {programTitle(release.display_name || release.project, name, release.has_lab)}
           </h1>
           <p className="max-w-4xl text-sm text-slate-600">
             How features depend on each other, from verified PR links and &quot;depends on&quot; statements in PR text. {v.designs} have no
