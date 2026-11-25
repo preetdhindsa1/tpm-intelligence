@@ -20,7 +20,7 @@ Design notes
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from enum import StrEnum
 from typing import Annotated, Literal
 
@@ -37,6 +37,7 @@ class Source(StrEnum):
 
     GITHUB = "github"
     JIRA = "jira"
+    GOOGLE_DRIVE = "google_drive"  # publicly shared meeting-notes documents (ADR-0030)
 
 
 class SubjectKind(StrEnum):
@@ -45,6 +46,7 @@ class SubjectKind(StrEnum):
     WORK_ITEM = "work_item"
     PULL_REQUEST = "pull_request"
     RELEASE = "release"
+    CONVERSATION = "conversation"  # a meeting's notes or transcript, or a chat thread
 
 
 class WorkItemType(StrEnum):
@@ -250,6 +252,37 @@ class CheckCompleted(_Model):
     completed_at: AwareDatetime | None = None
 
 
+class ConversationKind(StrEnum):
+    """What kind of conversation a segment comes from (ADR-0030)."""
+
+    MEETING_NOTES = "meeting_notes"
+    MEETING_TRANSCRIPT = "meeting_transcript"
+    CHAT = "chat"
+
+
+class ConversationSegmentObserved(_Model):
+    """One meeting (or chat message) from a conversation source, as the source has it now.
+
+    Every source (meeting notes, Zoom/Teams/Meet transcripts, Slack) produces this one
+    shape, so the RAID extractor never depends on where a conversation came from
+    (ADR-0030). ``text`` is verbatim: the extractor's quotes are checked against it word
+    for word. Names in the text may be stored for computation but are never displayed
+    (CLAUDE.md section 10). Notes are edited after a meeting, so the event's identity
+    includes ``text_sha256``: an edit is a new event, and history keeps both.
+    """
+
+    type: Literal["conversation.segment_observed"] = "conversation.segment_observed"
+    kind: ConversationKind
+    container: str  # e.g. the notes document id, a Slack channel id
+    container_title: str = ""
+    heading: str  # e.g. "Week 12 - Wednesday 18 November 2026 Weekly Meeting" (en dash in source)
+    text: str
+    text_sha256: str = Field(min_length=64, max_length=64)
+    meeting_date: date | None = None  # the day the meeting happened, when the source says
+    release_key: str | None = None  # e.g. "kubernetes:v1.38" when the source names one
+    url: str | None = None
+
+
 class ReleaseObserved(_Model):
     """Release definition with its key dates (from the checked-in calendar)."""
 
@@ -277,6 +310,7 @@ EventPayload = Annotated[
     | ReviewSubmitted
     | CommentPosted
     | CheckCompleted
+    | ConversationSegmentObserved
     | ReleaseObserved,
     Field(discriminator="type"),
 ]

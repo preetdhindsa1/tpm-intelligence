@@ -53,6 +53,18 @@ class CalendarRef(BaseModel):
     path: str
 
 
+class ConversationSource(BaseModel):
+    """A conversation the team's program reads (ADR-0030). Read-only, public sources only
+    in the demo; private sources come with their own connector and secrets."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    kind: Literal["google_doc"] = Field(description="publicly shared Google Doc of meeting notes")
+    document_id: str = Field(min_length=10)
+    title: str
+    release: str | None = Field(default=None, description="release name these notes belong to")
+
+
 class TeamConfig(BaseModel):
     """One cross-functional team's plug-in definition.
 
@@ -80,6 +92,8 @@ class TeamConfig(BaseModel):
     # (ADR-0025 addendum): "Code Freeze" for Kubernetes, "Feature Freeze" for Kafka, or
     # "Release cut" for a team that ships continuously.
     code_freeze_label: str = "Code Freeze"
+    # Meeting notes, transcripts and chat the team's programs read (ADR-0030).
+    conversations: tuple[ConversationSource, ...] = ()
 
     def calendar_path(self, *, relative_to: Path) -> Path:
         """Resolve the calendar file (paths are repo-root relative unless absolute)."""
