@@ -20,6 +20,7 @@ from engine.rules import (
     evaluate_feature,
     main_pr,
     unlinked_open_load,
+    unlinked_open_prs,
 )
 
 _TIMELINE_LABELS = {
@@ -79,6 +80,7 @@ class ReleaseAssessment:
     as_of: datetime
     features: tuple[FeatureAssessment, ...]
     unlinked_open_prs_by_sig: tuple[tuple[str, int], ...]
+    unlinked_open_prs: int = 0  # distinct PRs; the per-SIG counts double-count multi-SIG PRs
 
 
 def feature_timeline(
@@ -135,6 +137,7 @@ def assess_release(
         as_of=world.as_of,
         features=assessed,
         unlinked_open_prs_by_sig=tuple(sorted(sig_load.items(), key=lambda kv: (-kv[1], kv[0]))),
+        unlinked_open_prs=unlinked_open_prs(world, links),
     )
 
 
