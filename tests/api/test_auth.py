@@ -35,6 +35,7 @@ ACTIONS: list[tuple[str, str, Any]] = [
     ("POST", "/raid/4/confirm", {}),
     ("POST", "/raid/4/edit", {"owner": "SIG Node"}),
     ("POST", "/raid/4/reject", {"reason": "not a risk"}),
+    ("POST", "/readiness/v1.38/decision", {"decision": "go", "note": "all clear"}),
 ]
 
 
