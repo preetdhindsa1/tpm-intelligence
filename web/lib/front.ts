@@ -22,20 +22,18 @@ export const DEMO_CHAPTERS = [
   "What we measured",
 ] as const;
 
-export function freezeStory(display: string, release: string, removed: number, asOf: string): Story | null {
+export function freezeStory(
+  display: string,
+  release: string,
+  removed: number,
+  readded: number,
+  asOf: string,
+): Story | null {
   if (removed <= 0 || !asOf) return null;
+  const again = readded > 0 ? ` ${readded} were added back later.` : "";
   return {
     title: `${removed} removed at Code Freeze`,
-    detail: `${display} ${release}. From the release summary.`,
-    asOf,
-  };
-}
-
-export function reviewStory(display: string, approved: number, merged: number, asOf: string): Story | null {
-  if (merged <= 0 || !asOf) return null;
-  return {
-    title: `${approved} of ${merged} merged pull requests had an approving review`,
-    detail: display,
+    detail: `${display} ${release}. From the release summary.${again}`,
     asOf,
   };
 }

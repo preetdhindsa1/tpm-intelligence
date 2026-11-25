@@ -33,4 +33,4 @@ No AI. Stage, links, and the last program are deterministic. The Live Cockpit ti
 
 ## Front page
 
-The headline and tagline are the locked words. Live program cards come from `GET /portfolio`. The three stories are omitted when their source is missing: the Kubernetes release summary for removals at Code Freeze, the lab report for approving reviews, and `lib/measured.ts` for Kafka linking. The recorded demo lists five chapters and a 2:00 running time, and says no recording is published.
+The headline and tagline are the locked words. Live program cards come from `GET /portfolio`. The three stories are omitted when their source is missing: the Kubernetes release summary for removals at Code Freeze (and how many were added back, when the summary says so), and `lib/measured.ts` for Kafka linking and the fact checker. Approving-review counts stay off this page until cross-reviews are counted, because every pull request and review is posted from one account (issue #94). The recorded demo lists five chapters and a 2:00 running time, and says no recording is published.

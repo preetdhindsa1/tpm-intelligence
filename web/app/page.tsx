@@ -1,8 +1,10 @@
 // Front page. Live programs come from GET /portfolio. Story counts come from the
-// release summary, the lab report, or lib/measured.ts. A missing source omits that story.
+// release summary or lib/measured.ts. A missing source omits that story.
+// Approving-review counts stay off this page until cross-reviews are counted:
+// every pull request and review is posted from one account (issue #94).
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { DEMO_CHAPTERS, DEMO_LENGTH, STAGE_MODULES, freezeStory, measuredStory, reviewStory, type Story } from "@/lib/front";
+import { DEMO_CHAPTERS, DEMO_LENGTH, STAGE_MODULES, freezeStory, measuredStory, type Story } from "@/lib/front";
 import { formatUtc } from "@/lib/format";
 import { MEASURED, type Verdict } from "@/lib/measured";
 import { stageLabel, type Portfolio, type PortfolioProgram } from "@/lib/portfolio";
@@ -130,15 +132,19 @@ function ProgramCard({ program }: { program: PortfolioProgram }) {
 
 async function storiesFor(portfolio: Portfolio): Promise<Story[]> {
   const kubernetes = portfolio.programs.find((program) => program.project.toLowerCase() === "kubernetes");
-  const repo = portfolio.programs.find((program) => program.project === "tpm-intelligence");
-  const [summary, lab] = await Promise.all([
-    kubernetes ? api.summary(kubernetes.release).catch(() => null) : null,
-    repo ? api.lab(repo.project, repo.release).catch(() => null) : null,
-  ]);
+  const summary = kubernetes ? await api.summary(kubernetes.release).catch(() => null) : null;
   const stories = [
-    kubernetes && summary ? freezeStory(kubernetes.display_name, kubernetes.release, summary.removed_at_freeze, summary.as_of) : null,
-    repo && lab?.lanes_configured ? reviewStory(repo.display_name, lab.approved_merged, lab.n_merged, lab.as_of) : null,
+    kubernetes && summary
+      ? freezeStory(
+          kubernetes.display_name,
+          kubernetes.release,
+          summary.removed_at_freeze,
+          summary.outcomes.readded_after_freeze ?? 0,
+          summary.as_of,
+        )
+      : null,
     measuredStory(MEASURED, "kafka-linking"),
+    measuredStory(MEASURED, "fact-checker"),
   ];
   return stories.filter((story): story is Story => story !== null);
 }
