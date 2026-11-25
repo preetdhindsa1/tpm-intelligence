@@ -12,9 +12,15 @@ export function PdlcView({ pod, asOf, total, merged }: { pod: Pod; asOf: string;
   const cur = pod.flow[si];
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl bg-ink p-6 text-white">
-        <p className="text-sm text-indigo-200">AI-native PDLC / Pod: Program Intelligence repo · real pull requests · data as of {asOf}</p>
-        <h1 className="mt-2 font-heading text-3xl font-semibold">How the pod builds, checks and ships</h1>
+      <section className="-mx-6 -mt-6 bg-ink px-6 pb-10 pt-8 text-white">
+        <div className="mx-auto max-w-[1400px]">
+        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-indigo-300">AI-native PDLC</span>
+          <span aria-hidden className="text-slate-500">/</span>
+          <span className="rounded-md border border-white/20 px-2.5 py-1 text-white">Pod: Program Intelligence repo</span>
+          <span className="text-slate-300">Real pull requests · as of {asOf}</span>
+        </nav>
+        <h1 className="mt-4 font-heading text-4xl font-bold tracking-tight">How the pod builds, checks and ships</h1>
         <p className="mt-2 max-w-3xl text-slate-200">
           In a pod of 1 human, 2 AI agents and a bot, code is cheap and the human&apos;s attention is the only scarce
           thing. Velocity is merged, kept and released changes, never PRs opened.
@@ -41,6 +47,7 @@ export function PdlcView({ pod, asOf, total, merged }: { pod: Pod; asOf: string;
           {total} pull requests in this repository&apos;s whole history, {merged} merged, {pod.no_lane} with no lane. The
           pod rules started on 24 Nov 2026, so older PRs show as breaking them.
         </p>
+        </div>
       </section>
 
       <section className="rounded-2xl border bg-white p-6">
