@@ -37,6 +37,7 @@ from api.schemas import (
     LoadOut,
     MeOut,
     MergeDatesOut,
+    PortfolioOut,
     ReleaseOut,
     RiskNoteOut,
     SavedScenarioOut,
@@ -59,14 +60,17 @@ from api.views import (
     lab_out,
     lane_specs,
     merge_dates_out,
+    program_facts,
     release_out,
     release_summary_out,
     summary_out,
 )
 from connectors.load import load_teams
+from connectors.schema import TeamConfig
 from engine.assess import FeatureAssessment
 from engine.forecast import DEFAULT_FORECAST, model_version
 from engine.lab import lab_report
+from engine.portfolio import LabFacts, portfolio
 
 SERVICE_NAME = "tpm-api"
 # A live stream ends after this long and the browser reconnects (EventSource does so by
@@ -245,8 +249,7 @@ def create_app(
         if team is None:
             raise HTTPException(404, f"unknown project {project}")
         project = team.project
-        own_history = team.project == "tpm-intelligence"
-        if not own_history and not release:
+        if team.project != "tpm-intelligence" and not release:
             raise HTTPException(404, "release is required")
 
         def _newest_name() -> str | None:
@@ -259,7 +262,7 @@ def create_app(
         v = await view(name)
         if v.assessment.release.key.split(":", 1)[0] != project:
             raise HTTPException(404, f"unknown project {project}")
-        since = None if own_history else v.assessment.release.cycle_start_at
+        since = _lab_since(team, v)
         report = lab_report(
             v.world,
             v.assessment.release.key,
@@ -848,8 +851,72 @@ def create_app(
             events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"}
         )
 
+    def _program_facts(team: TeamConfig, v: ReleaseView, skipped: list[dict[str, str]]) -> Any:
+        """Stored facts for one program. A store that cannot be read is listed, not hidden."""
+        from agents.link_store import SuggestionStatus
+        from agents.updates import UpdateStatus
+
+        a = v.assessment
+        key = a.release.key
+        draft, suggested = None, 0
+        try:
+            rows = ai_services.list_updates(v)
+            if rows and rows[0][0].status is UpdateStatus.DRAFT:
+                draft = rows[0][0].id
+        except Exception:  # one store must not take the page down
+            logger.exception("portfolio: updates unavailable for %s", key)
+            skipped.append({"team": team.id, "reason": "exec updates could not be read"})
+        try:
+            suggested = len(links().list(key, SuggestionStatus.SUGGESTED))
+        except Exception:
+            logger.exception("portfolio: link suggestions unavailable for %s", key)
+            skipped.append({"team": team.id, "reason": "link suggestions could not be read"})
+        lab = None
+        if team.author_lanes:
+            r = lab_report(
+                v.world,
+                key,
+                lane_specs(team.author_lanes),
+                team.reviewer_pool,
+                since=_lab_since(team, v),
+            )
+            unassigned = sum(b.opened for b in r.buckets if b.lane == "unassigned")
+            lab = LabFacts(r.n_merged, r.approved_merged, r.median_hours_to_merge, unassigned)
+        return program_facts(v, team, draft_id=draft, suggested_links=suggested, lab=lab)
+
+    @app.get("/portfolio", response_model=PortfolioOut)
+    async def portfolio_view() -> PortfolioOut:
+        """Every live program at once (ADR-0025). Deterministic facts only, no AI."""
+
+        def build() -> dict[str, Any]:
+            with tracer.start_as_current_span("api.portfolio") as span:
+                s = svc()
+                facts, skipped = [], []
+                for team in load_teams().values():
+                    name = s.current_release_name(team.project)
+                    if name is None:
+                        skipped.append({"team": team.id, "reason": "no release yet"})
+                        continue
+                    try:
+                        v = s.view(f"{team.project}:{name}")
+                    except Exception:  # the other programs still return
+                        logger.exception("portfolio: %s:%s failed", team.project, name)
+                        skipped.append({"team": team.id, "reason": "release could not be computed"})
+                        continue
+                    facts.append(_program_facts(team, v, skipped))
+                span.set_attribute("portfolio.programs", len(facts))
+                span.set_attribute("portfolio.skipped", len(skipped))
+                return portfolio(facts, skipped, datetime.now(UTC))
+
+        return PortfolioOut.model_validate(await run_in_threadpool(build))
+
     FastAPIInstrumentor.instrument_app(app, excluded_urls="healthz,health")
     return app
+
+
+def _lab_since(team: TeamConfig, v: ReleaseView) -> datetime | None:
+    """This repository counts its whole history; other teams count the release cycle."""
+    return None if team.project == "tpm-intelligence" else v.assessment.release.cycle_start_at
 
 
 def _sse(event: str, data: dict[str, Any]) -> str:

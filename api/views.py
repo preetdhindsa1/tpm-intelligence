@@ -38,10 +38,12 @@ from api.schemas import (
 )
 from api.service import ReleaseSummary, ReleaseView
 from connectors.load import display_name_for_project, team_for_project
+from connectors.schema import TeamConfig
 from engine.assess import FeatureAssessment
 from engine.forecast import Forecast, outcome_definition
 from engine.lab import LabReport, LaneSpec
 from engine.merge_date import MergeDateForecast
+from engine.portfolio import LabFacts, ProgramFacts
 from engine.projection import ReleaseInfo, key_number
 
 
@@ -541,4 +543,48 @@ def lane_specs(team_lanes: dict[str, Any]) -> tuple[LaneSpec, ...]:
     return tuple(
         LaneSpec(name, rule.labels, rule.branch_prefixes, rule.trailers)
         for name, rule in team_lanes.items()
+    )
+
+
+def program_facts(
+    view: ReleaseView,
+    team: TeamConfig,
+    *,
+    draft_id: int | None,
+    suggested_links: int,
+    lab: LabFacts | None,
+) -> ProgramFacts:
+    """Stored facts for one Portfolio row (ADR-0025). Counts only, no names."""
+    a = view.assessment
+    r = a.release
+    in_release = [f for f in a.features if f.in_release]
+    return ProgramFacts(
+        key=r.key,
+        project=team.project,
+        display_name=team.display_name,
+        release=r.name,
+        planning_tool=team.planning.source,
+        code_tools=("github",),  # every connector's code activity is GitHub today
+        as_of=a.as_of,
+        dates={
+            "cycle_start_at": r.cycle_start_at,
+            "enhancements_freeze_at": r.enhancements_freeze_at,
+            "code_freeze_at": r.code_freeze_at,
+            "release_at": r.release_at,
+        },
+        features_in_release=len(in_release),
+        features_ever=len(a.features),
+        critical_codes=tuple(
+            codes
+            for f in in_release
+            if (codes := tuple(x.code for x in f.flags if x.severity == "critical"))
+        ),
+        linked_features=sum(1 for f in in_release if f.pull_requests),
+        readded_after_freeze=sum(
+            feature_outcome(view, f) == "readded_after_freeze" for f in a.features
+        ),
+        unlinked_open_prs=sum(n for _, n in a.unlinked_open_prs_by_sig),
+        draft_update_id=draft_id,
+        suggested_links=suggested_links,
+        lab=lab,
     )
