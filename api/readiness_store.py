@@ -15,6 +15,7 @@ from typing import Any
 
 from opentelemetry import trace
 
+from api.validation import Validation, load_readiness_validation
 from connectors.load import load_teams
 from modules.raid.store import RaidItem
 from modules.readiness.decisions import Decision, DecisionLog
@@ -23,7 +24,6 @@ from modules.readiness.rules import NAMES, Criterion, Readiness, evaluate
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 _GITHUB = re.compile(r"^(feature|pr):([\w.-]+/[\w.-]+)#(\d+)$")
-NOTE = "Not validated: the readiness backtest has not run (ADR-0032)."
 
 
 def evidence_url(ref: str) -> str | None:
@@ -56,8 +56,10 @@ class StoreReadiness:
         view: Callable[[str], Awaitable[Any]],  # release name -> ReleaseView (404 if unknown)
         raid: Callable[[str], Sequence[RaidItem]],
         log: DecisionLog,
+        validation: Validation | None = None,
     ) -> None:
         self._view, self._raid, self._log = view, raid, log
+        self._validation = validation or load_readiness_validation()
 
     def _items(self, release_key: str) -> list[RaidItem] | None:
         try:
@@ -91,7 +93,8 @@ class StoreReadiness:
             "project": project, "release": name, "as_of": r.as_of, "synthetic": False,
             "verdict": r.verdict, "criteria": [_criterion(c) for c in r.criteria],
             "decisions": [_decision(d) for d in self._log.list(r.release_key)],
-            "summary": None, "validated": False, "validation_note": NOTE,
+            "summary": None, "validated": self._validation.validated,
+            "validation_note": self._validation.reason,
         }  # fmt: skip
 
     async def readiness(self, release: str) -> dict[str, Any]:

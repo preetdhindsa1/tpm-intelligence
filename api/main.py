@@ -293,6 +293,16 @@ def create_app(
         )
         return lab_out(report, project=project, lanes_configured=bool(team.author_lanes))
 
+    @app.get("/results")
+    async def results() -> dict[str, Any]:
+        """Measured results the platform publishes (CLAUDE.md principle 5), newest file each.
+
+        ``readiness_backtest``: the ADR-0032 backtest (#184), pass or fail, or null.
+        """
+        from api.validation import latest_readiness_backtest
+
+        return {"readiness_backtest": latest_readiness_backtest()}
+
     @app.get("/retro/lanes", response_model=LaneRetroReportOut)
     async def retro_lanes(project: str = "tpm-intelligence") -> LaneRetroReportOut:
         """This repo's UX v1 sprint retro per pod lane, from PR data (#182, ADR-0032)."""
