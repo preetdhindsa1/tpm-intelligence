@@ -22,6 +22,17 @@ const list: RaidList = {
 };
 
 describe("RAID tracker", () => {
+  it("copies the filtered rows and leaves suggested items out", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(<Tracker list={list} />);
+    fireEvent.click(screen.getByRole("button", { name: "Copy as Markdown" }));
+    expect((await screen.findByRole("status")).textContent).toContain("Nothing was sent");
+    const text = String(writeText.mock.calls[0][0]);
+    expect(text).toContain("| K8S-R-001 | risk |");
+    expect(text).not.toContain("Still suggested");
+  });
+
   it("hides suggested items and shows history oldest first, with the actor as a role", async () => {
     browserGet.mockResolvedValue({
       item_id: 1, raid_id: "K8S-R-001", synthetic: true,
