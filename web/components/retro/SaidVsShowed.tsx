@@ -1,6 +1,6 @@
 import { formatUtc } from "@/lib/format";
 import type { SaidVsShowed } from "@/lib/api-readiness";
-import { byMeetingDate, riskWhen, riskWhenLabel } from "@/lib/said";
+import { byMeetingDate } from "@/lib/said";
 
 const FACTS: Record<string, string> = {
   replay_day: "Replay day",
@@ -25,19 +25,15 @@ export function SaidTimeline({ data }: { data: SaidVsShowed }) {
                 <p className="mt-1 text-sm text-slate-600">Nothing said.</p>
               ) : (
                 <ul className="mt-1 space-y-2">
-                  {row.said.map((item) => {
-                    const when = riskWhen(rows, row, item);
-                    return (
-                      <li key={item.item_id} className="text-sm">
-                        <p>
-                          <span className="capitalize">{item.type}</span>
-                          {item.review === "suggested" && <span className="ml-2 rounded-full bg-warning-bg px-2 py-0.5 text-xs font-medium text-warning">Suggested</span>}
-                        </p>
-                        {item.quote && <p className="mt-1 text-slate-800">{item.quote}</p>}
-                        {when && <p className="mt-1 text-slate-600">{riskWhenLabel(when)}</p>}
-                      </li>
-                    );
-                  })}
+                  {row.said.map((item) => (
+                    <li key={item.item_id} className="text-sm">
+                      <p>
+                        <span className="capitalize">{item.type}</span>
+                        {item.review === "suggested" && <span className="ml-2 rounded-full bg-warning-bg px-2 py-0.5 text-xs font-medium text-warning">Suggested</span>}
+                      </p>
+                      {item.quote && <p className="mt-1 text-slate-800">{item.quote}</p>}
+                    </li>
+                  ))}
                 </ul>
               )}
             </div>
