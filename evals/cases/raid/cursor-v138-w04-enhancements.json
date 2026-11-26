@@ -1,0 +1,59 @@
+{
+ "id": "cursor-v138-w04-enhancements",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-23",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Enhancements (APAC: [participant] / [participant], EMEA: [participant] / [participant]):\n      * Current Status: Yellow\n      * Release Tracking Board: https://github.com/orgs/kubernetes/projects/269\n      * Metrics: \n      * Total KEPs on the board = 90\n      * By stage:\n      * Alpha: 46\n      * Beta: 30\n      * Stable: 14\n      * Deprecation: 0\n      * By status:\n      * Tracked for KEP Readiness: 78\n      * At risk for enhancements freeze: 9\n      * Tracked for enhancements freeze: 3\n      * Removed from milestone: 10\n      * Updates:\n      * PRR Freeze has been renamed to KEP Readiness, so we have updated all communication templates to reflect the new name.\n      * KEP Readiness (formerly named PRR Freeze) Party ended 4 hours ago.\n      * Enhancement Freeze reminders will be sent out in the next few days.\n      * Enhancements Team Onboarding APAC timezone completed at 9/17 11:00 (UTC)\n      * Invitations for the Enhancement Freeze Party have been sent, and the links will be posted in the #sig-release channel.",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "At risk for enhancements freeze: 9",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "decision",
+   "quote": "PRR Freeze has been renamed to KEP Readiness, so we have updated all communication templates to reflect the new name.",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "action",
+   "quote": "Enhancement Freeze reminders will be sent out in the next few days.",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "action",
+   "quote": "Invitations for the Enhancement Freeze Party have been sent, and the links will be posted in the #sig-release channel.",
+   "owner": "Enhancements"
+  }
+ ],
+ "optional": [
+  {
+   "type": "issue",
+   "quote": "At risk for enhancements freeze: 9",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "risk",
+   "quote": "Current Status: Yellow",
+   "owner": "Enhancements"
+  }
+ ]
+}

@@ -1,0 +1,58 @@
+{
+ "id": "cursor-v138-w04-release-signal",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-23",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Release Signal (APAC: [participant] / [participant], EMEA: [participant]):\n      * Current Status: Red \n      * The current signal is a no-go as there are currently flaky and failing tests that we are following up on:\n      * SIG Node\n      * [Flaking Test] Kubernetes e2e suite.[It] [sig-node] Pod Allocated Endpoint [FeatureGate:KubeletAllocatedPodsEndpoint] should return all allocated pods with status cleared when listing [Alpha] [Feature:OffByDefault] \n      * [Failing Test] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] sig-release-master-informing#gce-cos-slow-master \n      * SIG Testing\n      * [Flaking Test] [sig-testing] ci-kubernetes-e2e-gce-cos-alphafeatures-master kubetest.Timeout [gce-cos-alphafeatures-master, gce-cos-alphafeatures-1.37] sig-release-master-blocking#gce-cos-alphafeatures-master\n      * SIG Windows\n      * [Flaking Test] sig-release-master-informing#capz-windows-master ci-kubernetes-e2e-capz-master-windows.Overall\n      * Infra and Testing \n      * sig-release-blocking#gce-cos-alphafeatures-master.kubetest.Timeout\n      * (resolved. Not the release blocker) sig-release-master-informing#ec2-master-scale-performance-5000 testgrid is currently not accessible.\n      * Report thread\n      * #testing-ops: https://kubernetes.slack.com/archives/C7J9RP96G/p1790144318614949\n      * #sig-k8s-infra: https://kubernetes.slack.com/archives/CCK68P2Q2/p1790144420680869\n      * Internal Team Assignment Sheet\n      * CI Signal Board\n      * Bug Triage Board\n      * Release blocking Issues (0)\n      * Release blocking PRs (0)\n      * Query: open non-test/flake k/k issues for v1.38 (4)\n      * priority/critical-urgent issues (0)\n      * priority/important-soon issues (0)\n      * Query: open k/k PRs for v1.38 (8)\n      * priority/critical-urgent PRs (0)\n      * priority/important-soon PRs (0)\n      * Query: ALL open k/k issues for v1.38 (4) (incl. this query (0)) \n      * Updates:\n      * Completed release signal onboarding meeting.",
+ "expected": [
+  {
+   "type": "issue",
+   "quote": "[Flaking Test] Kubernetes e2e suite.[It] [sig-node] Pod Allocated Endpoint [FeatureGate:KubeletAllocatedPodsEndpoint] should return all allocated pods with status cleared when listing [Alpha] [Feature:OffByDefault]",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "[Failing Test] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] sig-release-master-informing#gce-cos-slow-master",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "[Flaking Test] [sig-testing] ci-kubernetes-e2e-gce-cos-alphafeatures-master kubetest.Timeout [gce-cos-alphafeatures-master, gce-cos-alphafeatures-1.37] sig-release-master-blocking#gce-cos-alphafeatures-master",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "[Flaking Test] sig-release-master-informing#capz-windows-master ci-kubernetes-e2e-capz-master-windows.Overall",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "sig-release-blocking#gce-cos-alphafeatures-master.kubetest.Timeout",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "decision",
+   "quote": "(resolved. Not the release blocker) sig-release-master-informing#ec2-master-scale-performance-5000 testgrid is currently not accessible.",
+   "owner": "Release Signal"
+  }
+ ],
+ "optional": []
+}

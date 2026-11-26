@@ -1,0 +1,38 @@
+{
+ "id": "cursor-v138-w03-docs",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-16",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Docs (APAC: [participant] / [participant],  EMEA: [participant] /[participant] ):\n      * Current Status:  Green\n      * Updated hugo for v1.38 release \n      * Completed docs team shadow onboarding\n      * PR to add [participant] (myself) into the sig-docs-en-owners group for release tasks has been merged\n      * First weekly branch sync has been merged.\n      * Integration branch PR is open and on hold until release day —  https://github.com/kubernetes/website/pull/57502 \n      * Added necessary permissions for all release docs team with the following PR pending:\n      * Google Groups, release-team + release-team-shadows — open, has lgtm (https://github.com/kubernetes/k8s.io/pull/9933) \nImportant dates and upcoming work\n      * [participant] 17th Sept  Call for KEP Readiness / Enhancements Freeze exceptions \n      * Fri 18th Sept  Branch sync \n      * Wed 23rd Sept  alpha.1 + Start Release Notes Draft By [participant], reviewed by [participant] [participant] \n      * Tue 29th Sep  Enhancements Freeze (AoE)\n      * [participant] 1st Oct  KEP outreach R1 — GitHub comments on every tracked KEP\n      * Dec 3 - Docs Freeze\n      * Wed Dec 16 - 1.38 release date",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "Integration branch PR is open and on hold until release day —  https://github.com/kubernetes/website/pull/57502",
+   "owner": "Docs"
+  },
+  {
+   "type": "risk",
+   "quote": "Google Groups, release-team + release-team-shadows — open, has lgtm (https://github.com/kubernetes/k8s.io/pull/9933)",
+   "owner": "Docs"
+  }
+ ],
+ "optional": []
+}

@@ -1,0 +1,39 @@
+{
+ "id": "cursor-v138-w09-release-signal",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-10-28",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * Release Signal (APAC: [participant]/ [participant], EMEA: [participant] / [participant]):\n   * Current Status: Green\n   * https://kubernetes.slack.com/archives/CJH2GBF7Y/p1793103870439479?thread_ts=1792340462.709009&cid=CJH2GBF7Y\n           We are waiting v1.38.0-alpha.3 is cut. - alpha.3 is now live\n   * We have started sending reminders for the open issues on BugTriage Board. We are hoping to have all of them addressed before the Code Freeze on Nov 16th.\n   * Internal Team Assignment Sheet\n   * CI Signal Board\n   * Bug Triage Board\n   * Release blocking Issues (0)\n   * Release blocking PRs (0)\n   * Query: open non-test/flake k/k issues for v1.38 (3)\n   * priority/critical-urgent issues (0)\n   * priority/important-soon issues (0)\n   * Query: open k/k PRs for v1.38 (5)\n   * priority/critical-urgent PRs (0)\n   * priority/important-soon PRs (2)\n   * Query: ALL open k/k issues for v1.38 (4) (incl. this query (0)) \n   * Updates:\n   * ",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "We have started sending reminders for the open issues on BugTriage Board. We are hoping to have all of them addressed before the Code Freeze on Nov 16th.",
+   "owner": "Release Signal"
+  }
+ ],
+ "optional": [
+  {
+   "type": "issue",
+   "quote": "We have started sending reminders for the open issues on BugTriage Board. We are hoping to have all of them addressed before the Code Freeze on Nov 16th.",
+   "owner": "Release Signal"
+  }
+ ]
+}

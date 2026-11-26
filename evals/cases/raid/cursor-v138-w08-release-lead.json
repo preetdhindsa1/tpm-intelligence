@@ -1,0 +1,33 @@
+{
+ "id": "cursor-v138-w08-release-lead",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-10-21",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * Release Lead ([participant]/ [participant]):\n   * All of the action items and progress can be found in https://github.com/kubernetes/sig-release/issues/3087\n   * All good, we’re on track so far, Docs placeholder PR deadline coming up next week!",
+ "expected": [],
+ "optional": [
+  {
+   "type": "risk",
+   "quote": "All good, we’re on track so far, Docs placeholder PR deadline coming up next week!",
+   "owner": "Release Lead"
+  }
+ ]
+}
