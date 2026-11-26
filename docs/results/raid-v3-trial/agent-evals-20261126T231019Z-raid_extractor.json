@@ -1,0 +1,544 @@
+{
+ "suite": "agent:raid_extractor",
+ "task": "raid_extractor",
+ "prompt": "raid_extractor.v3",
+ "prompt_sha": "a3b450aa5abf0311d4295615b144b296da1bb7ec31b102d5fa45548b76458055",
+ "model": "claude-haiku-5-5",
+ "thresholds": {
+  "quote_match": 1.0,
+  "min_precision": 0.8,
+  "min_recall": 0.6,
+  "min_support": 5
+ },
+ "passed": false,
+ "summary": {
+  "cases": 37,
+  "seed_cases": 5,
+  "errors": 0,
+  "not_run": [],
+  "quote_match": 1.0,
+  "dropped": {
+   "quote_too_short": 2
+  },
+  "per_type": {
+   "risk": {
+    "support": 16,
+    "kept": 19,
+    "precision": 0.684,
+    "recall": 0.812,
+    "gated": true
+   },
+   "action": {
+    "support": 46,
+    "kept": 44,
+    "precision": 0.886,
+    "recall": 0.848,
+    "gated": true
+   },
+   "issue": {
+    "support": 34,
+    "kept": 31,
+    "precision": 0.935,
+    "recall": 0.853,
+    "gated": true
+   },
+   "decision": {
+    "support": 11,
+    "kept": 6,
+    "precision": 0.667,
+    "recall": 0.364,
+    "gated": true
+   },
+   "question": {
+    "support": 1,
+    "kept": 1,
+    "precision": 0.0,
+    "recall": 0.0,
+    "gated": false
+   }
+  },
+  "failing_types": [
+   "risk",
+   "decision"
+  ],
+  "cost_usd": 0.015725,
+  "passed": false
+ },
+ "cases": [
+  {
+   "id": "cursor-v138-w01-enhancements",
+   "sha": "48757a4f61a1e7197228295055075823cad337420caa9fe2534ff37b060b37f0",
+   "seed": false,
+   "kept": [
+    "action | Enhancements | It will be sent out after this meeting."
+   ],
+   "returned": 1,
+   "dropped": {},
+   "cost_usd": 0.000396
+  },
+  {
+   "id": "cursor-v138-w01-release-branch-management",
+   "sha": "68275252c4bd904ee32cc17129c87eb340b3a9d5320f1e55054072f235596a4e",
+   "seed": false,
+   "kept": [
+    "action | Release Branch Management | Progress issue (links to v1.37 progress issue, we should update the template when v1.38 issue is open)",
+    "action | Release Branch Management | We\u2019ll work with [participant] to finalize the team by next week"
+   ],
+   "returned": 2,
+   "dropped": {},
+   "cost_usd": 0.000311
+  },
+  {
+   "id": "cursor-v138-w01-release-lead",
+   "sha": "c02660f44d8f5936e2a66349a0ba0ef4848a4989f9ddae5d3d416014b6a24133",
+   "seed": false,
+   "kept": [
+    "action | Release Lead | Release schedule still in progress, please take a look!",
+    "action | Release Lead | Still need to sort access for everyone, I\u2019ll get everything merged by this week."
+   ],
+   "returned": 2,
+   "dropped": {},
+   "cost_usd": 0.000255
+  },
+  {
+   "id": "cursor-v138-w01-release-signal",
+   "sha": "f9ba21106c7ea059bbf1ac8c3dee1cbb7ef0b6ce8fcc83c2c33d6035f1358bf0",
+   "seed": false,
+   "kept": [],
+   "returned": 0,
+   "dropped": {},
+   "cost_usd": 0.00012
+  },
+  {
+   "id": "cursor-v138-w02-comms",
+   "sha": "ad09dde76da424f6ceb430bb22d4f3e72b43b698e49c6d0fc8aff0e45440b927",
+   "seed": false,
+   "kept": [],
+   "returned": 0,
+   "dropped": {},
+   "cost_usd": 8.7e-05
+  },
+  {
+   "id": "cursor-v138-w02-docs",
+   "sha": "a460ae01d5aeac4537e9fa01572595dfe087d554149463575b214a7cd5aad0bf",
+   "seed": false,
+   "kept": [
+    "risk | Docs | approved, waiting on /lgtm.",
+    "risk | Docs | some dates still blank pending the finalized v1.38 schedule.",
+    "action | Docs | Schedule the shadow onboarding call.",
+    "action | Docs | Raise the PRs adding our shadows to the relevant teams and groups.",
+    "action | Docs | Meet our shadows. Please introduce yourself."
+   ],
+   "returned": 5,
+   "dropped": {},
+   "cost_usd": 0.000546
+  },
+  {
+   "id": "cursor-v138-w02-enhancements",
+   "sha": "472c431e330ec67130bec02c1383ab1d4ea6f60d36d8c7ddc5a6c4be957bd3d1",
+   "seed": false,
+   "kept": [
+    "action | Enhancements | Schedule an onboarding shadow meeting for this week or next week."
+   ],
+   "returned": 1,
+   "dropped": {},
+   "cost_usd": 9.9e-05
+  },
+  {
+   "id": "cursor-v138-w02-release-signal",
+   "sha": "e1aa029438ab4e57166ab394fbb378a924f9faf0bda2f85b5b88ac6d7a132890",
+   "seed": false,
+   "kept": [
+    "issue | Release Signal | sig-release-master-blocking#gce-cos-master-default: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] updates the published spec when one version gets renamed [Conformance]",
+    "issue | Release Signal | sig-release-master-blocking#gce-ubuntu-master-containerd: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for multiple CRDs of same group but different versions [Conformance]",
+    "issue | Release Signal | sig-release-master-blocking#gce-cos-master-default: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] removes definition from spec when one version gets changed to not be served [Conformance]",
+    "issue | Release Signal | sig-release-master-blocking#gce-ubuntu-master-containerd: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for multiple CRDs of same group and version but different kinds [Conformance]",
+    "action | Release Signal | Will schedule an onboarding shadow meeting",
+    "action | Release Signal | I will create the Internal Team Assignment Sheet after the k8s v1.38 release schedule is fixed"
+   ],
+   "returned": 6,
+   "dropped": {},
+   "cost_usd": 0.000486
+  },
+  {
+   "id": "cursor-v138-w03-comms",
+   "sha": "80a6fa1d226c41ed0a154bd5ef7894ef9d0dad47a54a714f1c7900e799165b6a",
+   "seed": false,
+   "kept": [
+    "risk | Comms | Waiting for two shadows to become org members before getting this merged"
+   ],
+   "returned": 1,
+   "dropped": {},
+   "cost_usd": 0.000229
+  },
+  {
+   "id": "cursor-v138-w03-docs",
+   "sha": "80fe2b2685f42a4edb8f0120672a6ceb2aebb8d95ad7f6633eb96cc37711562f",
+   "seed": false,
+   "kept": [
+    "risk | Docs | Added necessary permissions for all release docs team with the following PR pending:"
+   ],
+   "returned": 1,
+   "dropped": {},
+   "cost_usd": 0.000437
+  },
+  {
+   "id": "cursor-v138-w03-enhancements",
+   "sha": "e1f7f47b4409dd917eb5aedcffd10077e38e3029a8288d06b7dec8b1c8f44bb4",
+   "seed": false,
+   "kept": [
+    "risk | Enhancements | At risk for PRR freeze: 5",
+    "action | Enhancements | Start sending PRR Freeze reminders."
+   ],
+   "returned": 2,
+   "dropped": {},
+   "cost_usd": 0.000273
+  },
+  {
+   "id": "cursor-v138-w03-release-branch-management",
+   "sha": "5886ca74ae49de85638b644d99ef2b06c0edfcf9a4b3c6bec7a87e4d721320e4",
+   "seed": false,
+   "kept": [],
+   "returned": 0,
+   "dropped": {},
+   "cost_usd": 0.000118
+  },
+  {
+   "id": "cursor-v138-w03-release-signal",
+   "sha": "e779032e04174d14cb2507b226bc146231d9cac49839d2872c36b42d8abde70a",
+   "seed": false,
+   "kept": [
+    "issue | Release Signal | sig-release-master-blocking#gce-cos-master-default: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] updates the published spec when one version gets renamed [Conformance]",
+    "issue | Release Signal | sig-release-master-blocking#gce-ubuntu-master-containerd: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for multiple CRDs of same group but different versions [Conformance]",
+    "issue | Release Signal | sig-release-master-blocking#gce-cos-master-default: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] removes definition from spec when one version gets changed to not be served [Conformance]",
+    "issue | Release Signal | sig-release-master-blocking#gce-ubuntu-master-containerd: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for multiple CRDs of same group and version but different kinds [Conformance]"
+   ],
+   "returned": 5,
+   "dropped": {
+    "quote_too_short": 1
+   },
+   "cost_usd": 0.00087
+  },
+  {
+   "id": "cursor-v138-w03-subproject-leads",
+   "sha": "0ec049dfc7e7e30eab51c97a4a2be24e2a1b34e1b870918d98f839f83652b494",
+   "seed": false,
+   "kept": [
+    "risk | Subproject Leads | Shadow onboarding complete aside from a couple of stragglers"
+   ],
+   "returned": 1,
+   "dropped": {},
+   "cost_usd": 0.000234
+  },
+  {
+   "id": "cursor-v138-w04-docs",
+   "sha": "1aef923be1ba979181d8b4717ec58b7370553c65f57d32bb4a14683f74bf9060",
+   "seed": false,
+   "kept": [
+    "action | Docs | This week's branch sync PR will be handled of by [participant]",
+    "action | Docs | The Release notes PR for v1.38.0-alpha.1 will be done after the release cut by [participant] and reviewed by [participant] - deadline 25th",
+    "action | Docs | Pending PR that needs attention to add sig docs team to the release groups for necessary permissions: https://github.com/kubernetes/k8s.io/pull/9933"
+   ],
+   "returned": 3,
+   "dropped": {},
+   "cost_usd": 0.000454
+  },
+  {
+   "id": "cursor-v138-w04-enhancements",
+   "sha": "69b16ae094b967abe1f93e880fba22064fb284890645667dda0989fedec62d63",
+   "seed": false,
+   "kept": [
+    "risk | Enhancements | At risk for enhancements freeze: 9",
+    "decision | Enhancements | PRR Freeze has been renamed to KEP Readiness, so we have updated all communication templates to reflect the new name.",
+    "action | Enhancements | Enhancement Freeze reminders will be sent out in the next few days.",
+    "action | Enhancements | Invitations for the Enhancement Freeze Party have been sent, and the links will be posted in the #sig-release channel."
+   ],
+   "returned": 4,
+   "dropped": {},
+   "cost_usd": 0.000451
+  },
+  {
+   "id": "cursor-v138-w04-release-branch-management",
+   "sha": "a443252184c246eda8a51353c13d44f1ca35eaf48fdd82111d43d5b461eeb1f5",
+   "seed": false,
+   "kept": [
+    "issue | Release Branch Management | alpha.1 was delayed to tomorrow due to an issue with cherry picks for an unpublished CVE"
+   ],
+   "returned": 1,
+   "dropped": {},
+   "cost_usd": 0.000188
+  },
+  {
+   "id": "cursor-v138-w04-release-lead",
+   "sha": "7ede84bf524b8423bf3b72240c18df760f893ec782ebb74ebdafabd1249aad71",
+   "seed": false,
+   "kept": [],
+   "returned": 0,
+   "dropped": {},
+   "cost_usd": 0.000115
+  },
+  {
+   "id": "cursor-v138-w04-release-signal",
+   "sha": "4f73099e98b7f3a9ccdecc3004bcfb6ddf0a6326a9e32df395dfd8af8fd52f6f",
+   "seed": false,
+   "kept": [
+    "issue | Release Signal | [Flaking Test] Kubernetes e2e suite.[It] [sig-node] Pod Allocated Endpoint [FeatureGate:KubeletAllocatedPodsEndpoint] should return all allocated pods with status cleared when listing [Alpha] [Feature:OffByDefault]",
+    "issue | Release Signal | [Failing Test] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] sig-release-master-informing#gce-cos-slow-master",
+    "issue | Release Signal | [Flaking Test] [sig-testing] ci-kubernetes-e2e-gce-cos-alphafeatures-master kubetest.Timeout [gce-cos-alphafeatures-master, gce-cos-alphafeatures-1.37] sig-release-master-blocking#gce-cos-alphafeatures-master",
+    "issue | Release Signal | [Flaking Test] sig-release-master-informing#capz-windows-master ci-kubernetes-e2e-capz-master-windows.Overall",
+    "action | Release Signal | The current signal is a no-go as there are currently flaky and failing tests that we are following up on:",
+    "decision | Release Signal | (resolved. Not the release blocker) sig-release-master-informing#ec2-master-scale-performance-5000 testgrid is currently not accessible."
+   ],
+   "returned": 6,
+   "dropped": {},
+   "cost_usd": 0.001025
+  },
+  {
+   "id": "cursor-v138-w04-subproject-leads",
+   "sha": "8a68624533d7611925e25478b074126d018e543c615b66624e86a02979ec3212",
+   "seed": false,
+   "kept": [
+    "action | Subproject Leads | One or two people left for shadow onboarding, one of whom I will ask [participant] to handle for timezone coverage"
+   ],
+   "returned": 1,
+   "dropped": {},
+   "cost_usd": 0.000236
+  },
+  {
+   "id": "cursor-v138-w06-comms",
+   "sha": "72cb9732580390c3768fc243bdf38fa571dce1dafd06f3815a790f3e043f4f50",
+   "seed": false,
+   "kept": [
+    "action | Comms | We will now start the Feature Blog outreach in the KEP issues.",
+    "action | Comms | [participant] (Comms Lead) will be opening the Release Highlights GitHub Discussion and the internal tracking issue this week so we can start collecting input from SIGs as soon as the enhancements list settles.",
+    "action | Comms | We'll aim to have writeup available as k/website PR a week before for #sig-docs-blog to review."
+   ],
+   "returned": 3,
+   "dropped": {},
+   "cost_usd": 0.000507
+  },
+  {
+   "id": "cursor-v138-w06-docs",
+   "sha": "bf347009c4d529c93ee6fbdb8b2436cc9b3200c22bd49dab36be8e52adeb19c0",
+   "seed": false,
+   "kept": [
+    "action | Docs | We will continue the next outreach (2nd) for Docs Placeholder reminders",
+    "risk | Docs | Missing Placeholder PR: 56 (~65 percent remaining)",
+    "action | Docs | Release Notes for v1.38.0-alpha.2 creation: 7th Oct 2026 by [participant] and review by [participant] [participant]"
+   ],
+   "returned": 3,
+   "dropped": {},
+   "cost_usd": 0.000451
+  },
+  {
+   "id": "cursor-v138-w06-enhancements",
+   "sha": "07467ca7713925dab1d82676ec5d3450c8203f6da6e2f5eaff5a28b4d000cde2",
+   "seed": false,
+   "kept": [
+    "decision | Enhancements | Of the 8 requests, 6 were approved, and 2 were rejected."
+   ],
+   "returned": 1,
+   "dropped": {},
+   "cost_usd": 0.000212
+  },
+  {
+   "id": "cursor-v138-w06-release-lead",
+   "sha": "b92ad1c21c8a57c9fb508164bf4d6709489124e2d69e6b11ab0960db125bc2cc",
+   "seed": false,
+   "kept": [],
+   "returned": 0,
+   "dropped": {},
+   "cost_usd": 0.000106
+  },
+  {
+   "id": "cursor-v138-w06-release-signal",
+   "sha": "8cca4469741063b66207dd197b6d7e2aaf1b77011781693c761ee5069b3da23d",
+   "seed": false,
+   "kept": [
+    "issue | Release Signal | E2eNode Suite [It] [sig-node] Probing container should not be restarted with a non-local redirect http liveness probe [NodeConformance]",
+    "issue | Release Signal | E2eNode Suite [It] [sig-node] Probing restartable init container should not be restarted with a non-local redirect http liveness probe [NodeConformance]",
+    "decision | Release Signal | [Flaking Test] sig-release-master-blocking#gce-cos-alphafeatures-master - not a blocker for the alpha cut, we will follow up for beta.",
+    "issue | Release Signal | [Flaking Test] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must call NodeUnprepareResources again if it's in progress for one plugin when Kubelet restarts [Serial]",
+    "issue | Release Signal | [Flaking Test] Kubernetes e2e suite.[It] [sig-node] Pod Allocated Endpoint [FeatureGate:KubeletAllocatedPodsEndpoint] should return all allocated pods with status cleared when listing [Alpha] [Feature:OffByDefault] - a fix is ready for this one - which is already lgtm\u2019ed and awaiting approval"
+   ],
+   "returned": 5,
+   "dropped": {},
+   "cost_usd": 0.000969
+  },
+  {
+   "id": "cursor-v138-w08-comms",
+   "sha": "b006555780484313727d1a2d1d3c6aae3dce4569505671f78971156fb14da7cd",
+   "seed": false,
+   "kept": [
+    "action | Comms | We will start second set of outreach for KEPs this week.",
+    "risk | Comms | We haven't gotten any responses yet on the Release Highlights GitHub Discussion though."
+   ],
+   "returned": 2,
+   "dropped": {},
+   "cost_usd": 0.000245
+  },
+  {
+   "id": "cursor-v138-w08-docs",
+   "sha": "af39a7bc32d4c2c2f86806e52c70fdb162b53df6504e8b450b0ea1af79aea36f",
+   "seed": false,
+   "kept": [
+    "action | Docs | We will continue the last outreach for Docs Placeholder reminders on Slack and Github",
+    "action | Docs | Release Notes for v1.38.0-alpha.3 creation: 21st Oct 2026 by [participant] and review by [participant]",
+    "risk | Docs | Missing Placeholder PR: 21 (~24 % remaining)"
+   ],
+   "returned": 3,
+   "dropped": {},
+   "cost_usd": 0.000402
+  },
+  {
+   "id": "cursor-v138-w08-release-lead",
+   "sha": "b27e068e46c54b8b0184c64b93f63a9d12d96dc7b56f906164e602613974138a",
+   "seed": false,
+   "kept": [],
+   "returned": 0,
+   "dropped": {},
+   "cost_usd": 0.000112
+  },
+  {
+   "id": "cursor-v138-w08-release-signal",
+   "sha": "c61bdca96ba243836d706e64e05fca5ba477eb667f72c5af9e5b479f84f8ad33",
+   "seed": false,
+   "kept": [
+    "issue | Release Signal | [sig-scheduling] TestCPGScheduling: PodGroup/CompositePodGroup \"Scheduled\" condition sometimes never set",
+    "issue | Release Signal | [sig k8s-infra] gce-cos-default-master kubetest.Up"
+   ],
+   "returned": 2,
+   "dropped": {},
+   "cost_usd": 0.000479
+  },
+  {
+   "id": "cursor-v138-w09-release-branch-management",
+   "sha": "4d5488b34ce20ad7e2aa5f74206c7397872aca382a43a67be6670b357ddf574b",
+   "seed": false,
+   "kept": [],
+   "returned": 0,
+   "dropped": {},
+   "cost_usd": 0.000136
+  },
+  {
+   "id": "cursor-v138-w09-release-lead",
+   "sha": "8bb9260ae496dcd15cc92a8669e9aee800500b85d2b73c83b398907676fd1d2f",
+   "seed": false,
+   "kept": [
+    "action | Docs | please feel free to reach out to us if anyone from the docs team needs support"
+   ],
+   "returned": 1,
+   "dropped": {},
+   "cost_usd": 0.000318
+  },
+  {
+   "id": "cursor-v138-w09-release-signal",
+   "sha": "85ddb89aa411f443e1c04c83a2bc72efdd9cf371f7f19038f4cf100338c8ba17",
+   "seed": false,
+   "kept": [
+    "risk | Release Signal | We are hoping to have all of them addressed before the Code Freeze on Nov 16th.",
+    "risk | Release Signal | Query: open non-test/flake k/k issues for v1.38 (3)"
+   ],
+   "returned": 3,
+   "dropped": {
+    "quote_too_short": 1
+   },
+   "cost_usd": 0.000374
+  },
+  {
+   "id": "seed-v138-week05-2026-09-30",
+   "sha": "7bcbb0dff9705b674b51fa0de96954c68fe8f961b4656e5fa40508c48153d976",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | [Flaking Test] E2eNode Suite [It] [sig-node] Probing container should not be restarted with a non-local redirect http liveness probe [NodeConformance]",
+    "issue | Release Signal | [Flaking Test] E2eNode Suite [It] [sig-node] Probing restartable init container should not be restarted with a non-local redirect http liveness probe [NodeConformance]",
+    "issue | Release Signal | [Flaking Test] ci-kubernetes-e2e-gce-scale-performance-100.Overall fails with unknown flag: --metadata - [sig-scalability]",
+    "issue | Release Signal | [Flaking Test] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must call NodeUnprepareResources again if it's in progress for one plugin when Kubelet restarts [Serial]",
+    "issue | Release Signal | a fix is ready for this one - which is already lgtm\u2019ed and awaiting approval",
+    "decision | Release Signal | [FeatureGate:InPlacePodVerticalScaling] - was not a blocker for the alpha1 cut, a fix is currently being worked on.",
+    "decision | Enhancements | Received 6 KEP Readiness Exception Requests; all were approved.",
+    "action | Enhancements | Keeping an eye on the Enhancement Freeze Exception Request.",
+    "action | Comms | I'll be opening the Release Highlights GitHub Discussion and the internal tracking issue this week so we can start collecting input from SIGs as soon as the enhancements list settles.",
+    "action | Release Lead | Please feel free to review and add your +1s in the exception requests in #sig-release!"
+   ],
+   "returned": 10,
+   "dropped": {},
+   "cost_usd": 0.001287
+  },
+  {
+   "id": "seed-v138-week07-2026-10-14",
+   "sha": "4545a3029e5ed1af14667d6a121799ce1cefcc6aaac4f13ad5026236daab3474",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | kubetest.Timout on sig-release-master-blocking#gce-cos-alphafeatures-master board is flaky, but sig node leadership said it\u2019s not a release blocker for the alpha release, so our current status is now green.",
+    "action | - | We will send out the Code Freeze reminder in Week 10 (early November).",
+    "risk | Enhancements | Missing Placeholder PR: 35 (~40 % remaining)",
+    "action | Enhancements | We will continue the next outreach (3rd) for Docs Placeholder reminders on Slack",
+    "action | - | Release Notes for v1.38.0-alpha.3 creation: 21st Oct 2026 by [participant] and review by [participant]",
+    "risk | - | Release Notes for v1.38.0-alpha.2 has been created and currently waiting review/approval",
+    "action | Comms | This week we'll start reaching out to SIGs on slack for release highlights.",
+    "action | Comms | We'll aim to have writeup available as k/website PR a week before for #sig-docs-blog to review.",
+    "risk | Subproject Leads | Missing shadow onboarding session scheduled."
+   ],
+   "returned": 9,
+   "dropped": {},
+   "cost_usd": 0.001123
+  },
+  {
+   "id": "seed-v138-week10-2026-11-04",
+   "sha": "6b395407de10028c9457bb932d4809aa80d4b3d2614371d4b19910bf06de040d",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | We found a new flaky test that is on the master blocking board.",
+    "risk | Release Branch Management | v1.38.0-beta.0 is scheduled for today, waiting for signal",
+    "risk | Comms | We got only 3 responses from the first set of outreach messages, they told us there's nothing to highlight",
+    "action | Comms | We will start working on the mid-cycle blog this week.",
+    "question | Comms | We're still confirming the list of deprecations with the respective SIGs."
+   ],
+   "returned": 5,
+   "dropped": {},
+   "cost_usd": 0.000317
+  },
+  {
+   "id": "seed-v138-week12-2026-11-18",
+   "sha": "2db1a56168a55082311c0ca42705c773d1652886767ef5404776035fa4f23f52",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | awaiting signal on failing on master-informing: sig-release-master-informing#ec2-master-scale-performance-5000 - Fixed now",
+    "issue | Release Signal | 3 flakes on master-informing",
+    "action | Release Lead | In review the code freeze exception requests with Release Lead.",
+    "action | Comms | Mid cycle blog: [participant] has raised the PR (kubernetes/website#59188) for #sig-docs-blog to review.",
+    "action | Comms | CNCF: We\u2019ve emailed webinars@cncf.io to schedule the v1.38 release webinar, aiming for the weeks of 4th or 11th January 2027.",
+    "risk | Comms | We\u2019re still collecting highlights and deprecations from SIGs on the Release Highlights GitHub Discussion, which closes on Tuesday 24th November 2026.",
+    "action | Release Branch Management | We\u2019ll start planning for rc.0 soon, rc.0 is on Thursday 3rd December 2026",
+    "action | Subproject Leads | It\u2019s time to decide about succession. DM [participant] + [participant] + [participant] with your thoughts about your successors ASAP."
+   ],
+   "returned": 8,
+   "dropped": {},
+   "cost_usd": 0.00047
+  },
+  {
+   "id": "seed-v138-week13-2026-11-25",
+   "sha": "eb21480d8dcce1962bdef32144f05c183d86f6393a5b8014a38c8dc109f84706",
+   "seed": true,
+   "kept": [
+    "issue | Release Signal | #144411: TestClientReceivedGOAWAY. SIG API Machinery is investigating a possible regression following #144168.",
+    "issue | Release Signal | #144420: TestAggregatedAPIServer. Awaiting SIG API Machinery assessment.",
+    "issue | Release Signal | #144412: MirrorPod tests on CRI-O. Investigation is ongoing.",
+    "decision | Release Signal | #144421: Memory-backed volume resize flake. Closed and confirmed as non-release-blocking by SIG Node.",
+    "issue | Release Signal | #144444: Dynamic Node-Local Ephemeral Volumes flake.",
+    "issue | Release Signal | #144231: EC2 scale performance 5000-node job. Reopened due to recurring DELETE latency SLO violations.",
+    "action | Release Signal | Following up on outstanding release-impact assessments ahead of v1.38.0-rc.0 on December 3.",
+    "issue | Docs | The ready-for-review deadline has passed.",
+    "risk | Docs | 1 tracked KEP still has a draft docs PR, and most ready PRs are still waiting on technical review, with Docs Freeze on 2 December",
+    "action | Comms | Feature blogs need to be ready to review by Monday 30th November 2026, so this week we\u2019ll chase authors who still have placeholder or WIP PRs.",
+    "action | Comms | we\u2019re starting the release announcement draft this week, with each shadow taking a few sections.",
+    "risk | Subproject Leads | Two teams still need to DM the subproject leads + release lead about succession!"
+   ],
+   "returned": 12,
+   "dropped": {},
+   "cost_usd": 0.001287
+  }
+ ],
+ "measured_at": "20261126T231019Z"
+}

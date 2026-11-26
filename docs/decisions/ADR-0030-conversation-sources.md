@@ -299,3 +299,57 @@ sources now include kubernetes/community `sigs.yaml` (`- github:` / `name:` pair
 the same way, never stored). Masking now also covers a listed person's surname used on
 its own, after a v1.38 item kept one. Re-checked against 619 public names: 0 names left
 in the v1.38 or v1.37 items (ADR-0032 addendum 3).
+
+## Addendum 6: the RAID gate on 32 independent cases fails (#242, 2026-11-26)
+
+cursor-agent labelled 32 independent cases (#224, #236, #240), each one team's block from a
+v1.38 meeting week the seeds do not use. That turns the gate on (`MIN_INDEPENDENT = 30`).
+
+**Live run, `raid_extractor.v2`, Haiku 5.5, 37 cases (5 seeds + 32 independent)**
+(`docs/results/agent-evals-20261126T230611Z-raid_extractor.json`, $0.011):
+
+| Type | Labels | Precision | Recall | Gate (P ≥ 0.80, R ≥ 0.60) |
+|---|---|---|---|---|
+| Action | 46 | 0.913 | 0.913 | pass |
+| Issue | 34 | 0.886 | 0.912 | pass |
+| Risk | 16 | 0.769 | 0.625 | **fail** (precision) |
+| Decision | 11 | 0.467 | 0.636 | **fail** (precision) |
+| Question | 1 | – | – | not gated (under 5 labels) |
+
+Every quote matched its source (quote match 1.0). **The gate fails.**
+
+**Why**:
+- v2 tells the model that scheduling a meeting is a decision, a convention from the
+  developer's seeds. The independent labels say it is not, and that is the better reading.
+- v2 calls work still missing before a deadline an `issue`. The labels call it a `risk`.
+
+**One trial of a fix**, `raid_extractor.v3` (both definitions corrected, generic wording,
+no quotes from the cases), one run on the same 37 cases
+(`docs/results/raid-v3-trial/`, $0.016):
+
+| Type | Precision | Recall |
+|---|---|---|
+| Risk | 0.684 | 0.812 |
+| Decision | 0.667 | 0.364 |
+
+It moved errors between precision and recall rather than removing them, and it still
+fails. With 11 decision labels and 16 risk labels, one prompt edit after another would
+fit noise in these 32 cases. **v3 is not adopted**: the prompt stays v2, and the v3 text is
+kept with its result as evidence only.
+
+**Consequences:**
+- **#240 cannot merge green.** Once its cases are on main, the gate is enforced and fails
+  for every PR, which is the intended behaviour of a failing eval.
+- These 32 cases have now informed one prompt trial, so they no longer measure a future
+  prompt blind. **A fresh holdout batch** (independent labels from v1.38 weeks 10-13,
+  non-seed teams, or the v1.37 notes) is needed before any prompt is judged.
+- **Product impact is limited by design.** RAID items stay `suggested` until a person
+  confirms them (CLAUDE.md principle 2). Actions and issues, 80 of the 108 labels, pass.
+
+**Options for the owner:**
+- (a) keep #240 open until a prompt passes on a fresh holdout;
+- (b) merge #240 and accept a red gate until then (blocks every PR);
+- (c) gate risks and decisions only once each has at least 20 labels, and report them
+  until then.
+
+My recommendation is (a), with cursor-agent writing the holdout batch.
