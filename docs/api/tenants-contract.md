@@ -1,9 +1,7 @@
 # Tenants, members and connectors: API contract (Wave 6)
 
 Decisions: ADR-0034 (tenants and isolation) and ADR-0035 (connector framework). Status:
-the tenant header, signature v2 and the **connector routes are built** (#231, #233). The
-tenant, member, limits, audit, export and deletion routes come in #234 and return 404
-until then.
+**every route below is built** (#231, #233, #234).
 
 ## Picking the tenant
 
@@ -96,8 +94,12 @@ owner: removing or demoting the last one returns 409.
 ### `GET /tenants/{id}/limits` (member), `PUT /tenants/{id}/limits` (owner)
 
 ```json
-{"ai_daily_budget_usd": 0.5, "ai_spent_today_usd": 0.12, "max_teams": 3, "teams": 1}
+{"ai_daily_budget_usd": 0.5, "max_teams": 3, "teams": 1}
 ```
+
+`PUT` takes `{"ai_daily_budget_usd": 0-50, "max_teams": 1-50}`; 422 outside those ranges.
+Adding a team beyond `max_teams` is 409. Today's spend is TBD on this route (the gateway
+enforces the cap; the number is not exposed yet).
 
 ### `GET /tenants/{id}/audit` (owner)
 

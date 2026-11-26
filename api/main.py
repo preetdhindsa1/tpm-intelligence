@@ -146,6 +146,7 @@ def create_app(
     retro_data: Any = None,
     tenants: TenantDirectory | None = None,
     team_configs: Callable[[str], Any] | None = None,
+    tenant_admin: Any = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis.
 
@@ -209,7 +210,14 @@ def create_app(
     from api.tenant_admin import tenant_admin_router
 
     # Wave 6: each tenant's connectors (ADR-0035, #233).
-    app.include_router(tenant_admin_router(acting, team_configs or _default_team_configs))
+    admin_box: dict[str, Any] = {}
+
+    def admin() -> Any:
+        if "a" not in admin_box:
+            admin_box["a"] = tenant_admin or _default_tenant_admin()
+        return admin_box["a"]
+
+    app.include_router(tenant_admin_router(acting, team_configs or _default_team_configs, admin))
 
     from api.raid import raid_router
 
@@ -1104,6 +1112,18 @@ def _shared_engine() -> Any:
     from pipeline.store.session import make_engine
 
     return make_engine()
+
+
+def _default_tenant_admin() -> Any:
+    """Tenant administration on Postgres; with no database, an empty in-memory one."""
+    from connectors.admin import MemoryTenantAdmin, PostgresTenantAdmin
+    from pipeline.env import configured
+
+    if configured("DATABASE_URL") is None:
+        return MemoryTenantAdmin()
+    from sqlalchemy.orm import sessionmaker
+
+    return PostgresTenantAdmin(sessionmaker(_shared_engine()))
 
 
 def _default_tenant_directory() -> TenantDirectory:
