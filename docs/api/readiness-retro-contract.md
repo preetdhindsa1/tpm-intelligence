@@ -9,7 +9,8 @@ fixture and is checked by `tests/api/test_readiness.py`.
 - **Readiness is real data** when the API has a database (#181): `"synthetic": false`, the
   team's criteria on the current release view, and an append-only decision log in
   Postgres. Without a database it is the synthetic fixture (`"synthetic": true`). Retros
-  stay synthetic until #182. Show `synthetic` on the page; both have the same shape.
+  come from stored replays (#182): `GET /retro?project=&release=` returns 404 until the
+  retro job has run for that release. Show `synthetic` on the page; both have the same shape.
 - **Evidence links:** `url` is the GitHub page for a feature or PR ref, otherwise `null`
   (RAID refs: open `/raid` for the item).
 - **Facts are rules, not AI.** Each criterion's `status` (`pass`, `fail`, `unknown`) and its
@@ -43,7 +44,10 @@ fixture and is checked by `tests/api/test_readiness.py`.
 | GET | `/retro/patterns` | | Patterns per pool across releases |
 
 Errors: 401 not signed in, 403 not an approver, 422 a missing note or a bad decision.
-`?project=&release=` filters for the retro endpoints arrive with real data (#182, #183).
+Retro endpoints take `?project=` (default `kubernetes`) and `?release=`; patterns take
+`?project=`. Real retros add `totals.planned`, `totals.warned_landed` (warned but landed:
+show it next to `warned`) and `slips[].moved_to`. A said-vs-showed row's `showed` names
+the replay day it used (`replay_day`).
 
 ## Examples
 

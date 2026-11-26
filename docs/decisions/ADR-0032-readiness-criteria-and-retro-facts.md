@@ -99,3 +99,45 @@ The rule is fixed now so the result cannot shape it.
   uses only these criteria's facts, and the fact checker checks each sentence.
 - **Validation:** `validated` stays `false` until the backtest (#184) passes the rule
   above.
+
+## Addendum 2: retro facts (#182, 2026-11-26)
+
+- **Replay, not today's data.** `modules/retro/facts.py` projects the stored events as
+  of noon UTC each day, from Enhancements Freeze to the outcome cutoff, and runs the rule
+  flags. A day's warning uses only what was known that day. The replay leaves out
+  confirmed link suggestions, which were decided later. Forecast snapshots (ADR-0015)
+  begin in November 2026, too late for past releases, so the retro replays rule flags
+  instead of reading stored odds.
+- **Planned features** were in the release at Enhancements Freeze, or were added before
+  the cutoff.
+- **Slips** are judged at the forecast's outcome cutoff (`engine/forecast.py`):
+  - `dropped`: out of the release at the cutoff, and in no later release;
+  - `moved`: out of it, but in a later release of the same project (`moved_to`);
+  - `late_exception`: landed, but its main PR merged after the freeze with exception
+    evidence; or out at the cutoff and re-added later. #6395 in v1.38 is the second kind:
+    removed Nov 17, re-added Nov 21.
+
+  Kafka main PRs merged after Feature Freeze with no exception evidence aren't counted as
+  slips. Kafka has no such signal (addendum 1).
+- **First warning:** the first replay day before the slip with one of these warning
+  flags: `late_main_pr`, `review_waiting`, `ci_failing`, `main_pr_not_merged`,
+  `merged_after_freeze`, `removed_at_freeze`.
+  - `no_linked_prs` is left out. Early in a cycle almost every feature has no PR yet, so
+    it would warn about everything on day one.
+  - `warned_landed` counts the features that landed but were warned before Code Freeze:
+    the false alarms.
+    Without it, a rule that warns about everything would look perfect on lead time.
+- **Said vs showed:** each meeting's RAID items, suggested ones included with their
+  review state, next to the replay day on or just before the meeting: features in the
+  release, features at risk, and open critical flags.
+- **Patterns:** grouped per pool, the feature's owning SIG (one pool per feature), across
+  every stored release of the project. There are two:
+  - `slipped`: the share of planned features that slipped;
+  - `late_main_pr`: the share whose main PR opened within 21 days of the freeze.
+
+  Pools with fewer than 10 features are counted in `suppressed_groups` but not shown.
+- **Storage:** a replay takes minutes, so `python -m modules.retro.job --release KEY`
+  computes the retro and appends it to `retro_runs` (migration 0012; a trigger refuses
+  changes). The API serves the latest run, and returns 404 until one exists.
+- **This repo's UX v1 sprint retro, per lane,** comes from PR data (`engine/lab.py`). It
+  is a separate step.

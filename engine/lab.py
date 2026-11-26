@@ -354,6 +354,16 @@ def _bucket(pr: PullRequest, rules: tuple[LaneSpec, ...] | list[LaneSpec]) -> st
     return bucket_of(pr.labels, pr.head_ref, texts, rules, pr.author)
 
 
+def lane_of(pr: PullRequest, rules: tuple[LaneSpec, ...] | list[LaneSpec]) -> str:
+    """The pull request's lane, Dependabot, or unassigned (module docstring)."""
+    return _bucket(pr, rules)
+
+
+def had_rework(pr: PullRequest) -> bool:
+    """Changes requested, or commits pushed after the first review round."""
+    return _rework(pr, tuple(review_rounds(pr)))
+
+
 def _approved(rounds: tuple[ReviewRound, ...]) -> bool:
     """An approving review round. Merging without one does not count."""
     return any(rnd.outcome == "approved" for rnd in rounds)
