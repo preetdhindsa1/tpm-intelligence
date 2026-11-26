@@ -49,6 +49,27 @@ describe("RAID review queue", () => {
     expect(screen.queryByRole("button", { name: "Confirm" })).toBeNull();
   });
 
+  it("starts the next item's edit from that item's title", () => {
+    viewer.approver = true;
+    const next = { ...item, item_id: 5, title: "Docs for the freeze are late" };
+    render(<ReviewQueue queue={{ ...queue, items: [item, next] }} summary={summary} />);
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "Changed on the first item" } });
+    fireEvent.keyDown(window, { key: "j" });
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    expect((screen.getByRole("textbox", { name: "Title" }) as HTMLInputElement).value).toBe(next.title);
+  });
+
+  it("does not confirm or re-edit while a form is open", () => {
+    viewer.approver = true;
+    render(<ReviewQueue queue={queue} summary={summary} />);
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.keyDown(window, { key: "c" });
+    fireEvent.keyDown(window, { key: "e" });
+    expect(confirmRaid).not.toHaveBeenCalled();
+    expect((screen.getByRole("textbox", { name: "Title" }) as HTMLInputElement).value).toBe(item.title);
+  });
+
   it("shows the new RAID ID after an approver confirms", async () => {
     viewer.approver = true;
     confirmRaid.mockResolvedValue({ ...item, review: "confirmed", raid_id: "K8S-R-002" });

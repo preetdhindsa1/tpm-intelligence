@@ -34,16 +34,23 @@ export function ReviewQueue({ queue, summary }: { queue: RaidList; summary: Raid
       if (action === "next" || action === "prev") {
         setIndex((i) => moveIndex(i, action === "next" ? 1 : -1, items.length));
         setMode(null);
+        setDraft({});
         return;
       }
       if (!canAct || !current || busy) return;
+      if (mode && (action === "confirm" || action === "edit")) return;
       if (action === "confirm") void run(() => confirmRaid(current.item_id, note.trim() || undefined));
-      if (action === "edit") setMode("edit");
+      if (action === "edit") beginEdit();
       if (action === "reject") setMode("reject");
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [canAct, current, busy, items.length, note]);
+  }, [canAct, current, busy, items.length, mode, note]);
+
+  function beginEdit() {
+    setDraft({});
+    setMode("edit");
+  }
 
   async function run(call: () => Promise<RaidItem>) {
     setBusy(true);
@@ -57,6 +64,7 @@ export function ReviewQueue({ queue, summary }: { queue: RaidList; summary: Raid
       });
       setDone((n) => n + 1);
       setMode(null);
+      setDraft({});
       setNote("");
       setReason("");
       const id = saved.raid_id ? `Confirmed as ${saved.raid_id}` : "Saved, but the API did not return a RAID ID.";
@@ -127,7 +135,7 @@ export function ReviewQueue({ queue, summary }: { queue: RaidList; summary: Raid
                   )}
                   <div className="flex flex-wrap gap-2">
                     <button type="button" disabled={busy} className="min-h-11 rounded-lg bg-action px-4 text-sm font-semibold text-white disabled:opacity-50" onClick={() => void run(() => confirmRaid(item.item_id, note.trim() || undefined))}>Confirm</button>
-                    <button type="button" disabled={busy} className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold" onClick={() => (mode === "edit" ? void run(() => editRaid(item.item_id, filled(draft, item))) : setMode("edit"))}>Edit</button>
+                    <button type="button" disabled={busy} className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold" onClick={() => (mode === "edit" ? void run(() => editRaid(item.item_id, filled(draft, item))) : beginEdit())}>Edit</button>
                     <button type="button" disabled={busy || (mode === "reject" && reasonError(reason) !== null)} className="min-h-11 rounded-lg border border-critical/40 px-4 text-sm font-semibold text-critical disabled:opacity-50" onClick={() => (mode === "reject" ? void run(() => rejectRaid(item.item_id, reason.trim())) : setMode("reject"))}>{mode === "reject" ? "Reject item" : "Reject"}</button>
                   </div>
                   {mode === "reject" && reasonError(reason) && <p className="text-sm text-critical">{reasonError(reason)}</p>}
