@@ -1,0 +1,59 @@
+{
+ "result": "readiness_backtest",
+ "measured_at": "2026-11-26T17:12:19.787099+00:00",
+ "releases": [
+  {
+   "release_key": "kubernetes:v1.36",
+   "features": 78,
+   "slipped": 20,
+   "flagged": 22,
+   "flagged_slipped": 19,
+   "shipped": 70,
+   "false_no_go": 9,
+   "counts": true,
+   "base_rate": 0.256
+  },
+  {
+   "release_key": "kubernetes:v1.37",
+   "features": 86,
+   "slipped": 27,
+   "flagged": 25,
+   "flagged_slipped": 23,
+   "shipped": 20,
+   "false_no_go": 2,
+   "counts": true,
+   "base_rate": 0.314
+  },
+  {
+   "release_key": "kubernetes:v1.38",
+   "features": 86,
+   "slipped": 29,
+   "flagged": 32,
+   "flagged_slipped": 23,
+   "shipped": null,
+   "false_no_go": null,
+   "counts": true,
+   "base_rate": 0.337
+  },
+  {
+   "release_key": "KAFKA:4.4.0",
+   "features": 20,
+   "slipped": 9,
+   "flagged": 3,
+   "flagged_slipped": 3,
+   "shipped": 19,
+   "false_no_go": 2,
+   "counts": true,
+   "base_rate": 0.45
+  }
+ ],
+ "verdict": {
+  "passed": false,
+  "recall": 0.8,
+  "precision": 0.829,
+  "base_rate": 0.315,
+  "false_no_go_rate": 0.119,
+  "rule": "recall >= 0.60, precision >= base rate + 0.15, false no-go on release day <= 0.05; releases with >= 20 features (ADR-0032)",
+  "reason": "false no-go 0.119 > 0.05"
+ }
+}

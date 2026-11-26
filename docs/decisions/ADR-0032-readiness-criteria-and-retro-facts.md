@@ -2,7 +2,8 @@
 
 - **Status:** accepted. Criteria (#181), decision log (addendum 1), retro facts (#182,
   addendum 2), the v1.37 worked example (#183, addendum 3) and the backtest (#184,
-  addendum 4). The backtest **failed**, so readiness is "not validated".
+  addendum 4). The backtest **failed**, so readiness is "not validated". The main PR is
+  scoped to the release (addendum 5).
 - **Date:** 2026-11-26
 
 ## Context
@@ -251,3 +252,84 @@ change, and the backtest must be re-run after it. It is not tuned here.
   Code Freeze exceptions, so it adds nothing to the Code Freeze outcome. Older releases
   (v1.33, v1.34) list Code Freeze exceptions and could check the exception-evidence
   signal later; they are not part of this rule.
+
+## Addendum 5: main PR scoped to the release (2026-11-26), written before the re-run
+
+**This change was made after seeing the failed backtest in addendum 4.** A re-run on the
+same releases is therefore not an independent test: the rule below was chosen knowing why
+those releases failed. Both results are published. The first clean test is Kubernetes
+v1.39, the next release with no part in choosing the rule.
+
+**Evidence** (local data, release day). Of the 28 shipped features that were flagged:
+
+- **13** had a main PR opened *after* Code Freeze. Kubernetes KEPs link PRs from every
+  stage (alpha, beta, GA): one v1.36 feature has 378 verified PRs. The newest one is often
+  next-stage work that cannot be part of the release.
+- **6** had a main PR that was closed without merging (an abandoned attempt).
+- The rest had a pre-freeze main PR that was genuinely open or merged late.
+
+**Rule** (engine/rules.py `main_pr(..., release_scoped=True)`, used by the rule flags and
+the release assessment). The candidate PRs are the first non-empty group of:
+
+1. PRs opened before the release's Code Freeze and not closed without merging;
+2. PRs not closed without merging;
+3. all verified PRs.
+
+Within that group the choice is unchanged: a PR the author declared as the implementation
+(KEP number in the title, "implements ... KEP-N"), else the most recently opened.
+
+- It uses only data known as of the replay time: before the freeze, every PR is opened
+  before it, so the rule changes nothing then except skipping abandoned PRs.
+- A feature whose only live work started after the freeze still gets that PR as its main
+  PR (group 2), so a late landing still fails `code_merged`.
+- #6395 keeps #143709 as its main PR (opened Nov 2, before the Nov 17 freeze).
+- **Unchanged:** the odds model (ADR-0005) and merge dates call `main_pr` without
+  `release_scoped`. They already filter PRs to the cycle in their own code, and their
+  published backtests stay valid.
+
+**What moves.** Rule flags, Cockpit and Portfolio, readiness, retro replays and the
+readiness backtest all read `is_main` from the assessment. Their results are re-run and
+re-published next to the old ones.
+
+**Expected from the diagnostic, not yet measured:** 16 of the 28 false no-go features
+clear. That would still leave about 12 of 109 (0.11), above the 0.05 pass mark, so the
+backtest is expected to fail again.
+
+### Re-run result (2026-11-26): **still failed, still not validated**
+
+`docs/results/readiness-backtest-20261126T171219Z.json` (the first run's file is kept).
+
+| Test | First run (addendum 4) | Re-run | Pass mark |
+|---|---|---|---|
+| Recall | 0.593 | **0.800** | ≥ 0.60, passes |
+| Precision | 0.745, base rate 0.437 | **0.829**, base rate 0.315 | ≥ base rate + 0.15, passes |
+| False no-go on release day | 0.257 (28 of 109) | **0.119 (13 of 109)** | ≤ 0.05, **fails** |
+
+| Release | Features at freeze | Slipped (old → new) | Flagged | Flagged and slipped | False no-go |
+|---|---|---|---|---|---|
+| v1.36 | 78 | 34 → 20 | 26 → 22 | 17 → 19 | 21 → 9 of 70 |
+| v1.37 | 86 | 44 → 27 | 29 → 25 | 25 → 23 | 4 → 2 of 20 |
+| v1.38 | 86 | 30 → 29 | 36 → 32 | 25 → 23 | not shipped yet |
+| Kafka 4.4.0 | 20 | 10 → 9 | 3 → 3 | 3 → 3 | 3 → 2 of 19 |
+
+**Read this with care.**
+- **The outcome moved too, not only the prediction.** "Slipped" includes "main PR merged
+  after the freeze", and the main PR is now the release's PR, not next-stage work. That is
+  why the base rate fell from 0.437 to 0.315, and most of the recall gain comes from it.
+  The old outcome counted features as slipped because a *later* release's PR merged after
+  this release's freeze. That was wrong, the same mistake ADR-0005 corrected for merge
+  dates, so the new outcome is the better one. But a reader must not take 0.593 → 0.800 as
+  the predictor getting better on a fixed truth.
+- **Not an independent test** (see above). v1.39 is the first clean one.
+
+**The 13 that remain.** 11 are Kubernetes features whose main PR was opened before the
+freeze and was still unmerged on release day: 8 merged after the release, 3 were later
+closed. The other 2 are Kafka features whose main PR merged after Feature Freeze with no
+exception signal (addendum 1). A likely cause for the Kubernetes ones, not checked case by
+case: the PR's target moved to the next cycle while the enhancement issue kept its
+milestone, so a feature that shipped without that PR looks like it has an unmerged main
+PR. Telling those apart needs data the engine does not have (which PRs a release note
+names, or the PR's own milestone). It is not attempted here.
+
+**Retro replays** (re-run on the same day): v1.36 slips 25 → 24 (warned first 10 → 9,
+landed but warned 57 → 58). v1.35, v1.37, v1.38, Kafka 4.3.0 and 4.4.0 are unchanged.
