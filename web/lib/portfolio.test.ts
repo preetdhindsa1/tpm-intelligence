@@ -52,7 +52,7 @@ describe("portfolio display", () => {
     ];
     expect(comingNextBlurb(modules)).toBe("A go/no-go from real signals before launch and a retro that shows when each slip was first visible.");
     expect(comingNextBlurb(modules.map((item) => ({ ...item, status: "planned" })))).toBe(
-      "A RAID log from the release notes, confirmed before it counts, a go/no-go from real signals before launch and a retro that shows when each slip was first visible.",
+      "A RAID log from meeting notes, confirmed before it counts, a go/no-go from real signals before launch and a retro that shows when each slip was first visible.",
     );
   });
 });

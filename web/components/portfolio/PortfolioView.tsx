@@ -15,7 +15,6 @@ import {
   severityClass,
   stageLabel,
   stageLine,
-  statusLabel,
   waitingVerb,
   type Portfolio,
   type PortfolioProgram,
@@ -218,19 +217,18 @@ function Across({ items }: { items: Portfolio["across_programs"] }) {
 const SHORT: Record<string, string> = { readiness: "readiness", retro: "retros" };
 
 function ComingNext({ items }: { items: Portfolio["coming_next"] }) {
-  const shown = items;
+  const shown = items.filter((item) => item.status === "planned");
+  if (shown.length === 0) return null;
   const names = shown.map((i) => SHORT[i.module] ?? i.name);
-  const title = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : (names[0] ?? "");
-  const planned = shown.length > 0 && shown.every((i) => i.status === "planned");
-  const blurb = comingNextBlurb(items);
+  const title = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0];
   return (
     <section className="rounded-2xl bg-ink p-6 text-white">
       <p className="text-xs font-medium uppercase tracking-wider text-indigo-300">Coming next · Preview</p>
-      <h2 className="mt-2 font-heading text-xl font-semibold">{title || "Nothing planned"}</h2>
-      {blurb && <p className="mt-3 text-sm leading-6 text-slate-300">{blurb}</p>}
+      <h2 className="mt-2 font-heading text-xl font-semibold">{title}</h2>
+      <p className="mt-3 text-sm leading-6 text-slate-300">{comingNextBlurb(shown)}</p>
       <p className="mt-4">
         <span className="inline-block rounded-full border border-white/25 px-3 py-1 text-xs text-slate-200">
-          {planned ? "Planned modules · no data yet" : shown.map((i) => `${i.name} · ${statusLabel(i.status)}`).join(" · ")}
+          Planned modules · no data yet
         </span>
       </p>
     </section>

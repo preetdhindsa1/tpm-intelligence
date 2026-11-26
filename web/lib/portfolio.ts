@@ -104,7 +104,7 @@ export function decisionHref(project: string, release: string, kind: string): st
 }
 
 const NEXT_LINE: Record<string, string> = {
-  raid: "a RAID log from the release notes, confirmed before it counts",
+  raid: "a RAID log from meeting notes, confirmed before it counts",
   readiness: "a go/no-go from real signals before launch",
   retro: "a retro that shows when each slip was first visible",
 };
