@@ -266,3 +266,27 @@ All 126 are `suggested`. None has a RAID ID until a person confirms it. The run 
 items in memory (`--dry-run`) because the RAID tables (migration 0010, #176) are not merged
 yet. Re-running without `--dry-run` after that merge puts the same items in the queue at no
 AI cost.
+
+## Addendum 4 (2026-11-25): a second name source for masking (#180)
+
+Masking from the notes alone missed people named in passing who are on no attendee list
+(addendum 3: one first name in 2 of 126 v1.38 items). A team's config can now list
+`people_sources`: public GitHub files that list its people as `Name ([@handle](...))`. For
+Kubernetes these are the v1.38 and v1.37 `release-team.md` files in `kubernetes/sig-release`
+and `release-managers.md` in `kubernetes/website`, 113 names and handles in total
+(2026-11-25).
+
+- **Read when masking runs, never stored.** `collectors/notes/people.py` reads them through
+  the GitHub contents API (read-only, the shared HTTP client) each time the RAID job runs.
+  Names exist only in memory, to be replaced by `[participant]` before any text reaches the
+  model or the store. Storing them as events would keep a list of people in the database for
+  no other use, so this is the one place a job reads a source directly; it reads no content
+  that ends up stored.
+- **A list that cannot be read is skipped with a warning**, and masking falls back to the
+  names in the notes.
+- **Measured** on the v1.38 run (prompt v2, claude-haiku-5-5, 2026-11-25): no listed or
+  rostered name in any kept quote or title, and a scan of capitalised words in all 128 kept
+  items found only weekdays, months, products and Kubernetes terms. Counts after the change:
+  136 returned, 8 dropped (7 too short, 1 quote not found), 128 kept (58 actions, 37 issues,
+  16 risks, 15 decisions, 2 questions), 125 with a team owner, 5 with explicit links, 22
+  possible repeats. Re-run cost $0.004 (9 of 13 meetings were cache hits).

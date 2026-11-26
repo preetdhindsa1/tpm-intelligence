@@ -130,6 +130,9 @@ class TeamConfig(BaseModel):
     code_freeze_label: str = "Code Freeze"
     # Meeting notes, transcripts and chat the team's programs read (ADR-0030).
     conversations: tuple[ConversationSource, ...] = ()
+    # Public files that list the team's people ("owner/repo/path" on GitHub), read only to
+    # mask names in meeting notes before extraction. Never stored (ADR-0030 addendum 4).
+    people_sources: tuple[str, ...] = ()
 
     def calendar_path(self, *, relative_to: Path) -> Path:
         """Resolve the calendar file (paths are repo-root relative unless absolute)."""
