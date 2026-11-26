@@ -59,6 +59,7 @@ class ProgramFacts:
     suggested_links: int = 0
     lab: LabFacts | None = None
     code_freeze_label: str = "Code Freeze"  # the team's own name for its code_freeze date
+    raid_suggested: int = 0  # RAID items waiting for a person (#225)
 
 
 def stage(dates: dict[str, datetime | None], now: datetime) -> dict[str, Any]:
@@ -203,6 +204,7 @@ def _gap_facts(lab: LabFacts) -> dict[str, Any]:
 _DECISION_LABEL = {
     "approve_exec_update": "Approve exec update",
     "review_link_suggestions": "Review AI link suggestions",
+    "review_raid": "Review RAID items",
     "classify_prs": "Classify pull requests with no lane",
 }
 
@@ -216,6 +218,10 @@ def waiting(p: ProgramFacts) -> list[dict[str, Any]]:
     if p.suggested_links > 0:
         label = f"{p.suggested_links} AI link suggestions · {p.release}"
         items.append(("review_link_suggestions", label, p.suggested_links, None))
+    if p.raid_suggested > 0:
+        n = p.raid_suggested
+        label = f"{n} RAID item{'s' if n != 1 else ''} waiting for review · {p.release}"
+        items.append(("review_raid", label, n, None))
     if p.lab is not None and p.lab.unassigned > 0:
         n = p.lab.unassigned
         label = f"{n} pull request{'s' if n != 1 else ''} with no lane · {p.display_name}"
@@ -316,8 +322,16 @@ def _sort_key(p: ProgramFacts) -> tuple[datetime, str]:
     return (p.dates.get("release_at") or datetime.max.replace(tzinfo=p.as_of.tzinfo), p.key)
 
 
+def coming_next(live: frozenset[str] = frozenset()) -> list[dict[str, str]]:
+    """The Wave 4/5 modules; ``live`` names those with real data (#225), else ``planned``."""
+    return [{**m, "status": "live" if m["module"] in live else "planned"} for m in COMING_NEXT]
+
+
 def portfolio(
-    facts: list[ProgramFacts], skipped: list[dict[str, str]], now: datetime
+    facts: list[ProgramFacts],
+    skipped: list[dict[str, str]],
+    now: datetime,
+    live: frozenset[str] = frozenset(),
 ) -> dict[str, Any]:
     """The whole ``GET /portfolio`` body (docs/api/ux-v1-contract.md)."""
     facts = sorted(facts, key=_sort_key)
@@ -334,6 +348,6 @@ def portfolio(
         "programs": [program(p) for p in facts],
         "waiting_on_you": items,
         "across_programs": across(facts),
-        "coming_next": [dict(m) for m in COMING_NEXT],
+        "coming_next": coming_next(live),
         "skipped": skipped,
     }

@@ -110,3 +110,61 @@ def test_a_broken_store_is_listed_and_the_page_still_returns() -> None:
     body = res.json()
     assert {"team": "kubernetes", "reason": "link suggestions could not be read"} in body["skipped"]
     assert body["programs"][0]["key"] == "kubernetes:v1.38"
+
+
+def _raid_client(raid: Any) -> TestClient:
+    service = ReleaseService(
+        InMemoryEventSource(list(fixture_events())),
+        forecast=ForecastConfig(replications=5, sims=100),
+        now=lambda: utc(2026, 11, 21, 3),
+        validation=lambda: Validation(False, "test: not validated"),
+    )
+    links = MemoryLinkSuggestionStore()
+    return TestClient(create_app(service=service, link_store=links, ai=_DraftUpdates(),
+                                 raid_data=raid))  # fmt: skip
+
+
+def _raid_store(n: int) -> Any:
+    from datetime import UTC, datetime
+
+    from api.raid_store import StoreRaid
+    from modules.raid.store import MemoryRaidStore, RaidItem, suggestion_key
+
+    now = datetime(2026, 11, 21, tzinfo=UTC)
+    store = MemoryRaidStore()
+    for i in range(n):
+        quote = f"Item {i} needs a decision before the release."
+        key = suggestion_key("doc", "2026-11-18", "risk", quote)
+        store.suggest(RaidItem(0, key, "kubernetes:v1.38", "K8S", "risk", "A risk", quote,  # type: ignore[arg-type]
+                               "doc", "2026-11-18"), now)  # fmt: skip
+    return StoreRaid(lambda: store, {}, lambda: now)
+
+
+def test_raid_items_waiting_are_a_portfolio_decision_and_raid_is_live() -> None:
+    body = _raid_client(_raid_store(3)).get("/portfolio").json()
+    rows = [i for i in body["waiting_on_you"] if i["kind"] == "review_raid"]
+    assert rows == [{"kind": "review_raid", "program_key": "kubernetes:v1.38",
+                     "label": "3 RAID items waiting for review · v1.38", "count": 3,
+                     "ref": None}]  # fmt: skip
+    assert body["totals"]["waiting_on_you"] == len(body["waiting_on_you"])
+    status = {m["module"]: m["status"] for m in body["coming_next"]}
+    # No database here: readiness and retro use the synthetic fixtures, which never count.
+    assert status == {"raid": "live", "readiness": "planned", "retro": "planned"}
+
+
+def test_the_synthetic_raid_fixture_is_not_live_and_adds_no_row() -> None:
+    body = _raid_client(None).get("/portfolio").json()
+    assert all(i["kind"] != "review_raid" for i in body["waiting_on_you"])
+    assert {m["status"] for m in body["coming_next"]} == {"planned"}
+
+
+def test_a_broken_raid_store_is_listed_not_hidden() -> None:
+    class Broken:
+        synthetic = False
+
+        def all_items(self, key: str) -> list[Any]:
+            raise RuntimeError("database is down")
+
+    body = _raid_client(Broken()).get("/portfolio").json()
+    assert {"team": "kubernetes", "reason": "RAID items could not be read"} in body["skipped"]
+    assert body["programs"][0]["key"] == "kubernetes:v1.38"

@@ -9,6 +9,7 @@ import threading
 import time
 from collections import OrderedDict
 from collections.abc import AsyncIterator, Awaitable, Callable
+from dataclasses import replace
 from datetime import UTC, datetime
 from typing import Any
 
@@ -171,7 +172,8 @@ def create_app(
 
     # Wave 4 RAID tracker: the RAID store when a database is configured, else the synthetic
     # fixture (ADR-0030, #180).
-    app.include_router(raid_router(approver, raid_data or _default_raid_data()))
+    raid_src = raid_data or _default_raid_data()
+    app.include_router(raid_router(approver, raid_src))
 
     simulations = asyncio.Semaphore(MAX_PARALLEL_SIMULATIONS)
     open_streams = {"n": 0}
@@ -899,7 +901,9 @@ def create_app(
             events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"}
         )
 
-    def _program_facts(team: TeamConfig, v: ReleaseView, skipped: list[dict[str, str]]) -> Any:
+    def _program_facts(
+        team: TeamConfig, v: ReleaseView, skipped: list[dict[str, str]], live: set[str]
+    ) -> Any:
         """Stored facts for one program. A store that cannot be read is listed, not hidden."""
         from agents.link_store import SuggestionStatus
         from agents.updates import UpdateStatus
@@ -944,7 +948,19 @@ def create_app(
                 if human and human.get("approved_of")
                 else None,
             )
-        return program_facts(v, team, draft_id=draft, suggested_links=suggested, lab=lab)
+        facts = program_facts(v, team, draft_id=draft, suggested_links=suggested, lab=lab)
+        if raid_src is None or raid_src.synthetic:  # the fixture is never a program's data
+            return facts
+        try:
+            items = raid_src.all_items(key)
+        except Exception:
+            logger.exception("portfolio: RAID items unavailable for %s", key)
+            skipped.append({"team": team.id, "reason": "RAID items could not be read"})
+            return facts
+        if items:
+            live.add("raid")
+        waiting = sum(1 for i in items if i["review"] == "suggested")
+        return replace(facts, raid_suggested=waiting)
 
     @app.get("/portfolio", response_model=PortfolioOut)
     async def portfolio_view() -> PortfolioOut:
@@ -954,6 +970,14 @@ def create_app(
             with tracer.start_as_current_span("api.portfolio") as span:
                 s = svc()
                 facts, skipped = [], []
+                live: set[str] = set()  # modules with real data (#225)
+                if data is not None:  # readiness on real data (StoreReadiness)
+                    live.add("readiness")
+                try:
+                    if retros is not None and retros.has_runs():
+                        live.add("retro")
+                except Exception:
+                    logger.exception("portfolio: retro runs unavailable")
                 for team in load_teams().values():
                     name = s.current_release_name(team.project)
                     if name is None:
@@ -965,10 +989,10 @@ def create_app(
                         logger.exception("portfolio: %s:%s failed", team.project, name)
                         skipped.append({"team": team.id, "reason": "release could not be computed"})
                         continue
-                    facts.append(_program_facts(team, v, skipped))
+                    facts.append(_program_facts(team, v, skipped, live))
                 span.set_attribute("portfolio.programs", len(facts))
                 span.set_attribute("portfolio.skipped", len(skipped))
-                return portfolio(facts, skipped, datetime.now(UTC))
+                return portfolio(facts, skipped, datetime.now(UTC), frozenset(live))
 
         return PortfolioOut.model_validate(await run_in_threadpool(build))
 

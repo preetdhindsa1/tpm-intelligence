@@ -117,6 +117,9 @@ class RaidSummaryOut(_Out):
     by_type: list[RaidCountOut]
     risks_without_owner: int  # open confirmed risks with no owner (a readiness criterion)
     waiting_for_review: int
+    # Notes and retro sources configured for the release (#225). 0: no conversations are
+    # connected, so zero counts mean "not measured", not "no risks".
+    sources: int
 
 
 class RaidEditIn(BaseModel):

@@ -234,11 +234,11 @@ All live programs at once. No query parameters. Example built from the live data
 | `scope` | object | Features in the release now, and ever in it (removed ones included). |
 | `bottleneck` | object | ADR-0025 rule 4. `kind`: `critical_flags` \| `review_gap` \| `linking_gap` \| `unlinked_load` \| `none`. `severity`: `critical` \| `warning` \| `info`. `facts` keys depend on `kind`, as in the example. `none` has `headline` "No bottleneck flagged", `detail` null, `facts` {}. |
 | `next_decision` | object \| null | ADR-0025 rule 5. Null means nothing waits on a person for this program. |
-| `next_decision.kind`, `waiting_on_you[].kind` | string | `approve_exec_update` (ref has `update_id`), `review_link_suggestions`, `classify_prs`. |
+| `next_decision.kind`, `waiting_on_you[].kind` | string | `approve_exec_update` (ref has `update_id`), `review_link_suggestions`, `review_raid` (suggested RAID items, #225), `classify_prs`. |
 | `waiting_on_you[]` | object | Everything a person must act on, across programs, in that kind order, then by program order. |
 | `across_programs[]` | object | ADR-0025 rule 7. `kind`: `late_code` \| `review_gap` \| `unlinked_load`. Present only when its fact is above zero. `unlinked_open_prs` counts distinct pull requests, not per-SIG load (`GET /releases/{name}/load` has that). |
-| `coming_next[]` | object | Planned modules. `status` is `planned`. They carry no numbers. |
-| `skipped[]` | `{team, reason}` | What could not be read. Reasons: `no release yet` and `release could not be computed` (the team has no row in `programs`); `exec updates could not be read` and `link suggestions could not be read` (the team **keeps** its row, and its waiting items may be incomplete). One team can appear in both `programs` and `skipped`: show the row and the note, never drop the row. |
+| `coming_next[]` | object | The Wave 4/5 modules. `status` is `live` when the module has real data (RAID: a stored item for any program; readiness: rules on the real store; retro: a stored replay), else `planned` (#225). Synthetic fixtures never make a module live. They carry no numbers. |
+| `skipped[]` | `{team, reason}` | What could not be read. Reasons: `no release yet` and `release could not be computed` (the team has no row in `programs`); `exec updates could not be read`, `link suggestions could not be read` and `RAID items could not be read` (the team **keeps** its row, and its waiting items may be incomplete). One team can appear in both `programs` and `skipped`: show the row and the note, never drop the row. |
 
 ### Where each example number comes from (2026-11-24)
 

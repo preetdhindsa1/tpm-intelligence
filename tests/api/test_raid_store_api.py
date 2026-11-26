@@ -83,3 +83,11 @@ def test_refusals_and_unknown_items(client: TestClient) -> None:
     assert client.post("/raid/2/confirm", json={}).status_code == 409
     assert client.get("/raid/99/history").status_code == 404
     assert client.post("/raid/99/confirm", json={}).status_code == 404
+
+
+def test_summary_counts_the_notes_sources_for_the_release(client: TestClient) -> None:
+    assert client.get("/raid/summary").json()["sources"] == 1  # the v1.38 meeting notes
+    assert client.get("/raid/summary?release=v1.37").json()["sources"] == 1  # the retro doc
+    none = client.get("/raid/summary?project=KAFKA&release=4.4.0").json()
+    assert none["sources"] == 0  # nothing connected: zeros are not "no risks"
+    assert none["waiting_for_review"] == 0
