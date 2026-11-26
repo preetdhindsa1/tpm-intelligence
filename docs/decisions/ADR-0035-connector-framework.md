@@ -126,3 +126,33 @@ evidence goes in an addendum here. The collector emits the existing normalized e
 
 No AI. Configs, secrets, audit and deletion are deterministic. AI budgets are enforced by
 the existing gateway, now per tenant.
+
+
+## Addendum 1 (2026-11-27): built (#233)
+
+- **`team_configs`** (migration 0016): primary key `(tenant_id, team_id)`, forced RLS like
+  every tenant table, each body validated by `TeamConfig` on write and on read.
+  `connectors/store.py` holds the Postgres store and an in-memory store for tests.
+- **`load_teams()` is per tenant.** With no argument it uses the current tenant: YAML for
+  the demo, `team_configs` for the others (cached for 30 s per tenant, cleared after a
+  change). **With no tenant it raises** rather than hand out the demo's teams. That caught
+  one real case: the API read meeting-doc titles from the team configs once at start-up,
+  outside any tenant. They are now read per request.
+- **Secrets:** `TeamConfig.secret_refs` maps a purpose to a reference (`{"github":
+  "github-token"}`). The schema refuses anything that is not a short name, so a pasted
+  token cannot reach the database. `connectors/secrets.py` resolves a reference to
+  Secret Manager `tenant-<id>-<ref>` when `SECRETS_BACKEND=gcp`, else to the environment
+  variable `TENANT_<ID>_<REF>`. `team_secret(team, purpose, demo_env)` gives the demo its
+  old variable and a private tenant only its own reference, with no fallback. The GitHub
+  poller uses it.
+- **API:** `GET /tenants/{id}/connectors` (members; the demo's are the YAML files),
+  `PUT` and `DELETE /tenants/{id}/connectors/{team_id}` (owners; never the demo). The path's
+  tenant must equal the request's tenant, or 404. The response lists each reference's
+  Secret Manager name and whether it resolves, never its value.
+- **Not yet, and needed before a second organization collects its own data:**
+  - the worker stores events for one tenant (`TPM_TENANT`), so a private tenant's poll needs
+    the tenant in each queue message and a worker that honours it;
+  - a release calendar inside the config (today it is a file in the repository);
+  - one scheduled poll per tenant.
+
+  These are the next step of #233.

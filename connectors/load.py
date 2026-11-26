@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+import threading
+import time
+from collections.abc import Callable, Iterable
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 import yaml
 
@@ -56,9 +58,68 @@ def _is_team_file(path: Path) -> bool:
     )
 
 
+_DB_TTL_S = 30.0  # private tenants' configs are re-read at most this often
+_db_cache: dict[str, tuple[float, dict[str, TeamConfig]]] = {}
+_db_lock = threading.Lock()
+# Where private tenants' configs come from: Postgres by default, swapped in tests.
+_db_source: Callable[[str], dict[str, TeamConfig]] | None = None
+
+
+def load_teams(tenant: str | None = None) -> dict[str, TeamConfig]:
+    """The teams of ``tenant`` (default: the current tenant), keyed by id (ADR-0035).
+
+    The public demo's teams are the YAML files in ``connectors/teams/``. Any other tenant's
+    come from its ``team_configs`` rows. With no tenant at all this refuses, rather than
+    hand one tenant's teams to code running for another.
+    """
+    from pipeline.store.tenancy import DEMO, current_tenant
+
+    t = tenant or current_tenant.get()
+    if t is None:
+        raise RuntimeError("no tenant: team configs are per tenant (ADR-0035)")
+    if t == DEMO:
+        return _yaml_teams()
+    now = time.monotonic()
+    with _db_lock:
+        hit = _db_cache.get(t)
+        if hit is not None and now - hit[0] < _DB_TTL_S:
+            return hit[1]
+    teams = (_db_source or _postgres_teams)(t)
+    with _db_lock:
+        _db_cache[t] = (now, teams)
+    return teams
+
+
+def set_team_source(source: Callable[[str], dict[str, TeamConfig]] | None) -> None:
+    """Tests: read private tenants' teams from ``source`` instead of Postgres."""
+    global _db_source
+    _db_source = source
+    clear_team_cache()
+
+
 @lru_cache(maxsize=1)
-def load_teams() -> dict[str, TeamConfig]:
-    """All non-template teams, keyed by id."""
+def _engine() -> Any:
+    from pipeline.store.session import make_engine
+
+    return make_engine()
+
+
+def _postgres_teams(tenant: str) -> dict[str, TeamConfig]:
+    from sqlalchemy.orm import sessionmaker
+
+    from connectors.store import PostgresTeamConfigStore
+    from pipeline.env import configured
+    from pipeline.store.tenancy import tenant_sessions
+
+    if configured("DATABASE_URL") is None:
+        return {}
+    store = PostgresTeamConfigStore(tenant_sessions(sessionmaker(_engine()), tenant))
+    return {row.config.id: row.config for row in store.list()}
+
+
+@lru_cache(maxsize=1)
+def _yaml_teams() -> dict[str, TeamConfig]:
+    """All non-template team files, keyed by id: the public demo's teams."""
     out: dict[str, TeamConfig] = {}
     for path in sorted(teams_dir().glob("*.yaml")):
         if not _is_team_file(path):
@@ -123,5 +184,7 @@ def scope_events[E: _Subject](events: Iterable[E], project: str) -> list[E]:
 
 
 def clear_team_cache() -> None:
-    """Test helper."""
-    load_teams.cache_clear()
+    """Forget cached teams (tests, and after a tenant changes a connector)."""
+    _yaml_teams.cache_clear()
+    with _db_lock:
+        _db_cache.clear()

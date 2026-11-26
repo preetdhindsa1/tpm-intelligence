@@ -1,8 +1,9 @@
 # Tenants, members and connectors: API contract (Wave 6)
 
 Decisions: ADR-0034 (tenants and isolation) and ADR-0035 (connector framework). Status:
-**contract first**. The routes below are built in #231, #233 and #234. Until then they
-return 404.
+the tenant header, signature v2 and the **connector routes are built** (#231, #233). The
+tenant, member, limits, audit, export and deletion routes come in #234 and return 404
+until then.
 
 ## Picking the tenant
 
@@ -78,8 +79,9 @@ owner: removing or demoting the last one returns 409.
 
 - `PUT` body: the same object as a `connectors/teams/<id>.yaml` file, as JSON.
 - 422 returns the schema errors.
-- Secrets are references, for example `"token_ref": "github-token"`. The response says
-  whether each reference resolves, and never shows a value:
+- Secrets are references in `secret_refs` (purpose → name), for example
+  `"secret_refs": {"github": "github-token"}`. A value that looks like a token is refused
+  (422). The response says whether each reference resolves, and never shows a value:
 
 ```json
 {

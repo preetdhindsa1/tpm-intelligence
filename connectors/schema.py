@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class GitHubPlanning(BaseModel):
@@ -148,6 +148,22 @@ class TeamConfig(BaseModel):
     # (ADR-0025 addendum): "Code Freeze" for Kubernetes, "Feature Freeze" for Kafka, or
     # "Release cut" for a team that ships continuously.
     code_freeze_label: str = "Code Freeze"
+    # Secrets by reference (ADR-0035): purpose -> ref, e.g. {"github": "github-token"},
+    # resolved per tenant by connectors.secrets. Empty for the public demo, which keeps its
+    # environment variables.
+    secret_refs: dict[str, str] = Field(default_factory=dict)
+
+    @field_validator("secret_refs")
+    @classmethod
+    def _refs_are_names(cls, refs: dict[str, str]) -> dict[str, str]:
+        """A ref is a short name, never a value: a pasted token must not reach the database."""
+        import re
+
+        for purpose, ref in refs.items():
+            if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,39}", ref):
+                raise ValueError(f"secret_refs.{purpose}: {ref!r} is not a secret name")
+        return refs
+
     # Meeting notes, transcripts and chat the team's programs read (ADR-0030).
     conversations: tuple[ConversationSource, ...] = ()
     # Public files that list the team's people ("owner/repo/path" on GitHub), read only to

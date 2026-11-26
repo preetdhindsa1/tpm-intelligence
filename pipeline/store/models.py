@@ -130,6 +130,20 @@ class Member(Base):
     added_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
 
 
+class TeamConfigRecord(Base):
+    """A tenant's team config: a ``connectors/teams/<id>.yaml`` body (ADR-0035)."""
+
+    __tablename__ = "team_configs"
+
+    tenant_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("tenants.id"), server_default=TENANT_DEFAULT, primary_key=True
+    )
+    team_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    config: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    version: Mapped[int] = mapped_column(Integer)
+    updated_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
 # ---------------------------------------------------------------- planning side
 
 

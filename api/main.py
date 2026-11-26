@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import functools
 import json
 import logging
 import threading
 import time
 from collections import OrderedDict
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Mapping
 from dataclasses import replace
 from datetime import UTC, datetime
 from typing import Any
@@ -144,6 +145,7 @@ def create_app(
     readiness_data: Callable[[Any], Any] | None = None,
     retro_data: Any = None,
     tenants: TenantDirectory | None = None,
+    team_configs: Callable[[str], Any] | None = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis.
 
@@ -203,6 +205,11 @@ def create_app(
         for key, value in _SECURITY_HEADERS.items():
             response.headers.setdefault(key, value)
         return response
+
+    from api.tenant_admin import tenant_admin_router
+
+    # Wave 6: each tenant's connectors (ADR-0035, #233).
+    app.include_router(tenant_admin_router(acting, team_configs or _default_team_configs))
 
     from api.raid import raid_router
 
@@ -1083,6 +1090,22 @@ def _default_service(tenant: str = DEMO) -> ReleaseService:
     )
 
 
+def _default_team_configs(tenant: str) -> Any:
+    """The tenant's ``team_configs`` on Postgres (row-level security picks the rows)."""
+    from sqlalchemy.orm import sessionmaker
+
+    from connectors.store import PostgresTeamConfigStore
+
+    return PostgresTeamConfigStore(tenant_sessions(sessionmaker(_shared_engine()), tenant))
+
+
+@functools.cache
+def _shared_engine() -> Any:
+    from pipeline.store.session import make_engine
+
+    return make_engine()
+
+
 def _default_tenant_directory() -> TenantDirectory:
     """Tenants from Postgres when ``DATABASE_URL`` is set; otherwise the demo only."""
     from pipeline.env import configured
@@ -1114,13 +1137,29 @@ def _default_raid_data() -> Any:
     def store() -> PostgresRaidStore:
         return PostgresRaidStore(sessionmaker(make_engine()))
 
-    titles = {
-        doc: c.title
-        for t in load_teams().values()
-        for c in t.conversations
-        if (doc := getattr(c, "document_id", None))
-    }
-    return StoreRaid(store, titles)
+    return StoreRaid(store, _DocTitles())
+
+
+class _DocTitles(Mapping[str, str]):
+    """Meeting-doc titles from the current tenant's team configs, read when asked: the app
+    is built before any request names a tenant (ADR-0035)."""
+
+    def _titles(self) -> dict[str, str]:
+        return {
+            doc: c.title
+            for t in load_teams().values()
+            for c in t.conversations
+            if (doc := getattr(c, "document_id", None))
+        }
+
+    def __getitem__(self, key: str) -> str:
+        return self._titles()[key]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._titles())
+
+    def __len__(self) -> int:
+        return len(self._titles())
 
 
 def _default_readiness_data(view: Any) -> Any:
