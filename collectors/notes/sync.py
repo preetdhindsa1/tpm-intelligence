@@ -10,7 +10,7 @@ from typing import Protocol
 from opentelemetry import trace
 
 from collectors.notes.normalize import to_events
-from collectors.notes.parse import split_meetings
+from collectors.notes.parse import split_meetings, split_retro
 from connectors.schema import GoogleDocSource, TeamConfig
 from pipeline.events import NormalizedEvent, release_key
 
@@ -53,7 +53,8 @@ def collect(team: TeamConfig, fetcher: Fetcher, publisher: Publisher) -> Stats:
                 logger.exception("notes: could not read document %s", source.document_id)
                 stats.failed.append(source.document_id)
                 continue
-            meetings = split_meetings(text)
+            split = split_retro if source.layout == "retro" else split_meetings
+            meetings = split(text)
             events = to_events(
                 meetings,
                 project=team.project,

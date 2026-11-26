@@ -290,3 +290,11 @@ and `release-managers.md` in `kubernetes/website`, 113 names and handles in tota
   136 returned, 8 dropped (7 too short, 1 quote not found), 128 kept (58 actions, 37 issues,
   16 risks, 15 decisions, 2 questions), 125 with a team owner, 5 with explicit links, 22
   possible repeats. Re-run cost $0.004 (9 of 13 meetings were cache hits).
+
+## Addendum 5: more people sources and surnames (#183, 2026-11-26)
+
+The v1.37 retrospective named a SIG lead who is on no release-team list. The people
+sources now include kubernetes/community `sigs.yaml` (`- github:` / `name:` pairs, read
+the same way, never stored). Masking now also covers a listed person's surname used on
+its own, after a v1.38 item kept one. Re-checked against 619 public names: 0 names left
+in the v1.38 or v1.37 items (ADR-0032 addendum 3).

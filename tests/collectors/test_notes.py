@@ -106,6 +106,9 @@ class _Publisher:
         return event.event_id
 
 
+RETRO_137 = "1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE"
+
+
 class _Fetcher:
     def __init__(self, text: str | None) -> None:
         self.text = text
@@ -121,14 +124,15 @@ class _Fetcher:
 
 def test_collect_publishes_every_meeting_of_every_listed_document() -> None:
     team = load_team("kubernetes")
-    assert [c.document_id for c in team.conversations] == [DOC]
+    assert [c.document_id for c in team.conversations] == [DOC, RETRO_137]
     pub = _Publisher()
     stats = collect(team, _Fetcher(TEXT), pub)
-    assert (stats.documents, stats.meetings, stats.published, stats.failed) == (1, 6, 6, [])
+    # The retro document (layout: retro) has no retro sections in this text: no meetings.
+    assert (stats.documents, stats.meetings, stats.published, stats.failed) == (2, 6, 6, [])
     assert pub.events[0].payload.release_key == "kubernetes:v1.38"  # type: ignore[union-attr]
 
 
 def test_a_failed_document_is_counted_not_fatal() -> None:
     stats = collect(load_team("kubernetes"), _Fetcher(None), _Publisher())
-    assert stats.failed == [DOC]
+    assert stats.failed == [DOC, RETRO_137]
     assert stats.published == 0

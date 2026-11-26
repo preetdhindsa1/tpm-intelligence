@@ -142,3 +142,10 @@ def test_cost_is_reported_and_the_prompt_file_loads() -> None:
     assert result.cost_usd > 0
     assert result.items == ()
     assert load_prompt("raid_extractor").label == "raid_extractor.v2"
+
+
+def test_a_surname_on_its_own_is_masked_too() -> None:
+    from modules.raid.mask import MASK, mask_names
+
+    out = mask_names("Thanks to Roe for the docs; KEP-6395 needs a Lead.", {"Jane Roe", "Al Lead"})
+    assert out == f"Thanks to {MASK} for the docs; KEP-6395 needs a {MASK}."

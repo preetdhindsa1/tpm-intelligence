@@ -76,3 +76,19 @@ def test_the_job_masks_known_names_in_the_text_sent_to_ai() -> None:
     sent = str(client_gw.client.calls[0])  # type: ignore[attr-defined]
     assert "Dana" not in sent
     assert f"work with {MASK}" in sent
+
+
+def test_yaml_people_files_give_names_and_handles() -> None:
+    from collectors.notes.people import names_in_yaml
+
+    text = """sigs:
+  - dir: sig-apps
+    leadership:
+      chairs:
+        - github: pexample
+          name: Pat Example
+          company: Example
+        - github: rsample
+          name: "Robin Sample"
+"""
+    assert names_in_yaml(text) == {"pexample", "Pat Example", "rsample", "Robin Sample"}

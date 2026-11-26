@@ -13,14 +13,23 @@ calendar:
   path: collectors/github_poller/release_calendar.yaml
 # Public release-team meeting notes (ADR-0030), linked from
 # kubernetes/sig-release/releases/release-1.38/links.md. Read with the Google Drive API.
-# Public lists of the release team and release managers. Read only to mask people's names
+# Public lists of the release team, release managers and SIG leads. Read only to mask people's names
 # in the notes before RAID extraction (ADR-0030 addendum 4); names are never stored.
 people_sources:
   - kubernetes/sig-release/releases/release-1.38/release-team.md
   - kubernetes/sig-release/releases/release-1.37/release-team.md
   - kubernetes/website/content/en/releases/release-managers.md
+  # SIG chairs and tech leads, named in retros (#183).
+  - kubernetes/community/sigs.yaml
 conversations:
   - kind: google_doc
     document_id: 1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0
     title: Kubernetes v1.38 Release Team Meeting
     release: v1.38
+  # Public v1.37 release retrospective, linked from
+  # kubernetes/sig-release/releases/release-1.37/links.md (#183).
+  - kind: google_doc
+    document_id: 1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE
+    title: Kubernetes v1.37 Release Retrospective
+    release: v1.37
+    layout: retro

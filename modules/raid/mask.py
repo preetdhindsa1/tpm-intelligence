@@ -54,7 +54,9 @@ def mask_names(text: str, names: Iterable[str]) -> str:
     )
     names = {n for n in names if len(n) > 1}
     firsts = {n.split()[0] for n in names if len(n.split()[0]) > 1}
-    names |= firsts
+    # Surnames on their own ("thanks to Roe"), from multi-word names (#183: found in v1.38).
+    lasts = {n.split()[-1] for n in names if len(n.split()) > 1}
+    names |= firsts | {w for w in lasts if len(w) > 2 and w[0].isupper()}
     # Short forms of a listed first name ("Fred" for "Frederico"), as whole capitalised words.
     names |= {
         w for w in set(_CAPITALISED.findall(out)) if any(f.startswith(w) and f != w for f in firsts)
