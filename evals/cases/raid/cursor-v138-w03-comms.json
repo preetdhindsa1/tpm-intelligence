@@ -1,0 +1,38 @@
+{
+ "id": "cursor-v138-w03-comms",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-16",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Comms (APAC: [participant] / [participant], EMEA: [participant]/ [participant]):\n      * Current Status: Green\n      * Progress Issue (created new 1.38 tracking issue)\n      * PR to add shadows to k/org giving them access has been raised\n      * Waiting for two shadows to become org members before getting this merged\n      * PR to add shadows to k/k8s.io has also been raised\n      * Shadow onboarding call next week, have shared availability doodle with the shadows",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "Waiting for two shadows to become org members before getting this merged",
+   "owner": "Comms"
+  },
+  {
+   "type": "decision",
+   "quote": "Shadow onboarding call next week, have shared availability doodle with the shadows",
+   "owner": "Comms"
+  }
+ ],
+ "optional": []
+}

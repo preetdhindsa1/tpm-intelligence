@@ -1,5 +1,5 @@
 {
- "id": "cursor-v138-w01-access",
+ "id": "cursor-v138-w01-docs",
  "seed": false,
  "independent": true,
  "author": "cursor-agent",
@@ -9,8 +9,8 @@
   "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
   "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
   "meeting_date": "2026-09-02",
-  "fetched_at": "2026-11-26T22:20:00Z",
-  "note": "Excerpt from a v1.38 meeting the seed cases do not use. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
  },
  "teams": [
   "Enhancements",
@@ -21,13 +21,7 @@
   "Subproject Leads",
   "Release Lead"
  ],
- "notes": "Still need to sort access for everyone, I’ll get everything merged by this week.",
- "expected": [
-  {
-   "type": "action",
-   "quote": "Still need to sort access for everyone, I’ll get everything merged by this week.",
-   "owner": "Release Lead"
-  }
- ],
+ "notes": "      * Docs ([participant] / [participant]):\n      * Current Status: Green\n      * Sent shadow recommendations ",
+ "expected": [],
  "optional": []
 }

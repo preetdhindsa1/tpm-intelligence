@@ -1,0 +1,38 @@
+{
+ "id": "cursor-v138-w08-comms",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-10-21",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * Comms (APAC: [participant] / EMEA: [participant]):\n   * Current Status: Green\n   * Progress Issue\n   * The first set of outreach to KEPs for feature blogs is fully complete. Feature Blog freeze is on Wednesday 4th November 2026.\n   * We will start second set of outreach for KEPs this week.\n   * First set of outreach to SIGs for release highlights has also been complete. We haven't gotten any responses yet on the Release Highlights GitHub Discussion though. The Release Highlights discussion closes on Tuesday 24th November 2026\n   * Mid cycle blog publication date is on Monday 23rd November 2026.",
+ "expected": [
+  {
+   "type": "action",
+   "quote": "We will start second set of outreach for KEPs this week.",
+   "owner": "Comms"
+  },
+  {
+   "type": "risk",
+   "quote": "First set of outreach to SIGs for release highlights has also been complete. We haven't gotten any responses yet on the Release Highlights GitHub Discussion though. The Release Highlights discussion closes on Tuesday 24th November 2026",
+   "owner": "Comms"
+  }
+ ],
+ "optional": []
+}

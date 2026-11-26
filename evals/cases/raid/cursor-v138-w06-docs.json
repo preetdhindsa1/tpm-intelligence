@@ -1,0 +1,54 @@
+{
+ "id": "cursor-v138-w06-docs",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-10-07",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * Docs (APAC: [participant] | EMEA: [participant]):\n   * Current Status: Green\n       - What's happened since last week\n   * Last week’s branch sync PR has been merged\n   * Release Notes for v1.38.0-alpha.1 has been merged\n   * 1st PR Placeholder reminder for KEP owners has completed on Github\n- Important dates & upcoming work\n   * We will continue the next outreach (2nd) for Docs Placeholder reminders\n   * Release Notes for v1.38.0-alpha.2 creation: 7th Oct 2026 by [participant] and review by [participant] [participant]\n   * Next k/website weekly sync: 09 Oct by [participant] [participant]\n   * Placeholder deadline: Thursday 29 October 2026 (AoE)\n                        - Total tracked KEPs: 86\n   * Missing Placeholder PR:  56 (~65 percent remaining)\n   * Draft PR: 24\n   * PR Ready for Review: 5\n   * No Docs Needed: 1\n   * Merged: 0\n   * ",
+ "expected": [
+  {
+   "type": "action",
+   "quote": "We will continue the next outreach (2nd) for Docs Placeholder reminders",
+   "owner": "Docs"
+  },
+  {
+   "type": "action",
+   "quote": "Release Notes for v1.38.0-alpha.2 creation: 7th Oct 2026 by [participant] and review by [participant] [participant]",
+   "owner": "Docs"
+  },
+  {
+   "type": "risk",
+   "quote": "Missing Placeholder PR:  56 (~65 percent remaining)",
+   "owner": "Docs"
+  }
+ ],
+ "optional": [
+  {
+   "type": "action",
+   "quote": "Next k/website weekly sync: 09 Oct by [participant] [participant]",
+   "owner": "Docs"
+  },
+  {
+   "type": "issue",
+   "quote": "Missing Placeholder PR:  56 (~65 percent remaining)",
+   "owner": "Docs"
+  }
+ ]
+}
