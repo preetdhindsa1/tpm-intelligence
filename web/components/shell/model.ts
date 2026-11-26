@@ -97,6 +97,7 @@ export const COCKPIT_SECTIONS: { suffix: string; label: string }[] = [
   { suffix: "/links", label: "Link review" },
   { suffix: "/raid", label: "RAID" },
   { suffix: "/readiness", label: "Readiness" },
+  { suffix: "/retro", label: "Retro" },
 ];
 
 /** The section a release path is on; feature pages belong to Overview. Null on Decision Studio. */
