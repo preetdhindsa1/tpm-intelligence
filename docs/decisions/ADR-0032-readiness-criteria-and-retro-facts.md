@@ -1,7 +1,8 @@
 # ADR-0032: Readiness criteria and retro facts
 
-- **Status:** accepted for the criteria (#181). The decision log, retro facts (#182) and
-  backtest result (#184) are added as addenda when they are built.
+- **Status:** accepted. Criteria (#181), decision log (addendum 1), retro facts (#182,
+  addendum 2), the v1.37 worked example (#183, addendum 3) and the backtest (#184,
+  addendum 4). The backtest **failed**, so readiness is "not validated".
 - **Date:** 2026-11-26
 
 ## Context

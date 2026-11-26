@@ -1,7 +1,8 @@
 # ADR-0030: Conversation sources (meeting notes, meeting transcripts, Slack)
 
-- **Status:** proposed (Wave 4). Evidence from official documentation and one live public
-  fetch. Live API calls for Slack, Zoom, Microsoft Teams and Google Meet are still owed
+- **Status:** accepted for public Google Doc meeting notes and retros (Waves 4-5: RAID
+  extraction on the v1.38 notes and the v1.37 retro, addenda 2-5); proposed for the
+  rest. Evidence from official documentation and live public fetches. Live API calls for Slack, Zoom, Microsoft Teams and Google Meet are still owed
   (they need test apps the owner creates). Each section says which.
 - **Date:** 2026-11-25
 

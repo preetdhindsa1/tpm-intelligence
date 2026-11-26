@@ -22,7 +22,9 @@ fixture and is checked by `tests/api/test_readiness.py`.
   not count), `docs_merged`.
 - **A person decides.** `POST /readiness/{release}/decision` needs sign-in, the approver
   allowlist and a note. Decisions are appended, never edited; `decided_by` is a role.
-- **`validated: false`** until the readiness backtest passes (ADR-0032); show "not validated".
+- **`validated`** comes from the newest readiness backtest in `GET /results`. It is
+  `false` today: the backtest failed (ADR-0032 addendum 4). Show "not validated" and the
+  `validation_note`.
 - **`summary`** is `null` or AI sentences from verified facts only, each fact-checked.
 - **Retro slips** are `dropped`, `moved` or `late_exception`. `first_warning_at` comes from
   forecast snapshots replayed as of each day (never today's data); `null` means the platform
@@ -42,6 +44,8 @@ fixture and is checked by `tests/api/test_readiness.py`.
 | GET | `/retro` | | Slips with first warning dates and lead times |
 | GET | `/retro/said-vs-showed` | | Meeting items next to same-day snapshot facts |
 | GET | `/retro/patterns` | | Patterns per pool across releases |
+| GET | `/retro/lanes?project=tpm-intelligence` | | This repo's UX v1 sprint per pod lane (opened, merged, hours to merge, review rounds, rework, CI failures, `small_sample`) |
+| GET | `/results` | | Published measured results; `readiness_backtest` is the newest ADR-0032 backtest, pass or fail |
 
 Errors: 401 not signed in, 403 not an approver, 422 a missing note or a bad decision.
 Retro endpoints take `?project=` (default `kubernetes`) and `?release=`; patterns take

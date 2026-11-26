@@ -196,6 +196,10 @@ make tf-plan                # offline plan: placeholder project, dummy token
 | Event → dashboard latency via webhooks (p95, target < 30 s) | **9.7 s: passes** (p50 5.7 s, max 12.2 s; n = 27 webhook events, each timed from GitHub's event time to the first push to an open page). GitHub's delivery p50 2.2 s, receipt → page p50 3.6 s. Measured 2026-11-24 04:29–04:45 UTC with Kubernetes, Kafka and webhooks flowing, after the P3-M5 fixes; before them some events took 60 s to 14 min (ADR-0022). Small sample, one repository. `docs/results/webhook-latency-cloud-20261124T044532Z.json` |
 | Simulator: one what-if scenario (target p95 < 2 s) | **Server p95 1.39 s** (p50 1.34 s, max 3.06 s; 9 of 10 runs under 2 s). n = 10 scenarios run one after another on the live API, 2026-11-24; small sample. `docs/results/load-test-cloud-20261124.json` |
 | API under load: 10 then 20 users | **0 errors; server p95 0.53 s at 31 requests/s** (client p95 0.65 s), after caching the dependency graph off the event loop (#74). Before: p95 about 2 s at 12 requests/s. 2026-11-24; no recompute ran during the final run (#70). `docs/results/load-test-cloud-20261124-after.json` |
+| RAID extractor eval (5 seed cases from the public v1.38 notes, Haiku 5.5, `raid_extractor.v2`) | Quote match **100%**. Actions: precision 0.90, recall 0.94. Issues: precision 0.77 (below the 0.80 gate), recall 1.00. Risks and decisions have under 5 labels each, so they are not gated. The gate **reports only** until 30 cases labelled by someone other than the developer exist (owner's decision, 2026-11-25). $0.006 per run. `docs/results/agent-evals-20261125T225737Z-raid_extractor.json`; ADR-0030 |
+| RAID items from the public v1.38 release-team notes (13 meetings) and the v1.37 retro | v1.38: 137 returned, **129 kept**; 8 dropped by the quote checks (7 too short, 1 not found). v1.37 retro: 10 kept. All are `suggested` until a person confirms them. **0 names** left against 619 public names, after the masking fixes (SIG leads from `sigs.yaml`, surnames on their own). About $0.004 per release. Local database, 2026-11-26; ADR-0030 addenda 4-5, ADR-0032 addendum 3 |
+| Readiness backtest (ADR-0032 pass rule fixed before the run; Kubernetes v1.36-v1.38, Kafka 4.4.0; per feature at Code Freeze) | **Failed, so readiness is "not validated".** Recall **0.593** (needs ≥ 0.60). Precision **0.745** against a 0.437 base rate (passes the +0.15 lift). False no-go on release day **0.257** (needs ≤ 0.05). Cause: the engine's main-PR choice, the latest-opened PR, which is often follow-up work still open or a closed PR. Measured 2026-11-26; `GET /results`; `docs/results/readiness-backtest-20261126T084416Z.json`; ADR-0032 addendum 4 |
+| Retro replay (rule flags as of each day, Kubernetes v1.35-v1.38, Kafka 4.3.0/4.4.0) | v1.37: 98 planned, **32 slips** (16 moved, 12 dropped, 4 late exceptions), 21 warned first, median lead 35 days. But **47 of the 66 features that landed were also warned**, mostly by `review_waiting`, so the warnings are too noisy to act on as they are. v1.36: 25 slips, 10 warned, 57 of 68 landed warned. v1.38: 39 slips, 30 warned, 53 of 57 landed warned. Local database, 2026-11-26; ADR-0032 addenda 2-3 |
 | Database restore (point-in-time clone) | **Pass**: 9 minutes; schema and every row count up to the restore point matched production. 2026-11-24. `docs/results/restore-test-20261124.json` |
 
 Coverage counts *whether* a link exists, not whether it is right. Reproduce with
@@ -332,6 +336,12 @@ Coverage counts *whether* a link exists, not whether it is right. Reproduce with
 - **API recompute is not incremental.** Each change to the data re-projects every stored event.
   With linking shared and the calibration cached (ADR-0019) a v1.38 recompute takes 9.2 s p95
   in the cloud (2026-11-23). Fine for polled data; heavy webhook traffic is untested.
+- **RAID, readiness and retros (Waves 4-5) run on real data locally; the cloud has none
+  yet.** Loading it means one-off jobs in production: notes sync, RAID extraction, retro
+  replays (about 3 min per release). The owner approves those first. Readiness is "not
+  validated" (backtest failed; ADR-0032 addendum 4). Kubernetes docs PRs live in
+  kubernetes/website, which is not collected, so `docs_merged` is "unknown". Kafka has no
+  exception signal after Feature Freeze. The pages are being built by cursor-agent.
 - **CI flags cannot tell required checks from optional ones.** Prow does not mark them in the
   API data we read, so `ci_failing` counts any failing check on the latest commit.
 - Release dates come from a checked-in calendar
