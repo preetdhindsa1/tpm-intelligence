@@ -28,13 +28,14 @@ SOURCE = {
 def public_retros(project: str, release: str) -> list[dict[str, Any]]:
     """The team's public retrospective documents for the release (``layout: retro``)."""
     from connectors.load import load_teams
+    from connectors.schema import GoogleDocSource
 
     return [
         {"kind": "retro", "title": c.title, "synthetic": False,
          "url": f"https://docs.google.com/document/d/{c.document_id}"}
         for t in load_teams().values() if t.project == project
         for c in t.conversations
-        if getattr(c, "layout", None) == "retro" and c.release == release
+        if isinstance(c, GoogleDocSource) and c.layout == "retro" and c.release == release
     ]  # fmt: skip
 
 
