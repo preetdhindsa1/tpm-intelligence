@@ -1,9 +1,10 @@
+import { SaidTimeline } from "@/components/retro/SaidVsShowed";
 import { formatUtc } from "@/lib/format";
-import type { Patterns, Retro } from "@/lib/api-readiness";
+import type { Patterns, Retro, SaidVsShowed } from "@/lib/api-readiness";
 import { slipLabel, suppressedText, totalLines, warningLine } from "@/lib/retro";
 
 /** Totals, slips and pool patterns. The API owns every count. */
-export function RetroView({ retro, patterns }: { retro: Retro; patterns: Patterns | null }) {
+export function RetroView({ retro, patterns, said }: { retro: Retro; patterns: Patterns | null; said?: SaidVsShowed | null }) {
   const hidden = patterns ? suppressedText(patterns.suppressed_groups) : null;
   return (
     <div className="space-y-5">
@@ -51,6 +52,12 @@ export function RetroView({ retro, patterns }: { retro: Retro; patterns: Pattern
           </ul>
         )}
         {hidden && <p className="mt-2 text-sm text-slate-500">{hidden}</p>}
+      </section>
+      <section>
+        <h2 className="font-heading text-lg font-semibold">Said versus showed</h2>
+        <div className="mt-2">
+          {said ? <SaidTimeline data={said} /> : <p className="text-sm text-slate-600">Said versus showed is not available.</p>}
+        </div>
       </section>
     </div>
   );
