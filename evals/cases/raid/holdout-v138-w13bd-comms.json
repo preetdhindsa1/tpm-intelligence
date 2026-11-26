@@ -1,0 +1,39 @@
+{
+ "id": "holdout-v138-w13bd-comms",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-11-23",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "* Comms (APAC: [participant] / [participant] | EMEA: [participant]):\n* Current Status: Green\n* Progress Issue\n* Mid cycle blog PR is merged\n* Release highlights discussion deadline is tomorrow Tuesday and we’re still working on that",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "Release highlights discussion deadline is tomorrow Tuesday and we’re still working on that",
+   "owner": "Comms"
+  }
+ ],
+ "optional": [
+  {
+   "type": "action",
+   "quote": "Release highlights discussion deadline is tomorrow Tuesday and we’re still working on that",
+   "owner": "Comms"
+  }
+ ]
+}

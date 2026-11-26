@@ -1,0 +1,27 @@
+{
+ "id": "holdout-v138-w13bd-docs",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-11-23",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "* Docs  (APAC: [participant] / EMEA:  [participant]) :\n* Current Status:  Green\n* Last week’s branch sync PR to k/website has been merged.\n* The v1.38.0-beta.0 Release Notes PR has been reviewed, and approved\n   * https://github.com/kubernetes/sig-release/pull/3134 \n* Ready-for-review outreach has started on GitHub:\n   * Draft PRs → Ready for review\n   * Ready PRs → Technical/docs review\n* Upcoming Deadline\n   * PRs ready for review: Tuesday, 24 November 2026.\n* KEP Docs Tracking\n   * Total tracked: 69\n   * Draft: 14\n   * Ready for review: 44\n   * Merged: 3\n   * No PR needed: 8 ",
+ "expected": [],
+ "optional": []
+}

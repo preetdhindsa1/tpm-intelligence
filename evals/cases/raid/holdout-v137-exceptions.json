@@ -1,0 +1,54 @@
+{
+ "id": "holdout-v137-exceptions",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.37",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.37 release retrospective (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE",
+  "meeting_date": "2026-07-29",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One topic from the public retrospective. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "* [participant] We had quite a few exception requests around Code and Test Freeze. While this was not entirely in our control, one thing we could try next cycle is more outreach from Enhancements before freeze, such as sharing the KEP list in SIG channels and asking leads and chairs to review their items early. \n   * It may also help to communicate more clearly what qualifies for an exception and what a reasonable extension looks like, given some of the requests we received this cycle.\n   * [participant] This is on subproject owners; we need to send an email reminder of what an exception request looks like when it’s accepted (how many days is reasonable, what state your KEP should be in, what constitutes important to the milestone)\n   * [participant] Having to occasionally send this reminder does not require structural changes to the release team",
+ "expected": [
+  {
+   "type": "issue",
+   "quote": "We had quite a few exception requests around Code and Test Freeze.",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "action",
+   "quote": "This is on subproject owners; we need to send an email reminder of what an exception request looks like when it’s accepted (how many days is reasonable, what state your KEP should be in, what constitutes important to the milestone)",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "decision",
+   "quote": "Having to occasionally send this reminder does not require structural changes to the release team",
+   "owner": "Release Lead"
+  }
+ ],
+ "optional": [
+  {
+   "type": "action",
+   "quote": "While this was not entirely in our control, one thing we could try next cycle is more outreach from Enhancements before freeze, such as sharing the KEP list in SIG channels and asking leads and chairs to review their items early.",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "action",
+   "quote": "It may also help to communicate more clearly what qualifies for an exception and what a reasonable extension looks like, given some of the requests we received this cycle.",
+   "owner": "Enhancements"
+  }
+ ]
+}

@@ -1,0 +1,64 @@
+{
+ "id": "holdout-v137-feature-blogs",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.37",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.37 release retrospective (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE",
+  "meeting_date": "2026-07-29",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One topic from the public retrospective. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * [participant] There’s an unusually high number of potential feature blogs (30+ at the time of writing); regardless of the specific decisions that are made this release, it would be important to have more generally applicable guidelines for future releases that take into account the different impact of this: a) dilution of what a Feature blog is (if everything is a FB, then nothing is, and readers will likely lose focus) b) Impact on SIG Docs and review ability. From the ongoing discussion, several possible selection criteria were identified, as well as possible different approaches to the feature blog (like grouped articles, limit on the number of blogs per SIG{not recommended but still covered}, redirecting alpha articles to the contributor blogs as calls for help on k8s.dev after the release, getting inputs on security concerns from SIG Security and trying to avoid having a blog for each stage - alpha/beta/stable) TL;DR, let’s think in terms of an end-user in terms of the number of blogs. \n   * [participant] Right now I don’t have a solution, but maybe we do what we do for code freeze with multiple deadlines? Blog deadlines are currently very flexible. This might lower the number of blogs.\n   * [participant] Maybe guidance on what constitutes a good target for a blog; more blogs is not more better\n   * [participant] There isn’t a lot of guidance in the handbook about blog PRs\n   * [participant] Lots of new KEP owners seem to think the blog is a requirement and get confused\n   * [participant] Maybe a template setting criteria for what could be eligible for a blog\n   * [participant] Alpha features can be on the contrib blog if they want, but the release team cannot coordinate that. Contribex has to, without interfering with the release team\n   * [participant] The scope is also weird; k8s.dev targets kubernetes developers, not users. The audience is wrong. \n   * [participant] Agree, different audiences.",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "There’s an unusually high number of potential feature blogs (30+ at the time of writing); regardless of the specific decisions that are made this release, it would be important to have more generally applicable guidelines for future releases that take into account the different impact of this: a) dilution of what a Feature blog is (if everything is a FB, then nothing is, and readers will likely lose focus) b) Impact on SIG Docs and review ability. From the ongoing discussion, several possible selection criteria were identified, as well as possible different approaches to the feature blog (like grouped articles, limit on the number of blogs per SIG{not recommended but still covered}, redirecting alpha articles to the contributor blogs as calls for help on k8s.dev after the release, getting inputs on security concerns from SIG Security and trying to avoid having a blog for each stage - alpha/beta/stable) TL;DR, let’s think in terms of an end-user in terms of the number of blogs.",
+   "owner": "Comms"
+  },
+  {
+   "type": "risk",
+   "quote": "Blog deadlines are currently very flexible. This might lower the number of blogs.",
+   "owner": "Comms"
+  },
+  {
+   "type": "issue",
+   "quote": "There isn’t a lot of guidance in the handbook about blog PRs",
+   "owner": "Comms"
+  },
+  {
+   "type": "issue",
+   "quote": "Lots of new KEP owners seem to think the blog is a requirement and get confused",
+   "owner": "Comms"
+  },
+  {
+   "type": "decision",
+   "quote": "Alpha features can be on the contrib blog if they want, but the release team cannot coordinate that.",
+   "owner": "Comms"
+  }
+ ],
+ "optional": [
+  {
+   "type": "action",
+   "quote": "Maybe a template setting criteria for what could be eligible for a blog",
+   "owner": "Comms"
+  },
+  {
+   "type": "question",
+   "quote": "Right now I don’t have a solution, but maybe we do what we do for code freeze with multiple deadlines?",
+   "owner": "Comms"
+  }
+ ]
+}

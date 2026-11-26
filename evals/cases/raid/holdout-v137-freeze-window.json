@@ -1,0 +1,44 @@
+{
+ "id": "holdout-v137-freeze-window",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.37",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.37 release retrospective (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE",
+  "meeting_date": "2026-09-02",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One topic from the public retrospective. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * [participant]: The Release Team Subproject is increasing the development time in the 1.38 cycle by starting earlier.   Consider also whether the Code Freeze period could be compressed; for reference, back in 2018 code freeze was a week.  While today's code freeze involves a lot more steps, shortening it by 5 days to a week might eliminate a lot of exception requests. \n   * [participant] We have a much larger number of KEPs in current releases. In 2020 we had 42, now we have 70 or more. This would not be feasible and the number of exception requests was a direct result of the shorter freeze window.",
+ "expected": [
+  {
+   "type": "decision",
+   "quote": "This would not be feasible and the number of exception requests was a direct result of the shorter freeze window.",
+   "owner": "Release Lead"
+  }
+ ],
+ "optional": [
+  {
+   "type": "issue",
+   "quote": "This would not be feasible and the number of exception requests was a direct result of the shorter freeze window.",
+   "owner": "Release Lead"
+  },
+  {
+   "type": "action",
+   "quote": "While today's code freeze involves a lot more steps, shortening it by 5 days to a week might eliminate a lot of exception requests.",
+   "owner": "Release Lead"
+  }
+ ]
+}

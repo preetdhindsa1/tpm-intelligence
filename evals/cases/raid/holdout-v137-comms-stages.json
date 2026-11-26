@@ -1,0 +1,53 @@
+{
+ "id": "holdout-v137-comms-stages",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.37",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.37 release retrospective (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE",
+  "meeting_date": "2026-09-02",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One topic from the public retrospective. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "* [participant] While we did a great job getting feedback for the SIGs - I believe it surely got overwhelming for the Comms team and [participant] because there were too many to resolve at once.\nIMO, we could divide it into multiple stages, starting with the SIG chairs & techleads, and then the Comms team, and finally the SIG Docs team.\n   * [participant] Similar to how we structure feature blog reviews in stages, we can extend this to release announcements and mid-cycle blog.\n   * [participant] 1-2 days between stages to give the author time to tackle the existing reviews first.\n   * [participant] Comms starts the draft in a Google Doc, shares the doc with the chairs and tech leads before opening the GitHub PR for final review. ([participant] +1, [participant] +1)\n   * [participant] Try this before documenting it as the “official” process. Need to find out if extra processes make things easier or harder. ([participant] +1)",
+ "expected": [
+  {
+   "type": "issue",
+   "quote": "While we did a great job getting feedback for the SIGs - I believe it surely got overwhelming for the Comms team and [participant] because there were too many to resolve at once.",
+   "owner": "Comms"
+  },
+  {
+   "type": "action",
+   "quote": "IMO, we could divide it into multiple stages, starting with the SIG chairs & techleads, and then the Comms team, and finally the SIG Docs team.",
+   "owner": "Comms"
+  },
+  {
+   "type": "action",
+   "quote": "1-2 days between stages to give the author time to tackle the existing reviews first.",
+   "owner": "Comms"
+  },
+  {
+   "type": "action",
+   "quote": "Comms starts the draft in a Google Doc, shares the doc with the chairs and tech leads before opening the GitHub PR for final review.",
+   "owner": "Comms"
+  },
+  {
+   "type": "decision",
+   "quote": "Try this before documenting it as the “official” process.",
+   "owner": "Comms"
+  }
+ ],
+ "optional": []
+}

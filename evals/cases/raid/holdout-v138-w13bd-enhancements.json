@@ -1,0 +1,27 @@
+{
+ "id": "holdout-v138-w13bd-enhancements",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-11-23",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "* Enhancements (APAC: [participant] / [participant] | EMEA: [participant] [participant]):\n* Current Status: Green\n* Release Tracking Board: https://github.com/orgs/kubernetes/projects/269\n* Metrics: \n   * Total KEPs on the board = 69\n   * By stage:\n      * Alpha: 29\n      * Beta: 28\n      * Stable: 12\n      * Deprecation: 0\n   * By status:\n      * Tracked for code freeze: 69\n* Updates:\n   * Code and Test Freeze Exception Requests: 21\n      * Rejected: 2\n      * No longer need: 3\n      * Accepted: 16\n         * All KEPs are tracked for code freeze.",
+ "expected": [],
+ "optional": []
+}

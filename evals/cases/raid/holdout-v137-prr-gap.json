@@ -1,0 +1,59 @@
+{
+ "id": "holdout-v137-prr-gap",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.37",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.37 release retrospective (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE",
+  "meeting_date": "2026-09-02",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One topic from the public retrospective. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * [participant] Paraphrased by [participant] - Doc gap identified during release. An issue was identified around the graduation of the metrics.k8s.io API to stable without sufficient reference documentation. Could the release team have identified this earlier during PRR and helped address it before GA graduation? (More context maybe: https://kubernetes.slack.com/archives/C0156PJ62RE/p1786302755300769)\n   * [participant] We don’t do the PRR, we enforce the deadline. This would be the PRR reviewer responsibility. Release could not have prevented this. Will message [participant], but keep in mind that PRR is understaffed.\n   * [participant] In future what are our options: [[participant]] This is an edge case and resolution is situational. Was handled well in this case.",
+ "expected": [
+  {
+   "type": "issue",
+   "quote": "An issue was identified around the graduation of the metrics.k8s.io API to stable without sufficient reference documentation.",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "decision",
+   "quote": "We don’t do the PRR, we enforce the deadline.",
+   "owner": "Release Lead"
+  },
+  {
+   "type": "decision",
+   "quote": "Release could not have prevented this.",
+   "owner": "Release Lead"
+  },
+  {
+   "type": "risk",
+   "quote": "Will message [participant], but keep in mind that PRR is understaffed.",
+   "owner": "Enhancements"
+  }
+ ],
+ "optional": [
+  {
+   "type": "action",
+   "quote": "Will message [participant], but keep in mind that PRR is understaffed.",
+   "owner": "Release Lead"
+  },
+  {
+   "type": "decision",
+   "quote": "In future what are our options: [[participant]] This is an edge case and resolution is situational.",
+   "owner": "Release Lead"
+  }
+ ]
+}

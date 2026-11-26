@@ -1,0 +1,54 @@
+{
+ "id": "holdout-v137-half-implemented",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.37",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.37 release retrospective (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE",
+  "meeting_date": "2026-07-29",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One topic from the public retrospective. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "* [participant] Some KEPs had partial code merged into k/k before ultimately being removed from the milestone at Code Freeze, as other related PRs couldn't land in time. This raised unresolved questions around whether the merged PRs should be reverted or allowed to ship with the release, and whether such KEPs should still be tracked, gaps that need formal documentation going forward.\n   * [participant] These edge cases might come up more frequently, and should be documented. Generally if it’s not harmful to leave half-implemented KEPs in the release, leave it in rather than risking a revert.",
+ "expected": [
+  {
+   "type": "issue",
+   "quote": "Some KEPs had partial code merged into k/k before ultimately being removed from the milestone at Code Freeze, as other related PRs couldn't land in time.",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "action",
+   "quote": "This raised unresolved questions around whether the merged PRs should be reverted or allowed to ship with the release, and whether such KEPs should still be tracked, gaps that need formal documentation going forward.",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "risk",
+   "quote": "These edge cases might come up more frequently, and should be documented.",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "decision",
+   "quote": "Generally if it’s not harmful to leave half-implemented KEPs in the release, leave it in rather than risking a revert.",
+   "owner": "Enhancements"
+  }
+ ],
+ "optional": [
+  {
+   "type": "action",
+   "quote": "These edge cases might come up more frequently, and should be documented.",
+   "owner": "Enhancements"
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+{
+ "id": "holdout-v138-w10-enhancements",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-11-04",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * Enhancements (APAC: [participant] / [participant] | EMEA: [participant]):\n   * Current Status: Green\n   * Release Tracking Board: https://github.com/orgs/kubernetes/projects/269\n   * Metrics: \n   * Total KEPs on the board = 87\n   * By stage:\n   * Alpha: 42\n   * Beta: 30\n   * Stable: 15\n   * Deprecation: 0\n   * By status:\n   * At risk for code freeze: 72\n   * Tracked for code freeze: 15\n   * Removed from milestone: 16\n   * Updates:\n   * ​​All Code Freeze reminders have been sent.",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "At risk for code freeze: 72",
+   "owner": "Enhancements"
+  }
+ ],
+ "optional": []
+}

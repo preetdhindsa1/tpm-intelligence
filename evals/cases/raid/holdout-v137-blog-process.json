@@ -1,0 +1,54 @@
+{
+ "id": "holdout-v137-blog-process",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.37",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.37 release retrospective (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE",
+  "meeting_date": "2026-07-29",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One topic from the public retrospective. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "* [participant] SIG Docs updated part of their blog process earlier this cycle, while Comms still used the old outreach template. Could we add an early cycle task to check for process changes across SIGs so the guidance and templates we use stay in sync?\n   * [participant] I think this is on SIG Docs; we should have been informed this was changing. With SIG Docs hat on, I didn’t know either\n   * [participant] Yes we should communicate, this goes both ways.\n   * [participant] One-off edge case, no action item or structural change required to prevent reoccurrence ",
+ "expected": [
+  {
+   "type": "issue",
+   "quote": "SIG Docs updated part of their blog process earlier this cycle, while Comms still used the old outreach template.",
+   "owner": "Comms"
+  },
+  {
+   "type": "issue",
+   "quote": "I think this is on SIG Docs; we should have been informed this was changing.",
+   "owner": "Docs"
+  },
+  {
+   "type": "action",
+   "quote": "Yes we should communicate, this goes both ways.",
+   "owner": "Docs"
+  },
+  {
+   "type": "decision",
+   "quote": "One-off edge case, no action item or structural change required to prevent reoccurrence",
+   "owner": "Release Lead"
+  }
+ ],
+ "optional": [
+  {
+   "type": "question",
+   "quote": "Could we add an early cycle task to check for process changes across SIGs so the guidance and templates we use stay in sync?",
+   "owner": "Comms"
+  }
+ ]
+}

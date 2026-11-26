@@ -1,0 +1,63 @@
+{
+ "id": "holdout-v138-w13bd-release-signal",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-11-23",
+  "fetched_at": "2026-11-26T23:20:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "* Release Signal (APAC: | EMEA: [participant]/ [participant])\n* Current Status: Red\n   * We observed 6 flaky tests on master blocking board below. We are reporting them to corresponding sigs now.\n   * sig-release-blocking#ci-node-crio-conformance.[sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update container image [NodeConformance]\n   * sig-release-blocking#ci-node-crio-conformance.[sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update initContainer image [NodeConformance]\n   * sig-release-blocking#ci-kubernetes-unit.k8s.io/apiserver/pkg/server/filters TestClientReceivedGOAWAY\n   * sig-release-blocking#integration-master.k8s.io/kubernetes/test/integration/examples TestAggregatedAPIServer\n   * sig-release-master-blocking#gce-cos-master-default\n   * Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Memory-Backed Volume [FeatureGate:InPlacePodVerticalScalingMemoryBackedVolumes] \n* Internal Team Assignment Sheet\n* CI Signal Board\n* Bug Triage Board\n* Release blocking Issues (0)\n* Release blocking PRs (0)\n* Query: open non-test/flake k/k issues for v1.38 (0)\n   * priority/critical-urgent issues (0)\n   * priority/important-soon issues (0)\n* Query: open k/k PRs for v1.38 (0)\n   * priority/critical-urgent PRs (0)\n   * priority/important-soon PRs (0)\n* Query: ALL open k/k issues for v1.38 (0) (incl. this query (0)) \n* Updates:",
+ "expected": [
+  {
+   "type": "issue",
+   "quote": "sig-release-blocking#ci-node-crio-conformance.[sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update container image [NodeConformance]",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "sig-release-blocking#ci-node-crio-conformance.[sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update initContainer image [NodeConformance]",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "sig-release-blocking#ci-kubernetes-unit.k8s.io/apiserver/pkg/server/filters TestClientReceivedGOAWAY",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "sig-release-blocking#integration-master.k8s.io/kubernetes/test/integration/examples TestAggregatedAPIServer",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "sig-release-master-blocking#gce-cos-master-default",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Memory-Backed Volume [FeatureGate:InPlacePodVerticalScalingMemoryBackedVolumes]",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "action",
+   "quote": "We are reporting them to corresponding sigs now.",
+   "owner": "Release Signal"
+  }
+ ],
+ "optional": []
+}
