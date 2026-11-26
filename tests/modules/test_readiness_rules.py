@@ -34,7 +34,7 @@ def test_before_the_freeze_the_unmerged_main_pr_fails_code_merged() -> None:
     c = by_id(utc(2026, 11, 10))
     code = c["code_merged"]
     assert code.status == "fail"
-    assert any(e.ref == f"feature:{K6395}" and MAIN_PR in e.text
+    assert any(e.ref == f"feature:{K6395}" and f"{MAIN_PR} is not merged" in e.text
                for e in code.evidence)  # fmt: skip
     assert c["no_critical_flags"].status == "pass"
     assert c["verdict"] == "not_ready"

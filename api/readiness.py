@@ -1,8 +1,9 @@
-"""Readiness and retro endpoints (Wave 5, ADR-0032) on a synthetic fixture.
+"""Readiness and retro endpoints (Wave 5, ADR-0032).
 
-Until the readiness engine (#181) and retro facts (#182) are wired in, every response says
-``"synthetic": true`` and its content is invented for the page to be built against. Decisions
-are appended to this process's copy only.
+Readiness comes from ``data`` (``StoreReadiness``: the rules on the release view, with an
+append-only decision log) when given; without it, a synthetic fixture whose responses say
+``"synthetic": true`` and whose decisions live in this process only. Retros stay synthetic
+until #182.
 """
 
 from __future__ import annotations
@@ -12,7 +13,7 @@ from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from api.readiness_schemas import (
     PatternsOut,
@@ -73,6 +74,7 @@ def _retro() -> dict[str, Any]:
 def readiness_router(
     approver: Callable[[Request], Awaitable[Any]],
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
+    data: Any = None,
 ) -> APIRouter:
     """Readiness and retro endpoints. ``approver`` is the app's sign-in dependency."""
     router = APIRouter(tags=["readiness", "retro"])
@@ -97,6 +99,8 @@ def readiness_router(
     @router.get("/readiness", response_model=ReadinessOut)
     async def get_readiness(release: str = "v1.38") -> ReadinessOut:
         """Each criterion with its evidence, the verdict and the decision log."""
+        if data is not None:
+            return ReadinessOut.model_validate(await data.readiness(release))
         return readiness(release)
 
     @router.post("/readiness/{release}/decision", response_model=ReadinessOut, status_code=201)
@@ -104,6 +108,12 @@ def readiness_router(
         release: str, body: ReadinessDecisionIn, who: Any = Depends(approver)
     ) -> ReadinessOut:
         """Append a person's go/no-go call with a note. Earlier calls are never changed."""
+        if data is not None:
+            try:
+                out = await data.decide(release, body.decision, body.note, who.login, now())
+            except ValueError as exc:
+                raise HTTPException(422, str(exc)) from exc
+            return ReadinessOut.model_validate(out)
         row = ReadinessDecisionOut(decision=body.decision, note=body.note, decided_by="approver",
                                    decided_at=now(), facts_as_of=now())  # fmt: skip
         with lock:
