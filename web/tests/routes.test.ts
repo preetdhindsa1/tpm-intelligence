@@ -59,6 +59,9 @@ describe("release routes", () => {
       "/projects/kubernetes/releases/v1.37",
     );
     expect(switchPath("/projects/kubernetes/releases/v1.38", "kubernetes", "v1.37")).toBe("/projects/kubernetes/releases/v1.37");
+    expect(switchPath("/projects/kubernetes/releases/v1.38/raid", "kubernetes", "v1.37")).toBe(
+      "/projects/kubernetes/releases/v1.37/raid",
+    );
   });
 
   it("names the next milestone, or none after release day", () => {

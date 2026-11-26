@@ -44,7 +44,7 @@ export function currentRelease(releases: Release[], asOf: Date): Release | undef
 }
 
 /** Sections that exist in every release; a feature page may not, so switching drops it. */
-const PORTABLE_SECTIONS = ["/dependencies", "/simulate", "/update", "/links"];
+const PORTABLE_SECTIONS = ["/dependencies", "/simulate", "/update", "/links", "/raid"];
 
 /** Where to go when the switcher picks another release: keep the section if portable. */
 export function switchPath(pathname: string, project: string, release: string): string {
