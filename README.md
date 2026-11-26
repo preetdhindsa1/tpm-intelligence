@@ -30,13 +30,14 @@ Decision Studio, and Shadow-Org Simulator.
 Live Cockpit and Decision Studio use the program in the URL, then the last program stored in the
 browser, otherwise Portfolio. The header is a breadcrumb (`Portfolio / Kubernetes · v1.38`) plus stage,
 Code Freeze, release date, and data as of. Live Cockpit sections are tabs: Overview, Dependencies,
-Executive update, Link review. Feature pages sit under Overview. Decision Studio has no tabs.
+Executive update, Link review, RAID. Feature pages sit under Overview. Decision Studio has no tabs.
 
 | Screen | Route | What it shows | Data |
 |---|---|---|---|
 | Front page | `/` | Dark hero and live program cards; five stages (Plan · Build · Verify · Launch · Learn) with module status; three stories drawn from live facts (Code Freeze removals, the human's approval of this repo's merged PRs, Kafka features linked to code) — a story is omitted when its source is missing; Trust by design (three rules) and Measure, don't claim (every measured result, failures included, opened in place); How it works; Any cross-functional team; a 2:00 demo outline (five chapters, no recording published) | `GET /portfolio`, release summaries, `GET /lab`, `web/lib/measured.ts` |
-| Portfolio | `/portfolio` | "Here are the live programs." Stage, scope, biggest bottleneck, next decision; Waiting on you; Across programs; Coming next (RAID, readiness, retros, labeled Planned) | `GET /portfolio` (ADR-0025) |
+| Portfolio | `/portfolio` | "Here are the live programs." Stage, scope, biggest bottleneck, next decision; Waiting on you; Across programs; Coming next (RAID, readiness, retros: Live when the API has real data for the module, else Planned) | `GET /portfolio` (ADR-0025) |
 | Live Cockpit | `/projects/{project}/releases/{name}` | One program: lifecycle bar, five stat tiles, the #6395 time machine (Kubernetes v1.38 only), Code Freeze chart or pre-freeze odds, a decide card, and the verified executive brief | Release endpoints |
+| RAID | `/projects/{project}/releases/{name}/raid` | Two tabs. **Waiting for review**: AI-suggested risks, actions, issues, decisions and questions from the release-team notes, each with its verbatim quote, source meeting and link; an approver confirms (the item gets its `K8S-R-001`-style ID), edits or rejects with a reason (keys j/k/c/e/r). **Tracker**: confirmed items with their history, filters and copy as Markdown. Nothing is sent anywhere | `GET /raid`, `/raid/queue`, `/raid/summary` (ADR-0030) |
 | Decision Studio | `/projects/{project}/releases/{name}/simulate` | Pool and lever pickers, baseline vs scenario as ranges, powered by the Shadow-Org Simulator. Before a run the comparison says Illustrative and shows no numbers. The "not validated" banner uses the API's replay checks | `GET /releases/{name}/simulator` (ADR-0012) |
 | AI-native PDLC | `/pdlc` | How this repository's pod (1 human, 2 AI agents, 1 bot) builds, checks and ships: seven stages, metrics vs targets, rules checked against real PRs. `/lab` is the per-release report; the same menu item stays underlined | `GET /lab` (ADR-0023) |
 | Connect your tools | `/connect` | Three steps (connect, describe releases, first program). Connector status comes from live programs. Read-only, human approval, and public-demo privacy. It does not start a sign-up | `GET /portfolio` and connector configs |
