@@ -65,6 +65,9 @@ class GoogleDocSource(_Conversation):
 
     kind: Literal["google_doc"] = "google_doc"
     document_id: str = Field(min_length=10)
+    # "weekly": one meeting per "Week N - <date> ... Meeting" heading. "retro": the whole
+    # document is one retrospective, dated by its first "Part 1: <date>" line (#183).
+    layout: Literal["weekly", "retro"] = "weekly"
 
 
 class SlackChannelSource(_Conversation):

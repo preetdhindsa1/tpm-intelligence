@@ -141,3 +141,63 @@ The rule is fixed now so the result cannot shape it.
   changes). The API serves the latest run, and returns 404 until one exists.
 - **This repo's UX v1 sprint retro, per lane,** comes from PR data (`engine/lab.py`). It
   is a separate step.
+
+## Addendum 3: worked example, the Kubernetes v1.37 retro (#183, 2026-11-26)
+
+**Source.** The public v1.37 Release Retrospective is a Google Doc. It is linked from
+`kubernetes/sig-release/releases/release-1.37/links.md`, and its plain-text export
+returned HTTP 200 (22,010 bytes) without signing in on 2026-11-26.
+- It's listed in `connectors/teams/kubernetes.yaml` with `layout: retro`. The collector
+  stores it as one meeting dated by "Part 1: 29th Jul 2026".
+- The meeting starts at "(+) What went well", so the call details and attendee list are
+  dropped.
+- The API labels it "Kubernetes v1.37, public retro" and links the doc.
+
+**Masking found two gaps, both fixed before anything was stored:**
+- A SIG lead was named by first name. No release-team list includes them, so
+  kubernetes/community `sigs.yaml` (SIG chairs and leads) is now a people source.
+- A v1.38 item kept a surname used on its own. Masking now also covers a listed
+  person's surname as a separate word.
+
+Re-running the leak check after the fixes, with 619 public names, finds 0 names in the
+129 v1.38 items and 0 in the v1.37 items. The only hits were the ordinary words "Slack"
+and "via".
+
+**Items (suggested).** 10 items: 3 actions, 3 issues, 3 questions and 1 decision. None
+had an owner or a KEP number. Cost: $0.0018. Three extraction runs gave 12, 13 and 10
+items: the extractor isn't deterministic on this document, and a person confirms what
+stays.
+
+**Computed facts (replay, local database).**
+
+| | v1.37 |
+|---|---|
+| Planned features | 98 |
+| Slips | 32: 16 moved to a later release, 12 dropped, 4 late exceptions |
+| Removed at Code Freeze (Jul 23 to 24) | 17 |
+| Warned before the slip | 21 of 32. Median lead 35.2 days, mean 28.1 |
+| First warning | `review_waiting` 15, `ci_failing` 5, `late_main_pr` 1, none 11 |
+| Warned but landed (false alarms) | 47 of 66 |
+| On the retro's date (replay day Jul 26) | 70 in the release, 36 at risk, 26 open critical flags |
+
+**Where the retro and the data agree:**
+- "Some KEPs had partial code merged then removed from milestone at Code Freeze": the
+  replay shows 17 features removed at Code Freeze and 26 open critical flags at the
+  cutoff.
+- "Gather exception request data": the replay counts 4 late exceptions.
+
+**Where they disagree, or one side is silent:**
+- The replay's most common first warning is a review wait (15 of 21). The retro doesn't
+  mention reviews.
+- The warnings are noisy: 47 of the 66 features that landed were also warned. The
+  `review_waiting` threshold (7 days) is the main cause, and lead times of 35 days mean
+  many warnings fired on the first replay day. Lead time on its own overstates the
+  warnings; the #184 backtest pass rule (precision against the base rate) is the honest
+  test.
+- "Multiple KEP owners unresponsive" has no signal in the platform's data. It measures
+  PRs and reviews, not replies to comments or DMs.
+- The docs, comms and process items have no counterpart in delivery data: handbooks, the
+  PRR Freeze name, docs labels, dashboard monitoring, the release-notes milestone.
+- The retro names no KEP numbers, so matching retro items to slips by explicit link
+  finds 0 pairs. The comparison above is by topic, written by a person (this ADR), not
+  computed.

@@ -3,7 +3,9 @@
 Meeting notes mention people who are on no attendee list in the notes (a release manager
 named in passing). The team config's ``people_sources`` name public GitHub files that list
 people as ``Name ([@handle](...))``, such as the Kubernetes release-team and
-release-managers pages. They are read through the GitHub contents API (read-only, the shared
+release-managers pages, or as YAML ``- github: handle`` / ``name: Full Name`` pairs, such as
+kubernetes/community ``sigs.yaml`` (SIG chairs and leads, named in retros, #183).
+They are read through the GitHub contents API (read-only, the shared
 HTTP client) when masking runs, and the names are never stored.
 """
 
@@ -28,6 +30,18 @@ def names_in_markdown(text: str) -> set[str]:
     return names | {m.group(1) for m in _HANDLE.finditer(text)}
 
 
+# "- github: soltysh\n  name: Full Name" (kubernetes/community sigs.yaml)
+_YAML_PERSON = re.compile(r"-\s*github:\s*([\w-]+)\s*\n\s*name:\s*([^\n#]+)")
+
+
+def names_in_yaml(text: str) -> set[str]:
+    """Full names and handles from ``github:`` / ``name:`` pairs."""
+    found: set[str] = set()
+    for m in _YAML_PERSON.finditer(text):
+        found |= {m.group(1), m.group(2).strip().strip("\"'")}
+    return found
+
+
 def fetch_people(sources: Iterable[str], http: HttpClient | None = None) -> set[str]:
     """Names from every ``owner/repo/path`` source; a source that fails is logged and skipped."""
     from pipeline.env import configured
@@ -46,7 +60,8 @@ def fetch_people(sources: Iterable[str], http: HttpClient | None = None) -> set[
             except Exception as exc:  # one missing list must not stop masking with the rest
                 logger.warning("people source %s not read: %s", source, exc)
                 continue
-            found |= names_in_markdown(res.text)
+            yaml = path.endswith((".yaml", ".yml"))
+            found |= names_in_yaml(res.text) if yaml else names_in_markdown(res.text)
     finally:
         if http is None:
             client.close()

@@ -63,3 +63,15 @@ def test_patterns_are_per_pool_and_small_groups_are_only_counted() -> None:
     assert (body["min_group"], body["suppressed_groups"]) == (10, 1)
     assert {(p["pool"], p["pattern"], p["n"]) for p in body["patterns"]} == {
         ("sig/node", "slipped", 12), ("sig/node", "late_main_pr", 12)}  # fmt: skip
+
+
+def test_a_release_with_a_public_retro_doc_is_labelled_and_linked() -> None:
+    from api.retro_store import public_retros
+
+    store = MemoryRetroStore()
+    store.add(RetroRun("kubernetes:v1.37", NOW, utc(2026, 7, 26), "retro-1", 0, (), 0, ()))
+    body = client(store).get("/retro?release=v1.37").json()
+    assert body["label"] == "Kubernetes v1.37, public retro"
+    assert body["sources"][0]["kind"] == "retro"
+    assert body["sources"][0]["url"].endswith("1mMMDAfuEgYqxJZ-3ZmllBPlD5-niZF6-16T8yF6uMxE")
+    assert public_retros("kubernetes", "v1.38") == []

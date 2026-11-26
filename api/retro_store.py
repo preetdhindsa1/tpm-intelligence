@@ -25,6 +25,20 @@ SOURCE = {
 }
 
 
+def public_retros(project: str, release: str) -> list[dict[str, Any]]:
+    """The team's public retrospective documents for the release (``layout: retro``)."""
+    from connectors.load import load_teams
+    from connectors.schema import GoogleDocSource
+
+    return [
+        {"kind": "retro", "title": c.title, "synthetic": False,
+         "url": f"https://docs.google.com/document/d/{c.document_id}"}
+        for t in load_teams().values() if t.project == project
+        for c in t.conversations
+        if isinstance(c, GoogleDocSource) and c.layout == "retro" and c.release == release
+    ]  # fmt: skip
+
+
 class StoreRetro:
     synthetic = False
 
@@ -40,10 +54,12 @@ class StoreRetro:
 
     def retro(self, project: str, release: str) -> dict[str, Any]:
         run = self._run(project, release)
+        docs = public_retros(project, release)
+        name = f"{project.capitalize()} {release}"
         return {
             "project": project, "release": release,
-            "label": f"{project.capitalize()} {release}, replayed retro",
-            "as_of": run.computed_at, "synthetic": False, "sources": [SOURCE],
+            "label": f"{name}, public retro" if docs else f"{name}, replayed retro",
+            "as_of": run.computed_at, "synthetic": False, "sources": [*docs, SOURCE],
             "totals": run.totals(),
             "slips": [{**s.__dict__} for s in run.slips],
         }  # fmt: skip
