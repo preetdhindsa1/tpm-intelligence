@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 import threading
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -12,13 +14,16 @@ from agents.risk_analyst import NoteResult, risk_note
 from agents.updates import ExecUpdate, UpdateStore
 from api.service import ReleaseView
 from engine.assess import FeatureAssessment
+from modules.raid.store import RaidItem
 from verify.build import OddsFacts, build_fact_sheet
 from verify.claims import Claim
 from verify.facts import FactSheet
+from verify.raid_facts import raid_facts
 
 
-def fact_sheet_for(view: ReleaseView) -> FactSheet:
-    """Every citable fact for a computed release view (odds carry their validation status)."""
+def fact_sheet_for(view: ReleaseView, raid: Iterable[RaidItem] = ()) -> FactSheet:
+    """Every citable fact for a computed release view (odds carry their validation status),
+    plus the release's confirmed, open RAID items."""
     odds = {
         key: OddsFacts(
             probability=fc.probability,
@@ -30,7 +35,8 @@ def fact_sheet_for(view: ReleaseView) -> FactSheet:
         for key, fc in view.forecasts.items()
         if fc.status == "forecast"
     }
-    return build_fact_sheet(view.assessment, odds)
+    sheet = build_fact_sheet(view.assessment, odds)
+    return FactSheet([*sheet.values(), *raid_facts(raid)])
 
 
 @dataclass
@@ -40,7 +46,9 @@ class AIServices:
     gateway: Gateway | None = None
     notes: NoteStore | None = None
     updates: UpdateStore | None = None
-    _sheets: dict[tuple[str, int], FactSheet] = field(default_factory=dict)
+    # A release's RAID items (``release_key -> items``); None reads the RAID store.
+    raid: Callable[[str], list[RaidItem]] | None = None
+    _sheets: dict[tuple[Any, ...], FactSheet] = field(default_factory=dict)
     _lock: threading.Lock = field(default_factory=threading.Lock)
 
     def _ensure(self) -> tuple[Gateway, NoteStore, UpdateStore]:
@@ -60,12 +68,29 @@ class AIServices:
                 self.updates = self.updates or PostgresUpdateStore(factory)
             return self.gateway, self.notes, self.updates
 
+    def _raid_items(self, release_key: str) -> list[RaidItem]:
+        if self.raid is None:
+            from sqlalchemy.orm import sessionmaker
+
+            from modules.raid.postgres import PostgresRaidStore
+            from pipeline.store.session import make_engine
+
+            self.raid = PostgresRaidStore(sessionmaker(make_engine())).items
+        try:
+            return self.raid(release_key)
+        except Exception as exc:  # no database or no RAID table: no RAID facts, said in the log
+            logging.getLogger("api.ai").warning("RAID facts unavailable: %s", exc)
+            return []
+
     def sheet(self, view: ReleaseView) -> FactSheet:
-        """Fact sheet per (release, view version), cached."""
-        key = (view.assessment.release.key, view.version)
+        """Fact sheet per (release, view version, confirmed RAID state), cached."""
+        release = view.assessment.release.key
+        raid = self._raid_items(release)
+        state = tuple(sorted((i.raid_id or "", i.status, i.review, i.title) for i in raid))
+        key = (release, view.version, state)
         with self._lock:
             if key not in self._sheets:
-                self._sheets = {key: fact_sheet_for(view)}  # keep only the newest
+                self._sheets = {key: fact_sheet_for(view, raid)}  # keep only the newest
             return self._sheets[key]
 
     def risk_note(
