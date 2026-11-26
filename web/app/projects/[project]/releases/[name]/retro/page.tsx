@@ -1,7 +1,7 @@
 import { RetroView } from "@/components/retro/RetroView";
 import { ErrorState } from "@/components/states/States";
 import { ApiError } from "@/lib/api-http";
-import { fetchPatterns, fetchRetro, type Patterns, type Retro } from "@/lib/api-readiness";
+import { fetchPatterns, fetchRetro, fetchSaidVsShowed, type Patterns, type Retro, type SaidVsShowed } from "@/lib/api-readiness";
 import { releaseFromParams } from "@/lib/release-page";
 import { NOT_COMPUTED, isMissingRetro } from "@/lib/retro";
 
@@ -25,5 +25,11 @@ export default async function RetroPage({ params }: { params: Promise<{ project:
   } catch {
     patterns = null;
   }
-  return <RetroView retro={retro} patterns={patterns} />;
+  let said: SaidVsShowed | null = null;
+  try {
+    said = await fetchSaidVsShowed(release.project, release.name);
+  } catch {
+    said = null;
+  }
+  return <RetroView retro={retro} patterns={patterns} said={said} />;
 }
