@@ -101,6 +101,23 @@ ConversationSource = Annotated[
 ]
 
 
+ReadinessCriterion = Literal[
+    "code_merged", "no_critical_flags", "ci_green", "risks_owned", "docs_merged"
+]
+
+
+class ReadinessConfig(BaseModel):
+    """Which go/no-go rules apply to the team's releases (ADR-0032)."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    criteria: tuple[ReadinessCriterion, ...] = (
+        "code_merged", "no_critical_flags", "ci_green", "risks_owned", "docs_merged"
+    )  # fmt: skip
+    # Repos whose linked PRs are the feature's docs PRs. Empty: docs_merged is "unknown".
+    docs_repos: tuple[str, ...] = ()
+
+
 class TeamConfig(BaseModel):
     """One cross-functional team's plug-in definition.
 
@@ -133,6 +150,8 @@ class TeamConfig(BaseModel):
     # Public files that list the team's people ("owner/repo/path" on GitHub), read only to
     # mask names in meeting notes before extraction. Never stored (ADR-0030 addendum 4).
     people_sources: tuple[str, ...] = ()
+    # Release readiness rules (ADR-0032).
+    readiness: ReadinessConfig = ReadinessConfig()
 
     def calendar_path(self, *, relative_to: Path) -> Path:
         """Resolve the calendar file (paths are repo-root relative unless absolute)."""
