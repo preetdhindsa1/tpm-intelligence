@@ -27,7 +27,7 @@ const queue: RaidList = { project: "kubernetes", release: "v1.38", as_of: "2026-
 const summary: RaidSummary = {
   project: "kubernetes", release: "v1.38", as_of: "2026-11-25T21:00:00Z", synthetic: true,
   by_type: [{ type: "risk", suggested: 1, open: 1, in_progress: 0, closed: 0, superseded: 0, rejected: 0 }],
-  risks_without_owner: 0, waiting_for_review: 1,
+  risks_without_owner: 0, waiting_for_review: 1, sources: 1,
 };
 
 afterEach(cleanup);

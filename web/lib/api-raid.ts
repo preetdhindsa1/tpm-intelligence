@@ -40,6 +40,7 @@ export type RaidCount = { type: RaidType; suggested: number; open: number; in_pr
 export type RaidSummary = {
   project: string; release: string; as_of: string; synthetic: boolean;
   by_type: RaidCount[]; risks_without_owner: number; waiting_for_review: number;
+  sources: number;
 };
 export type RaidEdit = { title?: string; type?: RaidType; owner?: string; status?: RaidStatus; note?: string };
 

@@ -9,7 +9,7 @@ const summary: RaidSummary = {
     { type: "action", suggested: 0, open: 0, in_progress: 0, closed: 1, superseded: 0, rejected: 0 },
     { type: "question", suggested: 0, open: 0, in_progress: 0, closed: 0, superseded: 0, rejected: 1 },
   ],
-  risks_without_owner: 0, waiting_for_review: 2,
+  risks_without_owner: 0, waiting_for_review: 2, sources: 1,
 };
 
 describe("RAID review queue", () => {

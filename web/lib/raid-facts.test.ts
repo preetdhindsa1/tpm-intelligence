@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { RaidSummary } from "./api-raid";
-import { openRisks, raidFacts } from "./raid-facts";
+import { NO_MEETING_NOTES, openRisks, raidFacts } from "./raid-facts";
 
 const summary: RaidSummary = {
   project: "kubernetes", release: "v1.38", as_of: "2026-11-25T21:00:00Z", synthetic: true,
@@ -10,6 +10,7 @@ const summary: RaidSummary = {
   ],
   risks_without_owner: 0,
   waiting_for_review: 2,
+  sources: 1,
 };
 
 describe("RAID cockpit facts", () => {
@@ -20,5 +21,10 @@ describe("RAID cockpit facts", () => {
       { label: "Risks without an owner", count: 0 },
       { label: "Waiting for review", count: 2 },
     ]);
+  });
+
+  it("does not show zero counts when no meeting notes are connected", () => {
+    expect(raidFacts({ ...summary, sources: 0, risks_without_owner: 0, waiting_for_review: 0 })).toBeNull();
+    expect(NO_MEETING_NOTES).toBe("No meeting notes are connected for this release");
   });
 });
