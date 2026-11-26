@@ -18,7 +18,7 @@ export const STAGES: { n: string; stage: string; title: string; body: string; ta
   { n: "01", stage: "Plan", title: "Program setup", body: "Workstreams, owners, milestones and dependencies from GitHub or Jira.", tags: [{ text: "Live", tone: "live" }] },
   { n: "02", stage: "Build", title: "Live tracking + AI-native PDLC", body: "Plan vs real work, and how the pod of people, agents and bots builds and checks code.", tags: [{ text: "Live", tone: "live" }] },
   { n: "03", stage: "Verify", title: "Forecast + Decision Studio", body: "Scope is locked; the work is reviewed, tested and hardened. Odds each feature is ready, and simulations before you move people.", tags: [{ text: "Live · not validated", tone: "warn" }] },
-  { n: "04", stage: "Launch", title: "Verified updates + readiness", body: "Fact-checked exec updates today; go/no-go from real signals next.", tags: [{ text: "Live", tone: "live" }, { text: "Next", tone: "next" }] },
+  { n: "04", stage: "Launch", title: "Verified updates + readiness", body: "Fact-checked exec updates, and a go/no-go from the readiness signals.", tags: [{ text: "Live", tone: "live" }] },
   { n: "05", stage: "Learn", title: "Retros + RAID", body: "What slipped and when it was first visible; risks and decisions from meetings.", tags: [{ text: "Planned", tone: "planned" }] },
 ];
 

@@ -20,6 +20,7 @@ import {
   type PortfolioProgram,
 } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
+import { launchLearn, stageCaption, type LaunchLearn } from "@/lib/stages";
 import { programTitle } from "@/lib/names";
 
 export function PortfolioView({ data, stage }: { data: Portfolio; stage?: string | null }) {
@@ -39,7 +40,7 @@ export function PortfolioView({ data, stage }: { data: Portfolio; stage?: string
           </Link>
         </div>
       </header>
-      <ProgramTable programs={shown} skipped={data.skipped} filtered={Boolean(stage)} />
+      <ProgramTable programs={shown} skipped={data.skipped} coming={data.coming_next} filtered={Boolean(stage)} />
       <div className="grid gap-5 lg:grid-cols-3">
         <Waiting data={data} />
         <Across items={data.across_programs} />
@@ -72,7 +73,7 @@ function StageFilter({ current }: { current: string | null }) {
 
 const TH = "px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500";
 
-function ProgramTable({ programs, skipped, filtered }: { programs: PortfolioProgram[]; skipped: Portfolio["skipped"]; filtered: boolean }) {
+function ProgramTable({ programs, skipped, coming, filtered }: { programs: PortfolioProgram[]; skipped: Portfolio["skipped"]; coming: Portfolio["coming_next"]; filtered: boolean }) {
   if (programs.length === 0) {
     return filtered
       ? <EmptyState title="No program is in this stage" body="Choose All stages to see every program." />
@@ -106,7 +107,13 @@ function ProgramTable({ programs, skipped, filtered }: { programs: PortfolioProg
                   ))}
                 </td>
                 <td className="w-[28%] px-6 py-5">
-                  <StageBar stages={p.stage.stages} />
+                  <StageBar
+                    stages={p.stage.stages}
+                    modules={launchLearn(coming, {
+                      launch: releasePath(p.project, p.release, "/readiness"),
+                      learn: releasePath(p.project, p.release, "/retro"),
+                    })}
+                  />
                   <p className="mt-2 text-slate-600">{stageLine(p)}</p>
                 </td>
                 <td className="px-6 py-5">
@@ -139,16 +146,30 @@ function ProgramTable({ programs, skipped, filtered }: { programs: PortfolioProg
   );
 }
 
-function StageBar({ stages }: { stages: { name: string; status: string }[] }) {
-  const text = stages.map((s) => `${stageLabel(s.name)} ${s.status}`).join(", ");
+function StageBar({ stages, modules }: { stages: { name: string; status: string }[]; modules: LaunchLearn }) {
+  const captions = stages.map((s) => ({ name: s.name, ...stageCaption(s.name, s.status, modules) }));
+  const text = captions.map((s) => `${stageLabel(s.name)} ${s.text}`).join(", ");
   return (
-    <div className="flex gap-1.5" role="img" aria-label={text}>
-      {stages.map((s) => (
-        <span
-          key={s.name}
-          className={`h-2 flex-1 rounded-full ${s.status === "done" ? "bg-action" : s.status === "current" ? "bg-indigo-300" : "bg-slate-200"}`}
-        />
-      ))}
+    <div>
+      <div className="flex gap-1.5" role="img" aria-label={text}>
+        {stages.map((s) => (
+          <span
+            key={s.name}
+            className={`h-2 flex-1 rounded-full ${s.status === "done" ? "bg-action" : s.status === "current" ? "bg-indigo-300" : "bg-slate-200"}`}
+          />
+        ))}
+      </div>
+      <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-600">
+        {captions.filter((s) => s.name === "launch" || s.name === "learn").map((s) =>
+          s.href ? (
+            <Link key={s.name} href={s.href} className="font-semibold text-action hover:underline">
+              {stageLabel(s.name)} · {s.text}
+            </Link>
+          ) : (
+            <span key={s.name}>{stageLabel(s.name)} · {s.text}</span>
+          ),
+        )}
+      </p>
     </div>
   );
 }

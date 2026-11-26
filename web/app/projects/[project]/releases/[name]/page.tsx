@@ -23,6 +23,7 @@ import { RaidFacts } from "@/components/cockpit/RaidFacts";
 import { TimeMachine } from "@/components/cockpit/TimeMachine";
 import { stageOf } from "@/components/shell/model";
 import { dayMonth, keyStops, lifecycle, simValidationText, type KeyStop } from "@/lib/cockpit";
+import { launchLearn } from "@/lib/stages";
 
 export const dynamic = "force-dynamic";
 
@@ -45,11 +46,16 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
   const before = summary.phase === "before_freeze";
   const stage = stageOf(r, new Date(r.as_of));
   const machine = await timeMachine(project, name);
+  const coming = await api.portfolio().then((p) => p.coming_next).catch(() => []);
+  const modules = launchLearn(coming, {
+    launch: releasePath(project, name, "/readiness"),
+    learn: releasePath(project, name, "/retro"),
+  });
   const simText = sim && !sim.validated ? simValidationText(sim.validation, r.key) : null;
 
   return (
     <div className="space-y-5">
-      <LifecycleBar steps={lifecycle(r, r.as_of, stage, r.code_freeze_label)} />
+      <LifecycleBar steps={lifecycle(r, r.as_of, stage, r.code_freeze_label)} modules={modules} />
       <StatTiles summary={summary} />
       <RaidStrip project={project} release={name} />
       {machine && <TimeMachine {...machine} />}
