@@ -22,6 +22,7 @@ from starlette.concurrency import run_in_threadpool
 from api.ai import AIServices
 from api.auth import Actor, AuthConfig, identify, require_approver
 from api.live import DEBOUNCE_S, Updates, push_timing
+from api.readiness_schemas import LaneRetroOut, LaneRetroReportOut
 from api.schemas import (
     ClaimOutApi,
     DecisionIn,
@@ -132,6 +133,7 @@ def create_app(
     auth: AuthConfig | None = None,
     raid_data: Any = None,
     readiness_data: Callable[[Any], Any] | None = None,
+    retro_data: Any = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis.
 
@@ -207,9 +209,10 @@ def create_app(
 
     # Wave 5: readiness rules on the release view (#181, ADR-0032) when ``readiness_data``
     # (view -> StoreReadiness) is given or a database is configured; else the synthetic
-    # fixture. Retros stay synthetic until #182.
+    # fixture. Retros: stored replays (#182) on Postgres, else the fixture.
     data = readiness_data(view) if readiness_data else _default_readiness_data(view)
-    app.include_router(readiness_router(approver, data=data))
+    retros = retro_data if retro_data is not None else _default_retro_data()
+    app.include_router(readiness_router(approver, data=data, retro=retros))
 
     @app.get("/me", response_model=MeOut)
     async def me(who: Actor = Depends(acting)) -> MeOut:
@@ -289,6 +292,25 @@ def create_app(
             since=since,
         )
         return lab_out(report, project=project, lanes_configured=bool(team.author_lanes))
+
+    @app.get("/retro/lanes", response_model=LaneRetroReportOut)
+    async def retro_lanes(project: str = "tpm-intelligence") -> LaneRetroReportOut:
+        """This repo's UX v1 sprint retro per pod lane, from PR data (#182, ADR-0032)."""
+        from modules.retro.lanes import UX_V1_SPRINT, lane_retro
+
+        team = next((t for t in load_teams().values() if t.project == project), None)
+        if team is None or not team.author_lanes:
+            raise HTTPException(404, f"no pod lanes configured for {project}")
+        rows = [r for r in await run_in_threadpool(svc().releases)
+                if r.release.key.split(":", 1)[0] == project]  # fmt: skip
+        if not rows:
+            raise HTTPException(404, f"no release for {project}")
+        v = await view(rows[-1].release.name)
+        since, until = UX_V1_SPRINT
+        lanes = lane_retro(v.world, lane_specs(team.author_lanes), since, until)
+        return LaneRetroReportOut(project=project, label="UX v1 sprint (Wave 1)", since=since,
+                                  until=until, as_of=v.world.as_of, synthetic=False,
+                                  lanes=[LaneRetroOut(**x.__dict__) for x in lanes])  # fmt: skip
 
     @app.get("/releases/{name}/features/{number}", response_model=FeatureDetailOut)
     async def feature(name: str, number: int) -> FeatureDetailOut:
@@ -1013,6 +1035,29 @@ def _default_readiness_data(view: Any) -> Any:
 
     sessions = sessionmaker(make_engine())
     return StoreReadiness(view, PostgresRaidStore(sessions).items, PostgresDecisionLog(sessions))
+
+
+def _default_retro_data() -> Any:
+    """``StoreRetro`` on Postgres when ``DATABASE_URL`` is set; None (the fixture) otherwise."""
+    from pipeline.env import configured
+
+    if configured("DATABASE_URL") is None:
+        return None
+    from functools import cache
+
+    from sqlalchemy.orm import sessionmaker
+
+    from api.retro_store import StoreRetro
+    from modules.raid.postgres import PostgresRaidStore
+    from modules.retro.store import PostgresRetroStore
+    from pipeline.store.session import make_engine
+
+    @cache
+    def sessions() -> Any:
+        return sessionmaker(make_engine())
+
+    return StoreRetro(lambda: PostgresRetroStore(sessions()),
+                      lambda key: PostgresRaidStore(sessions()).items(key))  # fmt: skip
 
 
 def _default_snapshot_store() -> Any:

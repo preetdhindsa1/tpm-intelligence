@@ -85,6 +85,7 @@ class SlipOut(_Out):
     first_warning_at: datetime | None  # None: no warning before the slip
     first_warning_flag: str | None
     lead_time_days: float | None  # slipped_at - first_warning_at
+    moved_to: str | None = None  # the later release, for "moved"
 
 
 class RetroSourceOut(_Out):
@@ -99,6 +100,8 @@ class RetroTotalsOut(_Out):
     warned: int
     average_lead_time_days: float | None
     median_lead_time_days: float | None
+    planned: int | None = None  # features in the release at Enhancements Freeze or added later
+    warned_landed: int | None = None  # warned but landed: false alarms, shown next to "warned"
 
 
 class RetroOut(_Out):
@@ -159,3 +162,27 @@ class PatternsOut(_Out):
     min_group: int
     suppressed_groups: int  # groups under min_group, counted but not shown
     patterns: list[PatternOut]
+
+
+class LaneRetroOut(_Out):
+    """One pod lane (ADR-0023), never a login. ``small_sample``: under 10 merged PRs."""
+
+    lane: str
+    opened: int
+    merged: int
+    still_open: int
+    median_hours_to_merge: float | None
+    review_rounds_median: float | None
+    rework: int
+    ci_failed: int
+    small_sample: bool
+
+
+class LaneRetroReportOut(_Out):
+    project: str
+    label: str
+    since: datetime
+    until: datetime
+    as_of: datetime
+    synthetic: bool
+    lanes: list[LaneRetroOut]

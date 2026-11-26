@@ -697,3 +697,16 @@ class ReadinessDecisionRecord(Base):
     facts_as_of: Mapped[datetime] = mapped_column(_tz())
     verdict: Mapped[str] = mapped_column(String(16))
     by_login: Mapped[str] = mapped_column(String(64))
+
+
+class RetroRunRecord(Base):
+    """One computed retro (migration 0012, ADR-0032 addendum 2). Append-only."""
+
+    __tablename__ = "retro_runs"
+    __table_args__ = (Index("ix_retro_runs_release_key", "release_key", "id"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    release_key: Mapped[str] = mapped_column(String(128))
+    computed_at: Mapped[datetime] = mapped_column(_tz())
+    model_version: Mapped[str] = mapped_column(String(32))
+    body: Mapped[dict[str, Any]] = mapped_column(JSONB)

@@ -2,8 +2,8 @@
 
 Readiness comes from ``data`` (``StoreReadiness``: the rules on the release view, with an
 append-only decision log) when given; without it, a synthetic fixture whose responses say
-``"synthetic": true`` and whose decisions live in this process only. Retros stay synthetic
-until #182.
+``"synthetic": true`` and whose decisions live in this process only. Retros come from ``retro``
+(``StoreRetro``: stored replays and RAID items) when given, else the same kind of fixture.
 """
 
 from __future__ import annotations
@@ -75,6 +75,7 @@ def readiness_router(
     approver: Callable[[Request], Awaitable[Any]],
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
     data: Any = None,
+    retro: Any = None,
 ) -> APIRouter:
     """Readiness and retro endpoints. ``approver`` is the app's sign-in dependency."""
     router = APIRouter(tags=["readiness", "retro"])
@@ -121,13 +122,19 @@ def readiness_router(
         return readiness(release)
 
     @router.get("/retro", response_model=RetroOut)
-    async def get_retro() -> RetroOut:
+    async def get_retro(project: str = "kubernetes", release: str = "v1.37") -> RetroOut:
         """What slipped, and when the platform first warned (as-of replay)."""
+        if retro is not None:
+            return RetroOut.model_validate(retro.retro(project, release))
         return RetroOut.model_validate({**_retro(), "as_of": now()})
 
     @router.get("/retro/said-vs-showed", response_model=SaidVsShowedOut)
-    async def said_vs_showed() -> SaidVsShowedOut:
+    async def said_vs_showed(
+        project: str = "kubernetes", release: str = "v1.38"
+    ) -> SaidVsShowedOut:
         """RAID items from each meeting next to the forecast snapshot of the same date."""
+        if retro is not None:
+            return SaidVsShowedOut.model_validate(retro.said_vs_showed(project, release))
         row = {
             "date": _T - timedelta(days=7),
             "said": [{"item_id": 4, "raid_id": None, "type": "risk",
@@ -140,8 +147,10 @@ def readiness_router(
         )
 
     @router.get("/retro/patterns", response_model=PatternsOut)
-    async def patterns() -> PatternsOut:
+    async def patterns(project: str = "kubernetes") -> PatternsOut:
         """Patterns per pool across releases; groups under 10 are counted, not shown."""
+        if retro is not None:
+            return PatternsOut.model_validate(retro.patterns(project))
         p = {"pool": "sig/node", "pattern": "late_main_pr",
              "text": _SYN + "main PRs opened in the last 14 days before Code Freeze",
              "value": 0.4, "n": 25, "releases": ["v1.36", "v1.37"]}  # fmt: skip
