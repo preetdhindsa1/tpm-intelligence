@@ -15,7 +15,7 @@ from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from starlette.concurrency import run_in_threadpool
@@ -54,6 +54,13 @@ from api.schemas import (
     UpdateWarningOut,
 )
 from api.service import ReleaseService, ReleaseView
+from api.tenants import (
+    MemoryDirectory,
+    PostgresDirectory,
+    TenantDirectory,
+    check_access,
+    requested_tenant,
+)
 from api.views import (
     dependencies_out,
     feature_detail,
@@ -73,6 +80,7 @@ from engine.assess import FeatureAssessment
 from engine.forecast import DEFAULT_FORECAST, model_version
 from engine.lab import lab_report
 from engine.portfolio import LabFacts, portfolio
+from pipeline.store.tenancy import DEMO, current_tenant, in_tenant, tenant_sessions, use_tenant
 
 SERVICE_NAME = "tpm-api"
 # A live stream ends after this long and the browser reconnects (EventSource does so by
@@ -135,6 +143,7 @@ def create_app(
     raid_data: Any = None,
     readiness_data: Callable[[Any], Any] | None = None,
     retro_data: Any = None,
+    tenants: TenantDirectory | None = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis.
 
@@ -158,6 +167,33 @@ def create_app(
         # from the browser directly; CORS covers reads and the live-update stream.
         allow_headers=["*"],
     )
+
+    directory: dict[str, TenantDirectory] = {}
+
+    def tenant_directory() -> TenantDirectory:
+        if "d" not in directory:
+            directory["d"] = tenants or _default_tenant_directory()
+        return directory["d"]
+
+    @app.middleware("http")
+    async def tenant_scope(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        """Every request runs for one tenant (ADR-0034): the demo unless ``X-TPM-Tenant``
+        names another, which needs a signed-in member. Sessions opened while it runs are
+        scoped to that tenant."""
+        try:
+            tenant = requested_tenant(request)
+            login = None
+            if tenant != DEMO:
+                actor = await identify(request, auth_config)
+                login = actor.login if actor.signed_in else None
+            access = await run_in_threadpool(check_access, tenant, login, tenant_directory())
+        except HTTPException as exc:
+            return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+        request.state.access = access
+        with use_tenant(access.tenant):
+            return await call_next(request)
 
     @app.middleware("http")
     async def security_headers(
@@ -187,7 +223,16 @@ def create_app(
     }
     ai_services = ai or AIServices()
 
+    services: dict[str, ReleaseService] = {}  # private tenants' views, never the demo's
+
     def svc() -> ReleaseService:
+        tenant = current_tenant.get()
+        if tenant is None:  # outside a request or a job: refuse rather than guess
+            raise RuntimeError("no tenant for this release service call")
+        if tenant != DEMO:
+            if tenant not in services:
+                services[tenant] = _default_service(tenant)
+            return services[tenant]
         if state["service"] is None:
             state["service"] = _default_service()
         result: ReleaseService = state["service"]
@@ -601,9 +646,16 @@ def create_app(
         """A person rejects: the suggestion is hidden from the feature for good."""
         return await _decide_link(name, suggestion_id, body, confirm=False, who=who)
 
+    sims: dict[str, Any] = {}  # private tenants' simulators (their caches are per tenant)
+
     def simulator() -> Any:
         from api.simulation import SimulatorService
 
+        tenant = current_tenant.get() or DEMO
+        if tenant != DEMO:
+            if tenant not in sims:
+                sims[tenant] = SimulatorService(_default_sim_store())
+            return sims[tenant]
         if state["sim"] is None:
             store = state["sim_store"] or _default_sim_store()
             state["sim"] = SimulatorService(store)
@@ -779,7 +831,8 @@ def create_app(
     async def dependencies(name: str, include_removed: bool = False) -> Response:
         """Feature-to-feature dependencies: shared PRs, stated "depends on", waiting PRs."""
         v = await view(name)
-        key = (v.assessment.release.key, v.version, v.computed_at, include_removed)
+        key = (current_tenant.get(), v.assessment.release.key, v.version, v.computed_at,
+               include_removed)  # fmt: skip
         body = dependencies_cache.get(key)
         if body is None:
             body = await run_in_threadpool(
@@ -1009,7 +1062,9 @@ def _sse(event: str, data: dict[str, Any]) -> str:
     return f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
 
-def _default_service() -> ReleaseService:
+def _default_service(tenant: str = DEMO) -> ReleaseService:
+    """The Postgres-backed release service for one tenant; its sessions always work for that
+    tenant, even from its background threads (ADR-0034)."""
     from sqlalchemy.orm import sessionmaker
 
     from agents.link_store import PostgresLinkSuggestionStore, engine_links
@@ -1017,14 +1072,28 @@ def _default_service() -> ReleaseService:
     from api.snapshots import PostgresSnapshotStore, recorder
     from pipeline.store.session import make_engine
 
-    factory = sessionmaker(make_engine())
+    factory = tenant_sessions(sessionmaker(make_engine()), tenant)
     links = PostgresLinkSuggestionStore(factory)
     return ReleaseService(
         PostgresEventSource(factory),
         extra_links=lambda key: engine_links(links.list(key)),
         # The day's forecast is recorded once, append-only, for the unseen test (ADR-0015).
         on_computed=recorder(PostgresSnapshotStore(factory)),
+        tenant=tenant,
     )
+
+
+def _default_tenant_directory() -> TenantDirectory:
+    """Tenants from Postgres when ``DATABASE_URL`` is set; otherwise the demo only."""
+    from pipeline.env import configured
+
+    if configured("DATABASE_URL") is None:
+        return MemoryDirectory()
+    from sqlalchemy.orm import sessionmaker
+
+    from pipeline.store.session import make_engine
+
+    return PostgresDirectory(sessionmaker(make_engine()))
 
 
 def _default_raid_data() -> Any:
@@ -1143,7 +1212,9 @@ def main() -> None:
         updates = local
     app = create_app(cors_origins=origins, updates=updates)
     # Warm in the background so the server starts accepting requests at once.
-    threading.Thread(target=app.state.warm_on_boot, name="warm-on-boot", daemon=True).start()
+    threading.Thread(
+        target=in_tenant(DEMO, app.state.warm_on_boot), name="warm-on-boot", daemon=True
+    ).start()
     try:
         uvicorn.run(
             app,

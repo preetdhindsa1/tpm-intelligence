@@ -9,6 +9,8 @@ from contextlib import contextmanager
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+import pipeline.store.tenancy  # noqa: F401  (registers the per-transaction tenant hook)
+
 DEFAULT_URL = "postgresql+psycopg://tpm:tpm@localhost:5432/tpm"
 
 

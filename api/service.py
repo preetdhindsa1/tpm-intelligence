@@ -46,6 +46,7 @@ from engine.projection import ReleaseInfo, World, project
 from engine.recalibrate import Recalibration, fit
 from linker.rules import LinkCandidate
 from pipeline.events import NormalizedEvent, PullRequestObserved, ReleaseObserved
+from pipeline.store.tenancy import DEMO, in_tenant, valid
 
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -155,7 +156,11 @@ class ReleaseService:
         extra_links: Callable[[str], Sequence[LinkCandidate]] | None = None,
         on_computed: Callable[[ReleaseView], None] | None = None,
         warm_window: timedelta = timedelta(minutes=15),
+        tenant: str = DEMO,
     ) -> None:
+        # Background threads lose the request's context, so they run for this tenant
+        # explicitly (ADR-0034).
+        self.tenant = valid(tenant)
         self._source = source
         self._project = project_name
         self._forecast = forecast
@@ -376,7 +381,9 @@ class ReleaseService:
                 except Exception:
                     logger.exception("release view warmer failed")
 
-        self._warmer = threading.Thread(target=loop, name="release-warmer", daemon=True)
+        self._warmer = threading.Thread(
+            target=in_tenant(self.tenant, loop), name="release-warmer", daemon=True
+        )
         self._warmer.start()
 
     def stop_warmer(self) -> None:
@@ -406,7 +413,9 @@ class ReleaseService:
                 with self._refreshing_guard:
                     self._refreshing.discard(key)
 
-        threading.Thread(target=run, name=f"recompute-{key}", daemon=True).start()
+        threading.Thread(
+            target=in_tenant(self.tenant, run), name=f"recompute-{key}", daemon=True
+        ).start()
 
     def _compute_locked(self, key: str) -> ReleaseView:
         with self._key_lock(key):

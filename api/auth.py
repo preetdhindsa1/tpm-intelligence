@@ -10,6 +10,9 @@ which checks the GitHub sign-in (Auth.js) and forwards the call with:
     X-TPM-Time:      Unix seconds
     X-TPM-Signature: hex HMAC-SHA256(secret, user \\n time \\n METHOD \\n path \\n sha256(body))
 
+Version 2 (``X-TPM-Signature-Version: 2``, ADR-0034) appends ``\\n tenant``, the tenant in
+``X-TPM-Tenant`` (the demo when absent). Version 1 is accepted for the public demo only.
+
 The API recomputes the signature with the shared secret, rejects it after
 ``MAX_AGE`` seconds, and checks the login against ``APPROVERS``. The API is the only
 place that enforces permissions; the web app only decides what to show.
@@ -32,6 +35,8 @@ from dataclasses import dataclass
 from typing import Literal
 
 from fastapi import HTTPException, Request
+
+from pipeline.store.tenancy import DEMO
 
 MAX_AGE = 300  # seconds a signature stays valid
 LOCAL_LOGIN = "local"
@@ -77,10 +82,22 @@ class Actor:
 ANONYMOUS = Actor("anonymous", approver=False, signed_in=False)
 
 
-def signature(secret: bytes, user: str, ts: str, method: str, path: str, body: bytes) -> str:
-    """The HMAC the web app sends and the API checks."""
+def signature(
+    secret: bytes,
+    user: str,
+    ts: str,
+    method: str,
+    path: str,
+    body: bytes,
+    tenant: str | None = None,
+) -> str:
+    """The HMAC the web app sends and the API checks. Version 2 adds the tenant as a sixth
+    line (ADR-0034), so a signature for one tenant cannot be replayed against another."""
     digest = hashlib.sha256(body).hexdigest()
-    message = "\n".join([user, ts, method.upper(), path, digest]).encode()
+    lines = [user, ts, method.upper(), path, digest]
+    if tenant is not None:
+        lines.append(tenant)
+    message = "\n".join(lines).encode()
     return hmac.new(secret, message, hashlib.sha256).hexdigest()
 
 
@@ -108,12 +125,23 @@ async def identify(
         raise HTTPException(401, "bad signature time") from exc
     if age > MAX_AGE:
         raise HTTPException(401, "signature expired")
+    version = request.headers.get("x-tpm-signature-version", "1").strip()
+    named = (request.headers.get("x-tpm-tenant") or "").strip() or DEMO
+    if version == "2":
+        tenant: str | None = named
+    elif version == "1" and named == DEMO:
+        tenant = None  # version 1 covers the public demo only
+    else:
+        raise HTTPException(401, "this request needs a version 2 signature")
     expected = signature(
-        config.secret, user, ts, request.method, _path(request), await request.body()
+        config.secret, user, ts, request.method, _path(request), await request.body(), tenant
     )
     if not hmac.compare_digest(expected, sig):
         raise HTTPException(401, "bad signature")
     login = user.lower()
+    access = getattr(request.state, "access", None)
+    if access is not None and access.tenant != DEMO:  # a private tenant: its members' roles
+        return Actor(login, approver=access.approver, signed_in=True)
     return Actor(login, approver=login in config.approvers, signed_in=True)
 
 

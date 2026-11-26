@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from pipeline.events import NormalizedEvent
 from pipeline.queue import BatchStore, EventConsumer, Handler, Transport
+from pipeline.store.tenancy import cli_tenant, in_tenant
 
 SERVICE_NAME = "tpm-worker"
 SUBSCRIPTION = "worker"
@@ -153,7 +154,9 @@ def start_in_background(
                 logger.exception("in-process worker failed; retrying in 5 s")
                 stop.wait(5)
 
-    threading.Thread(target=loop, name="worker", daemon=True).start()
+    # One tenant per worker for now: TPM_TENANT, else the demo. Tenant-aware consumption
+    # (the tenant in each message's attributes) comes with the connector framework (#233).
+    threading.Thread(target=in_tenant(cli_tenant(), loop), name="worker", daemon=True).start()
     return stop
 
 
@@ -187,4 +190,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    from pipeline.store.tenancy import cli_tenant, use_tenant
+
+    with use_tenant(cli_tenant()):  # TPM_TENANT, else the public demo (ADR-0034)
+        main()

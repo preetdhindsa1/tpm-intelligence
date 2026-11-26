@@ -24,3 +24,13 @@ def spans() -> Iterator[InMemorySpanExporter]:
     _EXPORTER.clear()
     yield _EXPORTER
     _EXPORTER.clear()
+
+
+@pytest.fixture(autouse=True)
+def demo_tenant() -> Iterator[None]:
+    """Tests run for the public demo tenant, as the jobs and the API do by default
+    (ADR-0034). Tests of the no-tenant case reset it themselves."""
+    from pipeline.store.tenancy import DEMO, use_tenant
+
+    with use_tenant(DEMO):
+        yield

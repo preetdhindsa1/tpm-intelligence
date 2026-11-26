@@ -86,11 +86,17 @@ class _Timestamps:
     )
 
 
+# The session's tenant (pipeline/store/tenancy.py). A write from a session with no tenant
+# fails on NOT NULL (ADR-0034, migration 0014). NULLIF: a pooled connection that once ran a
+# scoped transaction reads the setting as '' afterwards, not as missing.
+TENANT_DEFAULT = text("NULLIF(current_setting('app.tenant_id', true), '')")
+
+
 class _Tenant:
     """Every row belongs to one tenant (ADR-0034). Existing rows are the public ``demo``."""
 
     tenant_id: Mapped[str] = mapped_column(
-        String(32), ForeignKey("tenants.id"), server_default=text("'demo'"), index=True
+        String(32), ForeignKey("tenants.id"), server_default=TENANT_DEFAULT, index=True
     )
 
 
@@ -427,7 +433,7 @@ class SyncCursor(Base):
     __table_args__ = (CheckConstraint("consecutive_failures >= 0", name="failures_non_negative"),)
 
     tenant_id: Mapped[str] = mapped_column(
-        String(32), ForeignKey("tenants.id"), server_default=text("'demo'"), primary_key=True
+        String(32), ForeignKey("tenants.id"), server_default=TENANT_DEFAULT, primary_key=True
     )
     stream: Mapped[str] = mapped_column(String(256), primary_key=True)
     cursor: Mapped[str | None] = mapped_column(Text)  # e.g. max updated_at seen
@@ -473,7 +479,7 @@ class AIResult(Base):
     __tablename__ = "ai_results"
 
     tenant_id: Mapped[str] = mapped_column(
-        String(32), ForeignKey("tenants.id"), server_default=text("'demo'"), primary_key=True
+        String(32), ForeignKey("tenants.id"), server_default=TENANT_DEFAULT, primary_key=True
     )
     fingerprint: Mapped[str] = mapped_column(String(64), primary_key=True)
     task: Mapped[str] = mapped_column(String(64))
