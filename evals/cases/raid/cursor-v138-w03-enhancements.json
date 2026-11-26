@@ -1,0 +1,54 @@
+{
+ "id": "cursor-v138-w03-enhancements",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-16",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Enhancements (APAC: [participant] / [participant], EMEA: [participant] / [participant]):\n      * Current Status: Yellow\n      * Release Tracking Board: https://github.com/orgs/kubernetes/projects/269\n      * Metrics: \n      * Total KEPs on the board = 82\n      * By stage:\n      * Alpha: 40\n      * Beta: 31\n      * Stable: 11\n      * Deprecation: 0\n      * By status:\n      * Tracked for PRR freeze: 9\n      * At risk for PRR freeze: 5\n      * Updates:\n      * SIG reachout has been fully completed.\n      * Scheduled the Enhancements Team Onboarding on 9/17 [participant].\n      * Start sending PRR Freeze reminders.",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "At risk for PRR freeze: 5",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "decision",
+   "quote": "Scheduled the Enhancements Team Onboarding on 9/17 [participant].",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "action",
+   "quote": "Start sending PRR Freeze reminders.",
+   "owner": "Enhancements"
+  }
+ ],
+ "optional": [
+  {
+   "type": "issue",
+   "quote": "At risk for PRR freeze: 5",
+   "owner": "Enhancements"
+  },
+  {
+   "type": "risk",
+   "quote": "Current Status: Yellow",
+   "owner": "Enhancements"
+  }
+ ]
+}

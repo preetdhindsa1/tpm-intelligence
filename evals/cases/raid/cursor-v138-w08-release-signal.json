@@ -1,0 +1,38 @@
+{
+ "id": "cursor-v138-w08-release-signal",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-10-21",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * Release Signal (APAC: [participant]/ [participant], EMEA:[participant]/ [participant]):\n   * Current Status: Green\nOur signal is  :red_circle:  no-go because we have the following flaky tests which is on mater-blocker board are awaiting signal:\n   * [sig-scheduling] TestCPGScheduling: PodGroup/CompositePodGroup \"Scheduled\" condition sometimes never set https://kubernetes.slack.com/archives/C09TP78DV/p1792461883916159\n   * [sig k8s-infra] gce-cos-default-master kubetest.Up https://kubernetes.slack.com/archives/CCK68P2Q2/p1792550827096359\n   *    * Internal Team Assignment Sheet\n   * CI Signal Board\n   * Bug Triage Board\n   * Release blocking Issues (0)\n   * Release blocking PRs (0)\n   * Query: open non-test/flake k/k issues for v1.38 (4)\n   * priority/critical-urgent issues (0)\n   * priority/important-soon issues (0)\n   * Query: open k/k PRs for v1.38 (7)\n   * priority/critical-urgent PRs (0)\n   * priority/important-soon PRs (1)\n   * Query: ALL open k/k issues for v1.38 (4) (incl. this query (0)) \n   * Updates:\n   * ",
+ "expected": [
+  {
+   "type": "issue",
+   "quote": "[sig-scheduling] TestCPGScheduling: PodGroup/CompositePodGroup \"Scheduled\" condition sometimes never set https://kubernetes.slack.com/archives/C09TP78DV/p1792461883916159",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "[sig k8s-infra] gce-cos-default-master kubetest.Up https://kubernetes.slack.com/archives/CCK68P2Q2/p1792550827096359",
+   "owner": "Release Signal"
+  }
+ ],
+ "optional": []
+}

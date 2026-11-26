@@ -1,5 +1,5 @@
 {
- "id": "cursor-v138-w02-board-link",
+ "id": "cursor-v138-w03-release-branch-management",
  "seed": false,
  "independent": true,
  "author": "cursor-agent",
@@ -8,9 +8,9 @@
  "source": {
   "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
   "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
-  "meeting_date": "2026-09-09",
-  "fetched_at": "2026-11-26T22:20:00Z",
-  "note": "Excerpt from a v1.38 meeting the seed cases do not use. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+  "meeting_date": "2026-09-16",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
  },
  "teams": [
   "Enhancements",
@@ -21,7 +21,7 @@
   "Subproject Leads",
   "Release Lead"
  ],
- "notes": "Walk Project Board",
+ "notes": "      * Release Branch Management ([participant] / [participant]):\n      * Current Status: Green\n      * Progress issue\n      * Team accesses checked\n      * Cut assignments done",
  "expected": [],
  "optional": []
 }
