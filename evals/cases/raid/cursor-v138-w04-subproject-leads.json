@@ -1,0 +1,49 @@
+{
+ "id": "cursor-v138-w04-subproject-leads",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-23",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Subproject Leads ([participant] / [participant], [participant] / [participant]): \n      * One or two people left for shadow onboarding, one of whom I will ask [participant] to handle for timezone coverage\n      * Let me know if there are any outstanding PRs, questions, or issues",
+ "expected": [
+  {
+   "type": "action",
+   "quote": "One or two people left for shadow onboarding, one of whom I will ask [participant] to handle for timezone coverage",
+   "owner": "Subproject Leads"
+  },
+  {
+   "type": "question",
+   "quote": "Let me know if there are any outstanding PRs, questions, or issues",
+   "owner": "Subproject Leads"
+  }
+ ],
+ "optional": [
+  {
+   "type": "risk",
+   "quote": "One or two people left for shadow onboarding, one of whom I will ask [participant] to handle for timezone coverage",
+   "owner": "Subproject Leads"
+  },
+  {
+   "type": "action",
+   "quote": "Let me know if there are any outstanding PRs, questions, or issues",
+   "owner": "Subproject Leads"
+  }
+ ]
+}

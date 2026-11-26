@@ -1,0 +1,39 @@
+{
+ "id": "cursor-v138-w01-enhancements",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-02",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Enhancements ([participant] / [participant]):\n      * Current Status: Yellow\n      * Release Tracking Board: https://github.com/orgs/kubernetes/projects/269\n      * Metrics: \n      * Total KEPs on the board = 5\n      * Updates:\n      * Shadow selection is progressing.\n      * Created the v1.38 enhancement dashboard.\n      * https://github.com/orgs/kubernetes/projects/269\n      * Call for enhancement email is ready. It will be sent out after this meeting.",
+ "expected": [
+  {
+   "type": "action",
+   "quote": "Call for enhancement email is ready. It will be sent out after this meeting.",
+   "owner": "Enhancements"
+  }
+ ],
+ "optional": [
+  {
+   "type": "risk",
+   "quote": "Current Status: Yellow",
+   "owner": "Enhancements"
+  }
+ ]
+}
