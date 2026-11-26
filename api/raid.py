@@ -223,6 +223,19 @@ def summary(items: list[dict[str, Any]]) -> dict[str, Any]:
 # ---- routes ---------------------------------------------------------------------------------
 
 
+def conversation_sources(project: str, release: str) -> int:
+    """Conversation sources a team configures for this release (or for every release)."""
+    from connectors.load import load_teams
+
+    return sum(
+        1
+        for t in load_teams().values()
+        if t.project == project
+        for c in t.conversations
+        if c.release in (None, release)
+    )
+
+
 def raid_router(
     approver: Callable[[Request], Awaitable[Any]],
     data: Any = None,
@@ -261,9 +274,11 @@ def raid_router(
 
     @router.get("/raid/summary", response_model=RaidSummaryOut)
     async def raid_summary(project: str = "kubernetes", release: str = "v1.38") -> RaidSummaryOut:
-        """Counts by type and state, risks without an owner, items waiting for review."""
+        """Counts by type and state, risks without an owner, items waiting for review, and
+        how many notes sources feed them (0: nothing connected, counts are not measured)."""
         counts = summary(raid.all_items(f"{project}:{release}"))
-        return RaidSummaryOut.model_validate({**scope(project, release), **counts})
+        n = 1 if fake else conversation_sources(project, release)
+        return RaidSummaryOut.model_validate({**scope(project, release), **counts, "sources": n})
 
     @router.get("/raid/{item_id}/history", response_model=RaidHistoryOut)
     async def raid_history(item_id: int) -> RaidHistoryOut:

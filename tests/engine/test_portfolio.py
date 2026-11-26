@@ -196,3 +196,22 @@ def test_empty_portfolio() -> None:
     assert body["programs"] == []
     assert body["as_of"] == NOW
     assert body["totals"]["waiting_on_you"] == 0
+
+
+def test_raid_items_waiting_come_after_link_suggestions() -> None:
+    from dataclasses import replace
+
+    body = portfolio([replace(K, raid_suggested=1)], [], NOW, frozenset({"raid"}))
+    assert [i["kind"] for i in body["waiting_on_you"]] == [
+        "approve_exec_update", "review_link_suggestions", "review_raid",
+    ]  # fmt: skip
+    assert body["waiting_on_you"][2]["label"] == "1 RAID item waiting for review · v1.38"
+    assert [m["status"] for m in body["coming_next"]] == ["live", "planned", "planned"]
+
+
+def test_raid_alone_is_the_next_decision() -> None:
+    from dataclasses import replace
+
+    row = program(replace(KAFKA, raid_suggested=4))
+    assert row["next_decision"] == {"kind": "review_raid", "label": "Review RAID items",
+                                    "count": 4, "ref": None}  # fmt: skip

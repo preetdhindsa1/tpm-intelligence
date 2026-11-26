@@ -164,9 +164,15 @@ Postgres) the API serves the synthetic fixture below, `"synthetic": true`.
     }
   ],
   "risks_without_owner": 0,
-  "waiting_for_review": 2
+  "waiting_for_review": 2,
+  "sources": 1
 }
 ```
+
+`sources` (#225) is the number of notes and retro sources configured for the release. `0`
+means no conversations are connected: every count is then 0 because nothing was read, so
+show "No meeting notes are connected for this release", never "0 risks". The synthetic
+fixture reports 1.
 
 ### GET /raid/{item_id}/history
 

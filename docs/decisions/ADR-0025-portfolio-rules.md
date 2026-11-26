@@ -161,3 +161,19 @@ keeps the approval count. The row's facts carry both (`approved_merged`, plus
 
 **Trade-off.** "Human review" includes a comment by the owner without the agent marker line
 (the pod rule). That is how the PDLC page counts it, so the pages now agree.
+
+## Addendum 3 (2026-11-26): RAID waits on a person; modules report live from data (#225)
+
+- **Rule 5 gains `review_raid`.** A program with suggested RAID items waits on a person to
+  review them. The kind order is now `approve_exec_update`, `review_link_suggestions`,
+  `review_raid`, `classify_prs`: RAID items come from AI extraction and stay suggested until
+  someone confirms them, like link suggestions (CLAUDE.md principle 2). The count is the
+  number of suggested items for the program's current release. A RAID store that cannot be
+  read puts `RAID items could not be read` in `skipped` and keeps the row.
+- **`coming_next[].status` comes from data**, not a fixed list: `live` when the module has
+  real data (RAID: a stored item for any program's current release; readiness: the rules on
+  the real store; retro: any stored replay), else `planned`. Synthetic fixtures never count,
+  so a local run without a database still says `planned`.
+- **Why in the API:** the web had started building the RAID row and hiding RAID from
+  "coming next" itself (#223). Portfolio rules live here so every client shows the same
+  facts.
