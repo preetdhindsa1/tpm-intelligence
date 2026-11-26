@@ -150,7 +150,7 @@ def _assess(
     config: RuleConfig,
 ) -> FeatureAssessment:
     pr_keys = [k for k in links.verified_prs(f.key) if k in world.pull_requests]
-    main = main_pr(pr_keys, world, links, f.key)
+    main = main_pr(pr_keys, world, links, f.key, release.code_freeze_at, release_scoped=True)
     summaries: list[PRSummary] = []
     for key in pr_keys:
         pr = world.pull_requests[key]

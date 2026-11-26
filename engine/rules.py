@@ -23,6 +23,10 @@ largest SIGs, so it carried no signal (decision 2026-11-21).
 
 The "main PR" is the linked PR the author marked as the implementation (KEP number in the
 title or an "implements ... KEP-N" phrase), else the most recently opened verified PR.
+For the rule flags and assessments the candidates come first from PRs opened before the
+release's Code Freeze and not closed without merging, then from PRs not closed without
+merging, then from all (ADR-0032 addendum 5): a long-lived KEP links PRs from every stage,
+and its newest PR is often next-stage work or an abandoned attempt.
 """
 
 from __future__ import annotations
@@ -72,12 +76,27 @@ class Flag:
 
 
 def main_pr(
-    pr_keys: Sequence[str], world: World, links: ReleaseLinks, feature_key: str
+    pr_keys: Sequence[str],
+    world: World,
+    links: ReleaseLinks,
+    feature_key: str,
+    freeze: datetime | None = None,
+    *,
+    release_scoped: bool = False,
 ) -> PullRequest | None:
-    """The implementation PR for a feature (see module docstring)."""
+    """The implementation PR for a feature (see module docstring).
+
+    ``release_scoped``: choose among PRs opened before ``freeze`` and not closed without
+    merging, if any; else among PRs not closed without merging; else among all. Off, the
+    choice is the one the backtested odds model uses (ADR-0005), unchanged.
+    """
     prs = [world.pull_requests[k] for k in pr_keys if k in world.pull_requests]
     if not prs:
         return None
+    if release_scoped:
+        live = [pr for pr in prs if pr.state != "closed"]
+        before = [pr for pr in live if freeze is not None and pr.created_at < freeze]
+        prs = before or live or prs
     declared = [
         pr
         for pr in prs
@@ -123,7 +142,7 @@ def evaluate_feature(
     flags: list[Flag] = []
     now, freeze = world.as_of, release.code_freeze_at
     pr_keys = [k for k in links.verified_prs(feature.key) if k in world.pull_requests]
-    main = main_pr(pr_keys, world, links, feature.key)
+    main = main_pr(pr_keys, world, links, feature.key, freeze, release_scoped=True)
 
     if feature.tracked and not pr_keys:
         flags.append(
