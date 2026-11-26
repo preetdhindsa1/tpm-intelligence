@@ -96,8 +96,52 @@ export function approvalNotes(project: string, skipped: Skipped[]): string[] {
 export function decisionHref(project: string, release: string, kind: string): string | null {
   if (kind === "approve_exec_update") return releasePath(project, release, "/update");
   if (kind === "review_link_suggestions") return releasePath(project, release, "/links");
+  if (kind === "review_raid") return releasePath(project, release, "/raid");
   if (kind === "classify_prs") return "/lab";
   return null;
+}
+
+/** RAID is live, so it is not a planned module. Other modules stay as the API sent them. */
+export function comingNextItems(items: ComingNext[]): ComingNext[] {
+  return items.filter((item) => item.module !== "raid");
+}
+
+const NEXT_LINE: Record<string, string> = {
+  readiness: "a go/no-go from real signals before launch",
+  retro: "a retro that shows when each slip was first visible",
+};
+
+/** One sentence for the modules still planned. RAID is not one of them. */
+export function comingNextBlurb(items: ComingNext[]): string {
+  const lines = comingNextItems(items).flatMap((item) => (NEXT_LINE[item.module] ? [NEXT_LINE[item.module]] : []));
+  if (lines.length === 0) return "";
+  const sentence = lines.length === 1 ? lines[0] : `${lines.slice(0, -1).join(", ")} and ${lines[lines.length - 1]}`;
+  return `${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}.`;
+}
+
+/** A waiting row for one program. The count is `waiting_for_review` from GET /raid/summary. Zero adds no row. */
+export function raidWaitingItem(program: Pick<PortfolioProgram, "key" | "display_name" | "release">, waitingForReview: number): WaitingItem | null {
+  if (waitingForReview <= 0) return null;
+  const noun = waitingForReview === 1 ? "item" : "items";
+  return {
+    kind: "review_raid",
+    program_key: program.key,
+    label: `${program.display_name} ${program.release} · ${waitingForReview} RAID ${noun} waiting for review`,
+    count: waitingForReview,
+  };
+}
+
+/** Portfolio waiting rows plus one RAID row per program that has items waiting. A program already listed is not repeated. */
+export function withRaidWaiting(items: WaitingItem[], programs: Pick<PortfolioProgram, "key" | "display_name" | "release">[], counts: { key: string; waiting_for_review: number }[]): WaitingItem[] {
+  const listed = new Set(items.filter((item) => item.kind === "review_raid").map((item) => item.program_key));
+  const extra = programs.flatMap((program) => {
+    if (listed.has(program.key)) return [];
+    const count = counts.find((row) => row.key === program.key);
+    if (!count) return [];
+    const item = raidWaitingItem(program, count.waiting_for_review);
+    return item ? [item] : [];
+  });
+  return [...items, ...extra];
 }
 
 const TOOL: Record<string, string> = { github: "GitHub", jira: "Jira", gitlab: "GitLab", linear: "Linear" };
@@ -155,7 +199,7 @@ export function bottleneckText(b: PortfolioProgram["bottleneck"]): string | null
   return bottleneckTag(b) === b.headline ? b.detail : (b.detail ?? b.headline);
 }
 
-const VERB: Record<string, string> = { approve_exec_update: "Review", review_link_suggestions: "Confirm", classify_prs: "Classify" };
+const VERB: Record<string, string> = { approve_exec_update: "Review", review_link_suggestions: "Confirm", review_raid: "Review", classify_prs: "Classify" };
 
 /** The action word on a waiting row. */
 export function waitingVerb(kind: string): string {

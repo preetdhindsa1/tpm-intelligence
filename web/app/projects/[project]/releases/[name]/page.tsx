@@ -12,11 +12,14 @@ import { LiveRefresh } from "@/components/LiveRefresh";
 import { OddsCell } from "@/components/Odds";
 import { OddsPanel } from "@/components/OddsPanel";
 import { api, SECTION_TITLES, type ExecUpdate, type Summary } from "@/lib/api";
+import { fetchRaidSummary, type RaidSummary } from "@/lib/api-raid";
+import { ApiError } from "@/lib/api-http";
 import { briefToShow, outcomeRows } from "@/lib/dashboard";
 import { recordedLabel } from "@/lib/delay";
 import { ErrorState } from "@/components/states/States";
 import { errorDetail } from "@/lib/errors";
 import { LifecycleBar } from "@/components/cockpit/LifecycleBar";
+import { RaidFacts } from "@/components/cockpit/RaidFacts";
 import { TimeMachine } from "@/components/cockpit/TimeMachine";
 import { stageOf } from "@/components/shell/model";
 import { dayMonth, keyStops, lifecycle, simValidationText, type KeyStop } from "@/lib/cockpit";
@@ -48,6 +51,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
     <div className="space-y-5">
       <LifecycleBar steps={lifecycle(r, r.as_of, stage, r.code_freeze_label)} />
       <StatTiles summary={summary} />
+      <RaidStrip project={project} release={name} />
       {machine && <TimeMachine {...machine} />}
 
       <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-3">
@@ -117,6 +121,21 @@ function Card({ eyebrow, title, children }: { eyebrow: string; title: string; ch
       <div className="mt-4 flex-1">{children}</div>
     </section>
   );
+}
+
+async function RaidStrip({ project, release }: { project: string; release: string }) {
+  let summary: RaidSummary | null = null;
+  try {
+    summary = await fetchRaidSummary(project, release);
+  } catch (e) {
+    const missing = e instanceof ApiError && e.status === 404;
+    return (
+      <p className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-600">
+        {missing ? "No RAID summary for this release yet." : "RAID summary could not be loaded."}
+      </p>
+    );
+  }
+  return <RaidFacts summary={summary} href={releasePath(project, release, "/raid")} />;
 }
 
 function StatTiles({ summary: s }: { summary: Summary }) {
