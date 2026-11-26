@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { approvalNotes, bottleneckTag, bottleneckText, comingNextBlurb, comingNextItems, decisionHref, missingRows, portfolioSummary, programSubline, raidWaitingItem, stageLabel, stageLine, statusLabel, waitingVerb, withRaidWaiting } from "./portfolio";
+import { approvalNotes, bottleneckTag, bottleneckText, comingNextBlurb, decisionHref, missingRows, portfolioSummary, programSubline, stageLabel, stageLine, statusLabel, waitingVerb } from "./portfolio";
 
 describe("portfolio display", () => {
   it("uses the contract stage names and says when the stage is unknown", () => {
@@ -9,8 +9,9 @@ describe("portfolio display", () => {
     expect(stageLabel("other")).toBe("other");
   });
 
-  it("shows Planned for a planned module and leaves other statuses unchanged", () => {
+  it("shows Planned and Live, and leaves other statuses unchanged", () => {
     expect(statusLabel("planned")).toBe("Planned");
+    expect(statusLabel("live")).toBe("Live");
     expect(statusLabel("preview")).toBe("preview");
   });
 
@@ -38,31 +39,21 @@ describe("portfolio display", () => {
     expect(decisionHref("kubernetes", "v1.38", "approve_exec_update")).toBe("/projects/kubernetes/releases/v1.38/update");
     expect(decisionHref("kubernetes", "v1.38", "review_link_suggestions")).toBe("/projects/kubernetes/releases/v1.38/links");
     expect(decisionHref("kubernetes", "v1.38", "review_raid")).toBe("/projects/kubernetes/releases/v1.38/raid");
+    expect(waitingVerb("review_raid")).toBe("Review");
     expect(decisionHref("tpm-intelligence", "Phase 3", "classify_prs")).toBe("/lab");
     expect(decisionHref("kubernetes", "v1.38", "simulate")).toBeNull();
   });
 
-  it("adds a RAID waiting row from the summary count and drops RAID from coming next", () => {
-    const program = { key: "kubernetes:v1.38", display_name: "Kubernetes", release: "v1.38" };
-    const row = raidWaitingItem(program, 2);
-    expect(row).toEqual({
-      kind: "review_raid",
-      program_key: "kubernetes:v1.38",
-      label: "Kubernetes v1.38 · 2 RAID items waiting for review",
-      count: 2,
-    });
-    expect(raidWaitingItem(program, 0)).toBeNull();
-    const waiting = withRaidWaiting([], [program], [{ key: program.key, waiting_for_review: 2 }]);
-    expect(waiting).toEqual([row]);
-    expect(withRaidWaiting(waiting, [program], [{ key: program.key, waiting_for_review: 9 }])).toEqual(waiting);
-    const planned = [
-      { module: "raid", name: "RAID tracker", status: "planned" },
+  it("describes only the modules the API still marks planned", () => {
+    const modules = [
+      { module: "raid", name: "RAID tracker", status: "live" },
       { module: "readiness", name: "Release readiness", status: "planned" },
       { module: "retro", name: "Retro insights", status: "planned" },
     ];
-    expect(comingNextItems(planned).map((item) => item.module)).toEqual(["readiness", "retro"]);
-    expect(comingNextBlurb(planned)).toBe("A go/no-go from real signals before launch and a retro that shows when each slip was first visible.");
-    expect(comingNextBlurb(planned)).not.toContain("RAID");
+    expect(comingNextBlurb(modules)).toBe("A go/no-go from real signals before launch and a retro that shows when each slip was first visible.");
+    expect(comingNextBlurb(modules.map((item) => ({ ...item, status: "planned" })))).toBe(
+      "A RAID log from meeting notes, confirmed before it counts, a go/no-go from real signals before launch and a retro that shows when each slip was first visible.",
+    );
   });
 });
 

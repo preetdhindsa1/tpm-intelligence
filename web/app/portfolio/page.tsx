@@ -1,8 +1,7 @@
 import { PortfolioView } from "@/components/portfolio/PortfolioView";
 import { ErrorState } from "@/components/states/States";
 import { api } from "@/lib/api";
-import { fetchRaidSummary } from "@/lib/api-raid";
-import { STAGE_NAMES, withRaidWaiting, type Portfolio } from "@/lib/portfolio";
+import { STAGE_NAMES, type Portfolio } from "@/lib/portfolio";
 
 export const dynamic = "force-dynamic";
 
@@ -23,22 +22,9 @@ export default async function PortfolioPage({ searchParams }: { searchParams: Pr
       </div>
     );
   }
-  const counts = (
-    await Promise.all(
-      data.programs.map(async (program) => {
-        try {
-          const summary = await fetchRaidSummary(program.project, program.release);
-          return { key: program.key, waiting_for_review: summary.waiting_for_review };
-        } catch {
-          return null;
-        }
-      }),
-    )
-  ).filter((row): row is { key: string; waiting_for_review: number } => row !== null);
-  const waiting = withRaidWaiting(data.waiting_on_you, data.programs, counts);
   return (
     <PortfolioView
-      data={{ ...data, waiting_on_you: waiting, totals: { ...data.totals, waiting_on_you: waiting.length } }}
+      data={data}
       stage={stage && STAGE_NAMES.includes(stage as (typeof STAGE_NAMES)[number]) ? stage : null}
     />
   );

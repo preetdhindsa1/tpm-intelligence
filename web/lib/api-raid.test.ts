@@ -38,7 +38,7 @@ describe("RAID contract", () => {
     stub({
       project: "kubernetes", release: "v1.38", as_of: "2026-11-25T21:00:00Z", synthetic: true,
       by_type: ["risk", "action", "issue", "decision", "question"].map((type) => ({ type, suggested: type === "risk" ? 2 : 0, open: type === "risk" || type === "decision" ? 1 : 0, in_progress: 0, closed: type === "action" ? 1 : 0, superseded: 0, rejected: type === "question" ? 1 : 0 })),
-      risks_without_owner: 0, waiting_for_review: 2,
+      risks_without_owner: 0, waiting_for_review: 2, sources: 1,
     });
     expect(await fetchRaidSummary("kubernetes", "v1.38")).toMatchObject({ synthetic: true, risks_without_owner: 0, waiting_for_review: 2 });
   });

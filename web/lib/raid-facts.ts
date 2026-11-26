@@ -8,8 +8,12 @@ export function openRisks(summary: RaidSummary): number {
 
 export type RaidFact = { label: string; count: number };
 
-/** The three cockpit lines, in display order. */
-export function raidFacts(summary: RaidSummary): RaidFact[] {
+/** Shown instead of counts when the release has no notes source. Zeros would read as "no risks". */
+export const NO_MEETING_NOTES = "No meeting notes are connected for this release";
+
+/** The three cockpit lines, in display order. Null when nothing is connected. */
+export function raidFacts(summary: RaidSummary): RaidFact[] | null {
+  if (summary.sources === 0) return null;
   return [
     { label: "Open risks", count: openRisks(summary) },
     { label: "Risks without an owner", count: summary.risks_without_owner },
