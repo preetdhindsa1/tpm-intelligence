@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { act, messageFor, serverGet } from "./api-http";
+import { act, browserGet, messageFor, serverGet } from "./api-http";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -20,6 +20,8 @@ describe("API errors and the signed route", () => {
     expect(String(fetch.mock.calls[0][0])).toContain("/raid?project=kubernetes&release=v1.38");
     await act("/raid/4/confirm", {});
     expect(String(fetch.mock.calls[1][0])).toBe("/api/act/raid/4/confirm");
+    await browserGet("/raid/1/history");
+    expect(String(fetch.mock.calls[2][0])).toBe("/api/act/raid/1/history");
     fetch.mockResolvedValueOnce(new Response(JSON.stringify({ detail: "octocat is not an approver" }), { status: 403 }));
     await expect(act("/raid/4/reject", { reason: "no" })).rejects.toMatchObject({ status: 403 });
   });

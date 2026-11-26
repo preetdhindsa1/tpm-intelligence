@@ -46,6 +46,11 @@ export function serverGet<T>(path: string): Promise<T> {
   return fetch(`${serverApiUrl}${path}`, { cache: "no-store" }).then((res) => read<T>(res));
 }
 
+/** Browser GET through the signed same-origin route. */
+export function browserGet<T>(path: string): Promise<T> {
+  return fetch(`/api/act${path}`, { cache: "no-store" }).then((res) => read<T>(res));
+}
+
 /** Browser POST through the signed same-origin route. */
 export function act<T>(path: string, body: unknown): Promise<T> {
   return fetch(`/api/act${path}`, {

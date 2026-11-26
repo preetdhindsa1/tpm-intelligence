@@ -1,8 +1,8 @@
-// RAID review queue for one release. The tracker is a later tab; this page is the queue.
-import { ReviewQueue } from "@/components/raid/ReviewQueue";
+// RAID for one release: the review queue and the confirmed tracker.
+import { RaidTabs } from "@/components/raid/RaidTabs";
 import { ErrorState } from "@/components/states/States";
 import { ApiError } from "@/lib/api-http";
-import { fetchRaidQueue, fetchRaidSummary, type RaidList, type RaidSummary } from "@/lib/api-raid";
+import { fetchRaid, fetchRaidQueue, fetchRaidSummary, type RaidList, type RaidSummary } from "@/lib/api-raid";
 import { releaseFromParams } from "@/lib/release-page";
 
 export const dynamic = "force-dynamic";
@@ -11,14 +11,16 @@ export default async function RaidPage({ params }: { params: Promise<{ project: 
   const release = await releaseFromParams(params);
   let queue: RaidList;
   let summary: RaidSummary;
+  let tracker: RaidList;
   try {
-    [queue, summary] = await Promise.all([
+    [queue, summary, tracker] = await Promise.all([
       fetchRaidQueue(release.project, release.name),
       fetchRaidSummary(release.project, release.name),
+      fetchRaid(release.project, release.name),
     ]);
   } catch (e) {
     const detail = e instanceof ApiError ? e.message : "The RAID API failed";
     return <ErrorState title="RAID could not be loaded" detail={detail} />;
   }
-  return <ReviewQueue queue={queue} summary={summary} />;
+  return <RaidTabs queue={queue} summary={summary} tracker={tracker} />;
 }
