@@ -74,6 +74,9 @@ Also done in Phase 3: rename to Program Intelligence Platform (ADR-0021); foreca
 | Simulator validation (±20% on replay medians) | ❌ | Model work on review waits |
 | Simulator p95 < 2 s for a standard scenario | 🟡 server p95 1.39 s, 9 of 10 runs under 2 s, max 3.06 s (n = 10, 2026-11-24) | More runs; dashboard tile (#62) |
 | Forecast on an unseen release (v1.39, scored as it runs) | ⬜ | Time: v1.39 starts after v1.38 ships (2026-12-16) |
+| Readiness backtest (ADR-0032 rule) | ❌ failed 2026-11-26: recall 0.593, false no-go 0.257 | A better main-PR choice in the engine, then a re-run |
+| RAID extractor gate on independent labels | 🟡 report-only | 30 cases labelled by someone other than the developer |
+| Retro warnings worth acting on | ❌ 47 of 66 v1.37 features that landed were warned | Tune `review_waiting` against the readiness backtest, not lead time |
 | Availability 99.5% | 🟡 uptime checks live since 2026-11-24 (#36); needs a month of data | Time |
 
 ## Not scheduled yet (from CLAUDE.md, no phase owns them)

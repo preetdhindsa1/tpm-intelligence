@@ -6,9 +6,11 @@ below is produced by the API's synthetic fixture and checked by `tests/api/test_
 
 ## Rules the page can rely on
 
-- **Synthetic until the store lands.** Until #180, every response has `"synthetic": true` and
-  every source is labelled synthetic. Show that on the page. Real items arrive with
-  `"synthetic": false` and the same shape.
+- **Real items when the API has a database** (#180): `"synthetic": false`, sources link
+  to the public meeting-notes document. Without a database the synthetic fixture answers
+  (`"synthetic": true`, every source labelled synthetic). Show `synthetic` on the page;
+  both have the same shape. An empty list is real too: the cloud has no items until the
+  extraction job runs there.
 - **AI never confirms.** The extractor creates items with `review: "suggested"`. Only a person
   (signed in, on the approver allowlist, ADR-0016) confirms, edits or rejects.
 - **RAID ID** `{WORKSTREAM}-{TYPE}-{SEQ}` (types R risk, A action, I issue, D decision,
