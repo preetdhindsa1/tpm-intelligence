@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class GitHubPlanning(BaseModel):
@@ -45,12 +45,38 @@ class LaneRule(BaseModel):
     trailers: tuple[str, ...] = ()
 
 
-class CalendarRef(BaseModel):
-    """Path to a release calendar YAML (github_poller/release_calendar.yaml shape)."""
+class InlineRelease(BaseModel):
+    """One release's dates, written in the config itself (ADR-0035): a tenant that signs up
+    has no calendar file in this repository."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    path: str
+    name: str
+    cycle_start: AwareDatetime
+    enhancements_freeze: AwareDatetime
+    code_freeze: AwareDatetime
+    release: AwareDatetime
+    source_url: str = ""
+
+
+class CalendarRef(BaseModel):
+    """The team's release calendar: a YAML file in this repository (the demo teams), or the
+    releases inline (other tenants). Exactly one of the two."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    path: str | None = None
+    releases: tuple[InlineRelease, ...] = ()
+
+    @model_validator(mode="after")
+    def _one_source(self) -> CalendarRef:
+        if (self.path is None) == (not self.releases):
+            raise ValueError("calendar needs exactly one of path or releases")
+        for r in self.releases:
+            dates = [r.cycle_start, r.enhancements_freeze, r.code_freeze, r.release]
+            if dates != sorted(dates):
+                raise ValueError(f"{r.name}: dates out of order")
+        return self
 
 
 class _Conversation(BaseModel):
@@ -174,6 +200,8 @@ class TeamConfig(BaseModel):
 
     def calendar_path(self, *, relative_to: Path) -> Path:
         """Resolve the calendar file (paths are repo-root relative unless absolute)."""
+        if self.calendar.path is None:
+            raise ValueError(f"team {self.id} has its releases inline, not in a file")
         path = Path(self.calendar.path)
         if path.is_absolute():
             return path

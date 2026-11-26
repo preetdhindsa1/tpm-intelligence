@@ -14,7 +14,7 @@ import yaml
 from connectors.schema import TeamConfig
 
 if TYPE_CHECKING:
-    from collectors.github_poller.calendar import ReleaseDates
+    from collectors.github_poller.calendar import Calendar, ReleaseDates
 
 
 class _Key(Protocol):
@@ -150,20 +150,29 @@ def team_for_project(project: str) -> TeamConfig | None:
     return next((t for t in load_teams().values() if t.project == project), None)
 
 
-def release_plan(team: TeamConfig) -> dict[str, ReleaseDates]:
-    """Hand-entered release dates by name, from the team's calendar file ({} if none).
+def team_calendar(team: TeamConfig) -> Calendar | None:
+    """The team's release calendar: its inline releases, else its file (None if missing)."""
+    from collectors.github_poller.calendar import Calendar, ReleaseDates, load_calendar
 
-    For a Jira team the freeze dates come from here (#8); Jira gives the rest.
-    """
-    from collectors.github_poller.calendar import load_calendar
-
+    if team.calendar.releases:
+        return Calendar(project=team.project, releases=tuple(
+            ReleaseDates(**r.model_dump()) for r in team.calendar.releases))  # fmt: skip
     path = team.calendar_path(relative_to=teams_dir().parent.parent)
     if not path.is_file():
-        return {}
+        return None
     calendar = load_calendar(path)
     if calendar.project != team.project:
         raise ValueError(f"{path}: calendar project {calendar.project!r} is not {team.project!r}")
-    return {r.name: r for r in calendar.releases}
+    return calendar
+
+
+def release_plan(team: TeamConfig) -> dict[str, ReleaseDates]:
+    """Hand-entered release dates by name, from the team's calendar ({} if none).
+
+    For a Jira team the freeze dates come from here (#8); Jira gives the rest.
+    """
+    calendar = team_calendar(team)
+    return {r.name: r for r in calendar.releases} if calendar else {}
 
 
 def projects_owning(subject_key: str) -> set[str]:

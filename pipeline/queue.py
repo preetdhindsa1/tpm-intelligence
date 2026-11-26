@@ -82,12 +82,26 @@ class Transport(Protocol):
 
 
 def _event_attributes(event: NormalizedEvent) -> dict[str, str]:
+    from pipeline.store.tenancy import current_tenant
+
+    tenant = current_tenant.get()
+    if tenant is None:  # a collector must say whose data this is (ADR-0034)
+        raise RuntimeError("no tenant: cannot publish an event without one")
     return {
         "event_id": event.event_id,
         "event_type": event.event_type,
         "schema_version": str(event.schema_version),
         "source": event.source.value,
+        "tenant_id": tenant,
     }
+
+
+def message_tenant(message: ReceivedMessage) -> str:
+    """The tenant a message's event belongs to. Messages published before tenants existed
+    carry none, and they were all the public demo's."""
+    from pipeline.store.tenancy import DEMO, valid
+
+    return valid(message.attributes.get("tenant_id") or DEMO)
 
 
 @dataclass
@@ -163,7 +177,7 @@ class EventConsumer:
                 for message in messages:
                     self.transport.nack(self.topic, self.subscription, message)
                 return 0
-            stored = self._store_batch(self.batch, messages)
+            stored = self._store_batches(self.batch, messages)
             if stored is not None:
                 return stored
         handled = 0
@@ -174,6 +188,27 @@ class EventConsumer:
                 break
             handled += self._process(message)
         return handled
+
+    def _store_batches(self, batch: BatchStore, messages: Sequence[ReceivedMessage]) -> int | None:
+        """One batch per tenant, each stored for its own tenant (ADR-0034)."""
+        from pipeline.store.tenancy import use_tenant
+
+        groups: dict[str, list[ReceivedMessage]] = {}
+        try:
+            for message in messages:
+                groups.setdefault(message_tenant(message), []).append(message)
+        except ValueError:  # a malformed tenant: one at a time, so it dead-letters alone
+            return None
+        done = 0
+        for tenant, group in groups.items():
+            with use_tenant(tenant):
+                stored = self._store_batch(batch, group)
+            # A failed group falls back to one message at a time (retries, dead letters).
+            done += stored if stored is not None else self._one_by_one(group)
+        return done
+
+    def _one_by_one(self, messages: Sequence[ReceivedMessage]) -> int:
+        return sum(self._process(m) for m in messages)
 
     def _store_batch(self, batch: BatchStore, messages: Sequence[ReceivedMessage]) -> int | None:
         """Store and ack a batch at once; None means "fall back to one at a time"."""
@@ -214,8 +249,11 @@ class EventConsumer:
         start = time.perf_counter()
         with consume_span(self.transport.system, self.topic, self.subscription, message) as span:
             try:
+                from pipeline.store.tenancy import use_tenant
+
                 event = NormalizedEvent.from_bytes(message.data)
-                self.handler(event)
+                with use_tenant(message_tenant(message)):  # stored for the event's tenant
+                    self.handler(event)
             except Exception as exc:
                 span.record_exception(exc)
                 span.set_status(Status(StatusCode.ERROR, type(exc).__name__))

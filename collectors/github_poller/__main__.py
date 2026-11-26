@@ -4,6 +4,11 @@
     python -m collectors.github_poller --team kubernetes --release v1.38 --backfill
     python -m collectors.github_poller --team kafka --release 4.4.0 --backfill
     python -m collectors.github_poller --poll kubernetes=v1.38 --poll "tpm-intelligence=Phase 3"
+    python -m collectors.github_poller --all-tenants
+
+``--all-tenants`` (ADR-0035) polls every team of every private tenant, each under its own
+tenant and token, for the release its calendar says is current. One scheduled job covers
+every organization; the public demo keeps its own explicit ``--poll`` schedule.
 
 For a team that plans in Jira (Kafka, ADR-0018) only the code repo's PRs are synced,
 over the window the Jira version dates give (previous x.y.0 release to this release, or
@@ -21,7 +26,6 @@ import argparse
 import logging
 import sys
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 SERVICE_NAME = "tpm-github-poller"
@@ -76,7 +80,16 @@ def main(argv: list[str] | None = None) -> int:
         help="with --backfill: re-read PRs from this UTC date (YYYY-MM-DD) to now, for history "
         "before the release's cycle start (this repo's PRs predate Phase 3, 2026-11-25)",
     )
+    parser.add_argument(
+        "--all-tenants",
+        action="store_true",
+        help="poll every private tenant's teams (their current releases)",
+    )
     args = parser.parse_args(argv)
+    if args.all_tenants:
+        if args.poll or args.team or args.release:
+            parser.error("--all-tenants takes no --poll, --team or --release")
+        return _poll_all_tenants(backfill=args.backfill)
     try:
         polls = parse_polls(args.poll, args.team, args.release)
     except ValueError as err:
@@ -114,13 +127,68 @@ def main(argv: list[str] | None = None) -> int:
         telemetry.shutdown()
 
 
+def current_release(calendar: Any, now: datetime) -> str | None:
+    """The release whose cycle has started and that shipped at most a week ago, latest
+    first; None if no release is running (pure, for the all-tenant poll)."""
+    from datetime import timedelta
+
+    live = [r for r in calendar.releases
+            if r.cycle_start <= now <= r.release + timedelta(days=7)]  # fmt: skip
+    return max(live, key=lambda r: r.cycle_start).name if live else None
+
+
+def private_tenants() -> list[str]:
+    """Tenant ids other than the demo and the system tenant."""
+    from sqlalchemy import select
+    from sqlalchemy.orm import sessionmaker
+
+    from pipeline.store.models import Tenant
+    from pipeline.store.session import make_engine
+
+    with sessionmaker(make_engine())() as s:
+        ids = s.scalars(select(Tenant.id).where(Tenant.id.not_in(("demo", "system"))))
+        return sorted(ids)
+
+
+def _poll_all_tenants(*, backfill: bool, now: datetime | None = None) -> int:
+    """Every private tenant's teams, each for its tenant; one failure never stops the rest."""
+    from connectors.load import load_teams, team_calendar
+    from connectors.secrets import team_secret
+    from observability.telemetry import init_telemetry
+    from pipeline.store.tenancy import use_tenant
+
+    telemetry = init_telemetry(SERVICE_NAME)
+    logger = logging.getLogger("collectors.github_poller")
+    at = now or datetime.now(UTC)
+    worst = 0
+    try:
+        for tenant in private_tenants():
+            with use_tenant(tenant):
+                for team in load_teams().values():
+                    try:
+                        calendar = team_calendar(team)
+                        release = current_release(calendar, at) if calendar else None
+                        token = team_secret(team, "github", "GITHUB_TOKEN")
+                        if release is None or not token:
+                            why = "no current release" if release is None else "no token"
+                            logger.info("skip %s/%s: %s", tenant, team.id, why)
+                            continue
+                        code = _poll_team(team.id, release, token=token, backfill=backfill)
+                    except Exception:
+                        logger.exception("poll of %s/%s crashed", tenant, team.id)
+                        code = 1
+                    worst = max(worst, code)
+        return worst
+    finally:
+        telemetry.shutdown()
+
+
 def _poll_team(
     team_id: str, release: str, *, token: str, backfill: bool, since: datetime | None = None
 ) -> int:
     """Poll one team's release once. 0 ok, 1 a stream failed, 2 configuration error."""
     from sqlalchemy.orm import sessionmaker
 
-    from collectors.github_poller.calendar import load_calendar
     from collectors.github_poller.client import GitHubClient
     from collectors.github_poller.sync import GitHubPoller
     from pipeline.factory import create_transport
@@ -157,7 +225,12 @@ def _poll_team(
         stats = poller.run(backfill=backfill)
         return 1 if stats.failed_streams else 0
 
-    calendar = load_calendar(team.calendar_path(relative_to=Path.cwd()))
+    from connectors.load import team_calendar
+
+    calendar = team_calendar(team)  # inline releases for a tenant, else the YAML file
+    if calendar is None:
+        logger.error("team %s has no release calendar", team.id)
+        return 2
     logger.info(
         "polling team %s planning=%s code=%s link_pack=%s release=%s",
         team.id,
