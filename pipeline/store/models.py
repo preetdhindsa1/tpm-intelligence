@@ -110,6 +110,9 @@ class Tenant(Base):
     name: Mapped[str] = mapped_column(String(200))
     public: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+    # Usage limits (ADR-0035): the demo keeps $2/day (CLAUDE.md section 8).
+    ai_daily_budget_usd: Mapped[Decimal] = mapped_column(Numeric(8, 2), server_default="0.50")
+    max_teams: Mapped[int] = mapped_column(Integer, server_default="3")
 
 
 MEMBER_ROLES = ("reader", "approver", "owner")
@@ -142,6 +145,24 @@ class TeamConfigRecord(Base):
     config: Mapped[dict[str, Any]] = mapped_column(JSONB)
     version: Mapped[int] = mapped_column(Integer)
     updated_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
+class AuditRecord(Base):
+    """One admin action (ADR-0035). Append-only; the login is for audit, views show the role."""
+
+    __tablename__ = "audit_log"
+    __table_args__ = (Index("ix_audit_log_tenant_id", "tenant_id", "id"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("tenants.id"), server_default=TENANT_DEFAULT
+    )
+    at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+    actor_login: Mapped[str] = mapped_column(String(64))
+    actor_role: Mapped[str] = mapped_column(String(16))
+    action: Mapped[str] = mapped_column(String(48))
+    target: Mapped[str] = mapped_column(String(200))
+    details: Mapped[dict[str, Any]] = mapped_column(JSONB, server_default="{}")
 
 
 # ---------------------------------------------------------------- planning side

@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 from api.auth import AuthConfig, signature
 from api.main import create_app
 from api.tenants import MemoryDirectory, TenantInfo
+from connectors.admin import Limits, MemoryTenantAdmin
 from connectors.store import MemoryTeamConfigStore
 from pipeline.store.tenancy import DEMO
 from tests.api.test_auth import service
@@ -42,8 +43,10 @@ def h(user: str, method: str, path: str, body: bytes = b"", tenant: str = "acme"
 @pytest.fixture
 def api() -> tuple[TestClient, dict[str, MemoryTeamConfigStore]]:
     stores: dict[str, MemoryTeamConfigStore] = {}
+    admin = MemoryTenantAdmin(tenants={"acme": ("Acme", False, Limits(0.5, 3)),
+                                       "globex": ("Globex", False, Limits(0.5, 3))})  # fmt: skip
     app = create_app(
-        service=service(), auth=AUTH, tenants=DIRECTORY,
+        service=service(), auth=AUTH, tenants=DIRECTORY, tenant_admin=admin,
         team_configs=lambda t: stores.setdefault(t, MemoryTeamConfigStore()),
     )  # fmt: skip
     return TestClient(app), stores

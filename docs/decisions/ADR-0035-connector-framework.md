@@ -156,3 +156,33 @@ the existing gateway, now per tenant.
   - one scheduled poll per tenant.
 
   These are the next step of #233.
+
+
+## Addendum 2 (2026-11-27): tenants, members, audit, export, deletion, limits (#234)
+
+- **Migration 0017:**
+  - `audit_log` (append-only, under RLS);
+  - `tenants.ai_daily_budget_usd` (default $0.50; the demo $2.00) and `max_teams` (default 3;
+    the demo 50);
+  - a `system` tenant that holds the final "tenant deleted" entries.
+- **Deletion and the append-only rules.** The five append-only triggers (events, forecast
+  snapshots, readiness decisions, retro runs, audit log) now allow `DELETE` in one case:
+  the deletion function's own transaction, which sets `app.deleting_tenant` to the same
+  tenant its session is scoped to. `UPDATE` and `TRUNCATE` are still refused, and so is any
+  other `DELETE` (tested). Deletion removes the tenant's rows table by table, children first,
+  with an explicit `WHERE tenant_id = ...` as well as RLS (a superuser would bypass RLS),
+  then the tenant row. It leaves one `system` audit entry with the row count and no data.
+- **Export** streams one JSON line per row the tenant owns, read with the tenant set and an
+  explicit filter. The export itself is audited.
+- **Members:**
+  - roles are `reader`, `approver` and `owner`;
+  - an organization always keeps at least one owner (409);
+  - audit entries show the role, never the login.
+- **Creating organizations** is limited to `TENANT_CREATORS` (logins). It starts empty, so
+  creation stays closed until the owner opens it.
+- **AI budget per tenant.** The gateway takes a `cap()` for the current tenant: the demo's
+  $2/day from the settings, else the tenant's limit. Spend comes from `ai_usage` under RLS,
+  so cap and spend always belong to the same tenant. The API's fact-sheet cache key now
+  includes the tenant.
+- **Connector changes are audited**, with the new config (references only, never secret
+  values). Adding a team beyond `max_teams` is refused (409).

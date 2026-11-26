@@ -146,8 +146,13 @@ class Gateway:
         ledger: Ledger,
         client: MessagesClient | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+        cap: Callable[[], float] | None = None,
     ) -> None:
+        """``cap()`` is today's budget for the current tenant (ADR-0035); without it, the
+        settings' daily budget. The ledger's spend is already per tenant (row-level
+        security), so cap and spend always belong to the same tenant."""
         self.settings = settings
+        self._cap = cap or (lambda: settings.daily_budget_usd)
         self.ledger = ledger
         self._client = client
         self._clock = clock
@@ -161,7 +166,11 @@ class Gateway:
 
     def budget_fraction(self) -> float:
         """Share of today's cap spent."""
-        return self.ledger.spent_today(self._clock()) / self.settings.daily_budget_usd
+        return self.ledger.spent_today(self._clock()) / self.daily_cap()
+
+    def daily_cap(self) -> float:
+        """Today's AI budget for the current tenant."""
+        return self._cap()
 
     def run[T: BaseModel](
         self,
@@ -201,7 +210,7 @@ class Gateway:
             decision = decide(
                 spent=spent,
                 estimate=worst_case_cost(model, len(prompt.text) + len(user_text), task.max_tokens),
-                cap=self.settings.daily_budget_usd,
+                cap=self.daily_cap(),
                 essential=task.essential,
                 now=now,
                 last_nonessential_at=self.ledger.last_nonessential_at(now),
@@ -287,8 +296,8 @@ class Gateway:
         fraction = self.budget_fraction()
         _budget.set(fraction)
         state = budget_state(
-            fraction * self.settings.daily_budget_usd,
-            self.settings.daily_budget_usd,
+            fraction * self.daily_cap(),
+            self.daily_cap(),
             self.settings.slow_at,
         )
         if state is not BudgetState.NORMAL and rec.usages:

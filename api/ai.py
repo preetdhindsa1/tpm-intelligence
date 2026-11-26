@@ -15,6 +15,7 @@ from agents.updates import ExecUpdate, UpdateStore
 from api.service import ReleaseView
 from engine.assess import FeatureAssessment
 from modules.raid.store import RaidItem
+from pipeline.store.tenancy import DEMO, current_tenant
 from verify.build import OddsFacts, build_fact_sheet
 from verify.claims import Claim
 from verify.facts import FactSheet
@@ -37,6 +38,23 @@ def fact_sheet_for(view: ReleaseView, raid: Iterable[RaidItem] = ()) -> FactShee
     }
     sheet = build_fact_sheet(view.assessment, odds)
     return FactSheet([*sheet.values(), *raid_facts(raid)])
+
+
+def tenant_cap(settings: Any, factory: Any) -> Callable[[], float]:
+    """Today's AI budget for the current tenant (ADR-0035): the settings' cap for the public
+    demo ($2/day, CLAUDE.md section 8), the tenant's own limit otherwise."""
+
+    def cap() -> float:
+        tenant = current_tenant.get()
+        if tenant is None:
+            raise RuntimeError("no tenant: the AI budget is per tenant")
+        if tenant == DEMO:
+            return float(settings.daily_budget_usd)
+        from connectors.admin import PostgresTenantAdmin
+
+        return PostgresTenantAdmin(factory).limits(tenant).ai_daily_budget_usd
+
+    return cap
 
 
 @dataclass
@@ -63,7 +81,10 @@ class AIServices:
                 from pipeline.store.session import make_engine
 
                 factory: Any = sessionmaker(make_engine())
-                self.gateway = self.gateway or Gateway(AISettings(), PostgresLedger(factory))
+                settings = AISettings()
+                self.gateway = self.gateway or Gateway(
+                    settings, PostgresLedger(factory), cap=tenant_cap(settings, factory)
+                )
                 self.notes = self.notes or PostgresNoteStore(factory)
                 self.updates = self.updates or PostgresUpdateStore(factory)
             return self.gateway, self.notes, self.updates
@@ -87,7 +108,7 @@ class AIServices:
         release = view.assessment.release.key
         raid = self._raid_items(release)
         state = tuple(sorted((i.raid_id or "", i.status, i.review, i.title) for i in raid))
-        key = (release, view.version, state)
+        key = (current_tenant.get(), release, view.version, state)  # per tenant (ADR-0034)
         with self._lock:
             if key not in self._sheets:
                 self._sheets = {key: fact_sheet_for(view, raid)}  # keep only the newest

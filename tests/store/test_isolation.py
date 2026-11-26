@@ -125,3 +125,52 @@ def test_team_configs_are_per_tenant(app_engine: Engine) -> None:
         assert globex.delete("acme-web") is False  # cannot touch acme's row
     finally:
         acme.delete("acme-web")
+
+
+def test_deleting_a_tenant_removes_all_its_rows_and_nothing_else(app_engine: Engine) -> None:
+    from connectors.admin import PostgresTenantAdmin
+    from pipeline.events import Source, SubjectKind, SubjectRef, WorkItemLabelChanged, new_event
+    from pipeline.store.events_repo import append_events
+
+    factory = sessionmaker(app_engine)
+    admin = PostgresTenantAdmin(factory)
+    admin.create("doomed", "Doomed", "ada")
+    ref = SubjectRef(kind=SubjectKind.WORK_ITEM, source=Source.GITHUB,
+                     external_key="acme/web#1")  # fmt: skip
+    event = new_event(
+        source=Source.GITHUB,
+        subject=ref,
+        occurred_at=NOW,
+        observed_at=NOW,
+        identity=("x",),
+        payload=WorkItemLabelChanged(action="added", label="x"),
+    )  # type: ignore[arg-type]
+    for tenant in ("doomed", "demo"):
+        with use_tenant(tenant), factory() as s, s.begin():
+            append_events(s, [event])
+            s.add(_pr(77))
+    # An ordinary session still cannot delete history.
+    with (
+        use_tenant("doomed"),
+        factory() as s,
+        s.begin(),
+        pytest.raises(DBAPIError, match="append-only"),
+    ):
+        s.execute(text("DELETE FROM events"))
+    exported = list(admin.export("doomed"))
+    assert {line.split('"table": "')[1].split('"')[0] for line in exported} >= {
+        "events",
+        "pull_requests",
+    }
+    admin.delete("doomed", ("ada", "owner"))
+    with factory() as s:
+        assert s.scalar(text("SELECT count(*) FROM tenants WHERE id = 'doomed'")) == 0
+    with use_tenant("doomed"), factory() as s:
+        assert s.scalar(text("SELECT count(*) FROM events")) == 0
+    with use_tenant("demo"), factory() as s:  # the demo's copies are untouched
+        assert s.scalar(text("SELECT count(*) FROM pull_requests WHERE number = 77")) == 1
+        s.execute(text("DELETE FROM pull_requests WHERE number = 77"))
+        s.commit()
+    with use_tenant("system"), factory() as s:
+        actions = s.scalars(text("SELECT action FROM audit_log WHERE target = 'doomed'")).all()
+        assert actions == ["tenant_deleted"]
