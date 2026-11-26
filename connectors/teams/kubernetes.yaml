@@ -13,6 +13,12 @@ calendar:
   path: collectors/github_poller/release_calendar.yaml
 # Public release-team meeting notes (ADR-0030), linked from
 # kubernetes/sig-release/releases/release-1.38/links.md. Read with the Google Drive API.
+# Public lists of the release team and release managers. Read only to mask people's names
+# in the notes before RAID extraction (ADR-0030 addendum 4); names are never stored.
+people_sources:
+  - kubernetes/sig-release/releases/release-1.38/release-team.md
+  - kubernetes/sig-release/releases/release-1.37/release-team.md
+  - kubernetes/website/content/en/releases/release-managers.md
 conversations:
   - kind: google_doc
     document_id: 1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0

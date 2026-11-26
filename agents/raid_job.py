@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 import sys
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -78,10 +78,14 @@ def run_release(
     workstream: str,
     store: RaidStore,
     now: datetime,
+    known_names: Iterable[str] = (),
 ) -> JobReport:
-    """Extract every meeting; stops early (keeping what it has) if the budget pauses AI."""
+    """Extract every meeting; stops early (keeping what it has) if the budget pauses AI.
+
+    ``known_names`` adds people from the team's public lists to the names found in the notes.
+    """
     texts = [drop_roster(p["text"]) for p in payloads]
-    names = set().union(*(names_in(p["text"]) for p in payloads)) if payloads else set()
+    names = set(known_names).union(*(names_in(p["text"]) for p in payloads))
     teams = teams_in(mask_names(t, names) for t in texts)
     report = JobReport(release_key)
     with _tracer.start_as_current_span("raid.job", attributes={"raid.release": release_key}):
@@ -116,6 +120,8 @@ def main(argv: list[str] | None = None) -> int:
     from agents.prompts import load_prompt
     from agents.raid_extractor import TASK
     from agents.settings import AISettings
+    from collectors.notes.people import fetch_people
+    from connectors.load import team_for_project
     from modules.raid.postgres import PostgresRaidStore
     from modules.raid.store import MemoryRaidStore
     from observability.telemetry import init_telemetry
@@ -131,9 +137,12 @@ def main(argv: list[str] | None = None) -> int:
         sessions = sessionmaker(make_engine())
         gateway = Gateway(AISettings(), PostgresLedger(sessions))
         payloads = load_meetings(sessions, args.release)
+        team = team_for_project(args.release.split(":", 1)[0])
+        people = fetch_people(team.people_sources) if team else set()
         report = run_release(
             gateway, load_prompt(TASK.name), payloads, args.release, args.workstream,
             MemoryRaidStore() if args.dry_run else PostgresRaidStore(sessions), datetime.now(UTC),
+            people,
         )  # fmt: skip
         print(json.dumps(report.as_dict(), indent=1))
         return 1 if report.errors else 0
