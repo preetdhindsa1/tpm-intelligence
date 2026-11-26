@@ -62,3 +62,31 @@ def session(engine: Engine) -> Iterator[Session]:
         finally:
             sess.close()
             outer.rollback()
+
+
+APP_ROLE = "tpm_app_test"
+
+
+@pytest.fixture(scope="session")
+def app_engine(engine: Engine, db_url: str) -> Iterator[Engine]:
+    """An engine for a role with no superuser and no BYPASSRLS, like the cloud app user."""
+    password = uuid.uuid4().hex
+    # Role DDL cannot take bound parameters; APP_ROLE is a constant and the password a UUID.
+    exists = f"SELECT 1 FROM pg_roles WHERE rolname = '{APP_ROLE}'"  # noqa: S608
+    create = (
+        f"DO $$ BEGIN IF NOT EXISTS ({exists}) THEN "
+        f"CREATE ROLE {APP_ROLE} LOGIN NOSUPERUSER NOBYPASSRLS; END IF; END $$;"
+    )
+    with engine.begin() as conn:
+        conn.execute(text(create))
+        conn.execute(text(f"ALTER ROLE {APP_ROLE} PASSWORD '{password}'"))
+        conn.execute(text(f"GRANT USAGE ON SCHEMA public TO {APP_ROLE}"))
+        conn.execute(text(f"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public "
+                          f"TO {APP_ROLE}"))  # fmt: skip
+        conn.execute(text(f"GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO {APP_ROLE}"))
+        conn.execute(text("INSERT INTO tenants (id, name) VALUES ('acme', 'Acme'), "
+                          "('globex', 'Globex') ON CONFLICT DO NOTHING"))  # fmt: skip
+    url = make_url(db_url).set(username=APP_ROLE, password=password)
+    eng = create_engine(url)
+    yield eng
+    eng.dispose()

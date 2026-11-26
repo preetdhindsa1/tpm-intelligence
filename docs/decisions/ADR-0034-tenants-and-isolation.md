@@ -144,3 +144,43 @@ second tenant exists."
 ## AI vs rules
 
 No AI. Isolation is enforced by deterministic code and the database.
+
+## Addendum 1 (2026-11-27): how isolation is enforced and proven (#231, #232)
+
+- **Migrations.**
+  - 0013 adds the columns (default `'demo'`).
+  - 0014 switches the default to the session's tenant (`NULLIF(current_setting(...), '')`, so
+    a write with no tenant fails on NOT NULL).
+  - 0015 turns on row-level security with **FORCE** and one policy per table, `members`
+    included. The policy is `tenant_id = current_setting('app.tenant_id', true)`, for reads
+    and writes. `tenants` has no policy: it is read to resolve a request before any tenant is
+    set, and holds only names.
+- **No new database role for the cloud.** FORCE binds the table owner. On Cloud SQL the app
+  user (`tpm`) owns the tables but is not a superuser, so the policies apply to it as it
+  is. **To check after the deploy**: as `tpm`, with no tenant set,
+  `SELECT count(*) FROM events` must return 0. If Cloud SQL ever let that user bypass RLS,
+  the fallback is the separate `tpm_app` role from the decision above.
+- **Locally the Docker user is a superuser**, so it bypasses RLS. The app still scopes
+  every session, but the database backstop does not show locally. The proof is in CI:
+  `tests/store/test_isolation.py` and `test_isolation_api.py` connect as a role with
+  `NOSUPERUSER NOBYPASSRLS`.
+- **What the tests prove** (CI, real Postgres):
+  - every tenant table has forced RLS and a policy, and a new table without one fails the
+    test;
+  - each tenant reads only its rows; with no tenant, reads return nothing and writes fail;
+  - a tenant cannot write a row for another tenant, move one into it, or update another
+    tenant's rows;
+  - the same natural key in two tenants does not collide;
+  - **every GET route** in the OpenAPI schema (30 or more), called as the demo and as a
+    second tenant, returns none of the other tenant's markers and no 5xx. Each tenant's own
+    data does come back, so the check is not empty.
+- **Found while testing:**
+  - FastAPI 0.165 wraps included routers, so `app.routes` hid the RAID, readiness and retro
+    routes. The test reads the OpenAPI schema instead.
+  - A pooled connection reads the tenant setting as `''` after a scoped transaction ended,
+    hence `NULLIF`.
+- **Known gaps until #233:**
+  - The Portfolio lists the YAML teams for every tenant. Their data is still isolated: a
+    private tenant sees "no release yet" for them.
+  - The live-update hub announces "release changed" by release key alone, so a second
+    tenant tracking the same key may get a needless refresh. It carries no data.
