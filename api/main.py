@@ -131,6 +131,7 @@ def create_app(
     snapshot_store: Any = None,
     auth: AuthConfig | None = None,
     raid_data: Any = None,
+    readiness_data: Callable[[Any], Any] | None = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis.
 
@@ -169,10 +170,6 @@ def create_app(
     # Wave 4 RAID tracker: the RAID store when a database is configured, else the synthetic
     # fixture (ADR-0030, #180).
     app.include_router(raid_router(approver, raid_data or _default_raid_data()))
-    from api.readiness import readiness_router
-
-    # Wave 5 readiness and retros: synthetic fixtures until #181 and #182 (ADR-0032).
-    app.include_router(readiness_router(approver))
 
     simulations = asyncio.Semaphore(MAX_PARALLEL_SIMULATIONS)
     open_streams = {"n": 0}
@@ -205,6 +202,14 @@ def create_app(
         s.warm(s.current_release_keys())
 
     app.state.warm_on_boot = warm_on_boot
+
+    from api.readiness import readiness_router
+
+    # Wave 5: readiness rules on the release view (#181, ADR-0032) when ``readiness_data``
+    # (view -> StoreReadiness) is given or a database is configured; else the synthetic
+    # fixture. Retros stay synthetic until #182.
+    data = readiness_data(view) if readiness_data else _default_readiness_data(view)
+    app.include_router(readiness_router(approver, data=data))
 
     @app.get("/me", response_model=MeOut)
     async def me(who: Actor = Depends(acting)) -> MeOut:
@@ -991,6 +996,23 @@ def _default_raid_data() -> Any:
         if (doc := getattr(c, "document_id", None))
     }
     return StoreRaid(store, titles)
+
+
+def _default_readiness_data(view: Any) -> Any:
+    """``StoreReadiness`` on Postgres when ``DATABASE_URL`` is set; None (the fixture) otherwise."""
+    from pipeline.env import configured
+
+    if configured("DATABASE_URL") is None:
+        return None
+    from sqlalchemy.orm import sessionmaker
+
+    from api.readiness_store import StoreReadiness
+    from modules.raid.postgres import PostgresRaidStore
+    from modules.readiness.decisions import PostgresDecisionLog
+    from pipeline.store.session import make_engine
+
+    sessions = sessionmaker(make_engine())
+    return StoreReadiness(view, PostgresRaidStore(sessions).items, PostgresDecisionLog(sessions))
 
 
 def _default_snapshot_store() -> Any:

@@ -6,8 +6,12 @@ fixture and is checked by `tests/api/test_readiness.py`.
 
 ## Rules the pages can rely on
 
-- **Synthetic until the engines land.** Until #181 (readiness) and #182 (retro facts), every
-  response has `"synthetic": true`. Show that on the page. Real data keeps the same shape.
+- **Readiness is real data** when the API has a database (#181): `"synthetic": false`, the
+  team's criteria on the current release view, and an append-only decision log in
+  Postgres. Without a database it is the synthetic fixture (`"synthetic": true`). Retros
+  stay synthetic until #182. Show `synthetic` on the page; both have the same shape.
+- **Evidence links:** `url` is the GitHub page for a feature or PR ref, otherwise `null`
+  (RAID refs: open `/raid` for the item).
 - **Facts are rules, not AI.** Each criterion's `status` (`pass`, `fail`, `unknown`) and its
   evidence come from stored data. `unknown` means there is no data to decide; it is never a
   guess. `verdict` is `ready` when every criterion passes, `not_ready` when any fails,

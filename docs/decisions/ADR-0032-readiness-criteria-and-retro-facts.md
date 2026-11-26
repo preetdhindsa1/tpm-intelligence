@@ -76,3 +76,26 @@ The rule is fixed now so the result cannot shape it.
 - Exception evidence is re-adding after the freeze. The sig-release exceptions file is a
   better signal; it is the backtest's outcome record first, and joins the live rules only
   if the backtest supports it. `ci_green` over-counts optional checks, and says so.
+
+## Addendum 1: decision log and the API on real data (#181, 2026-11-26)
+
+- **Decision log** (`readiness_decisions`, migration 0011). A go/no-go call needs sign-in
+  on the approver allowlist (ADR-0016) and a note of 3+ characters. Each row stores:
+  - the decision and the note;
+  - the time;
+  - `facts_as_of`, the time of the readiness facts the person saw;
+  - `verdict`, what the rules said then;
+  - the login, for audit only. The API returns the role `approver`.
+
+  A database trigger refuses UPDATE and DELETE, as for the event log and forecast
+  snapshots.
+- **API:** when a database is configured, `GET /readiness?release=` runs the team's
+  criteria on the current release view and the RAID store. Each response has
+  `synthetic: false`. A GitHub feature or PR in the evidence links to its page.
+  - If the RAID store can't be read, `risks_owned` is `unknown` ("RAID items could not be
+    read"), never a pass. A RAID outage must not read as "no risks".
+  - Without a database, the synthetic fixture remains.
+- **AI summary:** optional, and not built yet; `summary` is `null`. When it is built, it
+  uses only these criteria's facts, and the fact checker checks each sentence.
+- **Validation:** `validated` stays `false` until the backtest (#184) passes the rule
+  above.

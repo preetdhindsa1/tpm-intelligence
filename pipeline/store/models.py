@@ -677,3 +677,23 @@ class RaidHistoryRecord(Base):
     changes: Mapped[dict[str, Any]] = mapped_column(JSONB, server_default="{}")
     reason: Mapped[str | None] = mapped_column(Text)
     by_login: Mapped[str | None] = mapped_column(String(64))
+
+
+class ReadinessDecisionRecord(Base):
+    """A go/no-go call (migration 0011, ADR-0032). Append-only; ``by_login`` is audit only."""
+
+    __tablename__ = "readiness_decisions"
+    __table_args__ = (
+        CheckConstraint(_in("decision", ("go", "no_go", "defer")), name="decision"),
+        CheckConstraint("length(trim(note)) >= 3", name="note"),
+        Index("ix_readiness_decisions_release_key", "release_key", "id"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    release_key: Mapped[str] = mapped_column(String(128))
+    decision: Mapped[str] = mapped_column(String(8))
+    note: Mapped[str] = mapped_column(Text)
+    decided_at: Mapped[datetime] = mapped_column(_tz())
+    facts_as_of: Mapped[datetime] = mapped_column(_tz())
+    verdict: Mapped[str] = mapped_column(String(16))
+    by_login: Mapped[str] = mapped_column(String(64))

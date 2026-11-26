@@ -28,6 +28,12 @@ NAMES = {
     "docs_merged": "Docs merged",
 }
 MAX_EVIDENCE = 25  # per criterion; ``count`` always has the full number
+_PHRASE = {
+    CodeStatus.NOT_MERGED: "is not merged",
+    CodeStatus.CLOSED_UNMERGED: "was closed without merging",
+    CodeStatus.MERGED_AFTER_FREEZE_NO_EXCEPTION: "merged after the freeze, no exception evidence",
+    CodeStatus.NO_FREEZE_DATE: "is not merged (the release has no freeze date)",
+}
 CI_NOTE = "Any failing check counts: the source does not mark required checks."
 
 
@@ -76,7 +82,7 @@ def code_merged(features: Sequence[FeatureAssessment]) -> Criterion:
         status = main.freeze.status
         ok = status in COUNTS or (status is CodeStatus.NO_FREEZE_DATE and main.merged_at)
         if not ok:
-            missing.append(Evidence(f"Main PR {main.key} is {status.value.replace('_', ' ')}.",
+            missing.append(Evidence(f"Main PR {main.key} {_PHRASE.get(status, status.value)}.",
                                     f"feature:{f.key}"))  # fmt: skip
     gap = (f" {no_pr} {'has' if no_pr == 1 else 'have'} no verified PR, so "
            f"{'it is' if no_pr == 1 else 'they are'} not counted.") if no_pr else ""  # fmt: skip
