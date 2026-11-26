@@ -45,6 +45,7 @@ describe("shell", () => {
     expect(cockpitSection(`${base}/dependencies`)).toBe("/dependencies");
     expect(cockpitSection(`${base}/links`)).toBe("/links");
     expect(cockpitSection(`${base}/raid`)).toBe("/raid");
+    expect(cockpitSection(`${base}/readiness`)).toBe("/readiness");
     expect(cockpitSection(`${base}/simulate`)).toBeNull();
     expect(cockpitSection("/portfolio")).toBeNull();
   });
