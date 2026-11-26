@@ -1,0 +1,33 @@
+{
+ "id": "cursor-v138-w02-enhancements",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-09",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Enhancements ([participant] / [participant]):\n      * Current Status: Green\n      * Release Tracking Board: https://github.com/orgs/kubernetes/projects/269\n      * Metrics: \n      * Total KEPs on the board = 56\n      * By stage:\n      * Alpha: 31\n      * Beta: 18\n      * Stable: 7\n      * Deprecation: 0\n      * By status:\n      * Tracked for PRR freeze:\n      * At risk for PRR freeze:\n      * Tracked for enhancements freeze:\n      * At risk for enhancements freeze:\n      * Tracked for code freeze:\n      * At risk for code freeze:\n      * Deferred:\n      * Removed from milestone:\n      * Updates:\n      * Call for enhancement email sent out last week.\n      * Schedule an onboarding shadow meeting for this week or next week.\n      * Meet our shadows!",
+ "expected": [
+  {
+   "type": "action",
+   "quote": "Schedule an onboarding shadow meeting for this week or next week.",
+   "owner": "Enhancements"
+  }
+ ],
+ "optional": []
+}

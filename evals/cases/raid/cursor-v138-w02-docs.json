@@ -1,0 +1,59 @@
+{
+ "id": "cursor-v138-w02-docs",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-09",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Docs ([participant] / [participant]):\n      * Current Status: Green\n      * What's happened since last week\n      * Raised k/website#57405  against dev-1.38 to update hugo.toml for v1.38 — approved, waiting on /lgtm.\n      * k/website#57406 merged, adding me to sig-docs-en-owners for release tasks.\n      * Created the v1.38 Release Docs team chat group.\n      * Built the team responsibility sheet, some dates still blank pending the finalized v1.38 schedule.\n      *  Upcoming work:\n      * Schedule the shadow onboarding call.\n      * Raise the PRs adding our shadows to the relevant teams and groups.\n      * Meet our shadows. Please introduce yourself.",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "Raised k/website#57405  against dev-1.38 to update hugo.toml for v1.38 — approved, waiting on /lgtm.",
+   "owner": "Docs"
+  },
+  {
+   "type": "risk",
+   "quote": "Built the team responsibility sheet, some dates still blank pending the finalized v1.38 schedule.",
+   "owner": "Docs"
+  },
+  {
+   "type": "action",
+   "quote": "Schedule the shadow onboarding call.",
+   "owner": "Docs"
+  },
+  {
+   "type": "action",
+   "quote": "Raise the PRs adding our shadows to the relevant teams and groups.",
+   "owner": "Docs"
+  },
+  {
+   "type": "action",
+   "quote": "Meet our shadows. Please introduce yourself.",
+   "owner": "Docs"
+  }
+ ],
+ "optional": [
+  {
+   "type": "issue",
+   "quote": "Raised k/website#57405  against dev-1.38 to update hugo.toml for v1.38 — approved, waiting on /lgtm.",
+   "owner": "Docs"
+  }
+ ]
+}

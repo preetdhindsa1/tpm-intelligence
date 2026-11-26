@@ -1,0 +1,43 @@
+{
+ "id": "cursor-v138-w06-comms",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-10-07",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * Comms (APAC: [participant] | EMEA: [participant]):\n   * Current Status: Green\n   * Progress Issue\n   * [participant] (Comms Lead) has set up the \"Comms - All\" board and assigned shadows to different KEPs (87 KEPs distributed among 6 people so 15/14 each)\n   * We will now start the Feature Blog outreach in the KEP issues. We do two rounds of outreach, they would be completed a couple of days before \"Feature Blog freeze\", on Wednesday 4th November 2026 (AoE) / Thursday 5th November 2026 12:00 UTC\n   * [participant] (Comms Lead) will be opening the Release Highlights GitHub Discussion and the internal tracking issue this week so we can start collecting input from SIGs as soon as the enhancements list settles. The Release Highlights discussion closes on Tuesday 24th November 2026\n   * Mid cycle blog publication date is on Monday 23rd November 2026. We'll aim to have writeup available as k/website PR a week before for #sig-docs-blog to review. For now we'll be focusing on Feature Blogs and Release Highlights, and will check deprecations and pick highlights for this blog in a couple of weeks",
+ "expected": [
+  {
+   "type": "action",
+   "quote": "We will now start the Feature Blog outreach in the KEP issues. We do two rounds of outreach, they would be completed a couple of days before \"Feature Blog freeze\", on Wednesday 4th November 2026 (AoE) / Thursday 5th November 2026 12:00 UTC",
+   "owner": "Comms"
+  },
+  {
+   "type": "action",
+   "quote": "[participant] (Comms Lead) will be opening the Release Highlights GitHub Discussion and the internal tracking issue this week so we can start collecting input from SIGs as soon as the enhancements list settles. The Release Highlights discussion closes on Tuesday 24th November 2026",
+   "owner": "Comms"
+  },
+  {
+   "type": "action",
+   "quote": "Mid cycle blog publication date is on Monday 23rd November 2026. We'll aim to have writeup available as k/website PR a week before for #sig-docs-blog to review. For now we'll be focusing on Feature Blogs and Release Highlights, and will check deprecations and pick highlights for this blog in a couple of weeks",
+   "owner": "Comms"
+  }
+ ],
+ "optional": []
+}
