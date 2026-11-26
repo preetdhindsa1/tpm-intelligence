@@ -46,7 +46,19 @@ def feature_facts(feature: FeatureAssessment, facts: FactSheet) -> FactSheet:
     prefixes = [f"feature:{feature.key}::"] + [f"pr:{p.key}::" for p in feature.pull_requests]
     keep += [k for k in facts if k.startswith(tuple(prefixes))]
     keep += [k for k in _sig_keys(feature.teams) if k in facts]
+    keep += raid_keys_for(facts, feature.key)
     return FactSheet(facts[k] for k in sorted(set(keep)))
+
+
+def raid_keys_for(facts: FactSheet, feature_key: str | None = None) -> list[str]:
+    """Confirmed RAID facts: every item's for ``None``, else only items linked to the feature."""
+    ids = {
+        k.split("::", 1)[0]
+        for k, f in facts.items()
+        if k.startswith("raid:")
+        and (feature_key is None or (k.endswith("::feature") and f.value == feature_key))
+    }
+    return [k for k in facts if k.split("::", 1)[0] in ids]
 
 
 def _sig_keys(teams: Iterable[str]) -> list[str]:
@@ -123,6 +135,13 @@ def update_facts(
         }
         keep |= {k for k in facts if k.startswith(prefix + "flag.removed_at_freeze")}
 
+    # Confirmed open risks and issues from the RAID log, cited by RAID ID.
+    risky = {
+        k.split("::", 1)[0]
+        for k, f in facts.items()
+        if k.startswith("raid:") and k.endswith("::type") and f.value in ("risk", "issue")
+    }
+    keep |= {k for k in raid_keys_for(facts) if k.split("::", 1)[0] in risky}
     rows: list[Fact] = [facts[k] for k in sorted(keep)]
     for f in top:
         rows.extend(ask_facts(f))
