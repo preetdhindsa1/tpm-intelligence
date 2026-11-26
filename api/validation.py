@@ -131,3 +131,24 @@ def load_date_validation(
         )
     release = max(r["release"] for r in results)
     return Validation(not failing, reason, files[-1].name, release, leads)
+
+
+def latest_readiness_backtest(results_dir: Path = DEFAULT_DIR) -> dict[str, Any] | None:
+    """The newest ``readiness-backtest-*.json`` (#184), with its file name; None if none."""
+    files = sorted(results_dir.glob("readiness-backtest-*.json"), key=lambda p: p.name)
+    if not files:
+        return None
+    return {**json.loads(files[-1].read_text()), "file": files[-1].name}
+
+
+def load_readiness_validation(results_dir: Path = DEFAULT_DIR) -> Validation:
+    """Readiness is validated only when its newest backtest passed the ADR-0032 rule."""
+    body = latest_readiness_backtest(results_dir)
+    if body is None:
+        return Validation(False, "Not validated: the readiness backtest has not run (ADR-0032).")
+    v = body["verdict"]
+    if v["passed"]:
+        return Validation(True, f"Validated: the readiness backtest passed ({v['rule']}).",
+                          body["file"])  # fmt: skip
+    return Validation(False, f"Not validated: the readiness backtest failed: {v['reason']} "
+                      f"(ADR-0032).", body["file"])  # fmt: skip

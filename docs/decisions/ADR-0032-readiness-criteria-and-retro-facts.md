@@ -201,3 +201,52 @@ stays.
 - The retro names no KEP numbers, so matching retro items to slips by explicit link
   finds 0 pairs. The comparison above is by topic, written by a person (this ADR), not
   computed.
+
+## Addendum 4: readiness backtest result: **failed, not validated** (#184, 2026-11-26)
+
+Run with `python -m modules.readiness.backtest_job`, on the rule fixed above before any
+result. The result file is
+`docs/results/readiness-backtest-20261126T084416Z.json`, also served by `GET /results`.
+
+| Release | Features at freeze | Slipped (base rate) | Flagged | Flagged and slipped | Shipped on release day | False no-go |
+|---|---|---|---|---|---|---|
+| Kubernetes v1.36 | 78 | 34 (0.44) | 26 | 17 | 70 | 21 |
+| Kubernetes v1.37 | 86 | 44 (0.51) | 29 | 25 | 20 | 4 |
+| Kubernetes v1.38 | 86 | 30 (0.35) | 36 | 25 | not shipped yet | n/a |
+| Kafka 4.4.0 | 20 | 10 (0.50) | 3 | 3 | 19 | 3 |
+| **Pooled** | 270 | 118 (0.437) | 94 | 70 | 109 | 28 |
+
+| Rule | Measured | Needed | Result |
+|---|---|---|---|
+| Recall | 0.593 | ≥ 0.60 | **fail** (just under) |
+| Precision | 0.745 | ≥ base rate 0.437 + 0.15 = 0.587 | pass |
+| False no-go on release day | 0.257 | ≤ 0.05 | **fail** |
+
+So `validated` stays `false`. `/readiness` now reads this from the newest result file
+instead of a fixed string, and shows the reason.
+
+**Why the false no-go is high.** On release day, the features that shipped but were
+flagged nearly all fail on the engine's *main PR* choice:
+
+| Release | Main PR still open | Main PR closed unmerged | Merged after the freeze, no exception evidence |
+|---|---|---|---|
+| v1.36 | 13 | 7 | 1 |
+| v1.37 | 3 | 1 | 0 |
+| Kafka 4.4.0 | 0 | 0 | 3 |
+
+The main PR is the most recently opened verified PR (engine/rules.py). For a shipped
+feature, that is often follow-up work still open, or an abandoned PR. The Kafka cases
+are the known gap: there is no exception signal after Feature Freeze (addendum 1).
+Readiness is only as good as the main-PR choice. Fixing that choice, preferring a merged
+implementation PR over a later open or closed one, is the next step. It needs its own
+change, and the backtest must be re-run after it. It is not tuned here.
+
+**Caveats.**
+- "Shipped on release day" counts features whose milestone was still the release. For
+  v1.37, many enhancement issues had moved to the v1.38 milestone by Aug 26, which leaves
+  20. The false no-go rate is measured on those.
+- The kubernetes/sig-release `exceptions.yaml` file exists for v1.36 only among these
+  releases. It lists 4 Enhancements Freeze exceptions (2 approved, 2 rejected) and no
+  Code Freeze exceptions, so it adds nothing to the Code Freeze outcome. Older releases
+  (v1.33, v1.34) list Code Freeze exceptions and could check the exception-evidence
+  signal later; they are not part of this rule.
