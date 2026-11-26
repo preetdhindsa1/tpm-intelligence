@@ -1,5 +1,5 @@
 {
- "id": "cursor-v138-w01-docs",
+ "id": "cursor-v138-w04-release-lead",
  "seed": false,
  "independent": true,
  "author": "cursor-agent",
@@ -8,9 +8,9 @@
  "source": {
   "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
   "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
-  "meeting_date": "2026-09-02",
+  "meeting_date": "2026-09-23",
   "fetched_at": "2026-11-26T22:40:00Z",
-  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+  "note": "One team's full Updates block, status only. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
  },
  "teams": [
   "Enhancements",
@@ -21,7 +21,7 @@
   "Subproject Leads",
   "Release Lead"
  ],
- "notes": "      * Docs ([participant] / [participant]):\n      * Current Status: Green\n      * Sent shadow recommendations ",
+ "notes": "      * Release Lead ([participant]/ [participant]):\n      * All of the action items and progress can be found in https://github.com/kubernetes/sig-release/issues/3087\n      * Done with KEP Readiness freeze party, enhancements freeze is next week\n      * Starting to pick up pace now",
  "expected": [],
  "optional": []
 }
