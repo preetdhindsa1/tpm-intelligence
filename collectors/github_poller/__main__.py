@@ -89,14 +89,18 @@ def main(argv: list[str] | None = None) -> int:
     telemetry = init_telemetry(SERVICE_NAME)
     logger = logging.getLogger("collectors.github_poller")
     try:
-        from pipeline.env import configured
+        from connectors.load import load_teams
+        from connectors.secrets import team_secret
 
-        token = configured("GITHUB_TOKEN")
-        if not token:
-            logger.error("GITHUB_TOKEN is not set (or still the deploy placeholder)")
-            return 2
         worst = 0
         for team_id, release in polls:
+            # The tenant's own token (ADR-0035); for the public demo, GITHUB_TOKEN as before.
+            token = team_secret(load_teams().get(team_id), "github", "GITHUB_TOKEN")
+            if not token:
+                logger.error("no GitHub token for team %s (GITHUB_TOKEN or its secret ref)",
+                             team_id)  # fmt: skip
+                worst = max(worst, 2)
+                continue
             try:
                 code = _poll_team(
                     team_id, release, token=token, backfill=args.backfill, since=args.since
@@ -119,14 +123,18 @@ def _poll_team(
     from collectors.github_poller.calendar import load_calendar
     from collectors.github_poller.client import GitHubClient
     from collectors.github_poller.sync import GitHubPoller
-    from connectors import load_team
     from pipeline.factory import create_transport
     from pipeline.queue import EventPublisher
     from pipeline.store.cursors import PostgresCursorStore
     from pipeline.store.session import make_engine
 
     logger = logging.getLogger("collectors.github_poller")
-    team = load_team(team_id)
+    from connectors.load import load_teams
+
+    team = load_teams().get(team_id)  # the current tenant's team (YAML for the demo)
+    if team is None:
+        logger.error("no team %s for this tenant", team_id)
+        return 2
     if team.planning_repo is None:
         window = _jira_window(team, release)
         if window is None:

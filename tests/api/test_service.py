@@ -19,6 +19,7 @@ from api.main import create_app
 from api.service import InMemoryEventSource, ReleaseService, ReleaseView
 from api.validation import Validation
 from engine.forecast import ForecastConfig
+from pipeline.store.tenancy import carry
 from tests.engine.conftest import fixture_events, utc
 
 FAST = ForecastConfig(replications=5, sims=100)
@@ -81,7 +82,9 @@ def test_concurrent_view_requests_compute_once(monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.setattr(service, "_compute", slow_compute)
     results: list[ReleaseView] = []
     threads = [
-        threading.Thread(target=lambda: results.append(service.view("v1.38"))) for _ in range(4)
+        # Request threads carry their tenant (run_in_threadpool copies the context).
+        threading.Thread(target=carry(lambda: results.append(service.view("v1.38"))))
+        for _ in range(4)
     ]
     for t in threads:
         t.start()

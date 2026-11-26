@@ -107,3 +107,21 @@ def test_the_same_key_in_two_tenants_does_not_collide(seeded: sessionmaker[Sessi
         assert _numbers(seeded) == [1, 2]
     with use_tenant("acme"), seeded() as s, s.begin():
         s.execute(text("DELETE FROM pull_requests WHERE number = 1"))
+
+
+def test_team_configs_are_per_tenant(app_engine: Engine) -> None:
+    from connectors.store import PostgresTeamConfigStore
+    from pipeline.store.tenancy import tenant_sessions
+    from tests.api.test_connectors_api import WEB
+
+    factory = sessionmaker(app_engine)
+    acme = PostgresTeamConfigStore(tenant_sessions(factory, "acme"))
+    globex = PostgresTeamConfigStore(tenant_sessions(factory, "globex"))
+    try:
+        assert acme.put(WEB).version == 1
+        assert acme.put(WEB).version == 2
+        assert [r.config.id for r in acme.list()] == ["acme-web"]
+        assert globex.list() == []
+        assert globex.delete("acme-web") is False  # cannot touch acme's row
+    finally:
+        acme.delete("acme-web")
