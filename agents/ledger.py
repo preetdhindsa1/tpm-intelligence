@@ -189,10 +189,12 @@ class PostgresLedger:
             )
 
     def get_result(self, fingerprint: str) -> CachedResult | None:
+        from sqlalchemy import select
+
         from pipeline.store.models import AIResult
 
-        with self._sessions() as s:
-            row = s.get(AIResult, fingerprint)
+        with self._sessions() as s:  # the session's tenant scopes the cache (ADR-0034)
+            row = s.scalars(select(AIResult).where(AIResult.fingerprint == fingerprint)).first()
             return None if row is None else CachedResult(fingerprint, row.output, row.check_counts)
 
     def put_result(
@@ -217,7 +219,7 @@ class PostgresLedger:
                 model=model,
                 output=output,
             )
-            .on_conflict_do_nothing(index_elements=["fingerprint"])
+            .on_conflict_do_nothing(index_elements=["tenant_id", "fingerprint"])
         )
         with self._sessions() as s, s.begin():
             s.execute(stmt)

@@ -36,6 +36,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -85,15 +86,53 @@ class _Timestamps:
     )
 
 
+class _Tenant:
+    """Every row belongs to one tenant (ADR-0034). Existing rows are the public ``demo``."""
+
+    tenant_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("tenants.id"), server_default=text("'demo'"), index=True
+    )
+
+
+class Tenant(Base):
+    """A company (or the public demo) whose data is isolated from every other (ADR-0034)."""
+
+    __tablename__ = "tenants"
+    __table_args__ = (CheckConstraint("id ~ '^[a-z0-9][a-z0-9-]{1,31}$'", name="id_slug"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    public: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
+MEMBER_ROLES = ("reader", "approver", "owner")
+
+
+class Member(Base):
+    """A signed-in GitHub login's role in one tenant. Stored for access only, never shown
+    publicly (CLAUDE.md section 10)."""
+
+    __tablename__ = "members"
+    __table_args__ = (CheckConstraint(_in("role", MEMBER_ROLES), name="role"),)
+
+    tenant_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("tenants.id", ondelete="CASCADE"), primary_key=True
+    )
+    login: Mapped[str] = mapped_column(String(64), primary_key=True)
+    role: Mapped[str] = mapped_column(String(16))
+    added_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
+
+
 # ---------------------------------------------------------------- planning side
 
 
-class Release(_Timestamps, Base):
+class Release(_Tenant, _Timestamps, Base):
     """A release (Kubernetes ``v1.38``, Jira fix version ``4.3.0``) and its key dates."""
 
     __tablename__ = "releases"
     __table_args__ = (
-        UniqueConstraint("source", "project", "name"),
+        UniqueConstraint("tenant_id", "source", "project", "name"),
         CheckConstraint(_in("source", [s.value for s in Source]), name="source"),
     )
 
@@ -107,12 +146,12 @@ class Release(_Timestamps, Base):
     source_url: Mapped[str | None] = mapped_column(Text)
 
 
-class WorkItem(_Timestamps, Base):
+class WorkItem(_Tenant, _Timestamps, Base):
     """Generic planning ticket: KEP issue, Jira initiative/epic/story/... (CLAUDE.md section 6)."""
 
     __tablename__ = "work_items"
     __table_args__ = (
-        UniqueConstraint("source", "external_key"),
+        UniqueConstraint("tenant_id", "source", "external_key"),
         CheckConstraint(_in("source", [s.value for s in Source]), name="source"),
         CheckConstraint(_in("type", [t.value for t in WorkItemType]), name="type"),
         CheckConstraint(_in("status_category", STATUS_CATEGORIES), name="status_category"),
@@ -139,7 +178,7 @@ class WorkItem(_Timestamps, Base):
     )
 
 
-class WorkItemRelease(Base):
+class WorkItemRelease(_Tenant, Base):
     """Many-to-many work item <-> release (KAFKA-21181 has four fix versions).
 
     ``status='removed'`` keeps the row for history but drops it from current-state
@@ -169,7 +208,7 @@ class WorkItemRelease(Base):
     release: Mapped[Release] = relationship()
 
 
-class WorkItemRelation(Base):
+class WorkItemRelation(_Tenant, Base):
     """Work item -> work item dependency (e.g. KAFKA-19831 links to KAFKA-17789)."""
 
     __tablename__ = "work_item_relations"
@@ -193,12 +232,12 @@ class WorkItemRelation(Base):
 # ---------------------------------------------------------------- code side
 
 
-class PullRequest(_Timestamps, Base):
+class PullRequest(_Tenant, _Timestamps, Base):
     """A pull request: text fields and timestamps only, never code."""
 
     __tablename__ = "pull_requests"
     __table_args__ = (
-        UniqueConstraint("repo", "number"),
+        UniqueConstraint("tenant_id", "repo", "number"),
         CheckConstraint(_in("source", [s.value for s in Source]), name="source"),
         CheckConstraint(_in("state", PR_STATES), name="state"),
         CheckConstraint("(state = 'merged') = (merged_at IS NOT NULL)", name="merged_at_state"),
@@ -233,7 +272,7 @@ class PullRequest(_Timestamps, Base):
     )
 
 
-class Review(Base):
+class Review(_Tenant, Base):
     """One raw review record. Rounds are derived in ``review_rounds`` (ADR-0006)."""
 
     __tablename__ = "reviews"
@@ -253,7 +292,7 @@ class Review(Base):
     pull_request: Mapped[PullRequest] = relationship(back_populates="reviews")
 
 
-class ReviewRound(Base):
+class ReviewRound(_Tenant, Base):
     """Reviews by one reviewer grouped within a time window (computed by the engine)."""
 
     __tablename__ = "review_rounds"
@@ -274,7 +313,7 @@ class ReviewRound(Base):
     window_minutes: Mapped[int] = mapped_column(Integer)  # grouping parameter used
 
 
-class CheckRun(Base):
+class CheckRun(_Tenant, Base):
     """CI result for a PR head commit."""
 
     __tablename__ = "check_runs"
@@ -294,7 +333,7 @@ class CheckRun(Base):
 # ---------------------------------------------------------------- links
 
 
-class Link(Base):
+class Link(_Tenant, Base):
     """PR -> work item link with method, confidence and status (CLAUDE.md section 6).
 
     Database guard: an ``ai_suggested`` link can only be ``verified`` when
@@ -335,7 +374,7 @@ class Link(Base):
 # ---------------------------------------------------------------- history
 
 
-class EventRecord(Base):
+class EventRecord(_Tenant, Base):
     """Append-only log of every normalized event. Backtests read only from here."""
 
     __tablename__ = "events"
@@ -345,10 +384,13 @@ class EventRecord(Base):
         Index(None, "subject_kind", "subject_key", "occurred_at"),
         Index(None, "occurred_at"),
         Index(None, "event_type", "occurred_at"),
+        # One tenant's copy of an event never blocks another's (ADR-0034): two companies
+        # may track the same public repository, so event ids repeat across tenants.
+        UniqueConstraint("tenant_id", "event_id"),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
-    event_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), unique=True)
+    event_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
     event_type: Mapped[str] = mapped_column(String(64))
     schema_version: Mapped[int] = mapped_column(Integer)
     source: Mapped[str] = mapped_column(String(16))
@@ -360,12 +402,12 @@ class EventRecord(Base):
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
 
 
-class Snapshot(Base):
+class Snapshot(_Tenant, Base):
     """Point-in-time copy of computed state (e.g. a forecast as it was on a date)."""
 
     __tablename__ = "snapshots"
     __table_args__ = (
-        UniqueConstraint("kind", "subject_kind", "subject_key", "as_of"),
+        UniqueConstraint("tenant_id", "kind", "subject_kind", "subject_key", "as_of"),
         CheckConstraint(_in("subject_kind", [k.value for k in SubjectKind]), name="subject_kind"),
     )
 
@@ -384,6 +426,9 @@ class SyncCursor(Base):
     __tablename__ = "sync_cursors"
     __table_args__ = (CheckConstraint("consecutive_failures >= 0", name="failures_non_negative"),)
 
+    tenant_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("tenants.id"), server_default=text("'demo'"), primary_key=True
+    )
     stream: Mapped[str] = mapped_column(String(256), primary_key=True)
     cursor: Mapped[str | None] = mapped_column(Text)  # e.g. max updated_at seen
     last_attempt_at: Mapped[datetime | None] = mapped_column(_tz())
@@ -395,7 +440,7 @@ class SyncCursor(Base):
 AI_OUTCOMES = ("ok", "refused", "max_tokens", "error", "budget_denied", "cache_hit")
 
 
-class AIUsage(Base):
+class AIUsage(_Tenant, Base):
     """One AI call attempt: tokens, cost and outcome. Sums per UTC day enforce the budget."""
 
     __tablename__ = "ai_usage"
@@ -427,6 +472,9 @@ class AIResult(Base):
 
     __tablename__ = "ai_results"
 
+    tenant_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("tenants.id"), server_default=text("'demo'"), primary_key=True
+    )
     fingerprint: Mapped[str] = mapped_column(String(64), primary_key=True)
     task: Mapped[str] = mapped_column(String(64))
     prompt_version: Mapped[str] = mapped_column(String(64))
@@ -436,7 +484,7 @@ class AIResult(Base):
     check_counts: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
 
 
-class RiskNoteRecord(Base):
+class RiskNoteRecord(_Tenant, Base):
     """A verified risk note for one feature (only verified claims are stored)."""
 
     __tablename__ = "risk_notes"
@@ -458,7 +506,7 @@ class RiskNoteRecord(Base):
 UPDATE_STATUSES = ("draft", "approved", "rejected")
 
 
-class ExecUpdateRecord(Base):
+class ExecUpdateRecord(_Tenant, Base):
     """An executive update draft and its approval (the platform never sends it)."""
 
     __tablename__ = "exec_updates"
@@ -494,7 +542,7 @@ class ExecUpdateRecord(Base):
 SUGGESTION_STATUSES = ("suggested", "confirmed", "rejected", "none", "dropped")
 
 
-class LinkSuggestionRecord(Base):
+class LinkSuggestionRecord(_Tenant, Base):
     """One AI link-suggester answer for an unlinked PR, and a person's decision (ADR-0011).
 
     Only ``confirmed`` rows become verified links, and only with ``decided_by`` set
@@ -514,6 +562,7 @@ class LinkSuggestionRecord(Base):
             name="link_has_feature",
         ),
         UniqueConstraint(
+            "tenant_id",
             "release_key",
             "pull_request_key",
             "input_sha",
@@ -539,7 +588,7 @@ class LinkSuggestionRecord(Base):
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
 
 
-class SimCalibrationRecord(Base):
+class SimCalibrationRecord(_Tenant, Base):
     """A fitted simulator calibration for one release (ADR-0012, CLAUDE.md section 14).
 
     Stored with its source releases, measurement date and validation result, so every
@@ -559,11 +608,11 @@ class SimCalibrationRecord(Base):
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
 
 
-class SimScenarioRecord(Base):
+class SimScenarioRecord(_Tenant, Base):
     """A saved what-if and its result, named per release (ADR-0012)."""
 
     __tablename__ = "sim_scenarios"
-    __table_args__ = (UniqueConstraint("release_key", "name"),)
+    __table_args__ = (UniqueConstraint("tenant_id", "release_key", "name"),)
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
     release_key: Mapped[str] = mapped_column(String(128))
@@ -575,7 +624,7 @@ class SimScenarioRecord(Base):
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
 
 
-class ForecastSnapshotRunRecord(Base):
+class ForecastSnapshotRunRecord(_Tenant, Base):
     """One day's recorded forecast of a release (ADR-0015). Never updated or deleted.
 
     ``body`` holds the model settings, calibration inputs, validation labels and the
@@ -583,7 +632,15 @@ class ForecastSnapshotRunRecord(Base):
     """
 
     __tablename__ = "forecast_snapshot_runs"
-    __table_args__ = (UniqueConstraint("release_key", "snapshot_date", "model_version"),)
+    __table_args__ = (
+        UniqueConstraint(
+            "tenant_id",
+            "release_key",
+            "snapshot_date",
+            "model_version",
+            name="uq_forecast_snapshot_runs_tenant_release_date_model",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
     release_key: Mapped[str] = mapped_column(String(128))
@@ -596,7 +653,7 @@ class ForecastSnapshotRunRecord(Base):
     created_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
 
 
-class ForecastSnapshotRecord(Base):
+class ForecastSnapshotRecord(_Tenant, Base):
     """One feature's recorded odds and merge-date forecast in a snapshot run (ADR-0015)."""
 
     __tablename__ = "forecast_snapshots"
@@ -622,7 +679,7 @@ class ForecastSnapshotRecord(Base):
     cdf: Mapped[list[Any]] = mapped_column(JSONB)
 
 
-class RaidItemRecord(Base):
+class RaidItemRecord(_Tenant, Base):
     """A RAID item (migration 0010, ADR-0030 addendum 2). Logic: ``modules.raid``."""
 
     __tablename__ = "raid_items"
@@ -636,10 +693,12 @@ class RaidItemRecord(Base):
         CheckConstraint("(review IN ('confirmed', 'edited')) = (raid_id IS NOT NULL)",
                         name="id_on_confirm"),
         Index("ix_raid_items_release_key", "release_key", "review"),
+        UniqueConstraint("tenant_id", "key"),
+        UniqueConstraint("tenant_id", "raid_id"),
     )  # fmt: skip
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
-    key: Mapped[str] = mapped_column(String(32), unique=True)
+    key: Mapped[str] = mapped_column(String(32))
     release_key: Mapped[str] = mapped_column(String(128))
     workstream: Mapped[str] = mapped_column(String(16))
     type: Mapped[str] = mapped_column(String(16))
@@ -650,7 +709,7 @@ class RaidItemRecord(Base):
     owner: Mapped[str | None] = mapped_column(String(120))
     status: Mapped[str] = mapped_column(String(16), server_default="open")
     review: Mapped[str] = mapped_column(String(16), server_default="suggested")
-    raid_id: Mapped[str | None] = mapped_column(String(32), unique=True)
+    raid_id: Mapped[str | None] = mapped_column(String(32))
     links: Mapped[list[Any]] = mapped_column(JSONB, server_default="[]")
     merge_into: Mapped[int | None] = mapped_column(ForeignKey("raid_items.id"))
     merge_reason: Mapped[str | None] = mapped_column(Text)
@@ -658,7 +717,7 @@ class RaidItemRecord(Base):
     updated_at: Mapped[datetime] = mapped_column(_tz(), server_default=func.now())
 
 
-class RaidHistoryRecord(Base):
+class RaidHistoryRecord(_Tenant, Base):
     """One append-only change to a RAID item. ``by_login`` is for audit, never shown."""
 
     __tablename__ = "raid_history"
@@ -679,7 +738,7 @@ class RaidHistoryRecord(Base):
     by_login: Mapped[str | None] = mapped_column(String(64))
 
 
-class ReadinessDecisionRecord(Base):
+class ReadinessDecisionRecord(_Tenant, Base):
     """A go/no-go call (migration 0011, ADR-0032). Append-only; ``by_login`` is audit only."""
 
     __tablename__ = "readiness_decisions"
@@ -699,7 +758,7 @@ class ReadinessDecisionRecord(Base):
     by_login: Mapped[str] = mapped_column(String(64))
 
 
-class RetroRunRecord(Base):
+class RetroRunRecord(_Tenant, Base):
     """One computed retro (migration 0012, ADR-0032 addendum 2). Append-only."""
 
     __tablename__ = "retro_runs"

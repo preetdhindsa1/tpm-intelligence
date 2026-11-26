@@ -10,7 +10,7 @@
 Wave 6 goal (docs/plan/e2e-plan.md): a company signs up, connects its tools and sees only
 its own data, proven by tests. Today there is one implicit tenant:
 
-- 22 tables in `pipeline/store/models.py`, none with a tenant column. The largest is
+- 25 tables in `pipeline/store/models.py`, none with a tenant column. The largest is
   `events` (about 391,000 rows locally; the cloud has a similar order).
 - Reading is public. Actions need a GitHub login on the `APPROVERS` allowlist, sent by the
   web server in a signed request (ADR-0016: `X-TPM-User`, `X-TPM-Time`, `X-TPM-Signature`).
@@ -30,10 +30,12 @@ second tenant exists."
   slug (`demo`, `acme`), readable in logs and in Secret Manager names.
 - The existing public data becomes tenant **`demo`** (`public = true`): Kubernetes, Kafka and
   this repository.
-- Every one of the 22 tables gains `tenant_id text not null references tenants(id)`.
+- Every one of the 25 tables gains `tenant_id text not null references tenants(id)`.
   - The migration adds it with the constant default `'demo'`. Postgres 11+ does this without
     rewriting the table, which matters for `events`.
-  - It then replaces the default with `current_setting('app.tenant_id')`. A write from a
+  - Once request scoping lands (#231), a second revision replaces the default with
+    `current_setting('app.tenant_id')`. Until then the default stays `'demo'`, so the app
+    keeps working between the two PRs. A write from a
     session that has not set its tenant **fails** (`unrecognized configuration parameter`).
     There is no silent fallback to `demo`.
 - Every unique key gains `tenant_id` as its first column, e.g. `(tenant_id, repo, number)`
@@ -123,7 +125,9 @@ second tenant exists."
   it keeps isolation simple, and each tenant can link it to its own plan.
 - RLS adds a predicate on every query. Indexes lead with `tenant_id` so it stays cheap.
 - The `events` migration is the risky step in the cloud: an `ALTER TABLE` with a constant
-  default does not rewrite rows, but index rebuilds for the new unique keys do take time. It
+  default does not rewrite rows, but index rebuilds for the new unique keys do take time.
+  Measured on a copy of the local database (391,486 events): upgrade about 1 s, downgrade
+  about 3 s. It
   runs in a maintenance window the owner approves, with a backup first.
 - Revisit if a customer needs physical isolation, or if RLS query plans become a bottleneck
   in the Wave 7 load test.
