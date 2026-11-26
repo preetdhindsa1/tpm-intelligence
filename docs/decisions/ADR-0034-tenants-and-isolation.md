@@ -34,15 +34,18 @@ second tenant exists."
   - The migration adds it with the constant default `'demo'`. Postgres 11+ does this without
     rewriting the table, which matters for `events`.
   - Once request scoping lands (#231), a second revision replaces the default with
-    `current_setting('app.tenant_id')`. Until then the default stays `'demo'`, so the app
-    keeps working between the two PRs. A write from a
-    session that has not set its tenant **fails** (`unrecognized configuration parameter`).
+    `NULLIF(current_setting('app.tenant_id', true), '')`. A write from a session that has
+    not set its tenant then **fails** on NOT NULL. `NULLIF` matters: a pooled connection
+    that once ran a scoped transaction reads the setting as `''` afterwards, not as missing
+    (found in the #231 tests). Until that revision the default stays `'demo'`, so the app
+    keeps working between the two PRs.
     There is no silent fallback to `demo`.
 - Every unique key gains `tenant_id` as its first column, e.g. `(tenant_id, repo, number)`
   on `pull_requests` and `(tenant_id, key)` on `raid_items`. Two companies can track the same
   public repository, or have the same RAID ID, without colliding.
 - **Row-level security** on every tenant table:
-  `USING (tenant_id = current_setting('app.tenant_id', true))`, with the same `WITH CHECK`.
+  `USING (tenant_id = current_setting('app.tenant_id', true))`, with the same `WITH CHECK`
+  (`''` and NULL match no row).
   With no tenant set, `current_setting(..., true)` is NULL and the policy matches no rows,
   so reads fail closed too.
 - The API, the worker and the jobs connect as a new role **`tpm_app`**: not the table owner,
@@ -52,13 +55,19 @@ second tenant exists."
 
 ### 2. Every database session is scoped to one tenant
 
-- `pipeline/store/session.py` gains `tenant_session(factory, tenant_id)`, which runs
+- `pipeline/store/tenancy.py` registers a session hook that runs
   `SELECT set_config('app.tenant_id', :t, true)` at the start of each transaction (the
   `true` means "this transaction only", so a pooled connection never carries one tenant's
   setting into another request).
-- Code that opens sessions takes the tenant explicitly. Stores (`PostgresRaidStore`,
-  `PostgresRetroStore`, the event repository, ...) receive a tenant-scoped factory. There is
-  no global "current tenant" variable.
+- The tenant comes from `session.info["tenant_id"]` when a factory is bound to one tenant
+  (`tenant_sessions(factory, tenant)`, used by each tenant's release service), else from a
+  context variable, `current_tenant`. The API middleware sets it per request; each job's
+  entry point sets it from `TPM_TENANT` (default `demo`). It is per request and per task,
+  not process-wide. A plain thread does not inherit it, so code that starts threads
+  passes the tenant on (`in_tenant`, `carry`). A thread that forgets runs with no tenant
+  and fails closed.
+- In-memory caches are per tenant: each private tenant gets its own release service and
+  simulator, and the dependencies cache key includes the tenant.
 - Background work (pollers, the worker, retro and RAID jobs, the forecast recorder) runs
   **per tenant**, looping over tenants and their connectors (ADR-0035). Queue messages
   carry `tenant_id` as an attribute, next to the trace context.

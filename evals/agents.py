@@ -279,4 +279,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    from pipeline.store.tenancy import cli_tenant, use_tenant
+
+    with use_tenant(cli_tenant()):  # TPM_TENANT, else the public demo (ADR-0034)
+        sys.exit(main())

@@ -24,6 +24,7 @@ from agents.prompts import Prompt, load_prompt
 from engine.links import candidate_index, link_release, unlinked_pull_requests
 from engine.projection import World
 from linker.candidates import shortlist
+from pipeline.store.tenancy import carry
 
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -135,5 +136,5 @@ def suggest_for_release(
                 one(item)
         else:
             with ThreadPoolExecutor(max_workers=workers) as pool:
-                list(pool.map(one, work))
+                list(pool.map(carry(one), work))  # pool threads keep the tenant
     return report
