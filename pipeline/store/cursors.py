@@ -75,7 +75,7 @@ class PostgresCursorStore:
         }
         stmt = insert(SyncCursor).values(values)
         stmt = stmt.on_conflict_do_update(
-            index_elements=[SyncCursor.stream],
+            index_elements=[SyncCursor.tenant_id, SyncCursor.stream],
             set_={k: stmt.excluded[k] for k in values if k != "stream"},
         )
         with session_scope(self._factory) as session:
@@ -87,7 +87,7 @@ class PostgresCursorStore:
             stream=stream, last_attempt_at=at, consecutive_failures=1, last_error=error[:2000]
         )
         stmt = base.on_conflict_do_update(
-            index_elements=[SyncCursor.stream],
+            index_elements=[SyncCursor.tenant_id, SyncCursor.stream],
             set_={
                 "last_attempt_at": at,
                 "last_error": error[:2000],

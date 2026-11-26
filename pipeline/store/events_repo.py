@@ -49,7 +49,7 @@ def append_new_events(session: Session, events: Iterable[NormalizedEvent]) -> se
     stmt = (
         insert(EventRecord)
         .values(rows)
-        .on_conflict_do_nothing(index_elements=["event_id"])
+        .on_conflict_do_nothing(index_elements=["tenant_id", "event_id"])
         .returning(EventRecord.event_id)
     )
     return {str(row[0]) for row in session.execute(stmt).all()}

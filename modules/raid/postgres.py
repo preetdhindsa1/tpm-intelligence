@@ -51,7 +51,7 @@ class PostgresRaidStore:
                     document_id=item.document_id, meeting_date=item.meeting_date,
                     owner=item.owner, links=list(item.links), merge_into=merge[0],
                     merge_reason=merge[1], created_at=at, updated_at=at,
-                ).on_conflict_do_nothing(index_elements=["key"]).returning(R.id)
+                ).on_conflict_do_nothing(index_elements=["tenant_id", "key"]).returning(R.id)
             ).scalar_one_or_none()  # fmt: skip
             if new_id is None:
                 return None
