@@ -4,7 +4,8 @@ Meeting notes mention people who are on no attendee list in the notes (a release
 named in passing). The team config's ``people_sources`` name public GitHub files that list
 people as ``Name ([@handle](...))``, such as the Kubernetes release-team and
 release-managers pages, or as YAML ``- github: handle`` / ``name: Full Name`` pairs, such as
-kubernetes/community ``sigs.yaml`` (SIG chairs and leads, named in retros, #183). They are read through the GitHub contents API (read-only, the shared
+kubernetes/community ``sigs.yaml`` (SIG chairs and leads, named in retros, #183).
+They are read through the GitHub contents API (read-only, the shared
 HTTP client) when masking runs, and the names are never stored.
 """
 
