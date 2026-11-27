@@ -13,6 +13,7 @@ export type PortfolioProgram = {
   planning_tool?: string;
   code_tools?: string[];
   has_lab?: boolean;
+  has_retro?: boolean;
   code_freeze_label?: string;
   dates?: { cycle_start_at: string | null; enhancements_freeze_at: string | null; code_freeze_at: string | null; release_at: string | null };
   stage: {
@@ -28,7 +29,7 @@ export type PortfolioProgram = {
 
 export type WaitingItem = { kind: string; program_key: string; label: string; count: number };
 export type AcrossItem = { kind: string; title: string; text: string; program_key: string };
-export type ComingNext = { module: string; name: string; status: string };
+export type ComingNext = { module: string; name: string; status: string; validated?: boolean | null };
 
 export type Skipped = { team: string; reason: string };
 

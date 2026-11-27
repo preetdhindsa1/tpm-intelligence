@@ -1,10 +1,11 @@
 // Lifecycle card (UX vision p.4): five stages, each filled as far as the release has
 // got as of its data date. Steps come from lib/cockpit lifecycle(). Launch and Learn
-// are live, and link to readiness or retro, only when the portfolio API says that
-// module has real data. Otherwise they say "not started".
+// link only when that module's data is for this release. Launch stays
+// "Live · not validated" until the API says the readiness model is validated.
+// Learn links only when this release has a stored retro. Otherwise "No data yet".
 import Link from "next/link";
 import type { LifeStep } from "@/lib/cockpit";
-import { NOT_STARTED, type LaunchLearn, type ModuleState } from "@/lib/stages";
+import type { LaunchLearn, ModuleState } from "@/lib/stages";
 
 function moduleFor(name: string, modules?: LaunchLearn): ModuleState | null {
   const key = name.toLowerCase();
@@ -31,7 +32,7 @@ export function LifecycleBar({ steps, modules }: { steps: LifeStep[]; modules?: 
               )}
               {s.here ? " · you are here" : ""}
             </p>
-            {mod && <p className="text-xs font-medium text-slate-500">{mod.live ? "Live" : NOT_STARTED}</p>}
+            {mod && <p className={`text-xs font-medium ${mod.tone === "warn" ? "text-warning" : "text-slate-500"}`}>{mod.label}</p>}
             <p className="text-sm text-slate-500">{s.note}</p>
           </li>
         );

@@ -51,10 +51,14 @@ export default async function FrontPage() {
   const tourHref = tour ? releasePath(tour.project, tour.release) : "/portfolio";
   const stages = frontStages(
     STAGES,
-    launchLearn(facts.portfolio?.coming_next, {
-      launch: tour ? releasePath(tour.project, tour.release, "/readiness") : "",
-      learn: tour ? releasePath(tour.project, tour.release, "/retro") : "",
-    }),
+    launchLearn(
+      facts.portfolio?.coming_next,
+      {
+        launch: tour ? releasePath(tour.project, tour.release, "/readiness") : "",
+        learn: tour ? releasePath(tour.project, tour.release, "/retro") : "",
+      },
+      tour?.has_retro === true,
+    ),
   );
 
   return (

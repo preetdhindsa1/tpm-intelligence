@@ -1,6 +1,6 @@
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { NOT_STARTED, type LaunchLearn } from "@/lib/stages";
+import { LIVE_UNVALIDATED, NO_DATA, type LaunchLearn } from "@/lib/stages";
 import { LifecycleBar } from "./LifecycleBar";
 
 const steps = [
@@ -10,8 +10,8 @@ const steps = [
 ];
 
 const live: LaunchLearn = {
-  launch: { live: true, href: "/projects/kubernetes/releases/v1.38/readiness" },
-  learn: { live: false, href: null },
+  launch: { live: true, href: "/projects/kubernetes/releases/v1.38/readiness", label: LIVE_UNVALIDATED, tone: "warn" },
+  learn: { live: false, href: null, label: NO_DATA, tone: "planned" },
 };
 
 afterEach(cleanup);
@@ -21,15 +21,18 @@ describe("LifecycleBar Launch and Learn", () => {
     const view = render(<LifecycleBar steps={steps} modules={live} />);
     const launch = view.getByRole("link", { name: "Launch" });
     expect(launch.getAttribute("href")).toBe("/projects/kubernetes/releases/v1.38/readiness");
-    expect(view.getByText("Live")).toBeTruthy();
-    expect(view.getByText(NOT_STARTED)).toBeTruthy();
+    expect(view.getByText(LIVE_UNVALIDATED)).toBeTruthy();
+    expect(view.getByText(NO_DATA)).toBeTruthy();
     expect(view.queryByRole("link", { name: "Learn" })).toBeNull();
   });
 
   it("marks both not started when the API has no module data", () => {
-    const none: LaunchLearn = { launch: { live: false, href: null }, learn: { live: false, href: null } };
+    const none: LaunchLearn = {
+      launch: { live: false, href: null, label: NO_DATA, tone: "planned" },
+      learn: { live: false, href: null, label: NO_DATA, tone: "planned" },
+    };
     const view = render(<LifecycleBar steps={steps} modules={none} />);
     expect(view.container.querySelector("a")).toBeNull();
-    expect(view.getAllByText(NOT_STARTED)).toHaveLength(2);
+    expect(view.getAllByText(NO_DATA)).toHaveLength(2);
   });
 });

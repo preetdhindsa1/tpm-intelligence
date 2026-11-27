@@ -46,11 +46,12 @@ export default async function ReleasePage({ params }: { params: Promise<{ projec
   const before = summary.phase === "before_freeze";
   const stage = stageOf(r, new Date(r.as_of));
   const machine = await timeMachine(project, name);
-  const coming = await api.portfolio().then((p) => p.coming_next).catch(() => []);
-  const modules = launchLearn(coming, {
+  const portfolio = await api.portfolio().catch(() => null);
+  const program = portfolio?.programs.find((p) => p.project.toLowerCase() === project.toLowerCase() && p.release === name);
+  const modules = launchLearn(portfolio?.coming_next, {
     launch: releasePath(project, name, "/readiness"),
     learn: releasePath(project, name, "/retro"),
-  });
+  }, program?.has_retro === true);
   const simText = sim && !sim.validated ? simValidationText(sim.validation, r.key) : null;
 
   return (

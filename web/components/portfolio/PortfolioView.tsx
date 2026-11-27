@@ -112,7 +112,7 @@ function ProgramTable({ programs, skipped, coming, filtered }: { programs: Portf
                     modules={launchLearn(coming, {
                       launch: releasePath(p.project, p.release, "/readiness"),
                       learn: releasePath(p.project, p.release, "/retro"),
-                    })}
+                    }, p.has_retro === true)}
                   />
                   <p className="mt-2 text-slate-600">{stageLine(p)}</p>
                 </td>
