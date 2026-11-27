@@ -31,7 +31,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
     <div className="mx-auto max-w-[1400px] space-y-6 py-4">
       <header>
         <h1 className="font-heading text-4xl font-bold tracking-tight">Plug in your org in three steps</h1>
-        <p className="mt-2 text-slate-600">Read-only access. No source code is stored. Signing a company up is not open yet; the public demo shows what you get.</p>
+        <p className="mt-2 text-slate-600">Read-only access. No source code is stored. Signing a company up is not open yet; the public demo shows what you get. <Link href="/connect/organization" className="underline">Your organizations</Link> lists the ones the API returns for you.</p>
       </header>
 
       <nav aria-label="Steps" className="grid gap-3 md:grid-cols-3">
