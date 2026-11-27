@@ -10,7 +10,7 @@ import threading
 import time
 from collections import OrderedDict
 from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Mapping
-from dataclasses import replace
+from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from typing import Any
 
@@ -32,6 +32,7 @@ from api.schemas import (
     ExecUpdateOut,
     FeatureDetailOut,
     FeaturesOut,
+    FreshnessOut,
     GraphOut,
     LabOut,
     LinkDecisionIn,
@@ -50,6 +51,7 @@ from api.schemas import (
     SimulatorOut,
     SnapshotRunOut,
     SnapshotsOut,
+    SourceFreshnessOut,
     SummaryOut,
     UpdateEditIn,
     UpdateWarningOut,
@@ -147,6 +149,7 @@ def create_app(
     tenants: TenantDirectory | None = None,
     team_configs: Callable[[str], Any] | None = None,
     tenant_admin: Any = None,
+    stream_health: Callable[[], Any] | None = None,
 ) -> FastAPI:
     """Build the API. ``service`` defaults to Postgres-backed; ``updates`` to Redis.
 
@@ -826,6 +829,34 @@ def create_app(
             raise HTTPException(404, f"scenario {scenario_id} not found for {name}")
         return saved_out(row)
 
+    health_box: dict[str, Callable[[], Any]] = {}
+
+    @app.get("/releases/{name}/freshness", response_model=FreshnessOut)
+    async def freshness(name: str) -> FreshnessOut:
+        """How old this release's data is, from its collectors' last successful syncs.
+        Pages never wait on GitHub or Jira; this says when the data stopped updating."""
+        from api.freshness import STALE_AFTER, release_freshness
+        from connectors.load import team_for_project
+
+        s = svc()
+        key = await run_in_threadpool(s.resolve, name)
+        rel = next((r.release for r in await run_in_threadpool(s.releases)
+                    if r.release.key == key), None)  # fmt: skip
+        team = team_for_project(key.split(":", 1)[0])
+        if rel is None or team is None:
+            raise HTTPException(404, f"unknown release {name}")
+        if "h" not in health_box:
+            health_box["h"] = stream_health or _default_stream_health()
+        streams = await run_in_threadpool(health_box["h"])
+        now = s.clock()
+        f = release_freshness(team, rel.name, rel.release_at, streams, now)
+        return FreshnessOut(
+            release=key, status=f.status, as_of=f.as_of, checked_at=now,
+            sources=[SourceFreshnessOut(**asdict(x),
+                     stale_after_minutes=int(STALE_AFTER[x.system].total_seconds() // 60))
+                     for x in f.sources],
+        )  # fmt: skip
+
     @app.get("/releases/{name}/summary", response_model=SummaryOut)
     async def summary(name: str) -> SummaryOut:
         """Dashboard tiles and feature outcomes (computed facts only)."""
@@ -1229,6 +1260,15 @@ def _default_retro_data() -> Any:
 
     return StoreRetro(lambda: PostgresRetroStore(sessions()),
                       lambda key: PostgresRaidStore(sessions()).items(key))  # fmt: skip
+
+
+def _default_stream_health() -> Callable[[], Any]:
+    from sqlalchemy.orm import sessionmaker
+
+    from pipeline.store.cursors import PostgresCursorStore
+    from pipeline.store.session import make_engine
+
+    return PostgresCursorStore(sessionmaker(make_engine())).health
 
 
 def _default_snapshot_store() -> Any:

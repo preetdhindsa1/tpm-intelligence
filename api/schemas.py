@@ -424,6 +424,28 @@ class FeatureOutcomeOut(_Out):
     sigs: list[str]
 
 
+class SourceFreshnessOut(_Out):
+    """One collector source of a release (ADR-0036). Never its error text."""
+
+    kind: str  # planning | code
+    system: str  # github | jira
+    last_success_at: datetime | None
+    age_minutes: float | None
+    consecutive_failures: int
+    stale: bool
+    stale_after_minutes: int
+
+
+class FreshnessOut(_Out):
+    """How old a release's data is: fresh | stale | final | unknown (ADR-0036)."""
+
+    release: str
+    status: str
+    as_of: datetime | None  # the stalest source's last successful sync
+    checked_at: datetime
+    sources: list[SourceFreshnessOut]
+
+
 class SummaryOut(_Out):
     """Stat tiles and outcome counts for the dashboard. All computed facts."""
 
