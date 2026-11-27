@@ -208,3 +208,43 @@ the existing gateway, now per tenant.
 - With #231–#234 this completes the Wave 6 "done when" path in code: an organization is
   created, connects a repo with its own token, is polled, and sees only its own data.
   Still owed: the GitHub App (needs the owner's account) and the web pages (cursor-agent).
+
+## Addendum 4 (2026-11-27): GitLab, verified before building (#235)
+
+Real anonymous calls to gitlab.com on 2026-11-27, against the public project
+`inkscape/inkscape` (project 3472737, release milestones such as "Inkscape 1.5"):
+
+| Data | REST v4, no token | GraphQL, no token |
+|---|---|---|
+| Merge requests (state, dates, milestone, labels, description) | 200 | 200 |
+| MR approvals (`approved_by`, rules) | 200 | 200 (`approvedBy`) |
+| MR pipelines, project pipelines (status, sha, ref) | 200 | not checked |
+| Issues with milestone (title, state, dates, description) | 200 | 200 |
+| Group milestones with start and due dates | not checked | 200 (`includeDescendants`) |
+| Project milestones list | **401** | empty (Inkscape's are group milestones) |
+| MR / issue notes and discussions | **401** | 200, system notes included ("approved this merge request", "requested review from ...") |
+| Milestone and label history (`resource_milestone_events`, `resource_label_events`, `resource_state_events`) | **401** | not in system notes: 0 milestone and 0 label notes in 532 system notes over 50 issues and 30 MRs |
+
+Rate limit, from the response headers: `throttle_unauthenticated_api`, 500 requests per
+window, with `ratelimit-remaining` and `ratelimit-reset` exposed, so backoff can follow the
+headers. GitLab's terms let you read public projects through the API. Contributor
+usernames come back, as on GitHub: they would be stored for computation only and never
+shown (CLAUDE.md section 10).
+
+**What this means:**
+- **Review flow works without a token.** Review rounds come from the review requests and
+  approvals in the system notes, plus approvals and pipelines. Time to first review and
+  review depth can be computed as for GitHub.
+- **Release membership history does not.** Without `resource_milestone_events`, an issue
+  that was in a milestone and was moved out cannot be found. CLAUDE.md section 6 requires
+  discovering every item that was ever in a release, and backtests need history. Current
+  state only would repeat the mistake the GraphQL timeline rule fixed on GitHub.
+- **A read-only token fixes it.** A personal access token with `read_api` from any free
+  gitlab.com account makes the resource-event endpoints readable for public projects.
+  Not verified yet, because it needs an account.
+
+**Decision:** build the GitLab collector after a `read_api` token exists (owner, one free
+account, stored as a secret reference). It would use GraphQL for nested data and REST
+resource events for history, through the shared HTTP client. Until then nothing is built
+on partial data, and #235 waits on that one input. The proof dataset is `inkscape/inkscape`,
+with group milestones as releases and MRs that close issues as links.
