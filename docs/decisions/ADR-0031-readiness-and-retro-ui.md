@@ -6,7 +6,10 @@
 ## Context
 
 Wave 5 shows a go/no-go and a retro from facts ADR-0032 already computes. The
-readiness backtest failed, so the page must say "not validated" (principle 5).
+readiness backtest failed
+([docs/results/readiness-backtest-20261126T171219Z.json](../results/readiness-backtest-20261126T171219Z.json):
+false no-go 0.119 against the 0.05 limit), so the page must say "not validated"
+(principle 5).
 Said versus showed puts meeting items next to that day's snapshot. The snapshot
 counts are for the whole release, not for one risk, so the page must not claim a
 risk was raised before, after, or never against the platform. Both screens are
