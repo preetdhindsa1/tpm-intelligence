@@ -31,7 +31,7 @@ class FakeGitHub:
     """Routes REST and GraphQL calls to fixtures; records what was asked."""
 
     search_hits: list[int] = field(default_factory=lambda: [143709, 143644])
-    fail_search: bool = False  # HTTP 502 on PR search only
+    fail_search: bool | str = False  # PR search only: True/"502", "429" (long wait), "timeout"
     search_count: Any = None  # callable(query) -> issueCount, for split tests
     requests: list[httpx.Request] = field(default_factory=list)
     graphql_queries: list[dict[str, Any]] = field(default_factory=list)
@@ -70,6 +70,10 @@ class FakeGitHub:
     def _graphql(self, body: dict[str, Any]) -> httpx.Response:
         query, variables = body["query"], body.get("variables", {})
         if self.fail_search and "query SearchPRs" in query:
+            if self.fail_search == "timeout":
+                raise httpx.ReadTimeout("search timed out")
+            if self.fail_search == "429":
+                return httpx.Response(429, headers={"retry-after": "99999"})
             return httpx.Response(502)
         self.graphql_queries.append(body)
         if "query IssueTimeline" in query:
@@ -246,6 +250,25 @@ def test_failed_stream_is_counted_and_others_still_run() -> None:
     poller2, _, _ = make_poller(FakeGitHub(fail_search=True), store)
     poller2.run(backfill=True)
     assert store.failures[poller.prs_stream] == 2  # "2 failed polls in a row" alert input
+
+
+@pytest.mark.parametrize("failure", ["502", "429", "timeout"])
+def test_every_failure_keeps_the_cursor_and_the_data(failure: str) -> None:
+    """GitHub down, rate-limited too long, or timing out (ADR-0036): the stream's cursor
+    stays, the failure is counted, and the other stream still syncs and publishes."""
+    store = InMemoryCursorStore()
+    first, _, _ = make_poller(FakeGitHub(), store)
+    first.run(backfill=True)
+    before = store.cursors[first.prs_stream]
+    poller, transport, _ = make_poller(FakeGitHub(fail_search=failure), store)
+    stats = poller.run()
+    assert stats.failed_streams == [poller.prs_stream]
+    assert store.cursors[poller.prs_stream] == before
+    assert store.failures[poller.prs_stream] == 1
+    assert published(transport)  # the issues stream still ran
+    [prs] = [h for h in store.health() if h.stream == poller.prs_stream]
+    assert prs.consecutive_failures == 1
+    assert prs.last_success_at is not None  # the earlier success is kept for freshness
 
 
 def test_search_range_is_split_while_over_1000_results() -> None:

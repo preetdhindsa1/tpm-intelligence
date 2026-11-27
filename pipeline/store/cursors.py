@@ -14,6 +14,15 @@ from pipeline.store.models import SyncCursor
 from pipeline.store.session import session_scope
 
 
+@dataclass(frozen=True)
+class StreamHealth:
+    """One stream's sync health, without its error text (it may hold URLs; ADR-0036)."""
+
+    stream: str
+    last_success_at: datetime | None
+    consecutive_failures: int
+
+
 class CursorStore(Protocol):
     """Where collectors keep their position per stream."""
 
@@ -36,6 +45,7 @@ class InMemoryCursorStore:
 
     cursors: dict[str, str | None] = field(default_factory=dict)
     failures: dict[str, int] = field(default_factory=dict)
+    successes: dict[str, datetime] = field(default_factory=dict)
 
     def get(self, stream: str) -> str | None:
         """Current cursor."""
@@ -45,11 +55,17 @@ class InMemoryCursorStore:
         """Advance and reset failures."""
         self.cursors[stream] = cursor
         self.failures[stream] = 0
+        self.successes[stream] = at
 
     def record_failure(self, stream: str, error: str, at: datetime) -> int:
         """Count a failure."""
         self.failures[stream] = self.failures.get(stream, 0) + 1
         return self.failures[stream]
+
+    def health(self) -> list[StreamHealth]:
+        """Every stream seen."""
+        streams = sorted({*self.failures, *self.successes})
+        return [StreamHealth(s, self.successes.get(s), self.failures.get(s, 0)) for s in streams]
 
 
 class PostgresCursorStore:
@@ -96,3 +112,9 @@ class PostgresCursorStore:
         ).returning(SyncCursor.consecutive_failures)
         with session_scope(self._factory) as session:
             return int(session.execute(stmt).scalar_one())
+
+    def health(self) -> list[StreamHealth]:
+        """Every stream of the current tenant (row-level security), for freshness."""
+        cols = (SyncCursor.stream, SyncCursor.last_success_at, SyncCursor.consecutive_failures)
+        with session_scope(self._factory) as session:
+            return [StreamHealth(*row) for row in session.execute(select(*cols)).all()]

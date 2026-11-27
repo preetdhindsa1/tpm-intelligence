@@ -318,6 +318,10 @@ class ReleaseService:
                 out.append(f"{project_}:{name}")
         return out
 
+    def clock(self) -> datetime:
+        """The service's "now" (fixed in tests and replays)."""
+        return self._now()
+
     def resolve(self, release: str) -> str:
         """Release key for ``kubernetes:v1.38``, or a bare name that is unique (``4.4.0``).
 

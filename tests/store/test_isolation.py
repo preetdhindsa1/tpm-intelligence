@@ -174,3 +174,20 @@ def test_deleting_a_tenant_removes_all_its_rows_and_nothing_else(app_engine: Eng
     with use_tenant("system"), factory() as s:
         actions = s.scalars(text("SELECT action FROM audit_log WHERE target = 'doomed'")).all()
         assert actions == ["tenant_deleted"]
+
+
+def test_sync_health_is_per_tenant(app_engine: Engine) -> None:
+    """Freshness (ADR-0036) reads only the asking tenant's collector streams."""
+    from pipeline.store.cursors import PostgresCursorStore
+
+    store = PostgresCursorStore(sessionmaker(app_engine))
+    stream = "github:acme/web:prs:v9.99"
+    with use_tenant("acme"):
+        store.record_success(stream, None, NOW)
+        store.record_failure(stream, "HttpError: https://example.test/secret-path", NOW)
+        [row] = [h for h in store.health() if h.stream == stream]
+        assert (row.last_success_at, row.consecutive_failures) == (NOW, 1)
+    with use_tenant("demo"):
+        assert stream not in {h.stream for h in store.health()}
+    with use_tenant("acme"), sessionmaker(app_engine)() as s, s.begin():
+        s.execute(text("DELETE FROM sync_cursors WHERE stream = :s"), {"s": stream})
