@@ -1057,10 +1057,19 @@ def create_app(
                         logger.exception("portfolio: %s:%s failed", team.project, name)
                         skipped.append({"team": team.id, "reason": "release could not be computed"})
                         continue
-                    facts.append(_program_facts(team, v, skipped, live))
+                    row = _program_facts(team, v, skipped, live)
+                    try:
+                        if retros is not None and retros.has_run(row.key):
+                            row = replace(row, has_retro=True)
+                    except Exception:
+                        logger.exception("portfolio: retro for %s unavailable", row.key)
+                    facts.append(row)
                 span.set_attribute("portfolio.programs", len(facts))
                 span.set_attribute("portfolio.skipped", len(skipped))
-                return portfolio(facts, skipped, datetime.now(UTC), frozenset(live))
+                from api.validation import load_readiness_validation
+
+                validated = {"readiness": load_readiness_validation().validated}
+                return portfolio(facts, skipped, datetime.now(UTC), frozenset(live), validated)
 
         return PortfolioOut.model_validate(await run_in_threadpool(build))
 

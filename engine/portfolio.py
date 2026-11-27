@@ -60,6 +60,7 @@ class ProgramFacts:
     lab: LabFacts | None = None
     code_freeze_label: str = "Code Freeze"  # the team's own name for its code_freeze date
     raid_suggested: int = 0  # RAID items waiting for a person (#225)
+    has_retro: bool = False  # a retro replay is stored for this release (#252)
 
 
 def stage(dates: dict[str, datetime | None], now: datetime) -> dict[str, Any]:
@@ -252,6 +253,7 @@ def program(p: ProgramFacts) -> dict[str, Any]:
         "planning_tool": p.planning_tool,
         "code_tools": list(p.code_tools),
         "has_lab": p.lab is not None,
+        "has_retro": p.has_retro,
         "code_freeze_label": p.code_freeze_label,
         "as_of": p.as_of,
         "dates": p.dates,
@@ -322,9 +324,18 @@ def _sort_key(p: ProgramFacts) -> tuple[datetime, str]:
     return (p.dates.get("release_at") or datetime.max.replace(tzinfo=p.as_of.tzinfo), p.key)
 
 
-def coming_next(live: frozenset[str] = frozenset()) -> list[dict[str, str]]:
-    """The Wave 4/5 modules; ``live`` names those with real data (#225), else ``planned``."""
-    return [{**m, "status": "live" if m["module"] in live else "planned"} for m in COMING_NEXT]
+def coming_next(
+    live: frozenset[str] = frozenset(), validated: dict[str, bool] | None = None
+) -> list[dict[str, Any]]:
+    """The Wave 4/5 modules; ``live`` names those with real data (#225), else ``planned``.
+
+    ``validated`` (#252): True or False for a module with a backtested model (readiness),
+    None for one with no model to validate (RAID items, retro facts), so a live but
+    unvalidated module can say so (CLAUDE.md principle 5).
+    """
+    known = validated or {}
+    return [{**m, "status": "live" if m["module"] in live else "planned",
+             "validated": known.get(m["module"])} for m in COMING_NEXT]  # fmt: skip
 
 
 def portfolio(
@@ -332,6 +343,7 @@ def portfolio(
     skipped: list[dict[str, str]],
     now: datetime,
     live: frozenset[str] = frozenset(),
+    validated: dict[str, bool] | None = None,
 ) -> dict[str, Any]:
     """The whole ``GET /portfolio`` body (docs/api/ux-v1-contract.md)."""
     facts = sorted(facts, key=_sort_key)
@@ -348,6 +360,6 @@ def portfolio(
         "programs": [program(p) for p in facts],
         "waiting_on_you": items,
         "across_programs": across(facts),
-        "coming_next": coming_next(live),
+        "coming_next": coming_next(live, validated),
         "skipped": skipped,
     }

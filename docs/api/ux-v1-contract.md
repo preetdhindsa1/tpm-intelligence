@@ -205,9 +205,9 @@ All live programs at once. No query parameters. Example built from the live data
     }
   ],
   "coming_next": [
-    {"module": "raid", "name": "RAID tracker", "status": "planned"},
-    {"module": "readiness", "name": "Release readiness", "status": "planned"},
-    {"module": "retro", "name": "Retro insights", "status": "planned"}
+    {"module": "raid", "name": "RAID tracker", "status": "planned", "validated": null},
+    {"module": "readiness", "name": "Release readiness", "status": "planned", "validated": false},
+    {"module": "retro", "name": "Retro insights", "status": "planned", "validated": null}
   ],
   "skipped": []
 }
@@ -237,7 +237,8 @@ All live programs at once. No query parameters. Example built from the live data
 | `next_decision.kind`, `waiting_on_you[].kind` | string | `approve_exec_update` (ref has `update_id`), `review_link_suggestions`, `review_raid` (suggested RAID items, #225), `classify_prs`. |
 | `waiting_on_you[]` | object | Everything a person must act on, across programs, in that kind order, then by program order. |
 | `across_programs[]` | object | ADR-0025 rule 7. `kind`: `late_code` \| `review_gap` \| `unlinked_load`. Present only when its fact is above zero. `unlinked_open_prs` counts distinct pull requests, not per-SIG load (`GET /releases/{name}/load` has that). |
-| `coming_next[]` | object | The Wave 4/5 modules. `status` is `live` when the module has real data (RAID: a stored item for any program; readiness: rules on the real store; retro: a stored replay), else `planned` (#225). Synthetic fixtures never make a module live. They carry no numbers. |
+| `programs[].has_retro` | bool | A retro replay is stored for this program's release (#252): link Learn to `/retro` only when true. |
+| `coming_next[]` | object | The Wave 4/5 modules. `status` is `live` when the module has real data (RAID: a stored item for any program; readiness: rules on the real store; retro: a stored replay), else `planned` (#225). Synthetic fixtures never make a module live. `validated` (#252): `true`/`false` for a module with a backtested model (readiness: the newest ADR-0032 backtest), `null` for one with nothing to validate (RAID, retro). Show "Live · not validated" when `status` is `live` and `validated` is `false`. They carry no numbers. |
 | `skipped[]` | `{team, reason}` | What could not be read. Reasons: `no release yet` and `release could not be computed` (the team has no row in `programs`); `exec updates could not be read`, `link suggestions could not be read` and `RAID items could not be read` (the team **keeps** its row, and its waiting items may be incomplete). One team can appear in both `programs` and `skipped`: show the row and the note, never drop the row. |
 
 ### Where each example number comes from (2026-11-24)
