@@ -186,3 +186,25 @@ the existing gateway, now per tenant.
   includes the tenant.
 - **Connector changes are audited**, with the new config (references only, never secret
   values). Adding a team beyond `max_teams` is refused (409).
+
+## Addendum 3 (2026-11-27): collection per tenant (#233 part 2)
+
+- **The tenant travels with each event.** `EventPublisher` stamps `tenant_id` on every
+  queue message and refuses to publish with no tenant. The consumer stores each message
+  for its own tenant: batches are split per tenant, a failed group falls back to one
+  message at a time without blocking the others, and the worker's own tenant does not
+  decide anything. A message from before this change has no tenant and is the demo's,
+  which it was.
+- **Release dates in the config.** `calendar` takes either `path` (a file in this
+  repository, as the demo teams do) or inline `releases` (a tenant that signs up). Exactly
+  one is allowed, and the dates must be in order. `connectors.load.team_calendar()` reads
+  either; the poller and `release_plan` use it.
+- **One scheduled poll for every organization.** `python -m collectors.github_poller
+  --all-tenants` polls each private tenant's teams under that tenant, with its own token,
+  for the release its calendar says is running (cycle started, shipped at most 7 days
+  ago). A team with no current release or no token is skipped and logged. One tenant's
+  failure does not stop the others. Scheduling it in the cloud is one Cloud Scheduler
+  job, a Terraform change that waits for the owner.
+- With #231–#234 this completes the Wave 6 "done when" path in code: an organization is
+  created, connects a repo with its own token, is polled, and sees only its own data.
+  Still owed: the GitHub App (needs the owner's account) and the web pages (cursor-agent).

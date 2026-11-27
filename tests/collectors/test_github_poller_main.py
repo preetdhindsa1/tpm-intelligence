@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from typing import Any
 
 import pytest
 
@@ -102,3 +103,52 @@ def test_since_needs_backfill_and_a_date(polled: list[tuple[str, str]], argv: li
         entry.main(["--poll", "ok=r1", *argv])
     assert exc.value.code == 2
     assert polled == []
+
+
+def test_current_release_is_the_running_cycle() -> None:
+    from collectors.github_poller.calendar import Calendar, ReleaseDates
+
+    def rel(name: str, start: int, ship: int) -> ReleaseDates:
+        return ReleaseDates(name=name, cycle_start=datetime(2027, start, 1, tzinfo=UTC),
+                            enhancements_freeze=datetime(2027, start, 10, tzinfo=UTC),
+                            code_freeze=datetime(2027, start, 20, tzinfo=UTC),
+                            release=datetime(2027, ship, 1, tzinfo=UTC), source_url="")  # fmt: skip
+
+    cal = Calendar(project="acme", releases=(rel("1", 1, 3), rel("2", 3, 5)))
+    assert entry.current_release(cal, datetime(2027, 2, 1, tzinfo=UTC)) == "1"
+    assert entry.current_release(cal, datetime(2027, 3, 5, tzinfo=UTC)) == "2"  # newest wins
+    assert entry.current_release(cal, datetime(2026, 6, 1, tzinfo=UTC)) is None
+
+
+def test_all_tenants_takes_no_explicit_polls() -> None:
+    with pytest.raises(SystemExit) as exc:
+        entry.main(["--all-tenants", "--poll", "kubernetes=v1.38"])
+    assert exc.value.code == 2
+
+
+def test_all_tenants_polls_each_team_under_its_own_tenant(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from connectors.load import set_team_source
+    from connectors.schema import TeamConfig
+    from pipeline.store.tenancy import current_tenant
+    from tests.api.test_connectors_api import WEB
+    from tests.connectors.test_tenant_teams import INLINE
+
+    team = TeamConfig.model_validate({**WEB, "calendar": INLINE})
+    set_team_source(lambda t: {team.id: team} if t in ("acme", "globex") else {})
+    monkeypatch.setattr(entry, "private_tenants", lambda: ["acme", "globex"])
+    monkeypatch.setenv("TENANT_ACME_GITHUB_TOKEN", "a-token")  # globex has none: skipped
+    seen: list[tuple[str | None, str, str]] = []
+
+    def fake(team_id: str, release: str, *, token: str, backfill: bool, **_: Any) -> int:
+        seen.append((current_tenant.get(), release, token))
+        return 0
+
+    monkeypatch.setattr(entry, "_poll_team", fake)
+    try:
+        code = entry._poll_all_tenants(backfill=False, now=datetime(2027, 2, 1, tzinfo=UTC))
+    finally:
+        set_team_source(None)
+    assert code == 0
+    assert seen == [("acme", "2027.1", "a-token")]

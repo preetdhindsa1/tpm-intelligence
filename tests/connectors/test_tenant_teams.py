@@ -77,3 +77,41 @@ def test_team_secret_is_the_demo_env_or_the_tenants_ref(
         web = load_teams()["acme-web"]
         assert team_secret(web, "github", "GITHUB_TOKEN") == "acme-token"
         assert team_secret(web, "jira", "JIRA_TOKEN") is None  # no ref: no demo fallback
+
+
+INLINE = {"releases": [{"name": "2027.1", "cycle_start": "2027-01-04T00:00:00Z",
+                        "enhancements_freeze": "2027-01-18T12:00:00Z",
+                        "code_freeze": "2027-02-15T12:00:00Z",
+                        "release": "2027-02-22T00:00:00Z"}]}  # fmt: skip
+
+
+def test_a_tenant_writes_its_release_dates_in_the_config() -> None:
+    from connectors.load import release_plan, team_calendar
+
+    team = TeamConfig.model_validate({**WEB, "calendar": INLINE})
+    calendar = team_calendar(team)
+    assert calendar is not None
+    assert calendar.project == "acme-web"
+    assert calendar.get("2027.1").code_freeze.isoformat() == "2027-02-15T12:00:00+00:00"
+    assert set(release_plan(team)) == {"2027.1"}
+
+
+@pytest.mark.parametrize(
+    "calendar",
+    [
+        {},  # neither
+        {"path": "x.yaml", **INLINE},  # both
+        {"releases": [{**INLINE["releases"][0], "code_freeze": "2026-01-01T00:00:00Z"}]},
+    ],
+)
+def test_a_calendar_needs_one_source_and_ordered_dates(calendar: dict[str, object]) -> None:
+    with pytest.raises(ValueError, match=r"calendar needs exactly one|out of order"):
+        TeamConfig.model_validate({**WEB, "calendar": calendar})
+
+
+def test_the_demo_calendars_are_still_files() -> None:
+    from connectors.load import team_calendar
+
+    k8s = team_calendar(load_teams()["kubernetes"])
+    assert k8s is not None
+    assert "v1.38" in {r.name for r in k8s.releases}
