@@ -425,6 +425,8 @@ class EventRecord(_Tenant, Base):
         Index(None, "subject_kind", "subject_key", "occurred_at"),
         Index(None, "occurred_at"),
         Index(None, "event_type", "occurred_at"),
+        # A tenant's newest id without walking other tenants' newer rows (#258).
+        Index(None, "tenant_id", "id"),
         # One tenant's copy of an event never blocks another's (ADR-0034): two companies
         # may track the same public repository, so event ids repeat across tenants.
         UniqueConstraint("tenant_id", "event_id"),
