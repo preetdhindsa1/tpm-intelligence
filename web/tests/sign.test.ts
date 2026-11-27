@@ -11,6 +11,9 @@ describe("signed actions (ADR-0016)", () => {
     expect(signature("test-secret", "preetdhindsa1", "1795000000", "GET", "/me", "")).toBe(
       "5211195b921a6b6648f33ac9d12b7b947b684ce85ca04770f6f9956b096db032",
     );
+    expect(signature("test-secret", "preetdhindsa1", "1795000000", "GET", "/tenants/acme/limits", "", "acme")).toBe(
+      "d75ebc52715596913ca9e7b7c17dd3b64b923ab11be0033b09c2de2f31e4e811",
+    );
   });
 
   it("signs nothing when nobody is signed in or no secret is set", () => {
@@ -19,6 +22,10 @@ describe("signed actions (ADR-0016)", () => {
     const h = signedHeaders("s", "a", "POST", "/x", "", 1_795_000_000_000);
     expect(h["x-tpm-user"]).toBe("a");
     expect(h["x-tpm-time"]).toBe("1795000000");
+    expect(h["x-tpm-signature-version"]).toBeUndefined();
+    const v2 = signedHeaders("s", "a", "GET", "/tenants/acme/limits", "", 1_795_000_000_000, "acme");
+    expect(v2["x-tpm-signature-version"]).toBe("2");
+    expect(v2["x-tpm-tenant"]).toBe("acme");
   });
 
   it("refuses paths that could escape the API root", () => {
