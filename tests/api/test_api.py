@@ -752,9 +752,14 @@ def test_dependencies_are_built_once_per_view_and_rebuilt_when_data_changes(
     assert first.json() == again.json()
     assert len(builds) == 1  # served from the stored JSON the second time
     source.events.append(events[-1])  # new Kubernetes data
-    client.get("/releases/v1.38/dependencies?include_removed=false")
-    client.get("/releases/v1.38/features")  # let the view recompute if it went stale
-    assert client.get("/releases/v1.38/dependencies").status_code == 200
+    # A stale view is served at once and recomputed in the background, so ask until the
+    # new view arrives instead of hoping one extra request is enough (it failed under load).
+    import time as _time
+
+    deadline = _time.monotonic() + 30
+    while len(builds) < 2 and _time.monotonic() < deadline:
+        assert client.get("/releases/v1.38/dependencies").status_code == 200
+        _time.sleep(0.05)
     assert len(builds) >= 2  # rebuilt for the new view
 
 
