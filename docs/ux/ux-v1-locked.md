@@ -49,3 +49,13 @@ Design canvas: https://claude.ai/artifact/QLp89uhmoeG8d1ZvXdUKW8 (version label 
 - Phone and tablet checks.
 - A 2-3 person usability test in Play mode.
 - The recorded 2-minute demo video (5 chapters on the front page).
+
+## Addendum (2026-11-26): where RAID, readiness and retro live
+
+The app menu stays Portfolio · Live Cockpit · Decision Studio · AI-native PDLC · Connect your tools. RAID, Readiness and Retro are not new top-level items. Each is a Live Cockpit section of one release, next to Overview, Dependencies, Executive update and Link review:
+
+- `/projects/{project}/releases/{name}/raid`
+- `/projects/{project}/releases/{name}/readiness`
+- `/projects/{project}/releases/{name}/retro`
+
+⌘K lists them as "Live Cockpit · RAID", "Live Cockpit · Readiness" and "Live Cockpit · Retro" for the release in the URL. Launch, on the lifecycle bar, the front-page five stages and the portfolio stage bar, links to that release's readiness. Learn links to that release's retro only when the portfolio says this program has a retro. The screen rules are ADR-0029 and ADR-0031.
