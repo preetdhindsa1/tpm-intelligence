@@ -5,6 +5,7 @@ import Link from "next/link";
 import { api, type FeatureDetail, type Summary } from "@/lib/api";
 import { fetchPodLab, type PodLab } from "@/lib/api-pdlc";
 import { DEMO_CHAPTERS, DEMO_LENGTH, STAGES, fraction, freezeReplay, shortDate, trustTiles, trustProof, verdictSummary, teamCards, PIPELINE, STEP_TAG, TRUST_RULES, type Tag, type WaitingLite } from "@/lib/front";
+import { frontStages, launchLearn } from "@/lib/stages";
 import { MEASURED, VERDICT_LABEL, VERDICT_TONE } from "@/lib/measured";
 import { stageLabel, type Portfolio, type PortfolioProgram } from "@/lib/portfolio";
 import { releasePath } from "@/lib/routes";
@@ -46,7 +47,19 @@ export default async function FrontPage() {
   const facts = await load();
   const programs = facts.portfolio?.programs ?? [];
   const kube = programs.find((p) => p.project.toLowerCase() === "kubernetes");
-  const tourHref = kube ? releasePath(kube.project, kube.release) : programs[0] ? releasePath(programs[0].project, programs[0].release) : "/portfolio";
+  const tour = kube ?? programs[0];
+  const tourHref = tour ? releasePath(tour.project, tour.release) : "/portfolio";
+  const stages = frontStages(
+    STAGES,
+    launchLearn(
+      facts.portfolio?.coming_next,
+      {
+        launch: tour ? releasePath(tour.project, tour.release, "/readiness") : "",
+        learn: tour ? releasePath(tour.project, tour.release, "/retro") : "",
+      },
+      tour?.has_retro === true,
+    ),
+  );
 
   return (
     <div className="-mx-6 -my-6">
@@ -83,9 +96,11 @@ export default async function FrontPage() {
           <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">From plan to launch, every stage has a module</h2>
           <p className="mt-2 text-sm text-slate-600">The same stages appear on every program in the product.</p>
           <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {STAGES.map((s) => (
+            {stages.map((s) => (
               <li key={s.stage} className="flex flex-col rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{s.n} · {s.stage}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  {s.n} · {s.href ? <Link href={s.href} className="hover:text-action hover:underline">{s.stage}</Link> : s.stage}
+                </p>
                 <p className="mt-2 font-heading font-semibold leading-snug">{s.title}</p>
                 <p className="mt-2 flex-1 text-xs leading-5 text-slate-600">{s.body}</p>
                 <p className="mt-4 flex flex-wrap gap-1.5">{s.tags.map((t) => <Pill key={t.text} tag={t} />)}</p>
