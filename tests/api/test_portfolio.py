@@ -25,6 +25,7 @@ PROGRAM_KEYS = {
     "code_tools",
     "code_freeze_label",
     "has_lab",
+    "has_retro",
     "as_of",
     "dates",
     "stage",
@@ -168,3 +169,12 @@ def test_a_broken_raid_store_is_listed_not_hidden() -> None:
     body = _raid_client(Broken()).get("/portfolio").json()
     assert {"team": "kubernetes", "reason": "RAID items could not be read"} in body["skipped"]
     assert body["programs"][0]["key"] == "kubernetes:v1.38"
+
+
+def test_modules_say_whether_they_are_validated() -> None:
+    body = _raid_client(None).get("/portfolio").json()
+    validated = {m["module"]: m["validated"] for m in body["coming_next"]}
+    # The newest readiness backtest failed (ADR-0032 addenda 4-5); RAID and retro have no
+    # model to validate.
+    assert validated == {"raid": None, "readiness": False, "retro": None}
+    assert body["programs"][0]["has_retro"] is False  # no retro store without a database

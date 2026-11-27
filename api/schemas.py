@@ -762,6 +762,7 @@ class PortfolioProgramOut(_Out):
     planning_tool: str
     code_tools: list[str]
     has_lab: bool
+    has_retro: bool = False
     code_freeze_label: str
     as_of: datetime
     dates: dict[str, datetime | None]
@@ -779,5 +780,5 @@ class PortfolioOut(_Out):
     programs: list[PortfolioProgramOut]
     waiting_on_you: list[PortfolioItemOut]
     across_programs: list[dict[str, Any]]
-    coming_next: list[dict[str, str]]
+    coming_next: list[dict[str, Any]]
     skipped: list[dict[str, str]]

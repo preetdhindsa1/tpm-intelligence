@@ -46,6 +46,10 @@ class StoreRetro:
                  raid: Callable[[str], Sequence[RaidItem]]) -> None:  # fmt: skip
         self._store, self._raid = store, raid
 
+    def has_run(self, release_key: str) -> bool:
+        """Whether a retro is stored for this release (the Portfolio links Learn, #252)."""
+        return self._store().latest(release_key) is not None
+
     def has_runs(self) -> bool:
         """Whether any retro has been computed (the Portfolio marks retros live, #225)."""
         return bool(self._store().latest_all())

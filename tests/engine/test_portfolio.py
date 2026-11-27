@@ -215,3 +215,19 @@ def test_raid_alone_is_the_next_decision() -> None:
     row = program(replace(KAFKA, raid_suggested=4))
     assert row["next_decision"] == {"kind": "review_raid", "label": "Review RAID items",
                                     "count": 4, "ref": None}  # fmt: skip
+
+
+def test_coming_next_carries_validation_only_for_modelled_modules() -> None:
+    from engine.portfolio import coming_next
+
+    rows = coming_next(frozenset({"readiness"}), {"readiness": False})
+    assert [(m["module"], m["status"], m["validated"]) for m in rows] == [
+        ("raid", "planned", None), ("readiness", "live", False), ("retro", "planned", None),
+    ]  # fmt: skip
+
+
+def test_has_retro_is_on_the_row() -> None:
+    from dataclasses import replace
+
+    assert program(replace(K, has_retro=True))["has_retro"] is True
+    assert program(K)["has_retro"] is False
