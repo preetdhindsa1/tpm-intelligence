@@ -79,14 +79,22 @@ class PostgresEventSource:
 
     def load_after(self, last_id: int) -> tuple[list[NormalizedEvent], int]:
         """Incremental read ordered by id."""
-        from sqlalchemy import select
+        from sqlalchemy import func, select
 
         from pipeline.store.events_repo import to_event
         from pipeline.store.models import EventRecord
 
         with self._factory() as session:
+            # First the tenant's newest id: an index-only lookup on (tenant_id, id). Without
+            # it, "id > last_id" under row-level security walked every newer row of every
+            # other tenant on each request (575 ms with two tenants of 391k events, #258).
+            newest = session.scalar(select(func.max(EventRecord.id)))
+            if newest is None or newest <= last_id:
+                return [], last_id
             rows = session.scalars(
-                select(EventRecord).where(EventRecord.id > last_id).order_by(EventRecord.id)
+                select(EventRecord)
+                .where(EventRecord.id > last_id, EventRecord.id <= newest)
+                .order_by(EventRecord.id)
             ).all()
             return [to_event(r) for r in rows], (rows[-1].id if rows else last_id)
 

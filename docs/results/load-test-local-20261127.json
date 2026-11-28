@@ -1,0 +1,51 @@
+{
+  "measured_at": "2026-11-27T07:40:00Z",
+  "issue": "#258",
+  "where": "Local Docker on the owner's laptop, not the cloud. Postgres 16; the API and webhook receiver as uv containers; k6 0.54.0 in a container on the same network. Not comparable one-to-one with docs/results/load-test-cloud-20261124*.json (different machine, no network hop).",
+  "setup": {
+    "database": "tpm_load, a copy of the local database migrated to 0017 (then 0018). Tenant demo: 391,486 events (Kubernetes v1.33-v1.38, Kafka 4.2.0-4.5.0, this repo). Tenant acme: a copy of the same 391,486 events and the same team configs (scripts/load/seed_second_tenant.py), so row-level security filters two equally large tenants.",
+    "api_role": "tpm_load_app, NOSUPERUSER NOBYPASSRLS, as the API connects on Cloud SQL. The local superuser bypasses RLS and would hide the cost.",
+    "api": "python -m api.main with WORKER_IN_PROCESS=true (the lean cloud shape, ADR-0017), AUTH_MODE=required; Redis database 5 so the existing local worker could not take the test's events.",
+    "webhooks": "collectors.github_webhooks with TPM_TENANT=demo; signed pull_request deliveries for kubernetes/kubernetes, PR numbers from 990000, title prefix LOADTEST-MARKER.",
+    "script": "scripts/load/two_tenants.js"
+  },
+  "profile": {
+    "reads": "Same pages as 2026-11-24: /releases, /releases/v1.38/summary, /releases/v1.38/features, /releases/v1.38/dependencies, /releases/4.5.0/features, then 1 s sleep. Ramp to 10 users for 70 s, then 20 users for 70 s, per tenant.",
+    "second_tenant": "MODE=two: the same reads for acme, signed (signature v2, X-TPM-Tenant).",
+    "burst": "MODE=two: 20 webhooks/s for 30 s (600 deliveries) starting at 60 s."
+  },
+  "bottleneck_found": {
+    "what": "The API's per-request 'any new events?' read (PostgresEventSource.load_after: id > last_id ORDER BY id) under row-level security walked the primary key past every newer row of the other tenant and filtered them out.",
+    "evidence": "EXPLAIN ANALYZE as tpm_load_app, tenant demo: Index Scan using pk_events, Rows Removed by Filter: 391486, 557-773 ms. The tenant's max(id): 575 ms (backward pk scan, 391,486 rows removed).",
+    "fix": "Migration 0018: index events (tenant_id, id), built concurrently. load_after first reads the tenant's max(id) (index-only scan, 0.7 ms) and returns at once when nothing is new; otherwise it reads the bounded range id > last_id AND id <= newest.",
+    "why_not_seen_before": "One tenant in the cloud today: no other tenant's rows sit above the demo's last id. It appears as soon as a second tenant's events are written after the demo's."
+  },
+  "runs": {
+    "1_demo_reads_before_fix": {"requests": 415, "rps": 2.6, "errors": 0, "p50_ms": 3696.5, "p95_ms": 13913.5, "max_ms": 32091.9, "note": "Code at main 4f5ceaf, two tenants in the database, only the demo reading. Idle cached pages took 0.19-0.51 s each (health 2 ms)."},
+    "2_demo_reads_after_fix": {"requests": 9500, "rps": 67.4, "errors": 0, "p50_ms": 7.4, "p95_ms": 26.3, "max_ms": 167.5},
+    "3_two_tenants_and_burst_a": {"requests": 9605, "rps": 66.5, "errors": 0, "p50_ms": 17.6, "p95_ms": 1089.1, "max_ms": 22160.9, "cross_tenant_leaks": 0},
+    "4_two_tenants_and_burst_b": {
+      "requests": 12321, "rps": 87.3, "errors": 0, "p50_ms": 16.7, "p95_ms": 201.1, "max_ms": 15108.4, "cross_tenant_leaks": 0,
+      "by_tenant_ms": {"demo": {"p50": 14.4, "p95": 178.4, "max": 15108.4}, "acme": {"p50": 22.1, "p95": 244.2, "max": 15009.9}, "webhook_receiver": {"p50": 2.5, "p95": 6.9, "max": 34.2}},
+      "by_page_max_ms": {"/releases": 12107.4, "/releases/v1.38/summary": 15009.9, "/releases/v1.38/features": 15108.4, "/releases/v1.38/dependencies": 12724.7, "/releases/4.5.0/features": 10980.4}
+    },
+    "5_two_tenants_and_burst_c_with_probe": {
+      "requests": 9036, "rps": 64.1, "errors": 0, "p50_ms": 39.7, "p95_ms": 1191.4, "max_ms": 14641.5, "cross_tenant_leaks": 0,
+      "health_probe_every_0_25s": {"n": 560, "p50_s": 0.007, "p95_s": 0.335, "max_s": 2.08},
+      "api_cpu_peak_percent": 108.2,
+      "api_memory_gib": 3.84
+    }
+  },
+  "webhook_ingest": {
+    "deliveries": 600, "accepted": 600,
+    "stored_in_demo": 600, "stored_in_acme": 0,
+    "receiver_to_stored_seconds": {"p50": 0.24, "p95": 1.23, "max": 2.23},
+    "note": "observed_at (receiver) to ingested_at (Postgres) for run 3. Event-to-dashboard push was not measured here; the cloud figure is docs/results/webhook-latency-cloud-20261124T044532Z.json."
+  },
+  "isolation": "0 responses for acme contained the webhook marker in any run, and 0 marker events were stored under acme (600 under demo).",
+  "open_weak_spots": [
+    "Tail stalls during recompute: with 40 readers and a burst, every page (including Kafka 4.5.0, which the burst does not touch) had a max of 11-15 s, and even /health took up to 2.08 s. The API sat at about one full core (108%): CPU-bound in one Python process (recompute threads, garbage collection). Burst alone or one reader alone: no stall (max 0.84 s). Not fixed in this PR; follow-up issue.",
+    "Memory per tenant: API memory 2.11 GiB with the demo warm, 3.84 GiB with both tenants warm (each tenant's ReleaseService keeps its whole event list and views). Cloud Run gives the API 4 GiB, so a third demo-sized tenant would not fit. Follow-up issue.",
+    "Cold start of a private tenant: only the demo is warmed at boot, so acme's first /releases took 47-49 s and its first v1.38 summary 28-32 s. Follow-up issue."
+  ]
+}

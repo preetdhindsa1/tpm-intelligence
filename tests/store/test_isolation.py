@@ -191,3 +191,37 @@ def test_sync_health_is_per_tenant(app_engine: Engine) -> None:
         assert stream not in {h.stream for h in store.health()}
     with use_tenant("acme"), sessionmaker(app_engine)() as s, s.begin():
         s.execute(text("DELETE FROM sync_cursors WHERE stream = :s"), {"s": stream})
+
+
+def test_new_events_check_ignores_other_tenants_newer_rows(app_engine: Engine) -> None:
+    """#258: the older tenant's "anything new?" read neither returns nor walks the other
+    tenant's newer events, and still finds its own next event."""
+    from api.service import PostgresEventSource
+    from pipeline.events import Source, SubjectKind, SubjectRef, WorkItemLabelChanged, new_event
+    from pipeline.store.events_repo import append_events
+
+    def event(n: int) -> Any:
+        ref = SubjectRef(kind=SubjectKind.WORK_ITEM, source=Source.GITHUB,
+                         external_key=f"load/test#{n}")  # fmt: skip
+        return new_event(source=Source.GITHUB, subject=ref, occurred_at=NOW, observed_at=NOW,
+                         identity=(str(n),),
+                         payload=WorkItemLabelChanged(action="added", label="x"))  # type: ignore[arg-type]  # fmt: skip
+
+    factory = sessionmaker(app_engine)
+    source = PostgresEventSource(factory)
+    with use_tenant("demo"), factory() as s, s.begin():
+        append_events(s, [event(1)])
+    with use_tenant("demo"):
+        _, last = source.load_after(0)
+    with use_tenant("acme"), factory() as s, s.begin():
+        append_events(s, [event(2), event(3)])  # newer ids, another tenant
+    with use_tenant("demo"):
+        assert source.load_after(last) == ([], last)
+    with use_tenant("demo"), factory() as s, s.begin():
+        append_events(s, [event(4)])
+    with use_tenant("demo"):
+        new, newest = source.load_after(last)
+    assert [e.subject.external_key for e in new] == ["load/test#4"]
+    assert newest > last
+    with use_tenant("acme"):
+        assert {e.subject.external_key for e in source.load_after(0)[0]} >= {"load/test#2"}
