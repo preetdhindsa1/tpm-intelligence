@@ -1,0 +1,59 @@
+{
+ "id": "cursor-v138-w08-docs",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-10-21",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "   * Docs (APAC:[participant]/[participant] | EMEA:[participant] / [participant]):\n   * Current Status: Green\nWhat's happened since last week  \n   * Last week’s branch sync PR has been merged\n   * Release Notes for v1.38.0-alpha.2 has been created and currently waiting review/approval\n   * 3rd and 4th PR Placeholder reminder for KEP owners has been completed on Slack\n   * Reminder has been sent on the chairs-and-techleads channel for Docs placeholder deadline by [participant]\nImportant dates & upcoming work\n   * We will continue the last outreach for Docs Placeholder reminders on Slack and Github\n   * Release Notes for v1.38.0-alpha.3 creation: 21st Oct 2026 by [participant] and review by [participant]\n   * Next k/website weekly sync: 23rd Oct by [participant]\n   * Docs Placeholder deadline: Thursday 29 October 2026 (AoE)\n              Total tracked KEPs: 86\n   * Missing Placeholder PR:  21 (~24 % remaining)\n   * Draft PR: 49\n   * PR Ready for Review: 9\n   * No Docs Needed: 7\n   * Merged: 0",
+ "expected": [
+  {
+   "type": "risk",
+   "quote": "Release Notes for v1.38.0-alpha.2 has been created and currently waiting review/approval",
+   "owner": "Docs"
+  },
+  {
+   "type": "action",
+   "quote": "We will continue the last outreach for Docs Placeholder reminders on Slack and Github",
+   "owner": "Docs"
+  },
+  {
+   "type": "action",
+   "quote": "Release Notes for v1.38.0-alpha.3 creation: 21st Oct 2026 by [participant] and review by [participant]",
+   "owner": "Docs"
+  },
+  {
+   "type": "risk",
+   "quote": "Missing Placeholder PR:  21 (~24 % remaining)",
+   "owner": "Docs"
+  }
+ ],
+ "optional": [
+  {
+   "type": "action",
+   "quote": "Next k/website weekly sync: 23rd Oct by [participant]",
+   "owner": "Docs"
+  },
+  {
+   "type": "issue",
+   "quote": "Missing Placeholder PR:  21 (~24 % remaining)",
+   "owner": "Docs"
+  }
+ ]
+}

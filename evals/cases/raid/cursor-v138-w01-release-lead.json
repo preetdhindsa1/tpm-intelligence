@@ -1,0 +1,44 @@
+{
+ "id": "cursor-v138-w01-release-lead",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-02",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Release Lead ([participant]/ [participant]):\n      * All of the action items and progress can be found in https://github.com/kubernetes/sig-release/issues/3087\n      * Release schedule still in progress, please take a look!\n      * Still need to sort access for everyone, I’ll get everything merged by this week.\n      * Shadows are being finalized",
+ "expected": [
+  {
+   "type": "action",
+   "quote": "Release schedule still in progress, please take a look!",
+   "owner": "Release Lead"
+  },
+  {
+   "type": "action",
+   "quote": "Still need to sort access for everyone, I’ll get everything merged by this week.",
+   "owner": "Release Lead"
+  }
+ ],
+ "optional": [
+  {
+   "type": "risk",
+   "quote": "Release schedule still in progress, please take a look!",
+   "owner": "Release Lead"
+  }
+ ]
+}

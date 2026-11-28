@@ -1,0 +1,53 @@
+{
+ "id": "cursor-v138-w03-release-signal",
+ "seed": false,
+ "independent": true,
+ "author": "cursor-agent",
+ "release_key": "kubernetes:v1.38",
+ "workstream": "K8S",
+ "source": {
+  "document": "Kubernetes v1.38 release team meeting notes (public Google Doc)",
+  "url": "https://docs.google.com/document/d/1fkUQyLupx_jkPcXtWmxnmVVVMj7KHRizx_yBRxJMOw0",
+  "meeting_date": "2026-09-16",
+  "fetched_at": "2026-11-26T22:40:00Z",
+  "note": "One team's full Updates block. Names masked as [participant]. Independent case written by cursor-agent. The extractor was not run."
+ },
+ "teams": [
+  "Enhancements",
+  "Release Signal",
+  "Docs",
+  "Comms",
+  "Release Branch Management",
+  "Subproject Leads",
+  "Release Lead"
+ ],
+ "notes": "      * Release Signal (APAC: [participant] / [participant], EMEA: [participant] / [participant]):\n      * Current Status: Red\n      * Flaky tests which are awaiting the signal from the responsible sig\n      * sig-api-machinary\n      * sig-release-master-blocking#gce-cos-master-default: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] updates the published spec when one version gets renamed [Conformance]\n      * sig-release-master-blocking#gce-ubuntu-master-containerd: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for multiple CRDs of same group but different versions [Conformance]\n      * sig-release-master-blocking#gce-cos-master-default: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] removes definition from spec when one version gets changed to not be served [Conformance]\n      * sig-release-master-blocking#gce-ubuntu-master-containerd: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for multiple CRDs of same group and version but different kinds [Conformance]\n      * sig-release-master-blocking#integration-64-master: [sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.oidc\n      * Internal Team Assignment Sheet\n      * CI Signal Board\n      * Bug Triage Board\n      * Release blocking Issues (0)\n      * Release blocking PRs (0)\n      * Query: open non-test/flake k/k issues for v1.38 (0)\n      * priority/critical-urgent issues (0)\n      * priority/important-soon issues (0)\n      * Query: open k/k PRs for v1.38 (0)\n      * priority/critical-urgent PRs (0)\n      * priority/important-soon PRs (0)\n      * Query: ALL open k/k issues for v1.38 (0) (incl. this query (0)) \n      * Updates:\n      * Scheduled an onboarding shadow meeting at Thursday, Sep 17th.\n      * Created the Internal Team Assignment Sheet.",
+ "expected": [
+  {
+   "type": "issue",
+   "quote": "sig-release-master-blocking#gce-cos-master-default: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] updates the published spec when one version gets renamed [Conformance]",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "sig-release-master-blocking#gce-ubuntu-master-containerd: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for multiple CRDs of same group but different versions [Conformance]",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "sig-release-master-blocking#gce-cos-master-default: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] removes definition from spec when one version gets changed to not be served [Conformance]",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "sig-release-master-blocking#gce-ubuntu-master-containerd: [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for multiple CRDs of same group and version but different kinds [Conformance]",
+   "owner": "Release Signal"
+  },
+  {
+   "type": "issue",
+   "quote": "sig-release-master-blocking#integration-64-master: [sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.oidc",
+   "owner": "Release Signal"
+  }
+ ],
+ "optional": []
+}
